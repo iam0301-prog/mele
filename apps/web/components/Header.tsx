@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { getServerTestUser } from '@/lib/test-auth-server';
 import { HeaderUserMenu } from './HeaderUserMenu';
 import { MobileHeaderMenu } from './MobileHeaderMenu';
+import { SeaStarLogo } from './SeaStarLogo';
 
 const linkClass =
   'rounded-full border border-accent-dim bg-black/50 px-4 py-1.5 text-xs tracking-widest text-accent backdrop-blur transition-colors hover:border-accent';
@@ -36,9 +37,9 @@ export async function Header() {
     <header className="fixed left-0 right-0 top-0 z-[100] flex items-start justify-between gap-2 px-4 py-3">
       <Link
         href="/"
-        className="rounded-full border border-accent-dim bg-black/45 px-4 py-1.5 text-xs tracking-widest text-accent backdrop-blur transition-colors hover:border-accent"
+        className="header-brand-link"
       >
-        MELE
+        <SeaStarLogo />
       </Link>
 
       <nav className="ml-auto hidden gap-2 md:flex">

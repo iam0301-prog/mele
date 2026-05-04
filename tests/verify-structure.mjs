@@ -376,6 +376,11 @@ const testAuth = readFileSync('apps/web/lib/test-auth.ts', 'utf8');
 const testAuthServer = readFileSync('apps/web/lib/test-auth-server.ts', 'utf8');
 const headerUserMenu = readFileSync('apps/web/components/HeaderUserMenu.tsx', 'utf8');
 const header = readFileSync('apps/web/components/Header.tsx', 'utf8');
+const brandLogo = existsSync('apps/web/components/SeaStarLogo.tsx')
+  ? readFileSync('apps/web/components/SeaStarLogo.tsx', 'utf8')
+  : '';
+const brandGlobalCss = readFileSync('apps/web/app/globals.css', 'utf8');
+const agentGuide = existsSync('AGENTS.md') ? readFileSync('AGENTS.md', 'utf8') : '';
 const cookieConsent = readFileSync('apps/web/components/CookieConsentBanner.tsx', 'utf8');
 log('signup requires consent checkbox state', login.includes('agreed') && login.includes('!agreed'));
 log('signup requires age confirmation', login.includes('ageConfirmed') && login.includes('未滿 13 歲不得自行註冊'));
@@ -384,6 +389,24 @@ log('login supports resending signup confirmation email', login.includes("auth.r
 log('local test auth is gated to localhost free test mode', testAuth.includes('NEXT_PUBLIC_ENABLE_FREE_BOOKING_TEST_MODE') && testAuth.includes('isLocalTestHost') && testAuth.includes('localhost'));
 log('login offers local test auth fallback', login.includes('使用本機測試帳號') && login.includes('setClientTestAuth') && login.includes('canUseClientTestAuth'));
 log('server header recognizes local test auth cookie', header.includes('getServerTestUser') && header.includes('testUser'));
+log(
+  'header uses Sea Star brand mark instead of text-only logo',
+  header.includes('SeaStarLogo') &&
+    brandLogo.includes('海底之星') &&
+    brandLogo.includes('MELE') &&
+    brandLogo.includes('sea-star-logo') &&
+    brandGlobalCss.includes('.sea-star-logo'),
+);
+log(
+  'agent handoff guide gives external workers a fast safe path',
+  agentGuide.includes('MELE Agent Handoff') &&
+    agentGuide.includes('Do not scan') &&
+    agentGuide.includes('封測優先順序') &&
+    agentGuide.includes('npm.cmd run release:check') &&
+    agentGuide.includes('登入 / 註冊 / Email / Google / LINE') &&
+    agentGuide.includes('會員點數') &&
+    agentGuide.includes('老師後台'),
+);
 log('local test signout clears browser state', headerUserMenu.includes('clearClientTestAuth'));
 log('charts page allows local test auth without Supabase session', chartsPage.includes('readClientTestUser') && chartsPage.includes('本機測試帳號'));
 log('teacher portal shows demo backend in local test auth', teacherPortalPage.includes('getServerTestUser') && teacherPortalPage.includes('demoTeacher') && teacherPortalPage.includes('本機測試模式'));

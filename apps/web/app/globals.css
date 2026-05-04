@@ -51,6 +51,11 @@ body::before {
 
 /* 共用元件樣式 (Tailwind @apply) */
 @layer components {
+  .header-brand-link {
+    @apply rounded-full border border-accent-dim bg-black/45 px-3 py-1 text-accent
+           backdrop-blur transition-colors hover:border-accent;
+  }
+
   .mele-card {
     @apply rounded-2xl border border-accent-dim bg-white/[0.03] backdrop-blur-xl p-6 md:p-8;
   }
@@ -108,6 +113,87 @@ body::before {
 
   .mele-subtitle {
     @apply font-cormorant text-accent text-sm tracking-[0.5em] uppercase;
+  }
+}
+
+.sea-star-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+  color: #e8c547;
+  line-height: 1;
+}
+
+.sea-star-logo__mark {
+  position: relative;
+  width: 28px;
+  height: 28px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  border: 1px solid rgba(232, 197, 71, 0.72);
+  background:
+    radial-gradient(circle at 50% 50%, rgba(244, 234, 210, 0.95) 0 7%, transparent 8%),
+    conic-gradient(from 18deg, transparent 0deg 18deg, rgba(232, 197, 71, 0.85) 19deg 24deg, transparent 25deg 72deg, rgba(106, 183, 199, 0.75) 73deg 78deg, transparent 79deg 144deg, rgba(232, 197, 71, 0.8) 145deg 150deg, transparent 151deg 216deg, rgba(106, 183, 199, 0.72) 217deg 222deg, transparent 223deg 288deg, rgba(232, 197, 71, 0.78) 289deg 294deg, transparent 295deg 360deg),
+    radial-gradient(circle, rgba(9, 38, 54, 0.96), rgba(4, 12, 22, 0.98));
+  box-shadow:
+    0 0 18px rgba(106, 183, 199, 0.2),
+    inset 0 0 12px rgba(232, 197, 71, 0.14);
+}
+
+.sea-star-logo__mark::before,
+.sea-star-logo__mark::after {
+  content: "";
+  position: absolute;
+  inset: 5px;
+  border-radius: 50%;
+  border: 1px solid rgba(244, 234, 210, 0.22);
+}
+
+.sea-star-logo__mark::after {
+  inset: 8px;
+  transform: rotate(45deg);
+  border-radius: 3px;
+  border-color: rgba(232, 197, 71, 0.62);
+  background: linear-gradient(135deg, rgba(232, 197, 71, 0.1), rgba(106, 183, 199, 0.12));
+}
+
+.sea-star-logo__core {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 1;
+  width: 11px;
+  height: 11px;
+  transform: translate(-50%, -50%) rotate(45deg);
+  background:
+    linear-gradient(90deg, transparent 42%, rgba(244, 234, 210, 0.9) 43% 57%, transparent 58%),
+    linear-gradient(0deg, transparent 42%, rgba(244, 234, 210, 0.9) 43% 57%, transparent 58%);
+  filter: drop-shadow(0 0 6px rgba(232, 197, 71, 0.82));
+}
+
+.sea-star-logo__word {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.sea-star-logo__word span {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.28em;
+}
+
+.sea-star-logo__word small {
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  color: rgba(244, 234, 210, 0.76);
+  white-space: nowrap;
+}
+
+@media (max-width: 420px) {
+  .sea-star-logo__word small {
+    display: none;
   }
 }
 
