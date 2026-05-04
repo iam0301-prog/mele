@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#000000">
+<title>AR 場景 · 命理媒介中心</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600&family=Noto+Sans+TC:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/aframe@1.5.0/dist/aframe-master.min.js"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: #050B16; color: white; font-family: 'Noto Sans TC', sans-serif; overflow: hidden; }
+.input-panel {
+  position: fixed; inset: 0; background: rgba(5,11,22,0.96);
+  display: flex; align-items: center; justify-content: center; z-index: 100; padding: 20px;
+}
+.panel-inner {
+  width: 100%; max-width: 460px;
+  background: rgba(30,45,69,0.4); border: 1px solid rgba(201,162,39,0.3);
+  border-radius: 18px; padding: 30px 24px; backdrop-filter: blur(16px);
+}
+h1 { font-family: 'Noto Serif TC'; color: #C9A227; font-size: 24px; letter-spacing: 4px; text-align: center; }
+.subtitle { text-align: center; color: rgba(255,255,255,0.55); font-size: 11px; letter-spacing: 4px; margin: 6px 0 24px; }
+.input-row { margin-bottom: 16px; }
+.input-row label { display: block; font-size: 13px; color: rgba(255,255,255,0.85); margin-bottom: 6px; }
+.input-row input, .input-row select {
+  width: 100%; padding: 12px 14px; background: rgba(0,0,0,0.4);
+  border: 1px solid rgba(201,162,39,0.3); border-radius: 8px;
+  color: white; font-size: 15px; font-family: inherit;
+}
+.input-row input:focus, .input-row select:focus { outline: none; border-color: #C9A227; }
+.row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.btn {
+  width: 100%; padding: 14px; background: linear-gradient(135deg, #C9A227, #E8C547);
+  border: none; border-radius: 10px; color: #0D1B2A; font-weight: 600;
+  font-size: 15px; letter-spacing: 3px; cursor: pointer; font-family: inherit;
+  margin-top: 8px;
+}
+.btn:disabled { opacity: 0.5; }
+.back-link { display: block; text-align: center; margin-top: 14px; color: rgba(255,255,255,0.6); font-size: 12px; text-decoration: none; }
+.loading {
+  position: fixed; inset: 0; background: rgba(5,11,22,0.95);
+  display: none; align-items: center; justify-content: center; z-index: 99;
+  flex-direction: column; gap: 14px;
+}
+.loading .spin { font-size: 36px; color: #C9A227; animation: spin 1.4s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* AR HUD */
+.hud-bar {
+  position: fixed; top: env(safe-area-inset-top, 0); left: 0; right: 0;
+  padding: 14px; display: flex; justify-content: space-between; align-items: center;
+  z-index: 50; pointer-events: none;
+}
+.hud-bar > * { pointer-events: auto; }
+.hud-btn {
+  background: rgba(0,0,0,0.6); border: 1px solid rgba(201,162,39,0.3); color: #C9A227;
+  border-radius: 20px; padding: 8px 14px; font-size: 13px; cursor: pointer;
+  backdrop-filter: blur(10px); font-family: inherit;
+}
+.info-panel {
+  position: fixed; bottom: env(safe-area-inset-bottom, 0); left: 0; right: 0;
+  padding: 16px; background: linear-gradient(to top, rgba(5,11,22,0.95), rgba(5,11,22,0)); z-index: 50;
+}
+.info-card {
+  background: rgba(13,27,42,0.85); border: 1px solid rgba(201,162,39,0.3);
+  border-radius: 14px; padding: 14px 18px; backdrop-filter: blur(12px);
+}
+.info-card .title { color: #C9A227; font-family: 'Noto Serif TC'; font-size: 14px; letter-spacing: 2px; margin-bottom: 4px; }
+.info-card .body { font-size: 13px; line-height: 1.8; color: rgba(255,255,255,0.9); }
+.action-row { display: flex; gap: 8px; margin-top: 10px; }
+.action-row button {
+  flex: 1; padding: 8px; background: transparent; border: 1px solid rgba(201,162,39,0.3);
+  color: #C9A227; border-radius: 8px; font-size: 12px; cursor: pointer; font-family: inherit;
+}
+.toast {
+  position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+  background: rgba(45,106,79,0.95); color: white; padding: 10px 18px; border-radius: 10px;
+  z-index: 200; font-size: 13px;
+}
+.toast.error { background: rgba(184,0,31,0.95); }
+</style>
+</head>
+<body>
+
+<!-- 輸入表單 panel -->
+<div class="input-panel" id="inputPanel">
+  <div class="panel-inner">
+    <h1 id="toolTitle">…</h1>
+    <div class="subtitle" id="toolSub"></div>
+    <div id="formArea"></div>
+    <button class="btn" id="enterBtn">進入 AR ›</button>
+    <a href="./" class="back-link">‹ 返回工具列表</a>
+  </div>
+</div>
+
+<!-- 載入過場 -->
+<div class="loading" id="loading">
+  <div class="spin">◆</div>
+  <div style="color:rgba(255,255,255,0.7);letter-spacing:3px;font-size:13px">運算中…</div>
+</div>
+
+<!-- AR HUD -->
+<div class="hud-bar" id="hud" style="display:none">
+  <a href="./" class="hud-btn">‹ 結束</a>
+  <button class="hud-btn" onclick="toggleSpeech()">🔊 朗讀</button>
+</div>
+
+<div class="info-panel" id="infoPanel" style="display:none">
+  <div class="info-card">
+    <div class="title" id="infoTitle">…</div>
+    <div class="body" id="infoBody">…</div>
+    <div class="action-row">
+      <button onclick="resetView()">重置視角</button>
+      <button onclick="window.location.href='../teachers/index.html'">找老師深聊</button>
+    </div>
+  </div>
+</div>
+
+<!-- A-Frame AR 場景 -->
+<a-scene id="arScene"
+  embedded
+  vr-mode-ui="enabled: false"
+  device-orientation-permission-ui="enabled: true"
+  webxr="optionalFeatures: hit-test, local-floor; requiredFeatures: local"
+  renderer="alpha: true; antialias: true; colorManagement: true"
+  background="color: #050B16"
+  style="display:none">
+
+  <a-assets>
+    <img id="paletteTex" crossorigin="anonymous" src=""/>
+  </a-assets>
+
+  <!-- 環境光 -->
+  <a-entity light="type: ambient; color: #888; intensity: 0.6"></a-entity>
+  <a-entity light="type: directional; color: #C9A227; intensity: 0.8" position="2 4 3"></a-entity>
+
+  <!-- 主呈現容器 -->
+  <a-entity id="container" position="0 0 -2.2">
+    <!-- 動態內容由 JS 注入 -->
+  </a-entity>
+
+  <!-- 攝影機（含可視察角控制） -->
+  <a-entity id="rig" position="0 1.6 0">
+    <a-camera look-controls wasd-controls position="0 0 0"></a-camera>
+  </a-entity>
+</a-scene>
+
+<script type="module">
+import { calc } from '../assets/mele-api.js';
+
+const params = new URLSearchParams(location.search);
+const tool = params.get('tool') || 'numerology';
+
+const TOOLS = {
+  numerology: { name: '靈數', en: 'NUMEROLOGY', fields: ['date'] },
+  maya:       { name: '瑪雅 Kin', en: 'MAYA TZOLKIN', fields: ['date'] },
+  bazi:       { name: '八字', en: 'FOUR PILLARS', fields: ['date', 'time', 'solar'] },
+  ziwei:      { name: '紫微', en: 'PURPLE STAR', fields: ['date', 'time', 'gender'] },
+  tarot:      { name: '塔羅', en: 'TAROT', fields: ['count', 'spread', 'question'] },
+  runes:      { name: '盧恩', en: 'RUNES', fields: ['count', 'question'] },
+  astro:      { name: '占星', en: 'NATAL CHART', fields: ['date', 'time', 'tz', 'latlon'] },
+  humandesign:{ name: '人類圖', en: 'HUMAN DESIGN', fields: ['date', 'time', 'tz'] },
+};
+
+const cfg = TOOLS[tool] || TOOLS.numerology;
+document.getElementById('toolTitle').textContent = cfg.name + ' AR';
+document.getElementById('toolSub').textContent = cfg.en;
+
+// 動態建表單
+const formArea = document.getElementById('formArea');
+let formHtml = '';
+if (cfg.fields.includes('date')) formHtml += `<div class="input-row"><label>生日 *</label><input id="f-date" type="date" required></div>`;
+if (cfg.fields.includes('time')) formHtml += `<div class="input-row"><label>出生時間 *</label><input id="f-time" type="time" required></div>`;
+if (cfg.fields.includes('gender')) formHtml += `<div class="input-row"><label>性別</label><select id="f-gender"><option value="男">男</option><option value="女">女</option></select></div>`;
+if (cfg.fields.includes('tz')) formHtml += `<div class="input-row"><label>時區</label><input id="f-tz" type="number" step="0.5" value="8"></div>`;
+if (cfg.fields.includes('latlon')) formHtml += `<div class="row-2"><div class="input-row"><label>緯度</label><input id="f-lat" type="number" step="0.0001" value="25.0330"></div><div class="input-row"><label>經度</label><input id="f-lon" type="number" step="0.0001" value="121.5654"></div></div>`;
+if (cfg.fields.includes('solar')) formHtml += `<div class="input-row"><label style="display:inline-flex;gap:8px;align-items:center"><input type="checkbox" id="f-solar" checked> 真太陽時校正</label></div>`;
+if (cfg.fields.includes('count')) formHtml += `<div class="input-row"><label>抽幾張</label><select id="f-count"><option value="1">1</option><option value="3" selected>3</option><option value="5">5</option></select></div>`;
+if (cfg.fields.includes('spread')) formHtml += `<div class="input-row"><label>牌陣</label><select id="f-spread"><option value="past-present-future">過去/現在/未來</option><option value="situation-action-outcome">現況/行動/結果</option></select></div>`;
+if (cfg.fields.includes('question')) formHtml += `<div class="input-row"><label>問題（選填）</label><input id="f-question" placeholder="想問的問題"></div>`;
+formArea.innerHTML = formHtml;
+
+// 蒐集表單 → API payload
+function buildPayload() {
+  const get = (id) => document.getElementById(id)?.value;
+  const p = {};
+  if (cfg.fields.includes('date')) {
+    const [y,m,d] = (get('f-date') || '').split('-').map(Number);
+    if (!y) throw new Error('請填生日');
+    Object.assign(p, { year: y, month: m, day: d });
+  }
+  if (cfg.fields.includes('time')) {
+    const [h,mn] = (get('f-time') || '').split(':').map(Number);
+    if (isNaN(h)) throw new Error('請填出生時間');
+    p.hour = h; p.minute = mn || 0;
+  }
+  if (cfg.fields.includes('gender')) p.gender = get('f-gender');
+  if (cfg.fields.includes('tz')) p.timezone = parseFloat(get('f-tz')) || 8;
+  if (cfg.fields.includes('latlon')) {
+    p.latitude = parseFloat(get('f-lat'));
+    p.longitude = parseFloat(get('f-lon'));
+  }
+  if (cfg.fields.includes('solar')) p.longitude = document.getElementById('f-solar').checked ? 121.5 : null;
+  if (cfg.fields.includes('count')) p.count = parseInt(get('f-count'));
+  if (cfg.fields.includes('spread')) p.spread = get('f-spread');
+  if (cfg.fields.includes('question')) p.question = get('f-question');
+  if (tool === 'tarot' || tool === 'runes') p.reversed_enabled = true;
+  return p;
+}
+
+// 進入 AR
+let currentResult = null;
+let speechEnabled = false;
+
+document.getElementById('enterBtn').onclick = async () => {
+  let payload;
+  try { payload = buildPayload(); } catch (e) { return showToast(e.message, true); }
+
+  document.getElementById('inputPanel').style.display = 'none';
+  document.getElementById('loading').style.display = 'flex';
+
+  try {
+    currentResult = await calc(tool, payload);
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('arScene').style.display = 'block';
+    document.getElementById('hud').style.display = 'flex';
+    document.getElementById('infoPanel').style.display = 'block';
+    renderInAR(currentResult);
+  } catch (e) {
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('inputPanel').style.display = 'flex';
+    showToast('運算失敗：' + e.message, true);
+  }
+};
+
+function renderInAR(result) {
+  const container = document.getElementById('container');
+  container.innerHTML = '';
+
+  // 主視覺：把 SVG 轉成 data URL，貼在 A-Frame plane 上
+  const svgB64 = btoa(unescape(encodeURIComponent(result.render.svg)));
+  const svgDataUrl = `data:image/svg+xml;base64,${svgB64}`;
+
+  // 中央浮空命盤（會緩慢旋轉）
+  const main = document.createElement('a-entity');
+  main.innerHTML = `
+    <a-image src="${svgDataUrl}" width="2.4" height="2.4"
+             position="0 0.2 0"
+             animation="property: rotation; to: 0 360 0; loop: true; dur: 60000; easing: linear">
+    </a-image>
+    <a-text value="${cfg.name}" align="center" position="0 1.5 0"
+            color="#C9A227" font="https://cdn.aframe.io/fonts/Roboto-msdf.json"
+            scale="0.8 0.8 0.8"></a-text>
+  `;
+  container.appendChild(main);
+
+  // 用 palette 圍繞放發光球體（活靈活現）
+  const palette = result.render.palette || ['#C9A227'];
+  palette.slice(0, 6).forEach((color, i) => {
+    const angle = (i / Math.max(palette.length, 6)) * Math.PI * 2;
+    const x = Math.cos(angle) * 1.8;
+    const z = Math.sin(angle) * 1.8;
+    const orb = document.createElement('a-sphere');
+    orb.setAttribute('position', `${x} 0.2 ${z}`);
+    orb.setAttribute('radius', '0.08');
+    orb.setAttribute('color', color);
+    orb.setAttribute('material', 'emissive: ' + color + '; emissiveIntensity: 0.8');
+    orb.setAttribute('animation', 'property: position; to: ' + x + ' 0.5 ' + z + '; dir: alternate; loop: true; dur: 3000');
+    container.appendChild(orb);
+  });
+
+  // 底部資訊卡
+  document.getElementById('infoTitle').textContent = `${cfg.name} 結果`;
+  document.getElementById('infoBody').textContent = result.render.speech || '已生成命盤，可圍繞觀察';
+
+  // 嘗試啟用 immersive-ar
+  const scene = document.getElementById('arScene');
+  if ('xr' in navigator && navigator.xr.isSessionSupported) {
+    navigator.xr.isSessionSupported('immersive-ar').then((supported) => {
+      if (supported) {
+        const enterAR = document.createElement('button');
+        enterAR.className = 'hud-btn';
+        enterAR.textContent = '⊹ 進入 AR';
+        enterAR.style.position = 'fixed';
+        enterAR.style.left = '50%';
+        enterAR.style.top = '60px';
+        enterAR.style.transform = 'translateX(-50%)';
+        enterAR.style.zIndex = '60';
+        enterAR.onclick = () => scene.enterVR(); // A-Frame 會自動切到 AR
+        document.body.appendChild(enterAR);
+      }
+    });
+  }
+}
+
+window.toggleSpeech = function () {
+  if (!currentResult?.render?.speech) return;
+  if (speechEnabled) {
+    speechSynthesis.cancel();
+    speechEnabled = false;
+  } else {
+    const u = new SpeechSynthesisUtterance(currentResult.render.speech);
+    u.lang = 'zh-TW';
+    u.rate = 1.0;
+    speechSynthesis.speak(u);
+    speechEnabled = true;
+    u.onend = () => { speechEnabled = false; };
+  }
+};
+
+window.resetView = function () {
+  const rig = document.getElementById('rig');
+  rig.setAttribute('rotation', '0 0 0');
+  rig.setAttribute('position', '0 1.6 0');
+  showToast('視角已重置');
+};
+
+function showToast(msg, isError = false) {
+  const t = document.createElement('div');
+  t.className = 'toast' + (isError ? ' error' : '');
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 2500);
+}
+</script>
+</body>
+</html>

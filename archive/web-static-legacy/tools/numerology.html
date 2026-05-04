@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>靈數 · 命理媒介中心</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Noto+Serif+TC:wght@400;600;700&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
+<style>
+.mele-result svg { max-width: 100%; height: auto; display: block; margin: 0 auto; }
+.cta-after { background: linear-gradient(135deg, rgba(201,162,39,0.12), rgba(201,162,39,0.04)); border: 1px solid var(--accent); border-radius: 14px; padding: 24px; margin-top: 30px; text-align: center; }
+.toolbar { display:flex; gap:8px; justify-content:center; margin-top:14px; flex-wrap:wrap; }
+.toolbar button { background:transparent; border:1px solid var(--accent-dim); color:var(--accent); padding:6px 14px; font-size:12px; border-radius:18px; cursor:pointer; }
+</style>
+</head>
+<body>
+<div class="container">
+  <a href="../" style="color:var(--accent);text-decoration:none;font-size:13px;letter-spacing:2px">‹ 回首頁</a>
+
+  <header style="padding:30px 0">
+    <div class="ornament">◆ ◆ ◆</div>
+    <h1>靈數</h1>
+    <div class="subtitle">NUMEROLOGY</div>
+    <div style="margin-top:20px;color:rgba(255,255,255,0.7);font-size:13px;line-height:1.9">
+      Pythagorean 派 · 生命靈數 + 天賦數 · 大師數 (11/22/33) 自動偵測
+    </div>
+  </header>
+
+  <div class="card">
+    <div class="section-title">輸入生日</div>
+    <div class="section-subtitle">BIRTH DATE</div>
+    <div class="input-row"><label>生日 *</label><input id="date" type="date" required></div>
+    <button class="btn-primary" id="calcBtn">排盤 ›</button>
+  </div>
+
+  <div id="result"></div>
+</div>
+
+<script src="../assets/config.js"></script>
+<script type="module">
+import { calc, mountResult, showLoading, showError, recordChart } from '../assets/mele-api.js';
+import { supabase, getCurrentUser, toast } from '../assets/supabase-client.js';
+
+const result = document.getElementById('result');
+
+document.getElementById('calcBtn').onclick = async () => {
+  const date = document.getElementById('date').value;
+  if (!date) return toast('請填寫生日', 'error');
+  const [year, month, day] = date.split('-').map(Number);
+
+  showLoading(result, '靈數運算中…');
+  try {
+    const r = await calc('numerology', { year, month, day });
+    mountResult(result, r);
+
+    // 加 CTA + 朗讀 + 重抽 toolbar
+    const cta = document.createElement('div');
+    cta.className = 'cta-after';
+    cta.innerHTML = `
+      <div style="font-family:'Noto Serif TC';font-size:18px;color:var(--accent);margin-bottom:10px">想深入了解你的能量藍圖？</div>
+      <a href="../teachers/index.html?spec=靈數" class="btn-primary" style="text-decoration:none;display:inline-block">找老師深入諮詢 ›</a>
+      <div class="toolbar">
+        <button onclick="window.speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(${JSON.stringify(r.render.speech || '')});u.lang='zh-TW';speechSynthesis.speak(u)">🔊 朗讀</button>
+      </div>
+    `;
+    result.appendChild(cta);
+
+    const user = await getCurrentUser();
+    await recordChart(supabase, user, 'numerology', { year, month, day }, r.data);
+  } catch (e) {
+    showError(result, e.message);
+  }
+};
+</script>
+</body>
+</html>

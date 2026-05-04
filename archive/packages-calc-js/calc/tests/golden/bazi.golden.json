@@ -1,0 +1,107 @@
+{
+  "tool": "bazi",
+  "version": "1.0.0",
+  "method": "lunar-javascript（github.com/6tail/lunar-javascript, MIT）— 中國農曆/八字/節氣標準庫，遵循《萬年曆》。",
+  "source": "獨立驗證來源：(a) 公開《萬年曆》查表；(b) Steve Jobs 八字為網路公認；(c) 立春/節氣為公開天文資料。",
+  "cases": [
+    {
+      "id": "b-001",
+      "label": "Steve Jobs 1955-02-24 19:15 (網路公認八字)",
+      "input": { "year": 1955, "month": 2, "day": 24, "hour": 19, "minute": 15 },
+      "expected": {
+        "pillars": { "year": "乙未", "month": "戊寅", "day": "丙辰", "time": "戊戌" },
+        "dayMaster": "丙",
+        "dayMasterElement": "火"
+      },
+      "verification": "公開記載"
+    },
+    {
+      "id": "b-002",
+      "label": "萬年曆 1900-01-01 12:00 (日柱甲戌)",
+      "input": { "year": 1900, "month": 1, "day": 1, "hour": 12, "minute": 0 },
+      "expected": {
+        "pillars": { "year": "己亥", "month": "丙子", "day": "甲戌", "time": "庚午" },
+        "dayMaster": "甲",
+        "dayMasterElement": "木"
+      },
+      "verification": "萬年曆查表"
+    },
+    {
+      "id": "b-003",
+      "label": "中華人民共和國成立 1949-10-01 15:00",
+      "input": { "year": 1949, "month": 10, "day": 1, "hour": 15, "minute": 0 },
+      "expected": {
+        "pillars": { "year": "己丑", "month": "癸酉", "day": "甲子", "time": "壬申" },
+        "dayMaster": "甲"
+      },
+      "verification": "歷史公開日期"
+    },
+    {
+      "id": "b-004",
+      "label": "Y2K 2000-01-01 00:00 (sect 2 default)",
+      "input": { "year": 2000, "month": 1, "day": 1, "hour": 0, "minute": 0 },
+      "expected": {
+        "pillars": { "year": "己卯", "month": "丙子", "day": "戊午", "time": "壬子" },
+        "dayMaster": "戊"
+      },
+      "verification": "回歸守門 + 萬年曆"
+    },
+    {
+      "id": "b-005",
+      "label": "立春前 2024-02-04 16:00 (16:27 立春，仍屬 2023 年柱)",
+      "input": { "year": 2024, "month": 2, "day": 4, "hour": 16, "minute": 0 },
+      "expected": {
+        "pillars": { "year": "癸卯", "month": "乙丑", "day": "戊戌", "time": "庚申" },
+        "dayMaster": "戊"
+      },
+      "verification": "立春節氣為年柱邊界"
+    },
+    {
+      "id": "b-006",
+      "label": "立春後 2024-02-04 17:00 (進入 2024 年柱)",
+      "input": { "year": 2024, "month": 2, "day": 4, "hour": 17, "minute": 0 },
+      "expected": {
+        "pillars": { "year": "甲辰", "month": "丙寅", "day": "戊戌", "time": "辛酉" },
+        "dayMaster": "戊"
+      },
+      "verification": "立春節氣為年柱邊界（甲辰年確認）"
+    },
+    {
+      "id": "b-007",
+      "label": "晚子時 sect 2 (default): 2023-12-31 23:30 仍算當日",
+      "input": { "year": 2023, "month": 12, "day": 31, "hour": 23, "minute": 30, "sect": 2 },
+      "expected": {
+        "pillars": { "year": "癸卯", "month": "甲子", "day": "癸亥", "time": "甲子" }
+      },
+      "verification": "sect 2 規則"
+    },
+    {
+      "id": "b-008",
+      "label": "晚子時 sect 1 (傳統): 2023-12-31 23:30 算次日",
+      "input": { "year": 2023, "month": 12, "day": 31, "hour": 23, "minute": 30, "sect": 1 },
+      "expected": {
+        "pillars": { "year": "癸卯", "month": "甲子", "day": "甲子", "time": "甲子" }
+      },
+      "verification": "sect 1 規則"
+    },
+    {
+      "id": "b-009",
+      "label": "次日凌晨 2024-01-01 00:30",
+      "input": { "year": 2024, "month": 1, "day": 1, "hour": 0, "minute": 30 },
+      "expected": {
+        "pillars": { "year": "癸卯", "month": "甲子", "day": "甲子", "time": "甲子" }
+      },
+      "verification": "60甲子日柱連續性（前一日為癸亥，次日為甲子）"
+    },
+    {
+      "id": "b-010",
+      "label": "Recent 2024-04-27 12:00",
+      "input": { "year": 2024, "month": 4, "day": 27, "hour": 12, "minute": 0 },
+      "expected": {
+        "pillars": { "year": "甲辰", "month": "戊辰", "day": "辛酉", "time": "甲午" },
+        "dayMaster": "辛"
+      },
+      "verification": "回歸守門"
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "name": "@mele/calc",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.js",
+  "exports": {
+    ".": "./src/index.js",
+    "./numerology": "./src/numerology.js",
+    "./maya": "./src/maya.js",
+    "./bazi": "./src/bazi.js",
+    "./tarot": "./src/tarot.js",
+    "./runes": "./src/runes.js",
+    "./astro": "./src/astro.js",
+    "./ziwei": "./src/ziwei.js",
+    "./humandesign": "./src/humandesign.js"
+  },
+  "dependencies": {
+    "@mele/data": "*"
+  }
+}

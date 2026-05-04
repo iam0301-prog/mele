@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>我的諮詢 · 命理媒介中心</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Noto+Serif+TC:wght@400;600;700&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
+<style>
+.booking-card {
+  border: 1px solid var(--accent-dim);
+  border-radius: 12px;
+  padding: 18px 20px;
+  margin-bottom: 14px;
+  background: rgba(255,255,255,0.02);
+}
+.booking-row { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; }
+.b-time { font-family: "Noto Serif TC"; font-size: 18px; color: var(--accent); }
+.b-meta { font-size: 13px; color: rgba(255,255,255,0.7); }
+.b-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.b-actions button { padding: 8px 16px; font-size: 12px; }
+</style>
+</head>
+<body>
+<div class="container">
+  <header style="padding:20px 0">
+    <h1 style="font-size:32px">我的諮詢</h1>
+    <div class="subtitle">MY BOOKINGS</div>
+  </header>
+
+  <div class="card">
+    <div class="tabs">
+      <div class="tab active" data-status="upcoming">即將諮詢</div>
+      <div class="tab" data-status="past">已完成</div>
+      <div class="tab" data-status="cancelled">已取消</div>
+    </div>
+    <div id="list"></div>
+  </div>
+
+  <div style="text-align:center;margin-top:20px">
+    <a href="charts.html" style="color:var(--accent);font-size:13px;letter-spacing:2px;text-decoration:none">→ 我的排盤紀錄</a>
+    &nbsp;|&nbsp;
+    <a href="profile.html" style="color:var(--accent);font-size:13px;letter-spacing:2px;text-decoration:none">→ 個人資料</a>
+    &nbsp;|&nbsp;
+    <a href="../teachers/index.html" style="color:var(--accent);font-size:13px;letter-spacing:2px;text-decoration:none">→ 找老師</a>
+  </div>
+</div>
+
+<!-- 評價 modal -->
+<div class="modal-backdrop" id="reviewModal">
+  <div class="modal">
+    <div class="section-title">為這次諮詢評價</div>
+    <div class="section-subtitle">REVIEW</div>
+    <div class="input-row">
+      <label>評分</label>
+      <div id="ratingStars" style="font-size:32px;cursor:pointer"></div>
+    </div>
+    <div class="input-row">
+      <label>評論（選填）</label>
+      <textarea id="reviewComment" placeholder="諮詢過程、老師印象、收穫..."></textarea>
+    </div>
+    <div class="input-row">
+      <label><input type="checkbox" id="anonReview"> 匿名評價（你的名字不會公開）</label>
+    </div>
+    <div class="flex-row">
+      <button class="btn-primary" id="submitReview">送出</button>
+      <button class="btn-secondary" onclick="document.getElementById('reviewModal').classList.remove('show')">取消</button>
+    </div>
+  </div>
+</div>
+
+<script src="../assets/config.js"></script>
+<script type="module">
+import { supabase, getCurrentUser, toast } from '../assets/supabase-client.js';
+
+let currentTab = 'upcoming';
+let reviewBookingId = null;
+let reviewRating = 5;
+
+document.querySelectorAll('.tab').forEach((t) => {
+  t.onclick = () => {
+    document.querySelectorAll('.tab').forEach((x) => x.classList.remove('active'));
+    t.classList.add('active');
+    currentTab = t.dataset.status;
+    load();
+  };
+});
+
+async function load() {
+  const user = await getCurrentUser();
+  if (!user) { location.href = 'login.html?return=' + encodeURIComponent(location.href); return; }
+
+  const now = new Date().toISOString();
+  let q = supabase.from('bookings').select('*, teachers(display_name, line_url, instagram), teacher_services(name)').eq('customer_id', user.id);
+  if (currentTab === 'upcoming') {
+    q = q.in('status', ['pending', 'paid', 'confirmed', 'in_progress']).gte('scheduled_at', now).order('scheduled_at');
+  } else if (currentTab === 'past') {
+    q = q.eq('status', 'completed').order('scheduled_at', { ascending: false });
+  } else {
+    q = q.in('status', ['cancelled_customer', 'cancelled_teacher', 'refunded', 'no_show']).order('scheduled_at', { ascending: false });
+  }
+  const { data, error } = await q;
+  if (error) return toast(error.message, 'error');
+
+  const el = document.getElementById('list');
+  if (!data || !data.length) {
+    el.innerHTML = `<div class="empty-state"><div class="icon">○</div>沒有紀錄</div>`;
+    return;
+  }
+
+  // 取出已評價的 booking ids（避免重複評）
+  const completedIds = data.filter((b) => b.status === 'completed').map((b) => b.id);
+  const { data: reviewedRows } = await supabase.from('reviews').select('booking_id').in('booking_id', completedIds);
+  const reviewedSet = new Set((reviewedRows || []).map((r) => r.booking_id));
+
+  el.innerHTML = data.map((b) => `
+    <div class="booking-card">
+      <div class="booking-row">
+        <div>
+          <div class="b-time">${new Date(b.scheduled_at).toLocaleString('zh-TW', { dateStyle: 'long', timeStyle: 'short' })}</div>
+          <div class="b-meta">老師：${b.teachers?.display_name || '?'} · ${b.teacher_services?.name || ''} (${b.duration_minutes} 分)</div>
+          <div class="b-meta">狀態：<span class="status-badge status-${b.status.includes('cancel') ? 'rejected' : b.status === 'completed' ? 'active' : 'reviewing'}">${labelStatus(b.status)}</span></div>
+          ${b.customer_question ? `<div class="b-meta" style="margin-top:8px">問題：${b.customer_question.substring(0, 80)}${b.customer_question.length > 80 ? '...' : ''}</div>` : ''}
+        </div>
+        <div class="b-actions">
+          ${b.status === 'pending' ? `<button class="btn-primary">前往付款</button>` : ''}
+          ${(b.status === 'paid' || b.status === 'confirmed') ? `
+            ${b.teachers?.line_url ? `<a href="${b.teachers.line_url}" target="_blank" class="btn-secondary" style="text-decoration:none">LINE</a>` : ''}
+            <button class="btn-secondary" onclick="cancelBooking('${b.id}', '${b.scheduled_at}')">取消</button>
+          ` : ''}
+          ${b.status === 'completed' && !reviewedSet.has(b.id) ? `<button class="btn-primary" onclick="openReview('${b.id}')">評價</button>` : ''}
+          ${b.status === 'completed' && !b.followup_question ? `<button class="btn-secondary" onclick="askFollowup('${b.id}')">免費追問</button>` : ''}
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function labelStatus(s) {
+  return ({
+    pending: '待付款', paid: '已付款', confirmed: '已確認', in_progress: '進行中',
+    completed: '已完成', cancelled_customer: '客戶取消',
+    cancelled_teacher: '老師取消', refunded: '已退款', no_show: '未出席',
+  }[s] || s);
+}
+
+window.cancelBooking = async (id, scheduledAt) => {
+  const hours = (new Date(scheduledAt).getTime() - Date.now()) / 3600000;
+  const refund = hours >= 24 ? '全額退款' : hours > 0 ? '退 50%' : '無法退款';
+  if (!confirm(`確定取消？預計：${refund}`)) return;
+  const { error } = await supabase.from('bookings').update({
+    status: 'cancelled_customer',
+    cancelled_at: new Date().toISOString(),
+    cancellation_reason: '客戶自行取消',
+  }).eq('id', id);
+  if (error) return toast(error.message, 'error');
+  toast('已取消');
+  load();
+};
+
+window.askFollowup = async (id) => {
+  const q = prompt('追問內容（限一次免費）：');
+  if (!q) return;
+  const { error } = await supabase.from('bookings').update({
+    followup_question: q,
+    followup_used_at: new Date().toISOString(),
+  }).eq('id', id);
+  if (error) return toast(error.message, 'error');
+  toast('追問已送出，老師將在 7 天內回覆');
+  load();
+};
+
+window.openReview = (id) => {
+  reviewBookingId = id;
+  reviewRating = 5;
+  renderStars();
+  document.getElementById('reviewComment').value = '';
+  document.getElementById('anonReview').checked = false;
+  document.getElementById('reviewModal').classList.add('show');
+};
+
+function renderStars() {
+  const el = document.getElementById('ratingStars');
+  el.innerHTML = [1,2,3,4,5].map((n) =>
+    `<span style="color:${n <= reviewRating ? '#FFD700' : 'rgba(255,255,255,0.3)'}" onclick="setStar(${n})">★</span>`
+  ).join('');
+}
+window.setStar = (n) => { reviewRating = n; renderStars(); };
+
+document.getElementById('submitReview').onclick = async () => {
+  const user = await getCurrentUser();
+  // 取得 teacher_id from booking
+  const { data: bk } = await supabase.from('bookings').select('teacher_id').eq('id', reviewBookingId).single();
+  if (!bk) return toast('找不到預約', 'error');
+  const { error } = await supabase.from('reviews').insert({
+    booking_id: reviewBookingId,
+    customer_id: user.id,
+    teacher_id: bk.teacher_id,
+    rating: reviewRating,
+    comment: document.getElementById('reviewComment').value.trim() || null,
+    is_anonymous: document.getElementById('anonReview').checked,
+  });
+  if (error) return toast(error.message, 'error');
+  toast('評價成功 ✦');
+  document.getElementById('reviewModal').classList.remove('show');
+  load();
+};
+
+load();
+</script>
+</body>
+</html>

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>我的排盤紀錄 · 命理媒介中心</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Noto+Serif+TC:wght@400;600;700&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
+<style>
+.chart-row { display:grid; grid-template-columns: 60px 1fr 100px 60px; gap:14px; align-items:center; padding:12px 14px; border:1px solid var(--accent-dim); border-radius:10px; margin-bottom:10px; background:rgba(255,255,255,0.03); }
+.chart-row .ic { font-size:20px; color:var(--accent); text-align:center; }
+.chart-row .nm { font-family:'Noto Serif TC'; font-size:14px; color:var(--accent); letter-spacing:1px; }
+.chart-row .meta { font-size:12px; color:rgba(255,255,255,0.6); margin-top:2px; }
+.chart-row .date { font-size:12px; color:rgba(255,255,255,0.5); text-align:right; }
+.chart-row button { background:transparent; border:1px solid var(--accent-dim); color:#ff8a8a; padding:5px 10px; font-size:11px; border-radius:6px; cursor:pointer; }
+.tool-filter { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:18px; }
+.tool-filter .chip { padding:6px 12px; border:1px solid var(--accent-dim); border-radius:14px; cursor:pointer; font-size:12px; }
+.tool-filter .chip.on { background:var(--accent); color:var(--primary); border-color:var(--accent); }
+</style>
+</head>
+<body>
+<div class="container" style="max-width:760px">
+  <a href="../" style="color:var(--accent);text-decoration:none;font-size:13px;letter-spacing:2px">‹ 回首頁</a>
+
+  <header style="padding:30px 0">
+    <div class="ornament">◆ ◆ ◆</div>
+    <h1>我的排盤紀錄</h1>
+    <div class="subtitle">MY CHARTS</div>
+  </header>
+
+  <div id="needLogin" class="card" style="display:none;text-align:center">
+    <div style="font-size:14px;margin:20px 0">請先登入才看得到自己的紀錄</div>
+    <a href="login.html" class="btn-primary" style="text-decoration:none">前往登入</a>
+  </div>
+
+  <div id="main" style="display:none">
+    <div class="card">
+      <div class="section-title">過去排盤</div>
+      <div class="section-subtitle">你做過的所有免費排盤都會留存在這裡，方便日後諮詢老師時調用</div>
+
+      <div class="tool-filter" id="filter">
+        <span class="chip on" data-t="">全部</span>
+        <span class="chip" data-t="bazi">八字</span>
+        <span class="chip" data-t="ziwei">紫微</span>
+        <span class="chip" data-t="astro">占星</span>
+        <span class="chip" data-t="humandesign">人類圖</span>
+        <span class="chip" data-t="numerology">靈數</span>
+        <span class="chip" data-t="maya">瑪雅</span>
+        <span class="chip" data-t="tarot">塔羅</span>
+        <span class="chip" data-t="runes">盧恩</span>
+      </div>
+
+      <div id="list"></div>
+    </div>
+  </div>
+</div>
+
+<script src="../assets/config.js"></script>
+<script type="module">
+import { supabase, getCurrentUser, toast } from '../assets/supabase-client.js';
+
+const ICONS = { bazi:'命', ziwei:'紫', astro:'☉', humandesign:'⊹', numerology:'數', maya:'⊕', tarot:'⚭', runes:'ᚠ' };
+const NAMES = { bazi:'八字', ziwei:'紫微', astro:'占星', humandesign:'人類圖', numerology:'靈數', maya:'瑪雅', tarot:'塔羅', runes:'盧恩' };
+
+let user, currentFilter = '';
+
+(async () => {
+  user = await getCurrentUser();
+  if (!user) { document.getElementById('needLogin').style.display = 'block'; return; }
+  document.getElementById('main').style.display = 'block';
+  load();
+})();
+
+document.querySelectorAll('#filter .chip').forEach(c => c.onclick = () => {
+  document.querySelectorAll('#filter .chip').forEach(x => x.classList.remove('on'));
+  c.classList.add('on');
+  currentFilter = c.dataset.t;
+  load();
+});
+
+async function load() {
+  let q = supabase.from('chart_records').select('*').eq('user_id', user.id).order('created_at', { ascending: false }).limit(100);
+  if (currentFilter) q = q.eq('tool', currentFilter);
+  const { data, error } = await q;
+  if (error) return toast(error.message, 'error');
+  const el = document.getElementById('list');
+  if (!data || !data.length) {
+    el.innerHTML = `<div style="text-align:center;padding:50px;color:rgba(255,255,255,0.5)">
+      還沒有排盤紀錄。<br><a href="../tools/bazi.html" style="color:var(--accent)">去排一個八字 ›</a>
+    </div>`;
+    return;
+  }
+  el.innerHTML = data.map(c => {
+    const summary = summarize(c.tool, c.input_data, c.output_data);
+    return `<div class="chart-row">
+      <div class="ic">${ICONS[c.tool] || '?'}</div>
+      <div>
+        <div class="nm">${NAMES[c.tool] || c.tool}</div>
+        <div class="meta">${summary}</div>
+      </div>
+      <div class="date">${new Date(c.created_at).toLocaleDateString('zh-TW')}<br>${new Date(c.created_at).toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'})}</div>
+      <button onclick="window.delChart('${c.id}')">刪除</button>
+    </div>`;
+  }).join('');
+}
+
+function summarize(tool, input, output) {
+  if (tool === 'bazi' || tool === 'ziwei') {
+    const d = input?.date || `${input?.year}-${String(input?.month).padStart(2,'0')}-${String(input?.day).padStart(2,'0')}`;
+    return `${d} ${input?.h ?? input?.hour ?? '?'}:${String(input?.mn ?? input?.minute ?? '00').padStart(2,'0')}`;
+  }
+  if (tool === 'numerology' || tool === 'maya') {
+    return `${input?.year}-${String(input?.month).padStart(2,'0')}-${String(input?.day).padStart(2,'0')}`;
+  }
+  if (tool === 'tarot' || tool === 'runes') {
+    const c = output?.cards?.length || output?.runes?.length || input?.count || 0;
+    return `${c} 張 / ${input?.spread || input?.question?.slice(0,20) || '無題'}`;
+  }
+  if (tool === 'astro' || tool === 'humandesign') {
+    return `${input?.y}-${String(input?.m).padStart(2,'0')}-${String(input?.d).padStart(2,'0')} (${input?.lat || '?'}, ${input?.lon || '?'})`;
+  }
+  return '';
+}
+
+window.delChart = async (id) => {
+  if (!confirm('刪除這筆排盤紀錄？')) return;
+  await supabase.from('chart_records').delete().eq('id', id);
+  toast('已刪除'); load();
+};
+</script>
+</body>
+</html>

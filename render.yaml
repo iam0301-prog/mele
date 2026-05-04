@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: mele-api
+    env: docker
+    plan: starter
+    rootDir: python_api
+    healthCheckPath: /ready
+    autoDeploy: false
+    envVars:
+      - key: MELE_ALLOWED_ORIGINS
+        sync: false
+      - key: MELE_RATE_LIMIT_MAX_REQUESTS
+        value: "90"
+      - key: MELE_RATE_LIMIT_WINDOW_SECONDS
+        value: "60"
+      - key: MELE_HEAVY_MAX_CONCURRENCY
+        value: "4"

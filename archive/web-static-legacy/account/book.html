@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>預約諮詢 · 命理媒介中心</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Noto+Serif+TC:wght@400;600;700&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
+<style>
+.steps {
+  display: flex; justify-content: space-between; margin-bottom: 30px;
+  position: relative;
+}
+.steps::before {
+  content: ''; position: absolute; top: 14px; left: 0; right: 0;
+  height: 2px; background: var(--accent-dim); z-index: 0;
+}
+.step {
+  flex: 1; text-align: center; position: relative; z-index: 1;
+}
+.step .num {
+  width: 30px; height: 30px; border-radius: 50%;
+  background: var(--primary); border: 2px solid var(--accent-dim);
+  display: inline-flex; align-items: center; justify-content: center;
+  color: rgba(255,255,255,0.5); font-size: 13px;
+}
+.step.done .num { background: var(--accent); color: var(--primary); border-color: var(--accent); }
+.step.current .num { background: var(--primary); color: var(--accent); border-color: var(--accent); border-width: 2.5px; }
+.step .label { font-size: 11px; color: rgba(255,255,255,0.6); margin-top: 6px; letter-spacing: 1px; }
+.step.current .label, .step.done .label { color: var(--accent); }
+
+.timeslot {
+  display: inline-block; padding: 8px 14px; margin: 4px;
+  border: 1px solid var(--accent-dim); border-radius: 8px;
+  cursor: pointer; font-size: 13px; transition: all .2s;
+}
+.timeslot:hover { border-color: var(--accent); }
+.timeslot.selected { background: var(--accent); color: var(--primary); border-color: var(--accent); font-weight: 600; }
+.timeslot.disabled { opacity: 0.3; cursor: not-allowed; }
+</style>
+</head>
+<body>
+<div class="container">
+  <header style="padding:20px 0">
+    <h1 style="font-size:32px">預約諮詢</h1>
+    <div class="subtitle">BOOK A SESSION</div>
+  </header>
+
+  <div class="card">
+    <div class="steps">
+      <div class="step current" data-step="1"><div class="num">1</div><div class="label">確認服務</div></div>
+      <div class="step" data-step="2"><div class="num">2</div><div class="label">選擇時段</div></div>
+      <div class="step" data-step="3"><div class="num">3</div><div class="label">填寫問題</div></div>
+      <div class="step" data-step="4"><div class="num">4</div><div class="label">確認付款</div></div>
+    </div>
+
+    <!-- Step 1: 服務確認 -->
+    <div id="step1">
+      <div id="serviceInfo"></div>
+      <div class="flex-row" style="margin-top:24px">
+        <button class="btn-primary" onclick="goStep(2)">下一步 ›</button>
+      </div>
+    </div>
+
+    <!-- Step 2: 選時段 -->
+    <div id="step2" style="display:none">
+      <div class="section-title">選擇諮詢時段</div>
+      <div class="section-subtitle">PICK A TIME</div>
+      <div id="timeslots"></div>
+      <div class="flex-row" style="margin-top:24px">
+        <button class="btn-secondary" onclick="goStep(1)">‹ 上一步</button>
+        <button class="btn-primary" id="step2Next" onclick="goStep(3)" disabled>下一步 ›</button>
+      </div>
+    </div>
+
+    <!-- Step 3: 填問題 + 簡易排盤 -->
+    <div id="step3" style="display:none">
+      <div class="section-title">告訴老師你的狀況</div>
+      <div class="section-subtitle">YOUR QUESTION</div>
+
+      <div class="input-row">
+        <label>你想問的主要問題（老師會在諮詢前看過）*</label>
+        <textarea id="question" required placeholder="可以是「我目前的職業方向適合我嗎？」、「最近感情卡住的原因？」等具體問題..."></textarea>
+      </div>
+
+      <div style="background:rgba(201,162,39,0.08);border:1px solid var(--accent-dim);border-radius:10px;padding:18px;margin:16px 0">
+        <div style="font-size:13px;color:var(--accent);margin-bottom:10px">★ 自動產生簡易排盤（老師打開即看到）</div>
+        <div class="input-row">
+          <label>排盤工具</label>
+          <select id="chartTool">
+            <option value="">不附排盤</option>
+            <option value="bazi">八字</option>
+            <option value="ziwei">紫微斗數</option>
+            <option value="numerology">靈數</option>
+            <option value="astro">占星本命盤</option>
+            <option value="humandesign">人類圖</option>
+            <option value="maya">瑪雅 Kin</option>
+          </select>
+        </div>
+        <div id="chartFields" style="display:none">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+            <div class="input-row"><label>出生日期</label><input id="birthDate" type="date"></div>
+            <div class="input-row"><label>出生時間（盡可能精確）</label><input id="birthTime" type="time"></div>
+          </div>
+          <div class="input-row" id="genderRow" style="display:none">
+            <label>性別</label>
+            <select id="gender"><option>男</option><option>女</option></select>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex-row" style="margin-top:24px">
+        <button class="btn-secondary" onclick="goStep(2)">‹ 上一步</button>
+        <button class="btn-primary" onclick="goStep(4)">下一步 ›</button>
+      </div>
+    </div>
+
+    <!-- Step 4: 確認 + 付款 -->
+    <div id="step4" style="display:none">
+      <div class="section-title">確認預約</div>
+      <div class="section-subtitle">REVIEW & PAY</div>
+      <div id="summary"></div>
+
+      <div style="background:rgba(0,0,0,0.3);border-radius:10px;padding:16px;margin:20px 0;font-size:13px;line-height:1.8">
+        <strong style="color:var(--accent)">取消政策</strong><br>
+        • 諮詢前 24 小時取消：全額退款<br>
+        • 諮詢前 24 小時內取消：退 50%<br>
+        • 諮詢開始後不予退款<br>
+        • 老師取消：100% 退款 + 補償方案
+      </div>
+
+      <div class="flex-row">
+        <button class="btn-secondary" onclick="goStep(3)">‹ 上一步</button>
+        <button class="btn-primary" id="confirmBtn">確認並付款</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="../assets/config.js"></script>
+<script type="module">
+import { supabase, getCurrentUser, toast } from '../assets/supabase-client.js';
+
+const params = new URLSearchParams(location.search);
+const teacherId = params.get('teacher');
+const serviceId = params.get('service');
+
+let teacher, service, selectedSlot;
+
+function goStep(n) {
+  for (let i = 1; i <= 4; i++) {
+    document.getElementById(`step${i}`).style.display = i === n ? 'block' : 'none';
+    const s = document.querySelector(`.step[data-step="${i}"]`);
+    s.classList.toggle('current', i === n);
+    s.classList.toggle('done', i < n);
+  }
+  if (n === 2) loadTimeslots();
+  if (n === 4) renderSummary();
+}
+window.goStep = goStep;
+
+async function init() {
+  const user = await getCurrentUser();
+  if (!user) {
+    if (confirm('預約需要登入，前往登入頁？')) location.href = 'login.html?return=' + encodeURIComponent(location.href);
+    return;
+  }
+  if (!teacherId || !serviceId) { toast('缺少參數', 'error'); return; }
+
+  const [tRes, sRes] = await Promise.all([
+    supabase.from('teachers').select('*').eq('id', teacherId).single(),
+    supabase.from('teacher_services').select('*').eq('id', serviceId).single(),
+  ]);
+  teacher = tRes.data; service = sRes.data;
+  if (!teacher || !service) { toast('資料載入失敗', 'error'); return; }
+
+  document.getElementById('serviceInfo').innerHTML = `
+    <div style="display:flex;align-items:center;gap:20px;padding:20px;background:rgba(0,0,0,0.25);border-radius:12px;margin-bottom:14px">
+      <div style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent-light));display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;color:var(--primary);font-family:'Noto Serif TC'">${teacher.display_name.charAt(0)}</div>
+      <div style="flex:1">
+        <div style="font-size:18px;color:var(--accent);font-family:'Noto Serif TC'">${teacher.display_name}</div>
+        <div style="font-size:13px;color:rgba(255,255,255,0.6)">${teacher.title || ''}</div>
+      </div>
+    </div>
+    <div style="padding:20px;border:1px solid var(--accent-dim);border-radius:12px">
+      <div style="font-size:18px">${service.name}</div>
+      <div style="color:rgba(255,255,255,0.6);font-size:13px;margin:6px 0">${service.duration_minutes} 分鐘 · NT$ ${service.price_ntd.toLocaleString()}</div>
+      ${service.description ? `<div style="margin-top:10px;font-size:13px;line-height:1.7">${service.description}</div>` : ''}
+    </div>
+  `;
+}
+
+async function loadTimeslots() {
+  const { data } = await supabase.from('teacher_availability').select('*').eq('teacher_id', teacherId);
+  const { data: bookings } = await supabase.from('bookings').select('scheduled_at, duration_minutes')
+    .eq('teacher_id', teacherId)
+    .in('status', ['paid', 'confirmed', 'in_progress'])
+    .gte('scheduled_at', new Date().toISOString());
+
+  const bookedSet = new Set((bookings || []).map((b) => new Date(b.scheduled_at).getTime()));
+
+  // 簡易：未來 14 天 × 老師 weekly availability
+  const slots = [];
+  const now = new Date();
+  for (let d = 1; d <= 14; d++) {
+    const day = new Date(now);
+    day.setDate(now.getDate() + d);
+    const dow = day.getDay();
+    const wins = (data || []).filter((a) => a.day_of_week === dow && !a.is_blocked);
+    for (const w of wins) {
+      const [sh, sm] = w.start_time.split(':').map(Number);
+      const [eh, em] = w.end_time.split(':').map(Number);
+      const start = new Date(day); start.setHours(sh, sm, 0, 0);
+      const end = new Date(day); end.setHours(eh, em, 0, 0);
+      // 每 30 分鐘一個 slot（≥ 服務長度）
+      for (let t = new Date(start); t.getTime() + service.duration_minutes * 60000 <= end.getTime(); t = new Date(t.getTime() + 30 * 60000)) {
+        slots.push({ time: new Date(t), disabled: bookedSet.has(t.getTime()) });
+      }
+    }
+  }
+
+  const el = document.getElementById('timeslots');
+  if (!slots.length) {
+    el.innerHTML = `
+      <div class="empty-state">
+        <div class="icon">○</div>
+        老師近期無可預約時段<br>
+        <span style="font-size:12px;color:rgba(255,255,255,0.5)">建議直接透過 LINE/IG 詢問</span>
+      </div>
+      ${teacher.line_url ? `<div style="text-align:center;margin-top:12px"><a href="${teacher.line_url}" target="_blank" class="btn-secondary">LINE 詢問</a></div>` : ''}
+    `;
+    return;
+  }
+
+  // 按日期分組
+  const grouped = {};
+  for (const s of slots) {
+    const key = s.time.toLocaleDateString('zh-TW', { month: 'long', day: 'numeric', weekday: 'short' });
+    (grouped[key] = grouped[key] || []).push(s);
+  }
+  el.innerHTML = Object.entries(grouped).map(([date, list]) => `
+    <div style="margin-bottom:18px">
+      <div style="color:var(--accent);font-size:13px;letter-spacing:2px;margin-bottom:8px">${date}</div>
+      ${list.map((s) => `
+        <span class="timeslot ${s.disabled ? 'disabled' : ''}" data-time="${s.time.toISOString()}" ${s.disabled ? '' : `onclick="selectSlot('${s.time.toISOString()}')"`}>
+          ${s.time.toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit', hour12: false })}
+        </span>
+      `).join('')}
+    </div>
+  `).join('');
+}
+
+window.selectSlot = (iso) => {
+  selectedSlot = iso;
+  document.querySelectorAll('.timeslot').forEach((el) => el.classList.toggle('selected', el.dataset.time === iso));
+  document.getElementById('step2Next').disabled = false;
+};
+
+document.getElementById('chartTool').onchange = (e) => {
+  document.getElementById('chartFields').style.display = e.target.value ? 'block' : 'none';
+  document.getElementById('genderRow').style.display = (e.target.value === 'ziwei') ? 'block' : 'none';
+};
+
+function renderSummary() {
+  const tool = document.getElementById('chartTool').value;
+  const summary = document.getElementById('summary');
+  summary.innerHTML = `
+    <div style="padding:20px;background:rgba(0,0,0,0.25);border-radius:10px;font-size:14px;line-height:2">
+      <div><strong style="color:var(--accent)">老師</strong>　${teacher.display_name}</div>
+      <div><strong style="color:var(--accent)">服務</strong>　${service.name} (${service.duration_minutes} 分)</div>
+      <div><strong style="color:var(--accent)">時間</strong>　${new Date(selectedSlot).toLocaleString('zh-TW')}</div>
+      <div><strong style="color:var(--accent)">問題</strong>　${document.getElementById('question').value || '—'}</div>
+      ${tool ? `<div><strong style="color:var(--accent)">附排盤</strong>　${tool}</div>` : ''}
+      <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--accent-dim);font-size:18px"><strong style="color:var(--accent)">金額</strong>　<span style="color:var(--accent-light);font-size:24px;font-family:'Noto Serif TC'">NT$ ${service.price_ntd.toLocaleString()}</span></div>
+    </div>
+  `;
+}
+
+document.getElementById('confirmBtn').onclick = async () => {
+  const user = await getCurrentUser();
+  if (!user) return toast('請先登入', 'error');
+  if (!selectedSlot) return toast('未選時段', 'error');
+  const question = document.getElementById('question').value.trim();
+  if (!question) return toast('請填寫問題', 'error');
+
+  const tool = document.getElementById('chartTool').value;
+  let chartData = null;
+  if (tool) {
+    const date = document.getElementById('birthDate').value;
+    const time = document.getElementById('birthTime').value || '12:00';
+    if (!date) return toast('請填出生日期', 'error');
+    chartData = {
+      tool,
+      birthDate: date,
+      birthTime: time,
+      gender: document.getElementById('gender')?.value,
+      // 實際排盤計算放在後端 Edge Function 完成；這裡只暫存原始輸入
+    };
+  }
+
+  const { data, error } = await supabase.from('bookings').insert({
+    customer_id: user.id,
+    teacher_id: teacherId,
+    service_id: serviceId,
+    scheduled_at: selectedSlot,
+    duration_minutes: service.duration_minutes,
+    amount_ntd: service.price_ntd,
+    customer_question: question,
+    chart_tool: tool || null,
+    chart_data: chartData,
+    status: 'pending',
+  }).select().single();
+  if (error) return toast(error.message, 'error');
+
+  toast('預約成功，下一步進入付款 ✦');
+  // TODO: 串接金流（綠界/藍新）
+  setTimeout(() => location.href = 'mybookings.html', 1500);
+};
+
+init();
+</script>
+</body>
+</html>

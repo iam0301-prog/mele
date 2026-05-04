@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>八字 · 命理媒介中心</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Noto+Serif+TC:wght@400;600;700&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
+<style>
+.mele-result svg { max-width: 100%; height: auto; display: block; margin: 0 auto; }
+.cta-after { background: linear-gradient(135deg, rgba(201,162,39,0.12), rgba(201,162,39,0.04)); border: 1px solid var(--accent); border-radius: 14px; padding: 24px; margin-top: 30px; text-align: center; }
+</style>
+</head>
+<body>
+<div class="container">
+  <a href="../" style="color:var(--accent);text-decoration:none;font-size:13px;letter-spacing:2px">‹ 回首頁</a>
+  <header style="padding:30px 0">
+    <div class="ornament">◆ ◆ ◆</div>
+    <h1>八字</h1>
+    <div class="subtitle">FOUR PILLARS</div>
+    <div style="margin-top:20px;color:rgba(255,255,255,0.7);font-size:13px">由生辰排出年/月/日/時四柱 · 五行 · 十神 · 納音</div>
+  </header>
+  <div style="background:rgba(244,162,97,0.08);border-left:3px solid var(--warning);padding:12px 16px;border-radius:8px;margin-bottom:20px;font-size:13px;line-height:1.8">
+    <strong style="color:var(--warning)">BETA · 試算版</strong><br>
+    四柱、五行、十神演算採用業界標準 sxtwl（壽星天文曆）。完整大運、流年、用神判定建議預約八字老師。
+  </div>
+  <div class="card">
+    <div class="section-title">輸入生辰</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+      <div class="input-row"><label>生日 *</label><input id="date" type="date" required></div>
+      <div class="input-row"><label>出生時間 *</label><input id="time" type="time" required></div>
+    </div>
+    <div class="input-row" style="display:flex;gap:14px;align-items:center">
+      <label style="display:inline-flex;align-items:center;gap:6px;margin:0">
+        <input type="checkbox" id="useTrueSolar" checked> 真太陽時校正（預設台北經度）
+      </label>
+    </div>
+    <button class="btn-primary" id="calcBtn">排盤 ›</button>
+  </div>
+  <div id="result"></div>
+</div>
+<script src="../assets/config.js"></script>
+<script type="module">
+import { calc, mountResult, showLoading, showError, recordChart } from '../assets/mele-api.js';
+import { supabase, getCurrentUser, toast } from '../assets/supabase-client.js';
+const result = document.getElementById('result');
+document.getElementById('calcBtn').onclick = async () => {
+  const date = document.getElementById('date').value;
+  const time = document.getElementById('time').value;
+  if (!date || !time) return toast('請填完整生辰', 'error');
+  const [year, month, day] = date.split('-').map(Number);
+  const [hour, minute] = time.split(':').map(Number);
+  const useTrueSolar = document.getElementById('useTrueSolar').checked;
+  const input = { year, month, day, hour, minute, sect: 2, longitude: useTrueSolar ? 121.5 : null };
+  showLoading(result, '八字四柱排盤中…');
+  try {
+    const r = await calc('bazi', input);
+    mountResult(result, r);
+    const cta = document.createElement('div');
+    cta.className = 'cta-after';
+    cta.innerHTML = `<div style="font-family:'Noto Serif TC';font-size:18px;color:var(--accent);margin-bottom:10px">想得到完整大運與流年？</div>
+      <a href="../teachers/index.html?spec=八字" class="btn-primary" style="text-decoration:none;display:inline-block">找八字老師諮詢 ›</a>`;
+    result.appendChild(cta);
+    const user = await getCurrentUser();
+    await recordChart(supabase, user, 'bazi', input, r.data);
+  } catch (e) { showError(result, e.message); }
+};
+</script>
+</body></html>

@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="38%" r="68%">
+      <stop offset="0%" stop-color="#22365A"/>
+      <stop offset="52%" stop-color="#0D1B2A"/>
+      <stop offset="100%" stop-color="#05070B"/>
+    </radialGradient>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F4E2A3"/>
+      <stop offset="45%" stop-color="#C9A227"/>
+      <stop offset="100%" stop-color="#E8C547"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="108" fill="url(#bg)"/>
+  <circle cx="256" cy="256" r="174" fill="none" stroke="#C9A227" stroke-width="8" opacity="0.7"/>
+  <circle cx="256" cy="256" r="118" fill="none" stroke="#F4E2A3" stroke-width="3" opacity="0.55"/>
+  <path d="M256 82l32 124 124 50-124 50-32 124-32-124-124-50 124-50z" fill="url(#gold)"/>
+  <circle cx="256" cy="256" r="54" fill="#0D1B2A" stroke="#F4E2A3" stroke-width="5"/>
+  <text x="256" y="276" text-anchor="middle" font-family="Georgia,serif" font-size="64" font-weight="700" fill="#F4E2A3">M</text>
+</svg>

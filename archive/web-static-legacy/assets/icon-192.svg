@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192">
+<defs>
+  <radialGradient id="bg" cx="50%" cy="40%">
+    <stop offset="0%" stop-color="#1E2D45"/>
+    <stop offset="100%" stop-color="#050B16"/>
+  </radialGradient>
+</defs>
+<rect width="192" height="192" rx="38" fill="url(#bg)"/>
+<text x="96" y="118" text-anchor="middle" font-size="72" font-family="Noto Serif TC, serif" fill="#C9A227" font-weight="600">命</text>
+<circle cx="96" cy="96" r="84" fill="none" stroke="#C9A227" stroke-width="1.5" opacity="0.4"/>
+<circle cx="96" cy="96" r="76" fill="none" stroke="#C9A227" stroke-width="0.8" opacity="0.6" stroke-dasharray="2,4"/>
+</svg>

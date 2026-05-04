@@ -1,0 +1,49 @@
+{
+  "name": "mele",
+  "version": "0.0.1",
+  "private": true,
+  "description": "MELE divination intermediary platform",
+  "type": "module",
+  "scripts": {
+    "build": "npm --prefix apps/web run build",
+    "type-check": "npm --prefix apps/web run type-check",
+    "dev:web": "npm --prefix apps/web run dev",
+    "start:web": "npm --prefix apps/web run start",
+    "test": "node tests/verify-structure.mjs && node tests/verify-python-api.mjs",
+    "test:python": "node scripts/run-python-pytest.mjs",
+    "test:api": "node tests/verify-python-api.mjs",
+    "test:structure": "node tests/verify-structure.mjs",
+    "test:legacy-calc": "vitest run",
+    "test:web": "npm --prefix apps/web run test",
+    "test:e2e": "npm --prefix apps/web run test:e2e",
+    "lint:python": "ruff check python_api && ruff format --check python_api",
+    "typecheck:python": "mypy python_api",
+    "test:sql": "node tests/verify-sql.mjs && node tests/verify-free-booking-sql.mjs && node tests/verify-auth-signup-sql.mjs",
+    "test:deployment": "node tests/verify-deployment-readiness.mjs",
+    "test:secrets": "node tests/verify-secrets.mjs",
+    "release:check": "npm run type-check && npm test && npm run test:web && npm run test:e2e && npm run test:python && npm run test:sql && npm run test:deployment && npm run test:secrets && npm run build",
+    "ops:restart:web": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/restart-web-3006.ps1",
+    "ops:restart:api": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/restart-api-8015.ps1",
+    "ops:restart": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/restart-local.ps1",
+    "ops:build:web": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build-and-restart-web.ps1",
+    "ops:verify": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify-local.ps1",
+    "ops:check-auth": "node scripts/check-supabase-auth.mjs",
+    "test:watch": "vitest",
+    "test:report": "node tests/verify-python-api.mjs",
+    "tarot:forest-status": "node scripts/tarot-art-phase.mjs --style forest_athena --limit 10",
+    "tarot:forest-prompts": "node scripts/tarot-art-phase.mjs --style forest_athena --jsonl tmp/forest_athena_missing.jsonl"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "^0.4.5",
+    "supabase": "^2.95.3",
+    "vitest": "^2.1.0"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.104.1",
+    "astronomia": "^4.2.0",
+    "iztro": "^2.5.8",
+    "lunar-javascript": "^1.7.7",
+    "sweph": "^2.10.3-5",
+    "tz-lookup": "^6.1.25"
+  }
+}

@@ -1,0 +1,70 @@
+{
+  "tool": "ziwei",
+  "version": "1.0.0",
+  "method": "iztro v2 (github.com/SylarLong/iztro, MIT) — TypeScript 紫微斗數標準庫，依《紫微斗數全書》算法。",
+  "source": "(a) iztro 為公認標準庫；(b) 八字四柱與我方 BaZi 模組(lunar-javascript) 交叉驗證；(c) 命宮位置以《紫微斗數全書》傳統定盤法手算驗證。",
+  "cases": [
+    {
+      "id": "z-001",
+      "label": "1990-05-15 14:00 男（與 BaZi 模組交叉驗證）",
+      "input": { "year": 1990, "month": 5, "day": 15, "hour": 14, "gender": "男" },
+      "expected": {
+        "chineseDate": "庚午 辛巳 庚辰 癸未",
+        "time": "未時",
+        "fiveElementsClass": "土五局",
+        "soul": "祿存",
+        "body": "火星",
+        "sign": "金牛座",
+        "zodiac": "馬",
+        "mingGongPalace": { "earthlyBranch": "戌" },
+        "mingGongMajorStars": ["紫微", "天相"]
+      },
+      "verification": "命宮地支「戌」由傳統定盤法手算驗證：農曆4月→寅起順數至巳；巳起子逆數至未→戌"
+    },
+    {
+      "id": "z-002",
+      "label": "Steve Jobs 1955-02-24 19:15 男",
+      "input": { "year": 1955, "month": 2, "day": 24, "hour": 19, "gender": "男" },
+      "expected": {
+        "time": "戌時",
+        "sign": "雙魚座",
+        "zodiac": "羊"
+      },
+      "verification": "Steve Jobs 已知雙魚座、未羊年（1955 為乙未年）"
+    },
+    {
+      "id": "z-003",
+      "label": "性別差異：1990-05-15 14:00 女（陰女、大限逆行）",
+      "input": { "year": 1990, "month": 5, "day": 15, "hour": 14, "gender": "女" },
+      "expected": {
+        "chineseDate": "庚午 辛巳 庚辰 癸未",
+        "fiveElementsClass": "土五局"
+      },
+      "verification": "八字相同但大限方向不同（陰女逆行）"
+    },
+    {
+      "id": "z-004",
+      "label": "閏月處理 2020-04-23 (農曆閏四月)",
+      "input": { "year": 2020, "month": 4, "day": 23, "hour": 12, "gender": "男" },
+      "expected": {
+        "time": "午時"
+      }
+    },
+    {
+      "id": "z-005",
+      "label": "夜子時 sect 2 (default): 23:30 算當日子時 (早子時)",
+      "input": { "year": 2024, "month": 1, "day": 1, "hour": 23, "gender": "男", "sect": 2 },
+      "expected": {
+        "time": "早子時"
+      }
+    },
+    {
+      "id": "z-006",
+      "label": "夜子時 sect 1: 23:30 算次日（時辰 index 12）",
+      "input": { "year": 2024, "month": 1, "day": 1, "hour": 23, "gender": "男", "sect": 1 },
+      "expected": {
+        "time": "晚子時"
+      }
+    }
+  ]
+}

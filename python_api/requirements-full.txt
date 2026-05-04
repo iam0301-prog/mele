@@ -1,0 +1,8 @@
+# 完整版（八字 / 紫微 / 占星 / 人類圖 需要這些）
+# 這兩個套件是 C++ 寫的，需要先裝 Microsoft C++ Build Tools：
+# https://visualstudio.microsoft.com/visual-cpp-build-tools/
+# 裝好後再 pip install -r requirements-full.txt
+-r requirements.txt
+pyswisseph==2.10.3.2
+sxtwl==2.0.7
+lunar-python==1.4.8

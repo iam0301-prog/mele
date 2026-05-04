@@ -1,0 +1,16 @@
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+node_modules/
+npm-debug.log*
+api-*.log
+*.sqlite
+*.db
+.env
+.env.*
+!*.example

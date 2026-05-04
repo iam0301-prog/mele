@@ -1,0 +1,15 @@
+{
+  "name": "@mele/python-api-runtime",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Node helper dependencies for the MELE FastAPI calculation service",
+  "type": "commonjs",
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "iztro": "^2.5.8",
+    "sweph": "^2.10.3-5",
+    "tz-lookup": "^6.1.25"
+  }
+}

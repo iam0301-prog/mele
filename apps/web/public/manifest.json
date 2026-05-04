@@ -1,0 +1,42 @@
+{
+  "name": "MELE 命理媒介中心",
+  "short_name": "MELE",
+  "description": "每日儀式、AR 解盤、命理工具與老師媒合的線上命理 App。",
+  "start_url": "/mobile",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": ["standalone", "fullscreen", "browser"],
+  "orientation": "portrait",
+  "theme_color": "#0D1B2A",
+  "background_color": "#050B16",
+  "lang": "zh-TW",
+  "categories": ["lifestyle", "utilities"],
+  "icons": [
+    {
+      "src": "/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "每日儀式",
+      "short_name": "每日",
+      "description": "查看今日解讀、抽塔羅與盧恩。",
+      "url": "/daily"
+    },
+    {
+      "name": "手機版",
+      "short_name": "手機",
+      "description": "開啟 App 版每日儀式。",
+      "url": "/mobile"
+    },
+    {
+      "name": "找老師",
+      "short_name": "老師",
+      "description": "尋找適合的命理老師。",
+      "url": "/teachers"
+    }
+  ]
+}

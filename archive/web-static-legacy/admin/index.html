@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>後台 · 命理媒介中心</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Noto+Serif+TC:wght@400;600;700&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="container">
+  <header>
+    <div class="ornament">◆ ◆ ◆</div>
+    <h1>後台管理</h1>
+    <div class="subtitle">ADMIN PANEL</div>
+  </header>
+
+  <div id="loginBox" class="card" style="display:none">
+    <div class="section-title">管理員登入</div>
+    <div class="section-subtitle">SIGN IN</div>
+    <div class="input-row">
+      <label>Email</label>
+      <input id="loginEmail" type="email" autocomplete="email">
+    </div>
+    <div class="input-row">
+      <label>密碼</label>
+      <input id="loginPwd" type="password" autocomplete="current-password">
+    </div>
+    <button class="btn-primary" id="loginBtn">登入</button>
+  </div>
+
+  <div id="mainPanel" style="display:none">
+    <div class="stat-grid" id="statsGrid"></div>
+
+    <div class="tabs">
+      <div class="tab active" data-tab="applications">申請審核</div>
+      <div class="tab" data-tab="teachers">老師管理</div>
+      <div class="tab" data-tab="bookings">預約監看</div>
+      <div class="tab" data-tab="reviews">評價管理</div>
+      <div class="tab" data-tab="support">客服工單</div>
+      <div class="tab" data-tab="disputes">退款 / 爭議</div>
+    </div>
+
+    <div id="tab-applications" class="tab-content card">
+      <div class="section-title">老師申請審核</div>
+      <div class="section-subtitle">TEACHER APPLICATIONS</div>
+      <div class="flex-row" style="margin-bottom:20px">
+        <select id="appFilter" style="padding:8px 14px;background:rgba(0,0,0,0.4);color:white;border:1px solid var(--accent-dim);border-radius:6px">
+          <option value="">所有狀態</option>
+          <option value="pending" selected>待審核 (pending)</option>
+          <option value="reviewing">審核中 (reviewing)</option>
+          <option value="revision">需補件 (revision)</option>
+          <option value="interview">試講中 (interview)</option>
+          <option value="contracted">已簽約 (contracted)</option>
+          <option value="rejected">已拒絕 (rejected)</option>
+          <option value="active">已上架 (active)</option>
+        </select>
+        <button class="btn-secondary" onclick="loadApplications()">重新載入</button>
+      </div>
+      <div id="appList"></div>
+    </div>
+
+    <div id="tab-teachers" class="tab-content card" style="display:none">
+      <div class="section-title">老師管理</div>
+      <div class="section-subtitle">TEACHERS</div>
+      <div id="teacherList"></div>
+    </div>
+
+    <div id="tab-bookings" class="tab-content card" style="display:none">
+      <div class="section-title">預約監看</div>
+      <div class="section-subtitle">BOOKINGS</div>
+      <div id="bookingList"></div>
+    </div>
+
+    <div id="tab-reviews" class="tab-content card" style="display:none">
+      <div class="section-title">評價管理</div>
+      <div class="section-subtitle">REVIEWS</div>
+      <div id="reviewList"></div>
+    </div>
+
+    <div id="tab-support" class="tab-content card" style="display:none">
+      <div class="section-title">客服工單</div>
+      <div class="section-subtitle">SUPPORT TICKETS</div>
+      <div class="flex-row" style="margin-bottom:16px">
+        <select id="supportFilter" style="padding:8px 14px;background:rgba(0,0,0,0.4);color:white;border:1px solid var(--accent-dim);border-radius:6px">
+          <option value="open" selected>待處理</option>
+          <option value="in_progress">處理中</option>
+          <option value="resolved">已解決</option>
+          <option value="">全部</option>
+        </select>
+      </div>
+      <div id="supportList"></div>
+    </div>
+
+    <div id="tab-disputes" class="tab-content card" style="display:none">
+      <div class="section-title">退款 / 爭議</div>
+      <div class="section-subtitle">REFUNDS &amp; DISPUTES</div>
+      <div id="disputeList"></div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="appModal">
+  <div class="modal" id="appModalBody"></div>
+</div>
+
+<script src="../assets/config.js"></script>
+<script type="module">
+import { supabase, isAdmin, toast } from '../assets/supabase-client.js';
+
+const STATUS_LABELS = {
+  pending: '待審核', reviewing: '審核中', revision: '需補件',
+  rejected: '已拒絕', interview: '試講中', contracted: '已簽約',
+  active: '已上架', paused: '暫停接案', suspended: '停權',
+};
+
+document.getElementById('loginBtn').onclick = async () => {
+  const email = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPwd').value;
+  if (!email || !password) return toast('請填寫帳密', 'error');
+  const { error } = await supabase.auth.signInWithPassword({ email, password });
+  if (error) return toast(error.message, 'error');
+  toast('登入成功');
+  setTimeout(() => location.reload(), 500);
+};
+
+document.querySelectorAll('.tab').forEach((t) => {
+  t.onclick = () => {
+    document.querySelectorAll('.tab').forEach((x) => x.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach((x) => x.style.display = 'none');
+    t.classList.add('active');
+    const id = `tab-${t.dataset.tab}`;
+    document.getElementById(id).style.display = 'block';
+    if (t.dataset.tab === 'teachers') loadTeachers();
+    else if (t.dataset.tab === 'bookings') loadBookings();
+    else if (t.dataset.tab === 'reviews') loadReviews();
+    else if (t.dataset.tab === 'support') loadSupport();
+    else if (t.dataset.tab === 'disputes') loadDisputes();
+  };
+});
+
+document.getElementById('appFilter').onchange = loadApplications;
+document.getElementById('supportFilter').onchange = loadSupport;
+
+async function init() {
+  const user = (await supabase.auth.getUser()).data.user;
+  if (!user) { document.getElementById('loginBox').style.display = 'block'; return; }
+  if (!(await isAdmin())) {
+    toast('您不是管理員', 'error');
+    document.getElementById('loginBox').style.display = 'block';
+    await supabase.auth.signOut();
+    return;
+  }
+  document.getElementById('mainPanel').style.display = 'block';
+  loadStats(); loadApplications();
+}
+
+async function loadStats() {
+  const grid = document.getElementById('statsGrid');
+  const stats = await Promise.all([
+    supabase.from('teacher_applications').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
+    supabase.from('teachers').select('id', { count: 'exact', head: true }).eq('status', 'active'),
+    supabase.from('bookings').select('id', { count: 'exact', head: true }).gte('scheduled_at', new Date().toISOString()),
+    supabase.from('support_threads').select('id', { count: 'exact', head: true }).in('status', ['open', 'in_progress']),
+  ]);
+  grid.innerHTML = `
+    <div class="stat-card"><div class="stat-value">${stats[0].count ?? '?'}</div><div class="stat-label">待審申請</div></div>
+    <div class="stat-card"><div class="stat-value">${stats[1].count ?? '?'}</div><div class="stat-label">上架老師</div></div>
+    <div class="stat-card"><div class="stat-value">${stats[2].count ?? '?'}</div><div class="stat-label">未來預約</div></div>
+    <div class="stat-card"><div class="stat-value">${stats[3].count ?? '?'}</div><div class="stat-label">待客服</div></div>
+  `;
+}
+
+window.loadApplications = async function () {
+  const filter = document.getElementById('appFilter').value;
+  let q = supabase.from('teacher_applications').select('*').order('submitted_at', { ascending: false });
+  if (filter) q = q.eq('status', filter);
+  const { data, error } = await q;
+  if (error) return toast(error.message, 'error');
+  const el = document.getElementById('appList');
+  if (!data || !data.length) { el.innerHTML = `<div class="empty-state"><div class="icon">○</div>目前沒有資料</div>`; return; }
+  el.innerHTML = `<table class="app-table"><thead><tr><th>顯示名</th><th>專長</th><th>狀態</th><th>送出</th><th>等候</th></tr></thead><tbody>
+    ${data.map(a => `<tr onclick="openAppModal('${a.id}')">
+      <td>${a.display_name}<br><span style="font-size:11px;color:rgba(255,255,255,0.5)">${a.legal_name}</span></td>
+      <td>${(a.specialties || []).slice(0,3).join('、')}</td>
+      <td><span class="status-badge status-${a.status}">${STATUS_LABELS[a.status] || a.status}</span></td>
+      <td style="font-size:12px">${new Date(a.submitted_at).toLocaleDateString('zh-TW')}</td>
+      <td style="font-size:12px">${Math.floor((Date.now() - new Date(a.submitted_at).getTime()) / 86400000)} 天</td>
+    </tr>`).join('')}</tbody></table>`;
+};
+
+window.openAppModal = async function (id) {
+  const { data: a } = await supabase.from('teacher_applications').select('*').eq('id', id).single();
+  if (!a) return toast('找不到申請', 'error');
+  const { data: logs } = await supabase.from('teacher_review_log').select('*').eq('application_id', id).order('created_at', { ascending: false });
+  const m = document.getElementById('appModalBody');
+  m.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+      <div>
+        <div style="font-size:22px;font-family:'Noto Serif TC';color:var(--accent)">${a.display_name}</div>
+        <div style="font-size:12px;color:rgba(255,255,255,0.5);margin-top:4px">${a.legal_name} · ${a.email} · ${a.phone}</div>
+      </div>
+      <span class="status-badge status-${a.status}">${STATUS_LABELS[a.status]}</span>
+    </div>
+    <div style="margin-bottom:16px"><div style="font-size:12px;color:var(--accent);margin-bottom:6px">短介</div><div style="font-size:14px">${a.intro_short || '(無)'}</div></div>
+    ${a.intro_long ? `<div style="margin-bottom:16px"><div style="font-size:12px;color:var(--accent);margin-bottom:6px">長介</div><div style="font-size:14px;white-space:pre-wrap">${a.intro_long}</div></div>` : ''}
+    <div class="input-row"><label>審核註記</label><textarea id="reviewerNotes"></textarea></div>
+    <div class="input-row" id="rateRow" style="display:none"><label>抽成比例（%）</label><input id="commissionRate" type="number" step="0.5" min="0" max="50" value="10"></div>
+    <div class="flex-row" style="margin-top:24px">
+      <button class="btn-success" onclick="actApp('${a.id}','review')">標記審核中</button>
+      <button class="btn-secondary" onclick="actApp('${a.id}','interview')">進入試講</button>
+      <button class="btn-secondary" onclick="actApp('${a.id}','request_revision')">要求補件</button>
+      <button class="btn-success" onclick="actApp('${a.id}','approve')">✓ 簽約</button>
+      <button class="btn-danger" onclick="actApp('${a.id}','reject')">✗ 拒絕</button>
+      ${a.status === 'contracted' ? `<button class="btn-success" onclick="activateTeacher('${a.id}')">★ 上架</button>` : ''}
+    </div>
+    <button class="btn-secondary" style="margin-top:20px" onclick="document.getElementById('appModal').classList.remove('show')">關閉</button>
+  `;
+  setTimeout(() => { document.getElementById('rateRow').style.display = (a.status !== 'rejected' && a.status !== 'active') ? 'block' : 'none'; }, 0);
+  document.getElementById('appModal').classList.add('show');
+};
+
+window.actApp = async function (id, action) {
+  const notes = document.getElementById('reviewerNotes').value.trim() || null;
+  const rate = parseFloat(document.getElementById('commissionRate').value) / 100;
+  const { error } = await supabase.rpc('review_teacher_application', { p_application_id: id, p_action: action, p_notes: notes, p_commission_rate: rate || 0.10 });
+  if (error) return toast(error.message, 'error');
+  toast('已更新'); document.getElementById('appModal').classList.remove('show'); loadApplications(); loadStats();
+};
+
+window.activateTeacher = async function (appId) {
+  const { error } = await supabase.rpc('activate_teacher', { p_application_id: appId });
+  if (error) return toast(error.message, 'error');
+  toast('老師已正式上架 ✦'); document.getElementById('appModal').classList.remove('show'); loadApplications(); loadStats();
+};
+
+async function loadTeachers() {
+  const { data } = await supabase.from('teachers').select('*').order('approved_at', { ascending: false });
+  const el = document.getElementById('teacherList');
+  if (!data || !data.length) { el.innerHTML = `<div class="empty-state">尚無老師</div>`; return; }
+  el.innerHTML = `<table class="app-table"><thead><tr><th>名字</th><th>專長</th><th>狀態</th><th>評分</th><th>諮詢數</th><th>抽成</th><th>操作</th></tr></thead><tbody>
+    ${data.map(t => `<tr>
+      <td>${t.display_name}</td>
+      <td>${(t.specialties || []).slice(0,3).join('、')}</td>
+      <td><span class="status-badge status-${t.status}">${STATUS_LABELS[t.status] || t.status}</span></td>
+      <td>★ ${t.rating || 0} (${t.total_reviews || 0})</td>
+      <td>${t.cases_count || 0}</td>
+      <td>${(t.commission_rate * 100).toFixed(1)}%</td>
+      <td>${t.status === 'active' ? `<button class="btn-danger" style="padding:6px 14px;font-size:11px" onclick="suspendT('${t.id}')">停權</button>` : ''}</td>
+    </tr>`).join('')}</tbody></table>`;
+}
+
+window.suspendT = async function (id) {
+  const reason = prompt('停權理由？');
+  if (!reason) return;
+  const { error } = await supabase.rpc('suspend_teacher', { p_teacher_id: id, p_reason: reason });
+  if (error) return toast(error.message, 'error');
+  toast('已停權'); loadTeachers();
+};
+
+async function loadBookings() {
+  const { data } = await supabase.from('bookings').select('*, teachers(display_name)').order('scheduled_at', { ascending: false }).limit(50);
+  const el = document.getElementById('bookingList');
+  if (!data || !data.length) { el.innerHTML = `<div class="empty-state">尚無預約</div>`; return; }
+  el.innerHTML = `<table class="app-table"><thead><tr><th>時間</th><th>老師</th><th>狀態</th><th>金額</th></tr></thead><tbody>
+    ${data.map(b => `<tr>
+      <td>${new Date(b.scheduled_at).toLocaleString('zh-TW')}</td>
+      <td>${b.teachers?.display_name || '-'}</td>
+      <td>${b.status}</td>
+      <td>NT$ ${b.amount_ntd}</td>
+    </tr>`).join('')}</tbody></table>`;
+}
+
+window.loadSupport = async function () {
+  const f = document.getElementById('supportFilter').value;
+  let q = supabase.from('support_threads').select('*').order('priority', { ascending: false }).order('created_at', { ascending: false }).limit(100);
+  if (f) q = q.eq('status', f);
+  const { data, error } = await q;
+  if (error) return toast(error.message, 'error');
+  const el = document.getElementById('supportList');
+  if (!data || !data.length) { el.innerHTML = `<div class="empty-state">沒有工單</div>`; return; }
+  el.innerHTML = data.map(t => `
+    <div style="border:1px solid var(--accent-dim);border-radius:10px;padding:14px;margin-bottom:10px">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+        <div>
+          <span style="color:var(--accent);font-family:'Noto Serif TC';letter-spacing:1px">${t.subject}</span>
+          <span style="margin-left:8px;font-size:11px;padding:2px 8px;border-radius:8px;border:1px solid var(--accent-dim)">${t.category}</span>
+          <span style="margin-left:6px;font-size:11px;color:${t.priority === 'urgent' ? '#ff8a8a' : t.priority === 'high' ? '#F4A261' : 'rgba(255,255,255,0.5)'}">[${t.priority}]</span>
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.5)">${new Date(t.created_at).toLocaleString('zh-TW')}</div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+        <button class="btn-secondary" style="padding:6px 12px;font-size:12px" onclick="updateThread('${t.id}','in_progress')">標記處理中</button>
+        <button class="btn-success" style="padding:6px 12px;font-size:12px" onclick="updateThread('${t.id}','resolved')">標記已解決</button>
+      </div>
+    </div>
+  `).join('');
+};
+
+window.updateThread = async function (id, status) {
+  const { error } = await supabase.from('support_threads').update({ status, resolved_at: status === 'resolved' ? new Date().toISOString() : null }).eq('id', id);
+  if (error) return toast(error.message, 'error');
+  toast('已更新'); loadSupport();
+};
+
+window.loadDisputes = async function () {
+  const { data, error } = await supabase.from('bookings').select('*, teachers(display_name)').or('status.eq.refunded,dispute_status.eq.open').order('created_at', { ascending: false }).limit(100);
+  if (error) return toast(error.message, 'error');
+  const el = document.getElementById('disputeList');
+  if (!data || !data.length) { el.innerHTML = `<div class="empty-state">目前沒有爭議或退款</div>`; return; }
+  el.innerHTML = `<table class="app-table"><thead><tr><th>時間</th><th>老師</th><th>金額</th><th>狀態</th><th>退款</th><th>原因</th><th>操作</th></tr></thead><tbody>
+    ${data.map(b => `<tr>
+      <td style="font-size:12px">${new Date(b.scheduled_at).toLocaleDateString('zh-TW')}</td>
+      <td>${b.teachers?.display_name || '-'}</td>
+      <td>NT$${b.amount_ntd}</td>
+      <td><span class="status-badge">${b.status}</span></td>
+      <td style="color:${b.refund_amount_ntd ? '#67e8a4' : 'rgba(255,255,255,0.5)'}">${b.refund_amount_ntd ? 'NT$' + b.refund_amount_ntd : '-'}</td>
+      <td style="font-size:12px;color:rgba(255,255,255,0.7)">${b.cancellation_reason || '-'}</td>
+      <td>
+        ${b.dispute_status === 'open' ? `<button class="btn-success" style="padding:4px 10px;font-size:11px" onclick="resolveDispute('${b.id}')">標記處理</button>` : ''}
+        ${b.status === 'paid' || b.status === 'confirmed' ? `<button class="btn-danger" style="padding:4px 10px;font-size:11px" onclick="adminCancel('${b.id}')">強制取消退款</button>` : ''}
+      </td>
+    </tr>`).join('')}</tbody></table>`;
+};
+
+window.resolveDispute = async function (id) {
+  const { error } = await supabase.from('bookings').update({ dispute_status: 'resolved' }).eq('id', id);
+  if (error) return toast(error.message, 'error');
+  toast('已標記處理'); loadDisputes();
+};
+
+window.adminCancel = async function (id) {
+  const reason = prompt('取消理由');
+  if (!reason) return;
+  const { data, error } = await supabase.rpc('cancel_booking', { p_booking_id: id, p_reason: reason });
+  if (error) return toast(error.message, 'error');
+  toast(`已取消，退款 NT$${data?.refund_amount_ntd || 0}`); loadDisputes();
+};
+
+async function loadReviews() {
+  const { data } = await supabase.from('reviews').select('*, teachers(display_name)').order('created_at', { ascending: false }).limit(50);
+  const el = document.getElementById('reviewList');
+  if (!data || !data.length) { el.innerHTML = `<div class="empty-state">尚無評價</div>`; return; }
+  el.innerHTML = data.map(r => `
+    <div style="border-bottom:1px solid var(--accent-dim);padding:14px 0">
+      <div style="display:flex;justify-content:space-between">
+        <div>
+          <span style="color:var(--accent)">${r.teachers?.display_name}</span>
+          <span style="color:#FFD700">${'★'.repeat(r.rating)}${'☆'.repeat(5-r.rating)}</span>
+          ${r.is_anonymous ? '<span style="font-size:11px;color:rgba(255,255,255,0.5)"> (匿名)</span>' : ''}
+        </div>
+        <div style="font-size:12px;color:rgba(255,255,255,0.5)">${new Date(r.created_at).toLocaleDateString('zh-TW')}</div>
+      </div>
+      <div style="margin-top:8px;font-size:14px">${r.comment || '(無評論)'}</div>
+    </div>
+  `).join('');
+}
+
+init();
+</script>
+</body>
+</html>

@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>登入 · 命理媒介中心</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Noto+Serif+TC:wght@400;600;700&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="container" style="max-width:480px">
+  <header style="padding:60px 0 30px">
+    <div class="ornament">◆ ◆ ◆</div>
+    <h1 style="font-size:36px">登入</h1>
+    <div class="subtitle">SIGN IN</div>
+  </header>
+
+  <div class="card">
+    <div class="tabs">
+      <div class="tab active" data-mode="signin">登入</div>
+      <div class="tab" data-mode="signup">註冊</div>
+    </div>
+
+    <div class="input-row">
+      <label>Email</label>
+      <input id="email" type="email" autocomplete="email" required>
+    </div>
+    <div class="input-row">
+      <label>密碼</label>
+      <input id="pwd" type="password" minlength="6" required>
+    </div>
+
+    <div id="extra" style="display:none">
+      <div class="input-row">
+        <label>顯示名稱</label>
+        <input id="displayName" required>
+      </div>
+      <div style="background:rgba(0,0,0,0.25);border:1px solid var(--accent-dim);border-radius:8px;padding:14px;margin-bottom:14px;font-size:12px;line-height:1.8;color:rgba(255,255,255,0.75)">
+        <div style="color:var(--accent);font-weight:600;margin-bottom:6px;letter-spacing:1px">個資使用告知</div>
+        本平台依《個人資料保護法》蒐集你的姓名、Email、生辰資料（含時間／地點），用途為：
+        (1) 排盤工具運算 (2) 媒合老師諮詢 (3) 客服。資料保留至帳號刪除後 30 天即清除。
+        生辰資料屬高敏感個資，僅在你預約諮詢時提供給你選擇的老師，平台不對外揭露、不販售第三方。
+        詳細條款請見 <a href="../legal/privacy.html" target="_blank" style="color:var(--accent-light)">隱私權政策</a> 與 <a href="../legal/tos.html" target="_blank" style="color:var(--accent-light)">服務條款</a>。
+      </div>
+      <label style="display:flex;align-items:flex-start;gap:8px;font-size:13px;color:rgba(255,255,255,0.85);margin-bottom:10px;cursor:pointer">
+        <input type="checkbox" id="agreePrivacy" style="margin-top:3px">
+        <span>我已閱讀並同意<strong style="color:var(--accent)">隱私權政策</strong>與<strong style="color:var(--accent)">服務條款</strong>（必填）</span>
+      </label>
+      <label style="display:flex;align-items:flex-start;gap:8px;font-size:12px;color:rgba(255,255,255,0.7);margin-bottom:6px;cursor:pointer">
+        <input type="checkbox" id="agreeMarketing" style="margin-top:3px">
+        <span>願意收到平台優惠 / 課程資訊（可選，隨時可取消）</span>
+      </label>
+    </div>
+
+    <button class="btn-primary" id="primaryBtn" style="width:100%;margin-top:8px">登入</button>
+
+    <div style="text-align:center;margin-top:20px;color:rgba(255,255,255,0.5);font-size:12px">
+      或以下方式快速登入
+    </div>
+    <button class="btn-secondary" style="width:100%;margin-top:14px" onclick="loginWithLine()">
+      📱 LINE 登入
+    </button>
+  </div>
+
+  <div style="text-align:center;margin-top:20px">
+    <a href="../" style="color:rgba(255,255,255,0.6);font-size:13px;text-decoration:none">← 回首頁</a>
+  </div>
+</div>
+
+<script src="../assets/config.js"></script>
+<script type="module">
+import { supabase, toast } from '../assets/supabase-client.js';
+
+let mode = 'signin';
+const params = new URLSearchParams(location.search);
+const returnUrl = params.get('return') || '../';
+
+document.querySelectorAll('.tab').forEach((t) => {
+  t.onclick = () => {
+    document.querySelectorAll('.tab').forEach((x) => x.classList.remove('active'));
+    t.classList.add('active');
+    mode = t.dataset.mode;
+    document.getElementById('extra').style.display = mode === 'signup' ? 'block' : 'none';
+    document.getElementById('primaryBtn').textContent = mode === 'signup' ? '註冊' : '登入';
+  };
+});
+
+document.getElementById('primaryBtn').onclick = async () => {
+  const email = document.getElementById('email').value.trim();
+  const password = document.getElementById('pwd').value;
+  if (!email || password.length < 6) return toast('請填寫 Email + 密碼（至少 6 字）', 'error');
+
+  if (mode === 'signin') {
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) return toast(error.message, 'error');
+    toast('登入成功 ✦');
+  } else {
+    const displayName = document.getElementById('displayName').value.trim();
+    if (!displayName) return toast('請填顯示名稱', 'error');
+    if (!document.getElementById('agreePrivacy').checked) return toast('需同意隱私權政策與服務條款才能註冊', 'error');
+    const marketing = document.getElementById('agreeMarketing').checked;
+
+    const { data, error } = await supabase.auth.signUp({
+      email, password,
+      options: { data: { display_name: displayName } },
+    });
+    if (error) return toast(error.message, 'error');
+    if (data.user) {
+      const now = new Date().toISOString();
+      await supabase.from('profiles').insert({
+        id: data.user.id,
+        display_name: displayName,
+        privacy_consent_at: now,
+        tos_consent_at: now,
+        privacy_consent_version: 'v1.0',
+        marketing_opt_in: marketing,
+      });
+      await supabase.from('consent_log').insert([
+        { user_id: data.user.id, consent_type: 'privacy', consent_version: 'v1.0', user_agent: navigator.userAgent },
+        { user_id: data.user.id, consent_type: 'tos', consent_version: 'v1.0', user_agent: navigator.userAgent },
+        ...(marketing ? [{ user_id: data.user.id, consent_type: 'marketing', consent_version: 'v1.0', user_agent: navigator.userAgent }] : []),
+      ]);
+    }
+    toast('註冊成功 ✦ 請查收驗證 Email');
+  }
+  setTimeout(() => location.href = returnUrl, 1000);
+};
+
+window.loginWithLine = async () => {
+  const { error } = await supabase.auth.signInWithOAuth({
+    provider: 'line',
+    options: { redirectTo: returnUrl },
+  });
+  if (error) toast('LINE 登入：' + error.message + '（請聯絡管理員啟用 LINE Provider）', 'error');
+};
+</script>
+</body>
+</html>

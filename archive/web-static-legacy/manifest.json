@@ -1,0 +1,32 @@
+{
+  "name": "命理媒介中心",
+  "short_name": "命理中心",
+  "description": "8 個排盤工具 · 真人老師媒合 · AR 體驗",
+  "start_url": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0D1B2A",
+  "theme_color": "#0D1B2A",
+  "lang": "zh-TW",
+  "icons": [
+    {
+      "src": "assets/icon-192.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icon-512.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    { "name": "八字排盤", "url": "./tools/bazi.html", "description": "四柱推命" },
+    { "name": "塔羅", "url": "./tools/tarot.html", "description": "Rider-Waite 78 牌" },
+    { "name": "找老師", "url": "./teachers/", "description": "媒合真人老師" },
+    { "name": "AR 體驗", "url": "./ar/", "description": "立體呈現命盤" }
+  ],
+  "categories": ["lifestyle", "entertainment"]
+}

@@ -1,0 +1,51 @@
+[project]
+name = "mele-python-api"
+version = "0.1.0"
+description = "Mele divination API (FastAPI + 8 engines)"
+requires-python = ">=3.11"
+
+[tool.ruff]
+line-length = 110
+target-version = "py311"
+extend-exclude = ["venv", "__pycache__", "data", ".pytest_cache"]
+
+[tool.ruff.lint]
+# E/W: pycodestyle, F: pyflakes, I: isort, B: bugbear, UP: pyupgrade,
+# SIM: simplify, N: pep8-naming, RUF: ruff-specific, ASYNC, S: bandit-lite
+select = ["E", "W", "F", "I", "B", "UP", "SIM", "N", "RUF", "ASYNC", "S"]
+# 演算法引擎含許多領域變數命名（甲乙丙丁等中文 / 西方占星縮寫），不強制 N803/N806
+# S101 assert 在測試中允許；S311 random 在塔羅/盧恩抽卡是合理用途
+ignore = ["N802", "N803", "N806", "S101", "S311", "B008", "SIM108"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S", "F401", "F811"]
+"engines/explanations.py" = ["E501"]  # 大量解釋文字
+"renderers/*.py" = ["E501"]  # SVG/HTML 字串難切
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+[tool.mypy]
+python_version = "3.11"
+ignore_missing_imports = true
+follow_imports = "silent"
+warn_unused_ignores = true
+warn_redundant_casts = true
+warn_unreachable = true
+strict_equality = true
+check_untyped_defs = true
+exclude = ["venv/", "__pycache__/", "data/", "tests/", "_iztro_helper", "_sweph_helper"]
+
+[[tool.mypy.overrides]]
+module = ["lunar_python.*", "sweph.*", "iztro.*"]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = "test_*.py"
+addopts = "-q --strict-markers"
+markers = [
+  "slow: marks tests as slow (deselect with -m 'not slow')",
+  "integration: marks tests requiring external dependencies",
+]

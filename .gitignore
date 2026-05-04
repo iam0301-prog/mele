@@ -1,0 +1,46 @@
+# Dependencies
+node_modules/
+apps/web/node_modules/
+python_api/venv/
+.py312-packages/
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p8
+*.p12
+
+# Build output
+dist/
+build/
+coverage/
+.vitest-cache/
+apps/web/.next/
+apps/web/.next.*/
+apps/web/out/
+apps/web/playwright-report/
+
+# Caches and generated test output
+.pytest_cache/
+python_api/.pytest_cache/
+supabase/.temp/
+**/__pycache__/
+*.py[cod]
+test-results/
+tmp/
+.tmp/
+*.log
+.tmp-*.png
+.tmp-*.json
+
+# OS and editor files
+.DS_Store
+Thumbs.db
+.claude/
+
+# Local extraction / scratch files
+sample_extracted.html
+新增 RTF 格式.rtf

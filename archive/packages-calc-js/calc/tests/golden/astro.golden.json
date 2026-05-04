@@ -1,0 +1,74 @@
+{
+  "tool": "astro",
+  "version": "1.0.0",
+  "method": "Swiss Ephemeris (sweph npm) with Moshier internal algorithm. House system: Placidus.",
+  "source": "(a) 春分/夏至/秋分/冬至為精確天文事件，公開可查；(b) Steve Jobs 1955-02-24 19:15 PST San Francisco 為 Astro.com 公開本命盤。",
+  "cases": [
+    {
+      "id": "a-001",
+      "label": "Spring Equinox 2024-03-20 ~03:07 UT — Sun ≈ 0° Aries (just past boundary)",
+      "input": { "year": 2024, "month": 3, "day": 20, "hour": 3, "minute": 8, "timezone": 0 },
+      "expected": {
+        "sun": { "sign": "牡羊", "longitudeAround": 0, "tolerance": 0.1 }
+      }
+    },
+    {
+      "id": "a-002",
+      "label": "Summer Solstice 2024-06-20 ~20:52 UT — Sun ≈ 0° Cancer",
+      "input": { "year": 2024, "month": 6, "day": 20, "hour": 20, "minute": 52, "timezone": 0 },
+      "expected": {
+        "sun": { "sign": "巨蟹", "longitudeAround": 90, "tolerance": 0.05 }
+      }
+    },
+    {
+      "id": "a-003",
+      "label": "Fall Equinox 2024-09-22 ~12:44 UT — Sun ≈ 0° Libra",
+      "input": { "year": 2024, "month": 9, "day": 22, "hour": 12, "minute": 45, "timezone": 0 },
+      "expected": {
+        "sun": { "sign": "天秤", "longitudeAround": 180, "tolerance": 0.1 }
+      }
+    },
+    {
+      "id": "a-004",
+      "label": "Winter Solstice 2024-12-21 ~09:21 UT — Sun ≈ 0° Capricorn",
+      "input": { "year": 2024, "month": 12, "day": 21, "hour": 9, "minute": 22, "timezone": 0 },
+      "expected": {
+        "sun": { "sign": "摩羯", "longitudeAround": 270, "tolerance": 0.05 }
+      }
+    },
+    {
+      "id": "a-005",
+      "label": "Steve Jobs 1955-02-24 19:15 PST San Francisco (Astro.com public chart)",
+      "input": {
+        "datetime": { "year": 1955, "month": 2, "day": 24, "hour": 19, "minute": 15, "timezone": -8 },
+        "location": { "lat": 37.7749, "lon": -122.4194 }
+      },
+      "expected": {
+        "sun": { "sign": "雙魚", "degInSignAround": 5.75, "tolerance": 0.5 },
+        "moon": { "sign": "牡羊", "degInSignAround": 7.75, "tolerance": 1 },
+        "mercury": { "sign": "水瓶" },
+        "venus": { "sign": "摩羯" },
+        "mars": { "sign": "牡羊" },
+        "jupiter": { "sign": "巨蟹" },
+        "saturn": { "sign": "天蠍" },
+        "ascendant": { "sign": "處女", "degInSignAround": 22.29, "tolerance": 1 }
+      }
+    },
+    {
+      "id": "a-006",
+      "label": "Cusp date: 1990-09-22 (Virgo/Libra cusp around fall equinox)",
+      "input": { "year": 1990, "month": 9, "day": 22, "hour": 12, "minute": 0, "timezone": 0 },
+      "expected": {
+        "sun": { "sign": "處女" }
+      }
+    },
+    {
+      "id": "a-007",
+      "label": "Cusp date: 1990-09-23 (next day, should be Libra)",
+      "input": { "year": 1990, "month": 9, "day": 23, "hour": 12, "minute": 0, "timezone": 0 },
+      "expected": {
+        "sun": { "sign": "天秤" }
+      }
+    }
+  ]
+}

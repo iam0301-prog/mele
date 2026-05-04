@@ -1,0 +1,602 @@
+[
+  {
+    "glyph": "ᚠ",
+    "name": "菲胡",
+    "zh": null,
+    "meaning": null,
+    "element": null,
+    "upright": {
+      "keywords": [
+        "財富",
+        "資源",
+        "起點",
+        "流動"
+      ],
+      "text": "豐盛流向你。新財富、資源、機會。關鍵是『流動』。"
+    },
+    "reversed": {
+      "keywords": [
+        "財富",
+        "資源",
+        "起點",
+        "流動"
+      ],
+      "text": "財富停滯、資源被卡。"
+    }
+  },
+  {
+    "glyph": "ᚢ",
+    "name": "烏魯茲",
+    "zh": null,
+    "meaning": null,
+    "element": null,
+    "upright": {
+      "keywords": [
+        "力量",
+        "原始",
+        "健康",
+        "勇氣"
+      ],
+      "text": "原始力量覺醒。野牛般的能量。"
+    },
+    "reversed": {
+      "keywords": [
+        "力量",
+        "原始",
+        "健康",
+        "勇氣"
+      ],
+      "text": "力量壓抑、健康警訊。"
+    }
+  },
+  {
+    "glyph": "ᚦ",
+    "name": "瑟里薩茲",
+    "zh": null,
+    "meaning": null,
+    "element": null,
+    "upright": {
+      "keywords": [
+        "突破",
+        "防禦",
+        "挑戰",
+        "保護"
+      ],
+      "text": "挑戰將至、有突破力量。雷神之鎚。"
+    },
+    "reversed": {
+      "keywords": [
+        "突破",
+        "防禦",
+        "挑戰",
+        "保護"
+      ],
+      "text": "被攻擊、防禦過度。"
+    }
+  },
+  {
+    "glyph": "ᚨ",
+    "name": "安蘇茲",
+    "zh": null,
+    "meaning": null,
+    "element": null,
+    "upright": {
+      "keywords": [
+        "訊息",
+        "智慧",
+        "溝通",
+        "靈感"
+      ],
+      "text": "重要訊息將至。注意你聽到的話。"
+    },
+    "reversed": {
+      "keywords": [
+        "訊息",
+        "智慧",
+        "溝通",
+        "靈感"
+      ],
+      "text": "被誤導、收到假訊息。"
+    }
+  },
+  {
+    "glyph": "ᚱ",
+    "name": "萊多",
+    "zh": null,
+    "meaning": null,
+    "element": null,
+    "upright": {
+      "keywords": [
+        "旅程",
+        "行動",
+        "節奏",
+        "正確的路"
+      ],
+      "text": "踏上旅程。找到自己的節奏。"
+    },
+    "reversed": {
+      "keywords": [
+        "旅程",
+        "行動",
+        "節奏",
+        "正確的路"
+      ],
+      "text": "旅程受阻、走錯方向。"
+    }
+  },
+  {
+    "glyph": "ᚲ",
+    "name": "開納茲",
+    "zh": null,
+    "meaning": null,
+    "element": null,
+    "upright": {
+      "keywords": [
+        "啟示",
+        "創造",
+        "熱情",
+        "真相"
+      ],
+      "text": "火炬點燃。啟示、洞見、創造熱情。"
+    },
+    "reversed": {
+      "keywords": [
+        "啟示",
+        "創造",
+        "熱情",
+        "真相"
+      ],
+      "text": "創造力枯竭、看不清。"
+    }
+  },
+  {
+    "glyph": "ᚷ",
+    "name": "基波",
+    "zh": null,
+    "meaning": null,
+    "element": null,
+    "upright": {
+      "keywords": [
+        "禮物",
+        "平等",
+        "連結",
+        "給予"
+      ],
+      "text": "互相給予的能量。新合作、深刻關係。"
+    },
+    "reversed": {
+      "keywords": [
+        "禮物",
+        "平等",
+        "連結",
+        "給予"
+      ],
+      "text": "⚠ 對稱符文・無逆位｜陰暗面：失衡的給予、付出沒回應、單方面的犧牲。"
+    }
+  },
+  {
+    "glyph": "ᚹ",
+    "name": "溫究",
+    "zh": null,
+    "meaning": null,
+    "element": null,
+    "upright": {
+      "keywords": [
+        "喜悅",
+        "和諧",
+        "成功",
+        "滿足"
+      ],
+      "text": "純粹的喜悅與和諧。"
+    },
+    "reversed": {
+      "keywords": [
+        "喜悅",
+        "和諧",
+        "成功",
+        "滿足"
+      ],
+      "text": "暫時失意、表面開心內在空虛。"
+    }
+  },
+  {
+    "glyph": "ᚺ",
+    "name": "哈格拉茲",
+    "zh": null,
+    "meaning": null,
+    "element": null,
+    "upright": {
+      "keywords": [
+        "破壞",
+        "轉化",
+        "危機",
+        "清理"
+      ],
+      "text": "突如其來的衝擊。必要的清理。"
+    },
+    "reversed": {
+      "keywords": [
+        "破壞",
+        "轉化",
+        "危機",
+        "清理"
+      ],
+      "text": "⚠ 對稱符文・無逆位｜陰暗面：抗拒不可避免的崩塌、災難重現、找不到重建力。"
+    }
+  },
+  {
+    "glyph": "ᚾ",
+    "name": "瑙提茲",
+    "zh": null,
+    "meaning": null,
+    "element": null,
+    "upright": {
+      "keywords": [
+        "需要",
+        "耐心",
+        "限制",
+        "必要的束縛"
+      ],
+      "text": "目前的限制是必要的功課。"
+    },
+    "reversed": {
+      "keywords": [
+        "需要",
+        "耐心",
+        "限制",
+        "必要的束縛"
+      ],
+      "text": "逃避責任、受害者心態。"
+    }
+  },
+  {
+    "glyph": "ᛁ",
+    "name": "伊薩",
+    "zh": null,
+    "meaning": null,
+    "element": null,
+    "upright": {
+      "keywords": [
+        "停滯",
+        "等待",
+        "冷凍",
+        "靜止"
+      ],
+      "text": "事情停滯了--但這不是壞事。等待。"
+    },
+    "reversed": {
+      "keywords": [
+        "停滯",
+        "等待",
+        "冷凍",
+        "靜止"
+      ],
+      "text": "⚠ 對稱符文・無逆位｜陰暗面：停太久變成情感冷漠、被冰封的關係、自我封閉。"
+    }
+  },
+  {
+    "glyph": "ᛃ",
+    "name": "耶拉",
+    "zh": null,
+    "meaning": null,
+    "element": null,
+    "upright": {
+      "keywords": [
+        "收穫",
+        "循環",
+        "耐心成果",
+        "季節"
+      ],
+      "text": "耕耘終將收成。等對的時節。"
+    },
+    "reversed": {
+      "keywords": [
+        "收穫",
+        "循環",
+        "耐心成果",
+        "季節"
+      ],
+      "text": "⚠ 對稱符文・無逆位｜陰暗面：收成不如預期、太早放棄、錯過該採收的時機。"
+    }
+  },
+  {
+    "glyph": "ᛇ",
+    "name": "埃瓦茲（紫杉）",
+    "zh": null,
+    "meaning": null,
+    "element": null,
+    "upright": {
+      "keywords": [
+        "轉化",
+        "內在",
+        "死亡與重生",
+        "靈性軸心"
+      ],
+      "text": "深刻的內在轉化。世界樹。"
+    },
+    "reversed": {
+      "keywords": [
+        "轉化",
+        "內在",
+        "死亡與重生",
+        "靈性軸心"
+      ],
+      "text": "⚠ 對稱符文・無逆位｜陰暗面：抗拒必經的轉化、僵化、不願面對死亡與重生。"
+    }
+  },
+  {
+    "glyph": "ᛈ",
+    "name": "佩斯洛",
+    "zh": null,
+    "meaning": null,
+    "element": null,
+    "upright": {
+      "keywords": [
+        "命運",
+        "秘密",
+        "機會",
+        "神秘"
+      ],
+      "text": "神秘的力量正運作。意外機會、隱藏真相。"
+    },
+    "reversed": {
+      "keywords": [
+        "命運",
+        "秘密",
+        "機會",
+        "神秘"
+      ],
+      "text": "運氣不順、秘密被揭穿。"
+    }
+  },
+  {
+    "glyph": "ᛉ",
+    "name": "亞茲",
+    "zh": null,
+    "meaning": null,
+    "element": null,
+    "upright": {
+      "keywords": [
+        "保護",
+        "直覺",
+        "防禦",
+        "神聖"
+      ],
+      "text": "你被保護著。相信直覺。"
+    },
+    "reversed": {
+      "keywords": [
+        "保護",
+        "直覺",
+        "防禦",
+        "神聖"
+      ],
+      "text": "忽略警訊、暴露於危險。"
+    }
+  },
+  {
+    "glyph": "ᛋ",
+    "name": "索維洛",
+    "zh": null,
+    "meaning": null,
+    "element": null,
+    "upright": {
+      "keywords": [
+        "太陽",
+        "成功",
+        "活力",
+        "勝利"
+      ],
+      "text": "陽光普照。成功、活力、清明。"
+    },
+    "reversed": {
+      "keywords": [
+        "太陽",
+        "成功",
+        "活力",
+        "勝利"
+      ],
+      "text": "⚠ 對稱符文・無逆位｜陰暗面：過度耀眼帶來的灼傷、自我膨脹、看不見陰影。"
+    }
+  },
+  {
+    "glyph": "ᛏ",
+    "name": "提瓦茲",
+    "zh": null,
+    "meaning": null,
+    "element": null,
+    "upright": {
+      "keywords": [
+        "勇氣",
+        "正義",
+        "犧牲",
+        "領導"
+      ],
+      "text": "戰士勇氣。為正義站出來。"
+    },
+    "reversed": {
+      "keywords": [
+        "勇氣",
+        "正義",
+        "犧牲",
+        "領導"
+      ],
+      "text": "懦弱、不公對待。"
+    }
+  },
+  {
+    "glyph": "ᛒ",
+    "name": "贝卡诺",
+    "zh": null,
+    "meaning": null,
+    "element": null,
+    "upright": {
+      "keywords": [
+        "新生",
+        "成長",
+        "母性",
+        "保育"
+      ],
+      "text": "新的開始、生命的成長。樺樹女神。"
+    },
+    "reversed": {
+      "keywords": [
+        "新生",
+        "成長",
+        "母性",
+        "保育"
+      ],
+      "text": "成長停滯、家庭問題。"
+    }
+  },
+  {
+    "glyph": "ᛖ",
+    "name": "艾瓦茲（馬）",
+    "zh": null,
+    "meaning": null,
+    "element": null,
+    "upright": {
+      "keywords": [
+        "夥伴",
+        "信任",
+        "旅程",
+        "合作"
+      ],
+      "text": "信任的夥伴出現。新合作。"
+    },
+    "reversed": {
+      "keywords": [
+        "夥伴",
+        "信任",
+        "旅程",
+        "合作"
+      ],
+      "text": "夥伴不可靠、孤軍奮戰。"
+    }
+  },
+  {
+    "glyph": "ᛗ",
+    "name": "瑪納茲",
+    "zh": null,
+    "meaning": null,
+    "element": null,
+    "upright": {
+      "keywords": [
+        "人性",
+        "自我",
+        "群體",
+        "認同"
+      ],
+      "text": "關於『身為人』。你不是孤島。"
+    },
+    "reversed": {
+      "keywords": [
+        "人性",
+        "自我",
+        "群體",
+        "認同"
+      ],
+      "text": "⚠ 對稱符文・無逆位｜陰暗面：自我中心、孤立、跟群體斷連、找不到歸屬。"
+    }
+  },
+  {
+    "glyph": "ᛚ",
+    "name": "拉古茲",
+    "zh": null,
+    "meaning": null,
+    "element": null,
+    "upright": {
+      "keywords": [
+        "流動",
+        "直覺",
+        "情感",
+        "深度"
+      ],
+      "text": "順流而行。相信感覺。"
+    },
+    "reversed": {
+      "keywords": [
+        "流動",
+        "直覺",
+        "情感",
+        "深度"
+      ],
+      "text": "被情緒淹沒、抗拒流動。"
+    }
+  },
+  {
+    "glyph": "ᛜ",
+    "name": "英瓦茲",
+    "zh": null,
+    "meaning": null,
+    "element": null,
+    "upright": {
+      "keywords": [
+        "完成",
+        "累積",
+        "內在準備",
+        "休眠"
+      ],
+      "text": "階段即將完成。內在累積。"
+    },
+    "reversed": {
+      "keywords": [
+        "完成",
+        "累積",
+        "內在準備",
+        "休眠"
+      ],
+      "text": "⚠ 對稱符文・無逆位｜陰暗面：累積太久不釋放、停在準備階段、不敢開花結果。"
+    }
+  },
+  {
+    "glyph": "ᛞ",
+    "name": "達加茲",
+    "zh": null,
+    "meaning": null,
+    "element": null,
+    "upright": {
+      "keywords": [
+        "突破",
+        "覺醒",
+        "新黎明",
+        "轉折"
+      ],
+      "text": "黎明覺醒。突破發生。"
+    },
+    "reversed": {
+      "keywords": [
+        "突破",
+        "覺醒",
+        "新黎明",
+        "轉折"
+      ],
+      "text": "⚠ 對稱符文・無逆位｜陰暗面：黎明前的最深黑暗、停留在交界處不敢跨。"
+    }
+  },
+  {
+    "glyph": "ᛟ",
+    "name": "奧提拉",
+    "zh": null,
+    "meaning": null,
+    "element": null,
+    "upright": {
+      "keywords": [
+        "傳承",
+        "家族",
+        "根基",
+        "真我"
+      ],
+      "text": "連結你的根。家族傳承。"
+    },
+    "reversed": {
+      "keywords": [
+        "傳承",
+        "家族",
+        "根基",
+        "真我"
+      ],
+      "text": "與家族議題、無法歸屬。"
+    }
+  }
+]

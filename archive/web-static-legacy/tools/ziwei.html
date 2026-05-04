@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>紫微 · 命理媒介中心</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Noto+Serif+TC:wght@400;600;700&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
+<style>
+.mele-result svg { max-width: 100%; height: auto; display: block; margin: 0 auto; }
+.cta-after { background: linear-gradient(135deg, rgba(201,162,39,0.12), rgba(201,162,39,0.04)); border: 1px solid var(--accent); border-radius: 14px; padding: 24px; margin-top: 30px; text-align: center; }
+</style>
+</head>
+<body>
+<div class="container">
+  <a href="../" style="color:var(--accent);text-decoration:none;font-size:13px;letter-spacing:2px">‹ 回首頁</a>
+  <header style="padding:30px 0">
+    <div class="ornament">◆ ◆ ◆</div><h1>紫微斗數</h1>
+    <div class="subtitle">PURPLE STAR</div>
+    <div style="margin-top:20px;color:rgba(255,255,255,0.7);font-size:13px">12 宮位 + 命/身宮 + 五行局</div>
+  </header>
+  <div class="card">
+    <div class="section-title">輸入生辰</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+      <div class="input-row"><label>生日 * (國曆)</label><input id="date" type="date" required></div>
+      <div class="input-row"><label>出生時間 *</label><input id="time" type="time" required></div>
+    </div>
+    <div class="input-row"><label>性別</label>
+      <select id="gender"><option value="男">男</option><option value="女">女</option></select>
+    </div>
+    <button class="btn-primary" id="calcBtn">排盤 ›</button>
+  </div>
+  <div id="result"></div>
+</div>
+<script src="../assets/config.js"></script>
+<script type="module">
+import { calc, mountResult, showLoading, showError, recordChart } from '../assets/mele-api.js';
+import { supabase, getCurrentUser, toast } from '../assets/supabase-client.js';
+const result = document.getElementById('result');
+document.getElementById('calcBtn').onclick = async () => {
+  const date = document.getElementById('date').value;
+  const time = document.getElementById('time').value;
+  if (!date || !time) return toast('請填完整', 'error');
+  const [year, month, day] = date.split('-').map(Number);
+  const [hour, minute] = time.split(':').map(Number);
+  const gender = document.getElementById('gender').value;
+  const input = { year, month, day, hour, minute, gender };
+  showLoading(result, '紫微 12 宮位排盤中…');
+  try {
+    const r = await calc('ziwei', input);
+    mountResult(result, r);
+    const cta = document.createElement('div');
+    cta.className = 'cta-after';
+    cta.innerHTML = `<div style="font-family:'Noto Serif TC';font-size:18px;color:var(--accent);margin-bottom:10px">看完整 14 主星與十年大限？</div>
+      <a href="../teachers/index.html?spec=紫微" class="btn-primary" style="text-decoration:none;display:inline-block">找紫微老師諮詢 ›</a>`;
+    result.appendChild(cta);
+    const user = await getCurrentUser();
+    await recordChart(supabase, user, 'ziwei', input, r.data);
+  } catch (e) { showError(result, e.message); }
+};
+</script>
+</body></html>

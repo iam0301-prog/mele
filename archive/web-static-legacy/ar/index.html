@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0D1B2A">
+<title>AR 體驗 · 命理媒介中心</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Noto+Serif+TC:wght@400;600;700&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
+<style>
+.ar-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; margin: 20px 0; }
+.ar-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--accent-dim);
+  border-radius: 14px;
+  padding: 22px 14px;
+  text-align: center; cursor: pointer; text-decoration: none; color: white;
+  transition: all .3s; position: relative; overflow: hidden;
+}
+.ar-card::before {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(circle at 50% 0%, rgba(201,162,39,0.15), transparent 70%);
+  opacity: 0; transition: opacity .3s;
+}
+.ar-card:hover::before { opacity: 1; }
+.ar-card:hover { border-color: var(--accent); transform: translateY(-3px); }
+.ar-card .ic { font-size: 32px; color: var(--accent); margin-bottom: 8px; position: relative; }
+.ar-card .name { font-family: "Noto Serif TC"; font-size: 15px; letter-spacing: 2px; position: relative; }
+.ar-card .desc { font-size: 11px; color: rgba(255,255,255,0.55); margin-top: 4px; position: relative; }
+
+.support-banner {
+  background: rgba(45,106,79,0.08);
+  border-left: 3px solid var(--success);
+  padding: 12px 16px; border-radius: 8px; margin: 18px 0;
+  font-size: 13px; line-height: 1.8;
+}
+.support-banner.warn { background: rgba(244,162,97,0.08); border-left-color: var(--warning); }
+.support-banner.warn .ic { color: var(--warning); }
+.support-banner .ic { color: var(--success); margin-right: 6px; }
+
+@media (max-width: 600px) {
+  .ar-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .ar-card { padding: 18px 10px; }
+  .ar-card .ic { font-size: 26px; }
+  .ar-card .name { font-size: 13px; letter-spacing: 1px; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <a href="../" style="color:var(--accent);text-decoration:none;font-size:13px;letter-spacing:2px">‹ 回首頁</a>
+
+  <header style="padding:30px 0">
+    <div class="ornament">◆ ◆ ◆</div>
+    <h1>AR 立體呈現</h1>
+    <div class="subtitle">AUGMENTED REALITY</div>
+    <div style="margin-top:20px;color:rgba(255,255,255,0.7);font-size:13px;line-height:1.9">
+      用手機鏡頭把命盤放進你的真實空間 · 圍繞它走、放大縮小、旁白朗讀
+    </div>
+  </header>
+
+  <div id="supportInfo"></div>
+
+  <div class="card">
+    <div class="section-title">選擇要 AR 呈現的工具</div>
+    <div class="section-subtitle">PICK A TOOL</div>
+
+    <div class="ar-grid">
+      <a href="scene.html?tool=numerology" class="ar-card">
+        <div class="ic">數</div>
+        <div class="name">靈數</div>
+        <div class="desc">脈動的能量數字</div>
+      </a>
+      <a href="scene.html?tool=maya" class="ar-card">
+        <div class="ic">⊕</div>
+        <div class="name">瑪雅 Kin</div>
+        <div class="desc">旋轉銀河印記</div>
+      </a>
+      <a href="scene.html?tool=bazi" class="ar-card">
+        <div class="ic">命</div>
+        <div class="name">八字</div>
+        <div class="desc">四柱浮現空間中</div>
+      </a>
+      <a href="scene.html?tool=ziwei" class="ar-card">
+        <div class="ic">紫</div>
+        <div class="name">紫微</div>
+        <div class="desc">12 宮環繞站立</div>
+      </a>
+      <a href="scene.html?tool=tarot" class="ar-card">
+        <div class="ic">⚭</div>
+        <div class="name">塔羅</div>
+        <div class="desc">立體翻牌動畫</div>
+      </a>
+      <a href="scene.html?tool=runes" class="ar-card">
+        <div class="ic">ᚠ</div>
+        <div class="name">盧恩</div>
+        <div class="desc">石頭從空中浮現</div>
+      </a>
+      <a href="scene.html?tool=astro" class="ar-card">
+        <div class="ic">☉</div>
+        <div class="name">占星</div>
+        <div class="desc">3D 旋轉星盤</div>
+      </a>
+      <a href="scene.html?tool=humandesign" class="ar-card">
+        <div class="ic">⊹</div>
+        <div class="name">人類圖</div>
+        <div class="desc">9 中心發光球體</div>
+      </a>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-title">使用說明</div>
+    <div style="font-size:13px;line-height:2;color:rgba(255,255,255,0.85)">
+      1. 點上方任一工具 → 填入生辰資料<br>
+      2. 點「進入 AR」按鈕，允許相機權限<br>
+      3. 把手機對準地面或桌面，會看到命盤浮現在前方<br>
+      4. 用手指拖曳可旋轉、縮放<br>
+      5. 點命盤元素會展開詳細資訊與朗讀
+    </div>
+    <div style="margin-top:16px;padding:12px 16px;background:rgba(74,111,165,0.1);border-radius:8px;border-left:3px solid var(--info);font-size:12px">
+      <strong style="color:var(--info)">提示：</strong> 不支援 AR 的裝置會自動 fallback 成 3D 預覽模式（用手指轉動視角）
+    </div>
+  </div>
+</div>
+
+<script>
+// 偵測 WebXR / AR 支援
+(async () => {
+  const banner = document.getElementById('supportInfo');
+  const isMobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
+  let hasXR = false, hasAR = false;
+  if ('xr' in navigator) {
+    hasXR = true;
+    try {
+      hasAR = await navigator.xr.isSessionSupported('immersive-ar');
+    } catch (e) {}
+  }
+
+  if (hasAR) {
+    banner.innerHTML = `<div class="support-banner"><span class="ic">✓</span> 你的裝置支援 WebXR AR — 可以完整 AR 體驗</div>`;
+  } else if (isMobile) {
+    banner.innerHTML = `<div class="support-banner warn"><span class="ic">⚠</span> 你的瀏覽器尚未啟用 WebXR。建議：iOS 用 Safari 或 WebXR Viewer App、Android 用 Chrome 並啟用 WebXR Incubations。仍可體驗 3D 預覽模式。</div>`;
+  } else {
+    banner.innerHTML = `<div class="support-banner warn"><span class="ic">ⓘ</span> 你正在電腦瀏覽。AR 需要手機鏡頭，但仍可進入 3D 預覽（用滑鼠拖曳旋轉）</div>`;
+  }
+})();
+</script>
+</body>
+</html>

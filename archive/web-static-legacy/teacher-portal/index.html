@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>老師後台 · 命理媒介中心</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Noto+Serif+TC:wght@400;600;700&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
+<style>
+.tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--accent-dim); margin-bottom: 20px; flex-wrap: wrap; }
+.tab { padding: 12px 18px; cursor: pointer; font-size: 14px; color: rgba(255,255,255,0.6); border-bottom: 2px solid transparent; }
+.tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+.stat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 14px; margin-bottom: 24px; }
+.stat-cell { padding: 18px; background: rgba(255,255,255,0.03); border: 1px solid var(--accent-dim); border-radius: 12px; }
+.stat-cell .num { font-family: "Cormorant Garamond"; font-size: 32px; color: var(--accent); }
+.stat-cell .lbl { font-size: 11px; color: rgba(255,255,255,0.5); letter-spacing: 2px; }
+.tab-pane { display: none; }
+.tab-pane.active { display: block; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th { text-align: left; color: rgba(255,255,255,0.6); padding: 10px 8px; border-bottom: 1px solid var(--accent-dim); font-weight: 500; letter-spacing: 1px; }
+td { padding: 12px 8px; border-bottom: 1px dashed rgba(201,162,39,0.15); vertical-align: top; }
+.row-act { display: flex; gap: 6px; flex-wrap: wrap; }
+.btn-mini { padding: 5px 10px; font-size: 12px; border-radius: 6px; cursor: pointer; border: 1px solid var(--accent-dim); background: transparent; color: var(--accent); }
+.btn-mini:hover { background: rgba(201,162,39,0.1); }
+.btn-mini.danger { color: #ff8a8a; border-color: #B8001F; }
+.toast { position: fixed; bottom: 30px; right: 30px; padding: 12px 18px; background: var(--success); color: white; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); z-index: 1000; }
+.toast.error { background: var(--reverse); }
+
+.svc-row, .av-row { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 100px; gap: 10px; align-items: center; padding: 8px 0; border-bottom: 1px dashed rgba(201,162,39,0.15); }
+.svc-row.head { font-size: 11px; color: rgba(255,255,255,0.5); letter-spacing: 1px; border-bottom: 1px solid var(--accent-dim); }
+.av-row { grid-template-columns: 100px 1fr 1fr 100px; }
+input.inline { padding: 6px 10px; font-size: 13px; }
+
+.rev-card { padding: 14px; background: rgba(255,255,255,0.04); border: 1px solid var(--accent-dim); border-radius: 10px; margin-bottom: 12px; }
+.rev-card .rating { color: #FFD700; }
+.rev-card .body { margin-top: 6px; color: rgba(255,255,255,0.8); }
+.rev-card .reply { margin-top: 10px; padding: 10px; background: rgba(201,162,39,0.06); border-left: 2px solid var(--accent); font-size: 13px; }
+
+@media (max-width:600px){
+  .svc-row, .av-row { grid-template-columns: 1fr; }
+  .svc-row.head { display: none; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <header style="padding:30px 0">
+    <div class="ornament">◆ ◆ ◆</div>
+    <h1>老師後台</h1>
+    <div class="subtitle">TEACHER PORTAL</div>
+  </header>
+
+  <div id="needLogin" class="card" style="display:none;text-align:center">
+    <div style="font-size:14px;margin:20px 0">請先登入</div>
+    <a href="../account/login.html" class="btn-primary" style="text-decoration:none">前往登入</a>
+  </div>
+
+  <div id="notTeacher" class="card" style="display:none;text-align:center">
+    <div style="font-size:14px;margin:20px 0">你尚未通過老師審核</div>
+    <a href="../teachers/apply.html" class="btn-primary" style="text-decoration:none">申請成為老師</a>
+  </div>
+
+  <div id="main" style="display:none">
+    <div class="stat-grid" id="stats"></div>
+
+    <div class="tabs">
+      <div class="tab active" data-tab="bookings">預約</div>
+      <div class="tab" data-tab="services">服務項目</div>
+      <div class="tab" data-tab="availability">可預約時段</div>
+      <div class="tab" data-tab="reviews">評價</div>
+      <div class="tab" data-tab="earnings">結算</div>
+      <div class="tab" data-tab="profile">個人資料</div>
+    </div>
+
+    <div id="pane-bookings" class="tab-pane active card">
+      <div class="section-title">預約清單</div>
+      <table id="bookingsTable"><thead><tr>
+        <th>時間</th><th>客戶</th><th>服務</th><th>金額</th><th>狀態</th><th>操作</th>
+      </tr></thead><tbody></tbody></table>
+    </div>
+
+    <div id="pane-services" class="tab-pane card">
+      <div class="section-title">服務項目</div>
+      <div class="section-subtitle">SERVICES</div>
+      <div class="svc-row head">
+        <div>名稱</div><div>時長(分)</div><div>價格(NT$)</div><div>顯示順序</div><div></div>
+      </div>
+      <div id="svcList"></div>
+      <div style="margin-top:16px">
+        <h4 style="color:var(--accent);font-family:'Noto Serif TC';margin-bottom:10px">新增服務</h4>
+        <div class="svc-row">
+          <input class="inline" id="newSvcName" placeholder="例：八字快問快答">
+          <input class="inline" id="newSvcDur" type="number" placeholder="60">
+          <input class="inline" id="newSvcPrice" type="number" placeholder="2000">
+          <input class="inline" id="newSvcOrder" type="number" placeholder="0">
+          <button class="btn-mini" id="addSvcBtn">新增</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="pane-availability" class="tab-pane card">
+      <div class="section-title">每週可預約時段</div>
+      <div class="section-subtitle">WEEKLY AVAILABILITY</div>
+      <div class="av-row" style="font-size:11px;color:rgba(255,255,255,0.5);letter-spacing:1px;border-bottom:1px solid var(--accent-dim);padding-bottom:6px">
+        <div>星期</div><div>開始</div><div>結束</div><div></div>
+      </div>
+      <div id="avList"></div>
+      <div style="margin-top:16px">
+        <h4 style="color:var(--accent);font-family:'Noto Serif TC';margin-bottom:10px">新增時段</h4>
+        <div class="av-row">
+          <select class="inline" id="newAvDow">
+            <option value="0">星期日</option><option value="1">星期一</option><option value="2">星期二</option>
+            <option value="3">星期三</option><option value="4">星期四</option><option value="5">星期五</option>
+            <option value="6">星期六</option>
+          </select>
+          <input class="inline" id="newAvStart" type="time" value="19:00">
+          <input class="inline" id="newAvEnd" type="time" value="22:00">
+          <button class="btn-mini" id="addAvBtn">新增</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="pane-reviews" class="tab-pane card">
+      <div class="section-title">客戶評價</div>
+      <div id="revList"></div>
+    </div>
+
+    <div id="pane-earnings" class="tab-pane card">
+      <div class="section-title">收入結算</div>
+      <div class="section-subtitle">EARNINGS</div>
+      <div id="earnList"></div>
+    </div>
+
+    <div id="pane-profile" class="tab-pane card">
+      <div class="section-title">個人資料</div>
+      <div class="input-row"><label>對外顯示名稱</label><input id="pfDisplay"></div>
+      <div class="input-row"><label>頭銜</label><input id="pfTitle"></div>
+      <div class="input-row"><label>一句話格言</label><input id="pfQuote"></div>
+      <div class="input-row"><label>短自介（30 字內）</label><input id="pfIntroShort"></div>
+      <div class="input-row"><label>長自介</label><textarea id="pfIntroLong" rows="4"></textarea></div>
+      <div class="input-row"><label>諮詢風格</label><input id="pfStyle"></div>
+      <div class="input-row"><label>LINE 連結</label><input id="pfLine"></div>
+      <div class="input-row"><label>Instagram</label><input id="pfIg"></div>
+      <button class="btn-primary" id="saveProfile">儲存</button>
+    </div>
+  </div>
+</div>
+
+<script src="../assets/config.js"></script>
+<script type="module">
+import { supabase, getCurrentUser, isActiveTeacher, toast } from '../assets/supabase-client.js';
+
+let teacher = null;
+
+(async () => {
+  const user = await getCurrentUser();
+  if (!user) { document.getElementById('needLogin').style.display = 'block'; return; }
+
+  const { data: t } = await supabase.from('teachers').select('*').eq('user_id', user.id).maybeSingle();
+  if (!t || t.status !== 'active') {
+    document.getElementById('notTeacher').style.display = 'block'; return;
+  }
+  teacher = t;
+  document.getElementById('main').style.display = 'block';
+
+  loadStats(); loadBookings(); loadServices(); loadAvailability(); loadReviews(); loadEarnings(); loadProfile();
+
+  // tabs
+  document.querySelectorAll('.tab').forEach(el => el.onclick = () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById('pane-' + el.dataset.tab).classList.add('active');
+  });
+})();
+
+async function loadStats() {
+  const [{ count: pending }, { count: completed }, { data: earn }] = await Promise.all([
+    supabase.from('bookings').select('*', { count: 'exact', head: true }).eq('teacher_id', teacher.id).eq('status', 'paid'),
+    supabase.from('bookings').select('*', { count: 'exact', head: true }).eq('teacher_id', teacher.id).eq('status', 'completed'),
+    supabase.from('bookings').select('teacher_amount_ntd').eq('teacher_id', teacher.id).in('status', ['completed','refunded']),
+  ]);
+  const total = (earn || []).reduce((s, b) => s + (b.teacher_amount_ntd || 0), 0);
+  document.getElementById('stats').innerHTML = `
+    <div class="stat-cell"><div class="lbl">待諮詢</div><div class="num">${pending || 0}</div></div>
+    <div class="stat-cell"><div class="lbl">完成案數</div><div class="num">${completed || 0}</div></div>
+    <div class="stat-cell"><div class="lbl">平均評分</div><div class="num">${(teacher.rating || 0).toFixed(2)}</div></div>
+    <div class="stat-cell"><div class="lbl">累計收入</div><div class="num">NT$${total.toLocaleString()}</div></div>
+  `;
+}
+
+async function loadBookings() {
+  const { data, error } = await supabase
+    .from('bookings').select('*, teacher_services(name)')
+    .eq('teacher_id', teacher.id).order('scheduled_at', { ascending: false }).limit(50);
+  if (error) return console.error(error);
+  const tbody = document.querySelector('#bookingsTable tbody');
+  tbody.innerHTML = (data || []).map(b => `
+    <tr>
+      <td>${new Date(b.scheduled_at).toLocaleString('zh-TW', { hour12: false })}</td>
+      <td><code style="font-size:11px">${(b.customer_id||'').slice(0,8)}</code></td>
+      <td>${b.teacher_services?.name || '-'}</td>
+      <td>NT$${b.amount_ntd}</td>
+      <td><span style="font-size:11px;padding:2px 8px;border-radius:8px;border:1px solid var(--accent-dim)">${b.status}</span></td>
+      <td><div class="row-act">
+        ${b.status === 'paid' || b.status === 'confirmed' ? `<button class="btn-mini" onclick="window.completeBooking('${b.id}')">標記完成</button>` : ''}
+        ${['paid','confirmed'].includes(b.status) ? `<button class="btn-mini danger" onclick="window.cancelByTeacher('${b.id}')">取消</button>` : ''}
+      </div></td>
+    </tr>
+  `).join('') || '<tr><td colspan="6" style="text-align:center;color:rgba(255,255,255,0.4);padding:30px">目前沒有預約</td></tr>';
+}
+
+window.completeBooking = async (id) => {
+  if (!confirm('確認諮詢已完成？將自動發送評價邀請給客戶')) return;
+  const { error } = await supabase.rpc('complete_booking', { p_booking_id: id });
+  if (error) return toast(error.message, 'error');
+  toast('已標記完成'); loadBookings(); loadStats();
+};
+window.cancelByTeacher = async (id) => {
+  const reason = prompt('取消原因');
+  if (!reason) return;
+  const { data, error } = await supabase.rpc('cancel_booking', { p_booking_id: id, p_reason: reason });
+  if (error) return toast(error.message, 'error');
+  toast(`已取消，退款 NT$${data.refund_amount_ntd || 0}`); loadBookings();
+};
+
+async function loadServices() {
+  const { data } = await supabase.from('teacher_services').select('*').eq('teacher_id', teacher.id).order('display_order');
+  const list = document.getElementById('svcList');
+  list.innerHTML = (data || []).map(s => `
+    <div class="svc-row">
+      <input class="inline" data-id="${s.id}" data-f="name" value="${s.name}">
+      <input class="inline" data-id="${s.id}" data-f="duration_minutes" type="number" value="${s.duration_minutes}">
+      <input class="inline" data-id="${s.id}" data-f="price_ntd" type="number" value="${s.price_ntd}">
+      <input class="inline" data-id="${s.id}" data-f="display_order" type="number" value="${s.display_order || 0}">
+      <div class="row-act">
+        <button class="btn-mini" onclick="window.saveSvc('${s.id}')">儲存</button>
+        <button class="btn-mini danger" onclick="window.delSvc('${s.id}')">刪</button>
+      </div>
+    </div>
+  `).join('');
+}
+window.saveSvc = async (id) => {
+  const inputs = document.querySelectorAll(`#svcList input[data-id="${id}"]`);
+  const patch = {};
+  inputs.forEach(i => patch[i.dataset.f] = i.type === 'number' ? +i.value : i.value);
+  const { error } = await supabase.from('teacher_services').update(patch).eq('id', id);
+  if (error) return toast(error.message, 'error');
+  toast('已儲存');
+};
+window.delSvc = async (id) => {
+  if (!confirm('刪除此服務？')) return;
+  await supabase.from('teacher_services').delete().eq('id', id);
+  toast('已刪除'); loadServices();
+};
+document.getElementById('addSvcBtn').onclick = async () => {
+  const name = document.getElementById('newSvcName').value.trim();
+  const dur = +document.getElementById('newSvcDur').value;
+  const price = +document.getElementById('newSvcPrice').value;
+  const order = +document.getElementById('newSvcOrder').value || 0;
+  if (!name || !dur || !price) return toast('請填完整', 'error');
+  const { error } = await supabase.from('teacher_services').insert({
+    teacher_id: teacher.id, name, duration_minutes: dur, price_ntd: price, display_order: order,
+  });
+  if (error) return toast(error.message, 'error');
+  document.getElementById('newSvcName').value = '';
+  toast('已新增'); loadServices();
+};
+
+async function loadAvailability() {
+  const { data } = await supabase.from('teacher_availability').select('*').eq('teacher_id', teacher.id).order('day_of_week');
+  const dows = ['日','一','二','三','四','五','六'];
+  document.getElementById('avList').innerHTML = (data || []).map(a => `
+    <div class="av-row">
+      <div>星期${dows[a.day_of_week] || '?'}</div>
+      <div>${(a.start_time || '').slice(0,5)}</div>
+      <div>${(a.end_time || '').slice(0,5)}</div>
+      <button class="btn-mini danger" onclick="window.delAv('${a.id}')">刪除</button>
+    </div>
+  `).join('');
+}
+window.delAv = async (id) => {
+  if (!confirm('刪除此時段？')) return;
+  await supabase.from('teacher_availability').delete().eq('id', id);
+  toast('已刪除'); loadAvailability();
+};
+document.getElementById('addAvBtn').onclick = async () => {
+  const dow = +document.getElementById('newAvDow').value;
+  const s = document.getElementById('newAvStart').value;
+  const e = document.getElementById('newAvEnd').value;
+  if (!s || !e) return toast('請填完整', 'error');
+  const { error } = await supabase.from('teacher_availability').insert({
+    teacher_id: teacher.id, day_of_week: dow, start_time: s, end_time: e,
+  });
+  if (error) return toast(error.message, 'error');
+  toast('已新增'); loadAvailability();
+};
+
+async function loadReviews() {
+  const { data } = await supabase.from('reviews').select('*').eq('teacher_id', teacher.id).order('created_at', { ascending: false }).limit(20);
+  const list = document.getElementById('revList');
+  list.innerHTML = (data || []).map(r => `
+    <div class="rev-card">
+      <div class="rating">${'★'.repeat(r.rating)}${'☆'.repeat(5 - r.rating)}</div>
+      <div style="font-size:11px;color:rgba(255,255,255,0.5);margin-top:4px">${new Date(r.created_at).toLocaleDateString()}${r.is_anonymous ? ' · 匿名' : ''}</div>
+      <div class="body">${r.comment || '（無留言）'}</div>
+    </div>
+  `).join('') || '<div style="text-align:center;color:rgba(255,255,255,0.4);padding:30px">尚無評價</div>';
+}
+
+async function loadEarnings() {
+  const { data } = await supabase.from('settlements').select('*').eq('teacher_id', teacher.id).order('period_end', { ascending: false });
+  document.getElementById('earnList').innerHTML = (data || []).map(s => `
+    <div class="rev-card">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <div style="font-family:'Noto Serif TC';color:var(--accent)">${s.period_start} → ${s.period_end}</div>
+          <div style="font-size:12px;color:rgba(255,255,255,0.6);margin-top:4px">${s.bookings_count} 筆完成 · 平台抽成 NT$${s.total_platform_fee_ntd}</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-family:'Cormorant Garamond';font-size:24px;color:var(--accent)">NT$${(s.total_teacher_amount_ntd || 0).toLocaleString()}</div>
+          <div style="font-size:11px;color:${s.status === 'paid' ? '#67e8a4' : '#F4A261'}">${s.status === 'paid' ? '✓ 已撥款' : '待結算'}</div>
+        </div>
+      </div>
+    </div>
+  `).join('') || '<div style="text-align:center;color:rgba(255,255,255,0.4);padding:30px">尚無結算紀錄（每月底自動產生）</div>';
+}
+
+async function loadProfile() {
+  document.getElementById('pfDisplay').value = teacher.display_name || '';
+  document.getElementById('pfTitle').value = teacher.title || '';
+  document.getElementById('pfQuote').value = teacher.quote || '';
+  document.getElementById('pfIntroShort').value = teacher.intro_short || '';
+  document.getElementById('pfIntroLong').value = teacher.intro_long || '';
+  document.getElementById('pfStyle').value = teacher.consultation_style || '';
+  document.getElementById('pfLine').value = teacher.line_url || '';
+  document.getElementById('pfIg').value = teacher.instagram || '';
+}
+document.getElementById('saveProfile').onclick = async () => {
+  const patch = {
+    display_name: document.getElementById('pfDisplay').value.trim(),
+    title: document.getElementById('pfTitle').value.trim(),
+    quote: document.getElementById('pfQuote').value.trim(),
+    intro_short: document.getElementById('pfIntroShort').value.trim(),
+    intro_long: document.getElementById('pfIntroLong').value.trim(),
+    consultation_style: document.getElementById('pfStyle').value.trim(),
+    line_url: document.getElementById('pfLine').value.trim(),
+    instagram: document.getElementById('pfIg').value.trim(),
+  };
+  const { error } = await supabase.from('teachers').update(patch).eq('id', teacher.id);
+  if (error) return toast(error.message, 'error');
+  Object.assign(teacher, patch);
+  toast('已儲存');
+};
+</script>
+</body>
+</html>

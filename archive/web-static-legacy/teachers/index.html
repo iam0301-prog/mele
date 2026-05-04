@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>找老師 · 命理媒介中心</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Noto+Serif+TC:wght@400;600;700&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
+<style>
+.teacher-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+.teacher-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--accent-dim);
+  border-radius: 14px;
+  padding: 24px 20px;
+  transition: all .3s;
+  cursor: pointer;
+  position: relative;
+}
+.teacher-card:hover {
+  border-color: var(--accent);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(201,162,39,0.15);
+}
+.t-avatar {
+  width: 80px; height: 80px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), var(--accent-light));
+  display: flex; align-items: center; justify-content: center;
+  font-family: "Noto Serif TC", serif;
+  font-size: 28px; font-weight: 700;
+  color: var(--primary);
+  margin: 0 auto 14px;
+}
+.t-name { text-align: center; font-family: "Noto Serif TC"; font-size: 20px; color: var(--accent); }
+.t-title { text-align: center; font-size: 12px; color: rgba(255,255,255,0.6); margin: 4px 0 14px; letter-spacing: 1px; }
+.t-rating { text-align: center; font-size: 13px; color: #FFD700; margin-bottom: 12px; }
+.t-spec { display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; margin-bottom: 14px; }
+.t-spec span { font-size: 11px; padding: 3px 9px; border: 1px solid var(--accent-dim); border-radius: 10px; }
+.t-quote { font-size: 12px; color: rgba(255,255,255,0.7); text-align: center; font-style: italic; min-height: 36px; }
+.t-social { display: flex; justify-content: center; gap: 10px; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--accent-dim); }
+.t-social a { color: var(--accent); opacity: 0.7; text-decoration: none; font-size: 18px; }
+.t-social a:hover { opacity: 1; transform: scale(1.15); }
+.filter-bar { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px; }
+.chip { padding: 8px 16px; background: rgba(255,255,255,0.05); border: 1px solid var(--accent-dim); border-radius: 18px; cursor: pointer; font-size: 13px; }
+.chip.active { background: var(--accent); color: var(--primary); border-color: var(--accent); font-weight: 600; }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <div class="ornament">◆ ◆ ◆</div>
+    <h1>命理老師</h1>
+    <div class="subtitle">OUR READERS</div>
+    <div style="margin-top:24px;color:rgba(255,255,255,0.7);font-size:14px">
+      所有老師均經審核 · 真人諮詢 · 收費透明
+    </div>
+  </header>
+
+  <div class="card">
+    <div class="filter-bar" id="filterBar">
+      <div class="chip active" data-spec="">全部</div>
+    </div>
+    <div id="grid" class="teacher-grid"></div>
+    <div id="empty" class="empty-state" style="display:none">
+      <div class="icon">○</div>
+      目前還沒有上架老師<br>
+      <a href="apply.html" style="color:var(--accent);font-size:13px;letter-spacing:2px">→ 我是命理老師、想申請加入</a>
+    </div>
+  </div>
+</div>
+
+<script src="../assets/config.js"></script>
+<script type="module">
+import { supabase } from '../assets/supabase-client.js';
+
+const SPECIALTIES = ['八字', '紫微斗數', '塔羅', '盧恩', '占星', '人類圖', '靈數', '瑪雅'];
+
+document.getElementById('filterBar').innerHTML += SPECIALTIES.map((s) =>
+  `<div class="chip" data-spec="${s}">${s}</div>`).join('');
+
+document.querySelectorAll('.chip').forEach((c) => {
+  c.onclick = () => {
+    document.querySelectorAll('.chip').forEach((x) => x.classList.remove('active'));
+    c.classList.add('active');
+    load(c.dataset.spec);
+  };
+});
+
+const ICONS = {
+  instagram: '◉',
+  facebook: 'ƒ',
+  threads: '@',
+  line: 'L',
+  youtube: '▶',
+};
+
+async function load(filterSpec = '') {
+  let q = supabase.from('teachers').select('*').eq('status', 'active');
+  if (filterSpec) q = q.contains('specialties', [filterSpec]);
+  const { data, error } = await q.order('rating', { ascending: false });
+  const grid = document.getElementById('grid');
+  const empty = document.getElementById('empty');
+  if (error || !data || data.length === 0) {
+    grid.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+  grid.innerHTML = data.map((t) => `
+    <div class="teacher-card" onclick="location.href='detail.html?id=${t.id}'">
+      <div class="t-avatar">${(t.display_name || '?').charAt(0)}</div>
+      <div class="t-name">${t.display_name}</div>
+      <div class="t-title">${t.title || ''}</div>
+      <div class="t-rating">★ ${t.rating || '—'} <span style="color:rgba(255,255,255,0.5)">(${t.total_reviews || 0} 評)</span> · ${t.cases_count || 0} 案</div>
+      <div class="t-spec">
+        ${(t.specialties || []).slice(0,4).map((s) => `<span>${s}</span>`).join('')}
+      </div>
+      <div class="t-quote">「${t.quote || t.intro_short || ''}」</div>
+      <div class="t-social">
+        ${t.line_url ? `<a href="${t.line_url}" target="_blank" onclick="event.stopPropagation()" title="LINE">${ICONS.line}</a>` : ''}
+        ${t.instagram ? `<a href="${t.instagram}" target="_blank" onclick="event.stopPropagation()" title="Instagram">${ICONS.instagram}</a>` : ''}
+        ${t.threads ? `<a href="${t.threads}" target="_blank" onclick="event.stopPropagation()" title="Threads">${ICONS.threads}</a>` : ''}
+        ${t.facebook ? `<a href="${t.facebook}" target="_blank" onclick="event.stopPropagation()" title="Facebook">${ICONS.facebook}</a>` : ''}
+        ${t.youtube ? `<a href="${t.youtube}" target="_blank" onclick="event.stopPropagation()" title="YouTube">${ICONS.youtube}</a>` : ''}
+      </div>
+    </div>
+  `).join('');
+}
+
+load();
+</script>
+</body>
+</html>

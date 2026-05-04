@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>瑪雅 · 命理媒介中心</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Noto+Serif+TC:wght@400;600;700&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
+<style>
+.mele-result svg { max-width: 100%; height: auto; display: block; margin: 0 auto; }
+.cta-after { background: linear-gradient(135deg, rgba(201,162,39,0.12), rgba(201,162,39,0.04)); border: 1px solid var(--accent); border-radius: 14px; padding: 24px; margin-top: 30px; text-align: center; }
+</style>
+</head>
+<body>
+<div class="container">
+  <a href="../" style="color:var(--accent);text-decoration:none;font-size:13px;letter-spacing:2px">‹ 回首頁</a>
+  <header style="padding:30px 0">
+    <div class="ornament">◆ ◆ ◆</div>
+    <h1>瑪雅曆</h1>
+    <div class="subtitle">DREAMSPELL TZOLKIN</div>
+    <div style="margin-top:20px;color:rgba(255,255,255,0.7);font-size:13px">260 Kin × 20 圖騰 × 13 音調 · 含命運神諭板</div>
+  </header>
+  <div class="card">
+    <div class="section-title">輸入生日</div>
+    <div class="input-row"><label>生日 *</label><input id="date" type="date" required></div>
+    <button class="btn-primary" id="calcBtn">排盤 ›</button>
+  </div>
+  <div id="result"></div>
+</div>
+<script src="../assets/config.js"></script>
+<script type="module">
+import { calc, mountResult, showLoading, showError, recordChart } from '../assets/mele-api.js';
+import { supabase, getCurrentUser, toast } from '../assets/supabase-client.js';
+const result = document.getElementById('result');
+document.getElementById('calcBtn').onclick = async () => {
+  const date = document.getElementById('date').value;
+  if (!date) return toast('請填寫生日', 'error');
+  const [year, month, day] = date.split('-').map(Number);
+  showLoading(result, '瑪雅銀河印記運算中…');
+  try {
+    const r = await calc('maya', { year, month, day });
+    mountResult(result, r);
+    const cta = document.createElement('div');
+    cta.className = 'cta-after';
+    cta.innerHTML = `<div style="font-family:'Noto Serif TC';font-size:18px;color:var(--accent);margin-bottom:10px">深入解讀你的 13 月亮週期</div>
+      <a href="../teachers/index.html?spec=瑪雅" class="btn-primary" style="text-decoration:none;display:inline-block">找老師深入諮詢 ›</a>`;
+    result.appendChild(cta);
+    const user = await getCurrentUser();
+    await recordChart(supabase, user, 'maya', { year, month, day }, r.data);
+  } catch (e) { showError(result, e.message); }
+};
+</script>
+</body></html>

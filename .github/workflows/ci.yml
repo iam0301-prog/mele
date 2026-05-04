@@ -1,0 +1,178 @@
+name: MELE CI
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  MELE_API_URL: http://127.0.0.1:8015
+  MELE_ALLOWED_ORIGINS: http://localhost:3000,http://127.0.0.1:3006
+  NEXT_TELEMETRY_DISABLED: 1
+
+jobs:
+  verify:
+    name: Typecheck, lint, test, and build
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install Node dependencies (root)
+        run: npm ci
+
+      - name: Install Node dependencies (apps/web)
+        run: npm --prefix apps/web ci
+
+      - name: Install Python API dependencies
+        run: |
+          python -m venv python_api/venv
+          python_api/venv/bin/python -m pip install --upgrade pip
+          python_api/venv/bin/python -m pip install -r python_api/requirements-dev.txt
+
+      - name: Type-check frontend
+        run: npm run type-check
+
+      - name: ESLint frontend
+        run: npm --prefix apps/web run lint
+
+      - name: Ruff lint Python
+        run: PATH=python_api/venv/bin:$PATH npm run lint:python
+
+      - name: Mypy typecheck Python
+        run: PATH=python_api/venv/bin:$PATH npm run typecheck:python
+        continue-on-error: true # 第一階段允許 mypy fail，待逐步補型別後改 strict
+
+      - name: Verify app and API structure
+        run: npm test
+
+      - name: Vitest (apps/web)
+        run: npm run test:web
+
+      - name: Run Python pytest
+        run: PYTHON=python_api/venv/bin/python npm run test:python
+
+      - name: Verify SQL workflows
+        run: npm run test:sql
+
+      - name: Verify deployment readiness
+        run: npm run test:deployment
+
+      - name: Verify secret hygiene
+        run: npm run test:secrets
+
+      - name: Build production frontend
+        run: npm run build
+
+  e2e:
+    name: Playwright e2e
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs: verify
+    if: github.event_name == 'pull_request' || github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install Node dependencies (root)
+        run: npm ci
+
+      - name: Install Node dependencies (apps/web)
+        run: npm --prefix apps/web ci
+
+      - name: Install Playwright browsers
+        run: npm --prefix apps/web exec playwright install --with-deps chromium
+
+      - name: Build frontend
+        run: npm run build
+        env:
+          MELE_API_URL: http://127.0.0.1:8015
+
+      - name: Run Playwright tests
+        run: npm --prefix apps/web exec playwright test
+        env:
+          CI: 'true'
+
+      - name: Upload Playwright report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: apps/web/playwright-report
+          retention-days: 7
+
+  deploy-preview:
+    name: Deploy preview (Vercel)
+    runs-on: ubuntu-latest
+    needs: [verify]
+    if: github.event_name == 'pull_request' && vars.VERCEL_DEPLOY_ENABLED == 'true'
+    permissions:
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - name: Vercel deploy (preview)
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: |
+          npm i -g vercel@latest
+          vercel pull --yes --environment=preview --token "$VERCEL_TOKEN"
+          vercel build --token "$VERCEL_TOKEN"
+          URL=$(vercel deploy --prebuilt --token "$VERCEL_TOKEN")
+          echo "PREVIEW_URL=$URL" >> "$GITHUB_ENV"
+          echo "Preview: $URL"
+
+  deploy-prod:
+    name: Deploy production (Vercel)
+    runs-on: ubuntu-latest
+    needs: [verify, e2e]
+    if: github.ref == 'refs/heads/main' && vars.VERCEL_DEPLOY_ENABLED == 'true'
+    environment:
+      name: production
+      url: ${{ steps.deploy.outputs.url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - id: deploy
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: |
+          npm i -g vercel@latest
+          vercel pull --yes --environment=production --token "$VERCEL_TOKEN"
+          vercel build --prod --token "$VERCEL_TOKEN"
+          URL=$(vercel deploy --prebuilt --prod --token "$VERCEL_TOKEN")
+          echo "url=$URL" >> "$GITHUB_OUTPUT"

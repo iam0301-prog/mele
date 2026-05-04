@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>盧恩 · 命理媒介中心</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Noto+Serif+TC:wght@400;600;700&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
+<style>
+.mele-result svg { max-width: 100%; height: auto; display: block; margin: 0 auto; }
+.cta-after { background: linear-gradient(135deg, rgba(201,162,39,0.12), rgba(201,162,39,0.04)); border: 1px solid var(--accent); border-radius: 14px; padding: 24px; margin-top: 30px; text-align: center; }
+.spread-pick { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 18px; }
+.spread-pick .chip { padding: 10px 16px; border: 1px solid var(--accent-dim); border-radius: 20px; cursor: pointer; font-size: 13px; }
+.spread-pick .chip.active { background: var(--accent); color: var(--primary); border-color: var(--accent); font-weight: 600; }
+</style>
+</head>
+<body>
+<div class="container">
+  <a href="../" style="color:var(--accent);text-decoration:none;font-size:13px;letter-spacing:2px">‹ 回首頁</a>
+  <header style="padding:30px 0">
+    <div class="ornament">◆ ◆ ◆</div><h1>盧恩</h1>
+    <div class="subtitle">ELDER FUTHARK</div>
+    <div style="margin-top:20px;color:rgba(255,255,255,0.7);font-size:13px">24 古英語符文 · 加密級隨機 · 含逆位</div>
+  </header>
+  <div class="card">
+    <div class="section-title">選擇牌陣</div>
+    <div class="spread-pick" id="spreads">
+      <div class="chip" data-count="1">1 個：核心啟示</div>
+      <div class="chip active" data-count="3">3 個：身 / 心 / 靈</div>
+      <div class="chip" data-count="5">5 個：北歐五元素</div>
+    </div>
+    <div class="input-row" style="display:flex;align-items:center;gap:14px">
+      <label style="display:inline-flex;align-items:center;gap:6px;margin:0">
+        <input type="checkbox" id="allowRev" checked> 啟用逆位
+      </label>
+    </div>
+    <div class="input-row"><label>你的問題（選填）</label><textarea id="question" rows="2"></textarea></div>
+    <button class="btn-primary" id="drawBtn">抽符文 ›</button>
+  </div>
+  <div id="result"></div>
+</div>
+<script src="../assets/config.js"></script>
+<script type="module">
+import { calc, mountResult, showLoading, showError, recordChart } from '../assets/mele-api.js';
+import { supabase, getCurrentUser, toast } from '../assets/supabase-client.js';
+let pickedCount = 3;
+document.querySelectorAll('#spreads .chip').forEach(el => el.onclick = () => {
+  document.querySelectorAll('#spreads .chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  pickedCount = +el.dataset.count;
+});
+const result = document.getElementById('result');
+document.getElementById('drawBtn').onclick = async () => {
+  const reversed_enabled = document.getElementById('allowRev').checked;
+  const question = document.getElementById('question').value.trim() || null;
+  const input = { count: pickedCount, reversed_enabled, question };
+  showLoading(result, '抽取北歐符文…');
+  try {
+    const r = await calc('runes', input);
+    mountResult(result, r);
+    const cta = document.createElement('div');
+    cta.className = 'cta-after';
+    cta.innerHTML = `<div style="font-family:'Noto Serif TC';font-size:18px;color:var(--accent);margin-bottom:10px">深度解讀北歐神話智慧</div>
+      <a href="../teachers/index.html?spec=盧恩" class="btn-primary" style="text-decoration:none;display:inline-block">找老師諮詢 ›</a>`;
+    result.appendChild(cta);
+    const user = await getCurrentUser();
+    await recordChart(supabase, user, 'runes', input, r.data);
+  } catch (e) { showError(result, e.message); }
+};
+</script>
+</body></html>

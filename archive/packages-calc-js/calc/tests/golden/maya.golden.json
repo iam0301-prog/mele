@@ -1,0 +1,100 @@
+{
+  "tool": "maya",
+  "version": "1.0.0",
+  "method": "Dreamspell (José Argüelles). Anchor: 1987-07-26 UTC = Kin 34 (Galactic Wizard). Default: ignore leap day Feb 29 (Day Out of Time merges into previous Kin).",
+  "source": "錨點與演算法為 Dreamspell 國際標準。獨立來源驗證的案例：m-001 (錨點定義)、m-002/003 (錨點±1)、m-004 (公開歷史對照)、m-005 (錨點+26 年的年度起點)、m-011 (一個 260 循環回到錨點)。其餘案例為演算法回歸守門。",
+  "cases": [
+    {
+      "id": "m-001",
+      "label": "Anchor day 1987-07-26 = Kin 34 (8 Wizard)",
+      "input": { "year": 1987, "month": 7, "day": 26 },
+      "expected": { "kin": 34, "sealNum": 14, "toneNum": 8, "label": "銀河星系 白巫師" },
+      "verification": "錨點定義"
+    },
+    {
+      "id": "m-002",
+      "label": "Day before anchor 1987-07-25 = Kin 33",
+      "input": { "year": 1987, "month": 7, "day": 25 },
+      "expected": { "kin": 33, "sealNum": 13, "toneNum": 7, "label": "共振 紅天行者" },
+      "verification": "anchor - 1"
+    },
+    {
+      "id": "m-003",
+      "label": "Day after anchor 1987-07-27 = Kin 35",
+      "input": { "year": 1987, "month": 7, "day": 27 },
+      "expected": { "kin": 35, "sealNum": 15, "toneNum": 9, "label": "太陽 藍鷹" },
+      "verification": "anchor + 1"
+    },
+    {
+      "id": "m-004",
+      "label": "End of 13th Baktun 2012-12-21 = Kin 207 (12 Hand)",
+      "input": { "year": 2012, "month": 12, "day": 21 },
+      "expected": { "kin": 207, "sealNum": 7, "toneNum": 12, "label": "水晶 藍手" },
+      "verification": "公開歷史對照（馬雅末日）"
+    },
+    {
+      "id": "m-005",
+      "label": "Year-bearer 2013-07-26 = Kin 164 (Yellow Galactic Seed)",
+      "input": { "year": 2013, "month": 7, "day": 26 },
+      "expected": { "kin": 164, "sealNum": 4, "toneNum": 8, "label": "銀河星系 黃種子" },
+      "verification": "anchor + 26 年的 Year-Bearer"
+    },
+    {
+      "id": "m-006",
+      "label": "Far past 1900-01-01",
+      "input": { "year": 1900, "month": 1, "day": 1 },
+      "expected": { "kin": 53, "sealNum": 13, "toneNum": 1, "label": "磁性 紅天行者" },
+      "verification": "回歸守門"
+    },
+    {
+      "id": "m-007",
+      "label": "Y2K 2000-01-01",
+      "input": { "year": 2000, "month": 1, "day": 1 },
+      "expected": { "kin": 153, "sealNum": 13, "toneNum": 10, "label": "行星 紅天行者" },
+      "verification": "回歸守門"
+    },
+    {
+      "id": "m-008",
+      "label": "Leap day 2000-02-29 (Day Out of Time, merges to Feb 28's Kin)",
+      "input": { "year": 2000, "month": 2, "day": 29 },
+      "expected": { "kin": 211, "sealNum": 11, "toneNum": 3, "label": "電力 藍猴" },
+      "verification": "與 2000-02-28 同 Kin（Dreamspell 規則）"
+    },
+    {
+      "id": "m-009",
+      "label": "Recent 2024-04-27",
+      "input": { "year": 2024, "month": 4, "day": 27 },
+      "expected": { "kin": 189, "sealNum": 9, "toneNum": 7, "label": "共振 紅月" },
+      "verification": "回歸守門"
+    },
+    {
+      "id": "m-010",
+      "label": "Future 2030-12-31",
+      "input": { "year": 2030, "month": 12, "day": 31 },
+      "expected": { "kin": 27, "sealNum": 7, "toneNum": 1, "label": "磁性 藍手" },
+      "verification": "回歸守門"
+    },
+    {
+      "id": "m-011",
+      "label": "Anchor + 260 effective days = back to Kin 34 (cycle)",
+      "input": { "year": 1988, "month": 4, "day": 12 },
+      "expected": { "kin": 34, "sealNum": 14, "toneNum": 8, "label": "銀河星系 白巫師" },
+      "verification": "260 循環數學驗證：1987-07-26 → 1988-04-12 raw 261 天，扣 1988-02-29 = 260 天，循環一次回到錨"
+    },
+    {
+      "id": "m-012",
+      "label": "Feb 28 vs Feb 29 same Kin (regression)",
+      "input": { "year": 2000, "month": 2, "day": 28 },
+      "expected": { "kin": 211, "sealNum": 11, "toneNum": 3, "label": "電力 藍猴" },
+      "verification": "與 m-008 同 Kin（驗證 Day Out of Time 行為）"
+    },
+    {
+      "id": "m-013",
+      "label": "Feb 29 with includeLeapDay=true (advances)",
+      "input": { "year": 2000, "month": 2, "day": 29 },
+      "options": { "includeLeapDay": true },
+      "expected": { "kin": 215, "sealNum": 15, "toneNum": 7, "label": "共振 藍鷹" },
+      "verification": "可選分支驗證"
+    }
+  ]
+}
