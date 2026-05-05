@@ -33,10 +33,13 @@ const migrations = [
   'supabase/migrations/0006_match_sessions.sql',
   'supabase/migrations/0007_auth_signup_mirror.sql',
   'supabase/migrations/0008_teacher_website_application.sql',
+  'supabase/migrations/0009_member_points_unlocks.sql',
+  'supabase/migrations/0010_kyc_auto_purge_cron.sql',
 ];
 
 const pointMigrationFile = 'supabase/migrations/0009_member_points_unlocks.sql';
-const SQL = [...migrations, ...(existsSync(pointMigrationFile) ? [pointMigrationFile] : [])]
+const kycPurgeMigrationFile = 'supabase/migrations/0010_kyc_auto_purge_cron.sql';
+const SQL = migrations
   .map((file) => readFileSync(file, 'utf8'))
   .join('\n');
 
@@ -188,6 +191,7 @@ log(
 );
 
 log('member points migration exists', existsSync(pointMigrationFile));
+log('KYC purge cron migration exists', existsSync(kycPurgeMigrationFile));
 log(
   'member point economy uses 200 daily claim and 100 point unlocks',
   SQL.includes('p_daily_amount int default 200') &&
@@ -307,9 +311,9 @@ log(
 const appLayout = readFileSync('apps/web/app/layout.tsx', 'utf8');
 const manifest = readFileSync('apps/web/public/manifest.json', 'utf8');
 const serviceWorker = readFileSync('apps/web/public/sw.js', 'utf8');
-log('PWA manifest is app-ready Traditional Chinese', manifest.includes('"name": "MELE 命理媒介中心"') && manifest.includes('"start_url": "/mobile"') && manifest.includes('"display": "standalone"'));
+log('PWA manifest is app-ready Traditional Chinese', manifest.includes('"name": "海底之星 MELE"') && manifest.includes('"short_name": "海底之星"') && manifest.includes('"start_url": "/mobile"') && manifest.includes('"display": "standalone"'));
 log('PWA service worker precaches mobile app shell', serviceWorker.includes("'/mobile'") && serviceWorker.includes('CACHE_NAME') && serviceWorker.includes("caches.match('/mobile')"));
-log('app metadata is clean and installable', appLayout.includes('MELE 命理媒介中心') && appLayout.includes("manifest: '/manifest.json'") && appLayout.includes("applicationName: 'MELE'"));
+log('app metadata is clean and installable', appLayout.includes('海底之星 MELE') && appLayout.includes("manifest: '/manifest.json'") && appLayout.includes("applicationName: '海底之星 MELE'"));
 log('layout renders cookie consent banner', appLayout.includes('CookieConsentBanner'));
 
 const apiClient = readFileSync('apps/web/lib/api.ts', 'utf8');
@@ -481,7 +485,7 @@ log('LINE LIFF panel manages push settings', linePanel.includes('push_enabled') 
 const homePage = readFileSync('apps/web/app/page.tsx', 'utf8');
 const homeGlobalCss = readFileSync('apps/web/app/globals.css', 'utf8');
 log('home page does not render AR stage directly', !homePage.includes('ArRelicStage'));
-log('home page has clear Traditional Chinese positioning', homePage.includes('MELE 命理媒介中心') && homePage.includes('八種命理入口') && homePage.includes('從自助探索走向專業諮詢'));
+log('home page has clear Traditional Chinese positioning', homePage.includes('海底之星 MELE') && homePage.includes('命理媒介中心') && homePage.includes('八種命理入口') && homePage.includes('從自助探索走向專業諮詢'));
 log(
   'home page presents premium closed-beta command center',
   [
@@ -825,6 +829,7 @@ log('admin dashboard includes operational readiness widgets', ['營運總覽', '
 const launchPage = readFileSync('apps/web/app/admin/launch/page.tsx', 'utf8');
 log('admin launch checklist checks production env', launchPage.includes('NEXT_PUBLIC_LIFF_ID') && launchPage.includes('MELE_API_URL') && launchPage.includes('iPhone AR fallback'));
 log('admin launch checklist separates cloud manual checks', ['SQL migrations 檔案完整', 'ECPay checkout secrets', '封閉公測名單', 'Auth 驗證信與 Redirect URLs', 'ops:check-auth'].every((token) => launchPage.includes(token)));
+log('admin launch checklist covers current migrations', ['0009_member_points_unlocks.sql', '0010_kyc_auto_purge_cron.sql', '0001-0010', 'member_wallets', 'content_unlocks', 'daily_point_claims'].every((token) => launchPage.includes(token)));
 const retiredNumerologyFunction = existsSync('supabase/functions/calc-numerology/index.ts');
 log('retired calc-numerology edge function is removed', !retiredNumerologyFunction);
 

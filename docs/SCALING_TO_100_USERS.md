@@ -75,7 +75,7 @@ MELE 不是一般命盤工具，而是「命理媒介中心」。客人進來後
 
 上線前 P0：
 
-- Supabase 5 個 migrations 必須套到正式 project。
+- Supabase 10 個 migrations 必須套到正式 project。
 - RLS policy 必須逐頁測試：會員只能看自己的資料，老師只能看自己的預約，admin 才能看全部。
 - ECPay sandbox 必須走完完整流程：建立訂單、付款成功、webhook 入帳、回跳結果頁。
 - webhook 必須可重複接收同一筆訂單，不可重複加帳。

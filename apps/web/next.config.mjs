@@ -1,4 +1,9 @@
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
 /** @type {import('next').NextConfig} */
+const webRoot = dirname(fileURLToPath(import.meta.url));
+const repoRoot = join(webRoot, '..', '..');
 const configuredApiUrl = process.env.MELE_API_URL;
 const calcApiUrl = configuredApiUrl ?? 'http://127.0.0.1:8015';
 
@@ -41,6 +46,7 @@ const nextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
   productionBrowserSourceMaps: false,
+  outputFileTracingRoot: repoRoot,
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production' ? { exclude: ['error', 'warn'] } : false,
   },

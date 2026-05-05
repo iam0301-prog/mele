@@ -5,7 +5,7 @@ import { createClient } from '@/lib/supabase/server';
 import type { Review, Teacher, TeacherService } from '@/types/db';
 
 interface PageProps {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 const SOCIAL_LABELS: Record<string, string> = {
@@ -18,15 +18,16 @@ const SOCIAL_LABELS: Record<string, string> = {
 };
 
 export default async function TeacherDetailPage({ params }: PageProps) {
-  const supabase = createClient();
+  const { id } = await params;
+  const supabase = await createClient();
   const { data } = await supabase
     .from('teachers')
     .select('*')
-    .eq('id', params.id)
+    .eq('id', id)
     .eq('status', 'active')
     .maybeSingle();
 
-  const demoTeacher = !data && isDemoTeacherId(params.id) ? getDemoTeacher(params.id) : null;
+  const demoTeacher = !data && isDemoTeacherId(id) ? getDemoTeacher(id) : null;
   if (!data && !demoTeacher) notFound();
   const teacher = (data || demoTeacher) as Teacher;
 
@@ -34,8 +35,8 @@ export default async function TeacherDetailPage({ params }: PageProps) {
   const [{ data: services }, { data: reviews }] = isDemo
     ? [{ data: getDemoTeacherServices(teacher.id) }, { data: [] as Review[] }]
     : await Promise.all([
-      supabase.from('teacher_services').select('*').eq('teacher_id', params.id).eq('is_active', true).order('display_order'),
-      supabase.from('reviews').select('*').eq('teacher_id', params.id).eq('is_visible', true).order('created_at', { ascending: false }).limit(10),
+      supabase.from('teacher_services').select('*').eq('teacher_id', id).eq('is_active', true).order('display_order'),
+      supabase.from('reviews').select('*').eq('teacher_id', id).eq('is_visible', true).order('created_at', { ascending: false }).limit(10),
     ]);
 
   return (

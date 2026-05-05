@@ -3,7 +3,7 @@ import Link from 'next/link';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'MELE 命理媒介中心',
+  title: '海底之星 MELE',
   description: '結合命盤、塔羅、盧恩、每日儀式、會員點數、老師媒合與精緻 2D 結果呈現的手機優先命理平台。',
 };
 
@@ -70,8 +70,8 @@ export default function HomePage() {
     <main className="home-page min-h-screen">
       <section className="home-hero">
         <div className="home-hero__content">
-          <div className="home-beta-badge">CLOSED BETA COMMAND CENTER</div>
-          <h1>MELE 命理媒介中心</h1>
+          <div className="home-beta-badge">命理媒介中心 · CLOSED BETA COMMAND CENTER</div>
+          <h1>海底之星 MELE</h1>
           <p>
             封閉測試版先把「自助理解、每日回訪、點數解鎖、老師詳解」四件事打通。會員不用一開始就付費，也能看懂自己的盤面；想看更深，再用點數開啟文言感解釋與流日、流月、流年。
           </p>

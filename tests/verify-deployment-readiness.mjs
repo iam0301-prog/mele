@@ -37,6 +37,11 @@ const renderYaml = read('render.yaml');
 const railwayJson = read('railway.json');
 const ciWorkflow = read('.github/workflows/ci.yml');
 const e2eSpec = read('apps/web/e2e/golden-path.spec.ts');
+const playwrightConfig = read('apps/web/playwright.config.ts');
+const webE2eRunner = read('scripts/run-web-e2e.mjs');
+const webPackage = JSON.parse(read('apps/web/package.json') || '{}');
+const webLayout = read('apps/web/app/layout.tsx');
+const nextConfig = read('apps/web/next.config.mjs');
 const pkg = JSON.parse(read('package.json') || '{}');
 
 for (const file of [
@@ -54,6 +59,7 @@ for (const file of [
   'python_api/package.json',
   'python_api/requirements-dev.txt',
   'scripts/run-python-pytest.mjs',
+  'scripts/run-web-e2e.mjs',
   'render.yaml',
   'railway.json',
   '.github/workflows/ci.yml',
@@ -112,6 +118,8 @@ for (const token of [
   'supabase functions deploy ecpay-checkout',
   'supabase functions deploy ecpay-webhook --no-verify-jwt',
   'supabase functions deploy line-daily-push',
+  '0009_member_points_unlocks.sql',
+  '0010_kyc_auto_purge_cron.sql',
   'SUPABASE_SERVICE_ROLE_KEY',
   'teacher-docs',
   'service_role',
@@ -162,6 +170,7 @@ for (const token of [
   'Render',
   'Fly.io',
   'Python FastAPI',
+  '10 個 migrations',
   'Supabase',
   'ECPay',
   'LINE',
@@ -241,6 +250,8 @@ console.log('\n=== CI workflow ===\n');
 for (const token of [
   'actions/setup-node@v4',
   'node-version: 22',
+  'cache-dependency-path',
+  'apps/web/package-lock.json',
   'actions/setup-python@v5',
   'python-version: "3.12"',
   'npm ci',
@@ -261,7 +272,7 @@ console.log('\n=== Package commands ===\n');
 ok('package exposes test:deployment', pkg.scripts?.['test:deployment'] === 'node tests/verify-deployment-readiness.mjs');
 ok('package exposes test:secrets', pkg.scripts?.['test:secrets'] === 'node tests/verify-secrets.mjs');
 ok('package exposes test:python', pkg.scripts?.['test:python'] === 'node scripts/run-python-pytest.mjs');
-ok('package exposes test:e2e', pkg.scripts?.['test:e2e'] === 'npm --prefix apps/web run test:e2e');
+ok('package exposes release-grade test:e2e runner', pkg.scripts?.['test:e2e'] === 'node scripts/run-web-e2e.mjs');
 ok('package exposes ops:check-auth', pkg.scripts?.['ops:check-auth'] === 'node scripts/check-supabase-auth.mjs');
 ok('package exposes release:check', typeof pkg.scripts?.['release:check'] === 'string');
 ok('release:check includes type-check', pkg.scripts?.['release:check']?.includes('type-check'));
@@ -271,6 +282,30 @@ ok('release:check includes test:sql', pkg.scripts?.['release:check']?.includes('
 ok('release:check includes test:deployment', pkg.scripts?.['release:check']?.includes('test:deployment'));
 ok('release:check includes test:secrets', pkg.scripts?.['release:check']?.includes('test:secrets'));
 ok('release:check includes build', pkg.scripts?.['release:check']?.includes('build'));
+
+for (const token of [
+  'PLAYWRIGHT_USE_BUILD',
+  'npm run start -- --port',
+  'npm run dev -- --port',
+]) {
+  ok(`Playwright config supports ${token}`, playwrightConfig.includes(token));
+}
+
+for (const token of [
+  "['run', 'build']",
+  'PLAYWRIGHT_USE_BUILD',
+  "['--prefix', 'apps/web', 'run', 'test:e2e'",
+]) {
+  ok(`web E2E runner covers ${token}`, webE2eRunner.includes(token));
+}
+
+ok('web package includes sharp for production images', Boolean(webPackage.dependencies?.sharp));
+ok('web lint uses ESLint CLI instead of deprecated next lint', webPackage.scripts?.lint === 'eslint . --max-warnings=0');
+ok('web package pins safe PostCSS override', webPackage.overrides?.postcss === '8.5.12');
+ok('web package targets patched Next 15 line', /^\^15\.5\.15/.test(webPackage.dependencies?.next || ''));
+ok('web package targets patched Playwright', /^\^1\.59\.1/.test(webPackage.devDependencies?.['@playwright/test'] || ''));
+ok('layout avoids build-time Google font network fetches', !webLayout.includes('next/font/google'));
+ok('Next config sets outputFileTracingRoot for multiple lockfiles', nextConfig.includes('outputFileTracingRoot'));
 
 console.log('\n=== Browser e2e coverage ===\n');
 

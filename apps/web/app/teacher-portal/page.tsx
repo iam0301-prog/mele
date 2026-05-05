@@ -194,9 +194,9 @@ const demoTeacher: Teacher = {
 };
 
 export default async function TeacherPortalPage() {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  const testUser = user ? null : getServerTestUser();
+  const testUser = user ? null : await getServerTestUser();
   if (!user && !testUser) redirect('/account/login?return=/teacher-portal');
 
   if (testUser) {

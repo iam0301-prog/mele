@@ -3,6 +3,7 @@ import { defineConfig, devices } from '@playwright/test';
 const PORT = Number(process.env.PORT ?? 3006);
 const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? `http://127.0.0.1:${PORT}`;
 const isCI = !!process.env.CI;
+const useProductionServer = isCI || process.env.PLAYWRIGHT_USE_BUILD === 'true';
 
 export default defineConfig({
   testDir: './e2e',
@@ -32,9 +33,11 @@ export default defineConfig({
   webServer: process.env.PLAYWRIGHT_BASE_URL
     ? undefined
     : {
-        command: `npm run dev -- --port ${PORT}`,
+        command: useProductionServer
+          ? `npm run start -- --port ${PORT}`
+          : `npm run dev -- --port ${PORT}`,
         url: baseURL,
-        reuseExistingServer: !isCI,
+        reuseExistingServer: !isCI && !useProductionServer,
         timeout: 120_000,
         env: {
           MELE_API_URL: 'http://127.0.0.1:8015',

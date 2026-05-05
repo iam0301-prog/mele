@@ -9,7 +9,7 @@ export function Footer() {
         <Link href="/legal/disclaimer" className="transition-colors hover:text-accent">免責聲明</Link>
         <Link href="/teachers/apply" className="transition-colors hover:text-accent">老師申請</Link>
       </div>
-      <div>© MELE 命理媒介中心 · DIVINATION HUB</div>
+      <div>© 海底之星 MELE · DIVINATION HUB</div>
     </footer>
   );
 }

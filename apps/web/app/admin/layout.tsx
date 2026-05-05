@@ -12,7 +12,7 @@ const TABS = [
 ];
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/account/login?return=/admin');
   const { data: admin } = await supabase.from('admins').select('role').eq('user_id', user.id).maybeSingle();

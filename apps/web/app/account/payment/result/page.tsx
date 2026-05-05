@@ -71,9 +71,10 @@ function statusCopy(status?: string) {
   };
 }
 
-export default async function PaymentResultPage({ searchParams }: { searchParams: PaymentResultSearchParams }) {
-  const bookingId = searchParams.booking;
-  const supabase = createClient();
+export default async function PaymentResultPage({ searchParams }: { searchParams: Promise<PaymentResultSearchParams> }) {
+  const resolvedSearchParams = await searchParams;
+  const bookingId = resolvedSearchParams.booking;
+  const supabase = await createClient();
   let booking: BookingResult | null = null;
   let loadError: string | null = null;
 
@@ -91,7 +92,7 @@ export default async function PaymentResultPage({ searchParams }: { searchParams
   const service = pickOne(booking?.teacher_services ?? null);
   const teacher = pickOne(booking?.teachers ?? null);
   const copy = statusCopy(booking?.status);
-  const ecpayMessage = searchParams.RtnMsg || (searchParams.RtnCode ? `綠界回傳代碼 ${searchParams.RtnCode}` : null);
+  const ecpayMessage = resolvedSearchParams.RtnMsg || (resolvedSearchParams.RtnCode ? `綠界回傳代碼 ${resolvedSearchParams.RtnCode}` : null);
 
   return (
     <main className="container mx-auto max-w-2xl px-5 py-12">
@@ -111,10 +112,10 @@ export default async function PaymentResultPage({ searchParams }: { searchParams
             {booking.paid_at && (
               <div><span>付款時間</span><strong>{new Date(booking.paid_at).toLocaleString('zh-TW')}</strong></div>
             )}
-            {(booking.payment_provider || booking.payment_id || searchParams.TradeNo) && (
+            {(booking.payment_provider || booking.payment_id || resolvedSearchParams.TradeNo) && (
               <div>
                 <span>交易資訊</span>
-                <strong>{[booking.payment_provider, booking.payment_id || searchParams.TradeNo].filter(Boolean).join(' / ')}</strong>
+                <strong>{[booking.payment_provider, booking.payment_id || resolvedSearchParams.TradeNo].filter(Boolean).join(' / ')}</strong>
               </div>
             )}
           </div>

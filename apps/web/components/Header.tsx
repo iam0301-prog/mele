@@ -9,9 +9,9 @@ const linkClass =
   'rounded-full border border-accent-dim bg-black/50 px-4 py-1.5 text-xs tracking-widest text-accent backdrop-blur transition-colors hover:border-accent';
 
 export async function Header() {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  const testUser = user ? null : getServerTestUser();
+  const testUser = user ? null : await getServerTestUser();
 
   let isAdmin = false;
   let displayName: string | null = testUser?.displayName ?? null;

@@ -22,7 +22,7 @@ MELE 不是單一 Vercel 專案。它有前端、Python 計算 API、Supabase、
 | --- | --- | --- |
 | Next.js 前端 | Vercel | 最適合 App Router 與 PWA |
 | Python FastAPI | Railway / Render / Fly.io / VM | 需要 `/ready`、持久 process、可安裝 Python dependencies |
-| Database/Auth/Storage | Supabase | 需跑 5 個 migrations 與 RLS |
+| Database/Auth/Storage | Supabase | 需跑 10 個 migrations 與 RLS |
 | Payment/LINE jobs | Supabase Edge Functions | ECPay webhook 與 LINE push |
 | Error monitoring | Sentry | 上線後必要 |
 | Analytics | Vercel Analytics 或 PostHog | 看使用漏斗與轉換 |

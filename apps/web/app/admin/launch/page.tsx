@@ -36,6 +36,8 @@ export default function LaunchChecklistPage() {
     '0006_match_sessions.sql',
     '0007_auth_signup_mirror.sql',
     '0008_teacher_website_application.sql',
+    '0009_member_points_unlocks.sql',
+    '0010_kyc_auto_purge_cron.sql',
   ];
 
   const checks: Check[] = [
@@ -63,7 +65,7 @@ export default function LaunchChecklistPage() {
     {
       label: 'SQL migrations 檔案完整',
       ok: migrations.every(migrationExists),
-      detail: '本機 migrations 檔案齊全。正式 project 必須實際執行 0001-0008，並確認 profiles、teachers、bookings、daily_draws、line_user_links、match_sessions、teacher_applications.website 等表與欄位存在。',
+      detail: '本機 migrations 檔案齊全。正式 project 必須實際執行 0001-0010，並確認 profiles、teachers、bookings、daily_draws、line_user_links、match_sessions、teacher_applications.website、member_wallets、content_unlocks、daily_point_claims 與 KYC 自動清除設定都存在。',
       level: 'P0',
       owner: '工程',
     },

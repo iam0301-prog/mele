@@ -29,7 +29,7 @@ function countOf(result: CountResult) {
 }
 
 export default async function AdminDashboard() {
-  const supabase = createClient();
+  const supabase = await createClient();
   const today = new Date().toISOString().slice(0, 10);
   const now = new Date().toISOString();
 

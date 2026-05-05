@@ -1,5 +1,4 @@
 import type { Metadata, Viewport } from 'next';
-import { Cormorant_Garamond, Noto_Sans_TC, Noto_Serif_TC } from 'next/font/google';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { ToastProvider } from '@/components/ToastProvider';
@@ -34,48 +33,27 @@ const localPreviewCacheResetScript = `
 })();
 `;
 
-const notoSans = Noto_Sans_TC({
-  subsets: ['latin'],
-  weight: ['300', '400', '500', '700'],
-  variable: '--font-noto-sans-tc',
-  display: 'swap',
-});
-
-const notoSerif = Noto_Serif_TC({
-  subsets: ['latin'],
-  weight: ['400', '600', '700'],
-  variable: '--font-noto-serif-tc',
-  display: 'swap',
-});
-
-const cormorant = Cormorant_Garamond({
-  subsets: ['latin'],
-  weight: ['400', '500', '600', '700'],
-  variable: '--font-cormorant',
-  display: 'swap',
-});
-
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3006'),
   title: {
-    default: 'MELE 命理媒介中心',
-    template: '%s | MELE 命理媒介中心',
+    default: '海底之星 MELE',
+    template: '%s | 海底之星 MELE',
   },
   description:
-    'MELE 整合八字、紫微、占星、人類圖、馬雅曆、生命靈數、塔羅與盧恩，提供每日儀式、AR 解盤與老師媒合。',
+    '海底之星 MELE 整合八字、紫微、占星、人類圖、馬雅曆、生命靈數、塔羅與盧恩，提供每日儀式、AR 解盤與老師媒合。',
   keywords: ['命理', '八字', '紫微斗數', '塔羅', '盧恩', '馬雅曆', '人類圖', '生命靈數', '占星', 'AR 解盤'],
   manifest: '/manifest.json',
-  applicationName: 'MELE',
+  applicationName: '海底之星 MELE',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
-    title: 'MELE',
+    title: '海底之星 MELE',
   },
   openGraph: {
     type: 'website',
     locale: 'zh_TW',
-    siteName: 'MELE 命理媒介中心',
-    title: 'MELE 命理媒介中心',
+    siteName: '海底之星 MELE',
+    title: '海底之星 MELE',
     description: '用每日儀式、AR 解盤與老師媒合，陪使用者更清楚地理解自己。',
   },
   formatDetection: {
@@ -93,7 +71,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="zh-TW" className={`${notoSans.variable} ${notoSerif.variable} ${cormorant.variable}`}>
+    <html lang="zh-TW">
       <body className="font-sans">
         <script dangerouslySetInnerHTML={{ __html: localPreviewCacheResetScript }} />
         <ToastProvider>

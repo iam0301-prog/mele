@@ -72,7 +72,7 @@ test.describe('Closed beta premium flows', () => {
   test('homepage exposes the beta task board, points economy, and visual assets', async ({ page }) => {
     await page.goto('/');
 
-    await expect(page.getByRole('heading', { name: 'MELE 命理媒介中心' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: '海底之星 MELE' })).toBeVisible();
     await expect(page.getByLabel('封閉測試任務台')).toBeVisible();
     await expect(page.getByText('今日可領 200 點')).toBeVisible();
     await expect(page.getByText('會員付 100 點解鎖')).toBeVisible();

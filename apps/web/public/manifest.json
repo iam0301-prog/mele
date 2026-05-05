@@ -1,6 +1,6 @@
 {
-  "name": "MELE 命理媒介中心",
-  "short_name": "MELE",
+  "name": "海底之星 MELE",
+  "short_name": "海底之星",
   "description": "每日儀式、AR 解盤、命理工具與老師媒合的線上命理 App。",
   "start_url": "/mobile",
   "scope": "/",

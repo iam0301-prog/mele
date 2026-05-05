@@ -13,6 +13,9 @@
   --success: #2D6A4F;
   --warning: #F4A261;
   --info: #4A6FA5;
+  --font-noto-sans-tc: "Noto Sans TC", "Microsoft JhengHei", "PingFang TC", sans-serif;
+  --font-noto-serif-tc: "Noto Serif TC", "Noto Serif CJK TC", "PMingLiU", serif;
+  --font-cormorant: "Cormorant Garamond", "Times New Roman", serif;
 }
 
 * {
