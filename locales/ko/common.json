@@ -1,0 +1,246 @@
+{
+  "meta": {
+    "siteName": "MELE Sea Star",
+    "title": "MELE Sea Star | 영성 콘텐츠, 자기 이해 도구, 선생님 매칭",
+    "description": "MELE Sea Star는 무료 테스트, 점술 도구, 성향 분석, 데일리 리추얼, 회원 포인트, 선생님 매칭을 제공하는 다국어 영성 콘텐츠 플랫폼입니다.",
+    "keywords": [
+      "영성",
+      "타로",
+      "마야력",
+      "사주",
+      "선생님 매칭",
+      "성향 분석"
+    ]
+  },
+  "nav": {
+    "tools": "도구",
+    "daily": "데일리 리추얼",
+    "mobile": "모바일",
+    "ar": "AR",
+    "teachers": "선생님",
+    "login": "로그인",
+    "teacherApply": "선생님 신청",
+    "menu": "메뉴",
+    "mobileMenu": "모바일 메뉴",
+    "language": "언어",
+    "myBookings": "내 상담",
+    "charts": "내 차트",
+    "profile": "프로필",
+    "dataRights": "데이터 권리",
+    "admin": "관리",
+    "signOut": "로그아웃"
+  },
+  "footer": {
+    "privacy": "개인정보",
+    "tos": "이용약관",
+    "disclaimer": "면책고지",
+    "teacherApply": "선생님 신청",
+    "copyright": "© MELE Sea Star | DIVINATION HUB"
+  },
+  "home": {
+    "badge": "클로즈드 베타 | MARKET COMMAND CENTER",
+    "title": "MELE Sea Star",
+    "subtitle": "영성 인사이트 허브",
+    "description": "대만, 베트남, 인도네시아, 국제 시장을 위한 무료 테스트, 점술 도구, 데일리 리추얼, 회원 포인트, 선생님 매칭의 다국어 입구입니다.",
+    "actions": {
+      "daily": "리추얼 시작",
+      "tarot": "타로 보기",
+      "teachers": "선생님 찾기"
+    },
+    "console": {
+      "ariaLabel": "베타 태스크 보드",
+      "label": "베타 태스크 보드",
+      "title": "회원 여정과 시장 입구 준비 완료",
+      "tarotAlt": "Ocean Poseidon 타로 카드",
+      "mayaAlt": "마야 Yellow Human 토템",
+      "tasks": [
+        "무료 테스트로 먼저 자신을 이해하게 합니다.",
+        "회원은 매일 200포인트를 받고 100포인트로 깊은 해석을 열 수 있습니다.",
+        "선생님 브리프가 회원 맥락을 상담으로 이어 줍니다."
+      ]
+    },
+    "stats": [
+      {
+        "label": "매일 200포인트",
+        "value": "200",
+        "hint": "베타 회원의 재방문 습관을 만듭니다."
+      },
+      {
+        "label": "해금당 100포인트",
+        "value": "100",
+        "hint": "깊은 해석, 일운, 월운, 연운이 같은 포인트 로직을 사용합니다."
+      },
+      {
+        "label": "8개 도구 입구",
+        "value": "8",
+        "hint": "타로, 룬, 마야, 사주, 자미, 점성술, 휴먼디자인, 수비학."
+      },
+      {
+        "label": "하루 한 번 선택",
+        "value": "1",
+        "hint": "타로 또는 룬 중 하나를 하루 한 번 선택합니다."
+      }
+    ],
+    "marketsKicker": "MARKET GATEWAYS",
+    "marketsTitle": "다국어 영성 시장 입구",
+    "marketsBody": "홈은 대만, 베트남, 인도네시아, 영어 국제판, 준비 중인 일본과 한국 시장으로 사용자를 안내합니다.",
+    "toolsKicker": "FREE TESTS",
+    "toolsTitle": "결제 전 신뢰를 먼저 만듭니다",
+    "toolsBody": "각 시장 페이지에는 무료 테스트, 페르소나 분석, 글, 숏폼 영상, 소셜 채널, 선생님 매칭 CTA를 준비합니다.",
+    "roleKicker": "ROLE FLOW",
+    "roleTitle": "회원, 선생님, 플랫폼의 명확한 흐름",
+    "roleBody": "회원은 초급 설명을 먼저 보고, 선생님은 맥락을 받고, 플랫폼은 콘텐츠와 소셜로 성장합니다.",
+    "finalKicker": "READY FOR CLOSED BETA",
+    "finalTitle": "테스트하고 이해시키고 다시 돌아오게 만든 뒤 유료화",
+    "finalBody": "다국어 기반은 기존 기능을 유지하며 공개 콘텐츠를 관리 가능한 JSON으로 옮깁니다.",
+    "proof": [
+      "다국어 라우트",
+      "경로 유지 언어 전환",
+      "다시장 홈",
+      "hreflang SEO",
+      "선생님 CTA"
+    ],
+    "tools": [
+      {
+        "slug": "numerology",
+        "name": "수비학",
+        "tag": "핵심 숫자",
+        "desc": "생년월일로 라이프패스, 생일수, 성향의 원형을 읽습니다."
+      },
+      {
+        "slug": "humandesign",
+        "name": "휴먼 디자인",
+        "tag": "에너지 전략",
+        "desc": "타입, 권위, 프로파일, 센터를 통해 결정 리듬을 이해합니다."
+      },
+      {
+        "slug": "tarot",
+        "name": "타로",
+        "tag": "무료 스프레드",
+        "desc": "카드 이미지, 위치, 정역방향으로 현재의 주제를 읽습니다."
+      },
+      {
+        "slug": "runes",
+        "name": "룬",
+        "tag": "오늘의 상징",
+        "desc": "장애물, 자원, 실천 가능한 메시지를 확인합니다."
+      },
+      {
+        "slug": "maya",
+        "name": "마야력",
+        "tag": "20 토템",
+        "desc": "Kin, 톤, 문양으로 재능과 흐름을 이해합니다."
+      },
+      {
+        "slug": "bazi",
+        "name": "사주명리",
+        "tag": "오행",
+        "desc": "일간, 오행 균형, 계절 흐름으로 성향의 바탕을 봅니다."
+      },
+      {
+        "slug": "ziwei",
+        "name": "자미두수",
+        "tag": "명반 궁위",
+        "desc": "궁위와 별을 통해 역할, 질문, 방향을 정리합니다."
+      },
+      {
+        "slug": "astro",
+        "name": "점성술",
+        "tag": "차트 입문",
+        "desc": "태양, 달, 상승궁, 행성을 자기 이해의 지도로 봅니다."
+      }
+    ],
+    "roles": [
+      {
+        "role": "회원",
+        "title": "깊이 보기 전 자신을 이해합니다",
+        "body": "회원은 쉬운 설명부터 시작하고 포인트로 깊은 해석과 운세 흐름을 열 수 있습니다.",
+        "href": "/account/charts",
+        "action": "회원 아카이브"
+      },
+      {
+        "role": "선생님",
+        "title": "상담 전 맥락을 받습니다",
+        "body": "선생님 포털은 회원 질문, 차트 정보, 유용한 브리프를 보여줄 수 있습니다.",
+        "href": "/teacher-portal",
+        "action": "선생님 포털"
+      },
+      {
+        "role": "플랫폼",
+        "title": "시장별 콘텐츠로 성장합니다",
+        "body": "각 시장은 글, 숏폼, 소셜 링크, 선생님 CTA를 독립적으로 운영할 수 있습니다.",
+        "href": "/admin/launch",
+        "action": "런치 체크"
+      }
+    ]
+  },
+  "markets": {
+    "items": [
+      {
+        "locale": "zh-TW",
+        "name": "대만 입구",
+        "status": "주요 시장",
+        "body": "번체 중국어, LINE, 선생님 매칭, 데일리 리추얼 중심.",
+        "href": "/zh-TW/spiritual"
+      },
+      {
+        "locale": "vi",
+        "name": "베트남 입구",
+        "status": "주요 시장",
+        "body": "베트남어 테스트, 숏폼, 소셜 채널 준비.",
+        "href": "/vi/spiritual"
+      },
+      {
+        "locale": "id",
+        "name": "인도네시아 입구",
+        "status": "주요 시장",
+        "body": "인도네시아어 콘텐츠와 선생님 협업 준비.",
+        "href": "/id/spiritual"
+      },
+      {
+        "locale": "en",
+        "name": "영어 국제 입구",
+        "status": "글로벌",
+        "body": "영어 사용자를 위한 도구와 상담 흐름.",
+        "href": "/en/spiritual"
+      },
+      {
+        "locale": "ja",
+        "name": "일본 입구",
+        "status": "준비",
+        "body": "SEO와 시장 페이지 구조를 먼저 준비.",
+        "href": "/ja/spiritual"
+      },
+      {
+        "locale": "ko",
+        "name": "한국 입구",
+        "status": "준비",
+        "body": "SEO와 시장 페이지 구조를 먼저 준비.",
+        "href": "/ko/spiritual"
+      }
+    ],
+    "page": {
+      "kicker": "SPIRITUAL MARKET",
+      "heroTitle": "영성 시장 입구",
+      "heroBody": "무료 테스트, 페르소나 인사이트, 글, 숏폼 영상, 공식 채널, 선생님 매칭을 위한 현지화 페이지입니다.",
+      "freeTests": "무료 테스트 입구",
+      "freeTestsBody": "수비학, 휴먼 디자인, 타로, 마야력, 데일리 리추얼을 첫 번째 상호작용으로 둡니다.",
+      "persona": "페르소나 분석",
+      "personaBody": "회원이 강점, 막힘, 오늘의 행동을 쉽게 이해하게 합니다.",
+      "articles": "글 목록",
+      "articlesBody": "CMS 또는 JSON 기반 시장 콘텐츠를 배치할 수 있습니다.",
+      "video": "숏폼 영상",
+      "videoBody": "TikTok, Reels, Shorts 또는 현지 플랫폼으로 연결합니다.",
+      "social": "공식 LINE / 소셜 채널",
+      "socialBody": "대만은 LINE을 우선하고, 다른 시장은 현지 소셜을 사용할 수 있습니다.",
+      "teacherCta": "선생님 매칭 CTA",
+      "teacherCtaBody": "초급 해석 후 적합한 선생님으로 안내합니다.",
+      "primaryCta": "무료 테스트 시작",
+      "teacherCtaButton": "선생님 찾기"
+    }
+  },
+  "language": {
+    "label": "언어 변경",
+    "current": "현재 언어"
+  }
+}

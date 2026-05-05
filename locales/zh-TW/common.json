@@ -1,0 +1,247 @@
+{
+  "meta": {
+    "siteName": "海底之星 MELE",
+    "title": "海底之星 MELE｜身心靈、命理工具與老師媒合平台",
+    "description": "海底之星 MELE 是多市場身心靈內容平台，提供免費測驗、命理工具、角色分析、每日儀式、會員點數與老師媒合。",
+    "keywords": [
+      "身心靈",
+      "命理",
+      "塔羅",
+      "馬雅曆",
+      "八字",
+      "老師媒合",
+      "人格分析"
+    ]
+  },
+  "nav": {
+    "tools": "全部工具",
+    "daily": "每日儀式",
+    "mobile": "手機版",
+    "ar": "AR 體驗",
+    "teachers": "老師媒合",
+    "login": "登入",
+    "teacherApply": "老師申請",
+    "menu": "選單",
+    "mobileMenu": "手機選單",
+    "language": "語言",
+    "myBookings": "我的諮詢",
+    "charts": "我的命盤",
+    "profile": "個人資料",
+    "dataRights": "資料權利",
+    "admin": "後台",
+    "signOut": "登出"
+  },
+  "footer": {
+    "privacy": "隱私權政策",
+    "tos": "服務條款",
+    "disclaimer": "免責聲明",
+    "teacherApply": "老師申請",
+    "copyright": "© 海底之星 MELE ｜ DIVINATION HUB"
+  },
+  "home": {
+    "badge": "封閉測試版 ｜ CLOSED BETA COMMAND CENTER",
+    "title": "海底之星 MELE",
+    "subtitle": "命理媒介中心",
+    "description": "從免費測驗、八種命理入口、每日儀式到老師媒合，陪會員先認識自己，再從自助探索走向專業諮詢。",
+    "actions": {
+      "daily": "開始每日儀式",
+      "tarot": "先抽一組塔羅",
+      "teachers": "尋找適合老師"
+    },
+    "console": {
+      "ariaLabel": "封閉測試任務台",
+      "label": "封閉測試任務台",
+      "title": "會員旅程與市場入口已上線",
+      "tarotAlt": "大海波賽頓塔羅卡面",
+      "mayaAlt": "瑪雅黃色人圖騰",
+      "tasks": [
+        "先用免費測驗理解自己的主題。",
+        "每天可領 200 點，付 100 點解鎖深入解釋。",
+        "老師詳解備忘承接會員脈絡，諮詢前更好準備。"
+      ]
+    },
+    "stats": [
+      {
+        "label": "今日可領 200 點",
+        "value": "200",
+        "hint": "每日登入可領取測試點數，培養回訪習慣。"
+      },
+      {
+        "label": "會員付 100 點解鎖",
+        "value": "100",
+        "hint": "深入解釋、流日、流月、流年都用同一點數邏輯。"
+      },
+      {
+        "label": "八種命理入口",
+        "value": "8",
+        "hint": "塔羅、盧恩、馬雅、八字、紫微、占星、人類圖與靈數。"
+      },
+      {
+        "label": "每日一次選擇",
+        "value": "1",
+        "hint": "每日塔羅或每日盧恩擇一，讓互動更有節奏。"
+      }
+    ],
+    "marketsKicker": "MARKET GATEWAYS",
+    "marketsTitle": "多市場身心靈入口",
+    "marketsBody": "首頁先作為台灣、越南、印尼與國際市場的總入口；日文與韓文先保留預備入口，之後可由 JSON 或後台擴充內容。",
+    "toolsKicker": "FREE TESTS",
+    "toolsTitle": "先用免費測驗建立信任",
+    "toolsBody": "每個市場都預留免費測驗、角色分析、文章、短影音、社群導流與老師媒合 CTA，讓新會員不用一開始就付費。",
+    "roleKicker": "ROLE FLOW",
+    "roleTitle": "會員、老師、平台各有清楚路徑",
+    "roleBody": "會員先看初階解釋，老師能看更完整脈絡，平台則用內容與社群導流持續養成信任。",
+    "finalKicker": "READY FOR CLOSED BETA",
+    "finalTitle": "先做到能測、能懂、能回訪，再走向正式收費",
+    "finalBody": "多語系骨架會保留既有功能，並把公開入口改成可長期維護的內容架構。",
+    "proof": [
+      "多語系路由",
+      "語言切換保留路徑",
+      "多市場首頁",
+      "hreflang SEO",
+      "老師媒合 CTA"
+    ],
+    "tools": [
+      {
+        "slug": "numerology",
+        "name": "生命靈數",
+        "tag": "核心數字",
+        "desc": "用出生日期看生命數、生日數與性格原型，先理解自己的慣性與課題。"
+      },
+      {
+        "slug": "humandesign",
+        "name": "人類圖",
+        "tag": "能量策略",
+        "desc": "用類型、權威、人生角色與中心，理解你適合怎麼做決定與互動。"
+      },
+      {
+        "slug": "tarot",
+        "name": "塔羅牌",
+        "tag": "免費牌陣",
+        "desc": "用牌面、正逆位與位置看今日主題與下一步。"
+      },
+      {
+        "slug": "runes",
+        "name": "盧恩",
+        "tag": "每日符文",
+        "desc": "用符文看阻礙、資源與可執行的提醒。"
+      },
+      {
+        "slug": "maya",
+        "name": "馬雅曆",
+        "tag": "20 圖騰",
+        "desc": "用 Kin、調性與圖騰理解核心天賦與節奏。"
+      },
+      {
+        "slug": "bazi",
+        "name": "八字",
+        "tag": "四柱五行",
+        "desc": "從日主、五行平衡與歲運線索看性格底色。"
+      },
+      {
+        "slug": "ziwei",
+        "name": "紫微斗數",
+        "tag": "命盤宮位",
+        "desc": "用命宮、主星與宮位關係整理人生角色與方向。"
+      },
+      {
+        "slug": "astro",
+        "name": "占星",
+        "tag": "星盤初讀",
+        "desc": "用太陽、月亮、上升與行星位置建立自我理解。"
+      }
+    ],
+    "roles": [
+      {
+        "role": "會員",
+        "title": "先懂自己，再決定是否深入",
+        "body": "會員先看到簡易、可理解的解釋，再用點數解鎖文言感較強的深度解釋與流日流月流年。",
+        "href": "/account/charts",
+        "action": "查看會員解讀庫"
+      },
+      {
+        "role": "老師",
+        "title": "承接會員詳解與問題脈絡",
+        "body": "老師後台可看到會員已附資料、提問與詳解備忘，諮詢前能更快掌握重點。",
+        "href": "/teacher-portal",
+        "action": "前往老師後台"
+      },
+      {
+        "role": "平台",
+        "title": "用內容與市場入口養成信任",
+        "body": "台灣、越南、印尼與國際入口能分別放文章、短影音、社群帳號與老師媒合 CTA。",
+        "href": "/admin/launch",
+        "action": "查看發布檢查"
+      }
+    ]
+  },
+  "markets": {
+    "items": [
+      {
+        "locale": "zh-TW",
+        "name": "台灣身心靈入口",
+        "status": "主要市場",
+        "body": "以繁體中文、LINE 導流、老師媒合與每日儀式為核心。",
+        "href": "/zh-TW/spiritual"
+      },
+      {
+        "locale": "vi",
+        "name": "越南身心靈入口",
+        "status": "主要市場",
+        "body": "預留越南語測驗、短影音與社群入口。",
+        "href": "/vi/spiritual"
+      },
+      {
+        "locale": "id",
+        "name": "印尼身心靈入口",
+        "status": "主要市場",
+        "body": "預留印尼語內容、社群導流與老師合作模式。",
+        "href": "/id/spiritual"
+      },
+      {
+        "locale": "en",
+        "name": "英文國際入口",
+        "status": "國際版",
+        "body": "提供英文使用者理解工具與預約流程。",
+        "href": "/en/spiritual"
+      },
+      {
+        "locale": "ja",
+        "name": "日本入口",
+        "status": "預備入口",
+        "body": "先建立 SEO 與市場頁骨架，後續補內容。",
+        "href": "/ja/spiritual"
+      },
+      {
+        "locale": "ko",
+        "name": "韓國入口",
+        "status": "預備入口",
+        "body": "先建立 SEO 與市場頁骨架，後續補內容。",
+        "href": "/ko/spiritual"
+      }
+    ],
+    "page": {
+      "kicker": "SPIRITUAL MARKET",
+      "heroTitle": "身心靈市場入口",
+      "heroBody": "這裡預留該市場的免費測驗、角色分析、文章、短影音、官方社群與老師媒合入口。",
+      "freeTests": "免費測驗入口",
+      "freeTestsBody": "生命靈數、人類圖、塔羅、馬雅曆與每日儀式適合作為第一層互動。",
+      "persona": "角色分析入口",
+      "personaBody": "用初階分析讓會員理解自己的天賦、卡點與今日行動。",
+      "articles": "文章列表",
+      "articlesBody": "後續可串接 CMS 或 JSON，先保留三到六篇市場內容位置。",
+      "video": "短影音導流區",
+      "videoBody": "預留 TikTok、Reels、Shorts 或在地平台的內容導流。",
+      "social": "官方 LINE / 社群帳號",
+      "socialBody": "台灣以 LINE 為主，其他市場可切換成當地社群帳號。",
+      "teacherCta": "老師媒合 CTA",
+      "teacherCtaBody": "當會員完成初階探索後，引導他找合適老師進一步解讀。",
+      "primaryCta": "開始免費測驗",
+      "teacherCtaButton": "尋找老師"
+    }
+  },
+  "language": {
+    "label": "切換語言",
+    "current": "目前語言"
+  }
+}

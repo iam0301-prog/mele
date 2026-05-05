@@ -1,0 +1,246 @@
+{
+  "meta": {
+    "siteName": "MELE Sea Star",
+    "title": "MELE Sea Star | Spiritual tools, personality insights, and teacher matching",
+    "description": "MELE Sea Star is a multilingual spiritual content platform for free tests, divination tools, personality insights, daily rituals, member points, and teacher matching.",
+    "keywords": [
+      "spirituality",
+      "tarot",
+      "maya calendar",
+      "bazi",
+      "teacher matching",
+      "personality analysis"
+    ]
+  },
+  "nav": {
+    "tools": "Tools",
+    "daily": "Daily Ritual",
+    "mobile": "Mobile",
+    "ar": "AR",
+    "teachers": "Teachers",
+    "login": "Log in",
+    "teacherApply": "Apply",
+    "menu": "Menu",
+    "mobileMenu": "Mobile menu",
+    "language": "Language",
+    "myBookings": "My sessions",
+    "charts": "My charts",
+    "profile": "Profile",
+    "dataRights": "Data rights",
+    "admin": "Admin",
+    "signOut": "Sign out"
+  },
+  "footer": {
+    "privacy": "Privacy",
+    "tos": "Terms",
+    "disclaimer": "Disclaimer",
+    "teacherApply": "Teacher Application",
+    "copyright": "© MELE Sea Star | DIVINATION HUB"
+  },
+  "home": {
+    "badge": "Closed Beta | MARKET COMMAND CENTER",
+    "title": "MELE Sea Star",
+    "subtitle": "Spiritual insight hub",
+    "description": "A multilingual gateway for free tests, divination tools, daily rituals, member points, and teacher matching across Taiwan, Vietnam, Indonesia, and future global markets.",
+    "actions": {
+      "daily": "Start daily ritual",
+      "tarot": "Try tarot",
+      "teachers": "Find a teacher"
+    },
+    "console": {
+      "ariaLabel": "Closed beta task board",
+      "label": "Closed beta task board",
+      "title": "Member journeys and market gateways are ready",
+      "tarotAlt": "Ocean Poseidon tarot card artwork",
+      "mayaAlt": "Maya Yellow Human totem",
+      "tasks": [
+        "Begin with free tests so visitors understand themselves first.",
+        "Members can claim 200 points daily and unlock deeper readings for 100 points.",
+        "Teacher briefs carry member context into consultation."
+      ]
+    },
+    "stats": [
+      {
+        "label": "200 daily points",
+        "value": "200",
+        "hint": "A lightweight daily return loop for beta members."
+      },
+      {
+        "label": "100 points per unlock",
+        "value": "100",
+        "hint": "Deep readings, daily, monthly, and yearly transits share one logic."
+      },
+      {
+        "label": "8 tool entrances",
+        "value": "8",
+        "hint": "Tarot, runes, Maya, Bazi, Zi Wei, astrology, Human Design, and numerology."
+      },
+      {
+        "label": "One daily choice",
+        "value": "1",
+        "hint": "Choose tarot or runes once per day for a stronger ritual rhythm."
+      }
+    ],
+    "marketsKicker": "MARKET GATEWAYS",
+    "marketsTitle": "A multilingual spiritual market entrance",
+    "marketsBody": "The homepage now routes Taiwan, Vietnam, Indonesia, international English, and future Japanese and Korean audiences into localized entry pages.",
+    "toolsKicker": "FREE TESTS",
+    "toolsTitle": "Build trust before asking for payment",
+    "toolsBody": "Each market page reserves sections for free tests, persona analysis, articles, short-form video, social channels, and teacher matching.",
+    "roleKicker": "ROLE FLOW",
+    "roleTitle": "Clear journeys for members, teachers, and operators",
+    "roleBody": "Members see beginner-friendly explanations first, teachers receive more context, and the platform grows through content and social channels.",
+    "finalKicker": "READY FOR CLOSED BETA",
+    "finalTitle": "Test, explain, and bring members back before paid launch",
+    "finalBody": "The multilingual foundation keeps current features intact while moving public content into maintainable JSON.",
+    "proof": [
+      "Localized routes",
+      "Path-preserving language switcher",
+      "Market homepage",
+      "hreflang SEO",
+      "Teacher matching CTA"
+    ],
+    "tools": [
+      {
+        "slug": "numerology",
+        "name": "Numerology",
+        "tag": "Core numbers",
+        "desc": "Read life path, birth-day number, and archetypes from the birth date."
+      },
+      {
+        "slug": "humandesign",
+        "name": "Human Design",
+        "tag": "Energy strategy",
+        "desc": "Understand type, authority, profile, centers, and decision rhythm."
+      },
+      {
+        "slug": "tarot",
+        "name": "Tarot",
+        "tag": "Free spread",
+        "desc": "Use card imagery, position, and orientation to read the present theme."
+      },
+      {
+        "slug": "runes",
+        "name": "Runes",
+        "tag": "Daily symbol",
+        "desc": "See obstacles, resources, and a grounded reminder for action."
+      },
+      {
+        "slug": "maya",
+        "name": "Maya Calendar",
+        "tag": "20 totems",
+        "desc": "Use Kin, tone, and glyphs to understand gifts and timing."
+      },
+      {
+        "slug": "bazi",
+        "name": "Bazi",
+        "tag": "Five elements",
+        "desc": "Read day master, element balance, and seasonal tendencies."
+      },
+      {
+        "slug": "ziwei",
+        "name": "Zi Wei Dou Shu",
+        "tag": "Life palaces",
+        "desc": "Use palaces and stars to map roles, questions, and direction."
+      },
+      {
+        "slug": "astro",
+        "name": "Astrology",
+        "tag": "Chart primer",
+        "desc": "Read Sun, Moon, rising sign, and planets as a self-knowledge map."
+      }
+    ],
+    "roles": [
+      {
+        "role": "Member",
+        "title": "Understand yourself before going deeper",
+        "body": "Members start with simple explanations, then use points to unlock deeper classical-style readings and transit views.",
+        "href": "/account/charts",
+        "action": "Open member archive"
+      },
+      {
+        "role": "Teacher",
+        "title": "Receive better context before a session",
+        "body": "Teacher pages can surface member questions, chart context, and helpful briefs before consultation.",
+        "href": "/teacher-portal",
+        "action": "Open teacher portal"
+      },
+      {
+        "role": "Platform",
+        "title": "Grow through content and market-specific entry points",
+        "body": "Each market can host articles, short videos, social links, and teacher CTAs without changing core code.",
+        "href": "/admin/launch",
+        "action": "Open launch checklist"
+      }
+    ]
+  },
+  "markets": {
+    "items": [
+      {
+        "locale": "zh-TW",
+        "name": "Taiwan Spiritual Gateway",
+        "status": "Primary market",
+        "body": "Traditional Chinese content, LINE flow, teacher matching, and daily rituals.",
+        "href": "/zh-TW/spiritual"
+      },
+      {
+        "locale": "vi",
+        "name": "Vietnam Spiritual Gateway",
+        "status": "Primary market",
+        "body": "Vietnamese tests, short videos, and social growth path.",
+        "href": "/vi/spiritual"
+      },
+      {
+        "locale": "id",
+        "name": "Indonesia Spiritual Gateway",
+        "status": "Primary market",
+        "body": "Indonesian content, social routing, and teacher collaboration.",
+        "href": "/id/spiritual"
+      },
+      {
+        "locale": "en",
+        "name": "International English Gateway",
+        "status": "Global",
+        "body": "English onboarding for tools and consultation flow.",
+        "href": "/en/spiritual"
+      },
+      {
+        "locale": "ja",
+        "name": "Japan Gateway",
+        "status": "Prepared",
+        "body": "SEO and market page scaffolding ready for future content.",
+        "href": "/ja/spiritual"
+      },
+      {
+        "locale": "ko",
+        "name": "Korea Gateway",
+        "status": "Prepared",
+        "body": "SEO and market page scaffolding ready for future content.",
+        "href": "/ko/spiritual"
+      }
+    ],
+    "page": {
+      "kicker": "SPIRITUAL MARKET",
+      "heroTitle": "Spiritual market gateway",
+      "heroBody": "A localized landing page for free tests, persona insights, articles, short videos, official channels, and teacher matching.",
+      "freeTests": "Free test entrance",
+      "freeTestsBody": "Numerology, Human Design, tarot, Maya, and daily rituals are the first layer of interaction.",
+      "persona": "Persona analysis",
+      "personaBody": "Give members a simple way to understand strengths, friction, and today's action.",
+      "articles": "Article list",
+      "articlesBody": "Reserved for CMS or JSON-managed market content.",
+      "video": "Short-form video",
+      "videoBody": "Route TikTok, Reels, Shorts, or local video platforms here.",
+      "social": "Official LINE / Social channels",
+      "socialBody": "Taiwan can prioritize LINE; other markets can use local social accounts.",
+      "teacherCta": "Teacher matching CTA",
+      "teacherCtaBody": "After a beginner reading, guide members toward a suitable teacher.",
+      "primaryCta": "Start free test",
+      "teacherCtaButton": "Find a teacher"
+    }
+  },
+  "language": {
+    "label": "Change language",
+    "current": "Current language"
+  }
+}

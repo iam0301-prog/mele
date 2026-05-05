@@ -1,0 +1,246 @@
+{
+  "meta": {
+    "siteName": "MELE Sea Star",
+    "title": "MELE Sea Star｜スピリチュアル診断・命理ツール・先生マッチング",
+    "description": "MELE Sea Star は、無料診断、命理ツール、自己理解、毎日のリチュアル、会員ポイント、先生マッチングを備えた多言語スピリチュアルコンテンツ平台です。",
+    "keywords": [
+      "スピリチュアル",
+      "タロット",
+      "マヤ暦",
+      "八字",
+      "先生マッチング",
+      "自己分析"
+    ]
+  },
+  "nav": {
+    "tools": "ツール",
+    "daily": "毎日の儀式",
+    "mobile": "モバイル",
+    "ar": "AR",
+    "teachers": "先生探し",
+    "login": "ログイン",
+    "teacherApply": "先生申請",
+    "menu": "メニュー",
+    "mobileMenu": "モバイルメニュー",
+    "language": "言語",
+    "myBookings": "相談履歴",
+    "charts": "命盤",
+    "profile": "プロフィール",
+    "dataRights": "データ権利",
+    "admin": "管理",
+    "signOut": "ログアウト"
+  },
+  "footer": {
+    "privacy": "プライバシー",
+    "tos": "利用規約",
+    "disclaimer": "免責事項",
+    "teacherApply": "先生申請",
+    "copyright": "© MELE Sea Star | DIVINATION HUB"
+  },
+  "home": {
+    "badge": "クローズドベータ | MARKET COMMAND CENTER",
+    "title": "MELE Sea Star",
+    "subtitle": "スピリチュアル洞察ハブ",
+    "description": "台湾、ベトナム、インドネシア、国際市場に向けて、無料診断、命理ツール、毎日のリチュアル、会員ポイント、先生マッチングをつなぐ多言語入口です。",
+    "actions": {
+      "daily": "毎日の儀式を始める",
+      "tarot": "タロットを試す",
+      "teachers": "先生を探す"
+    },
+    "console": {
+      "ariaLabel": "ベータ任務ボード",
+      "label": "ベータ任務ボード",
+      "title": "会員導線と市場入口を準備済み",
+      "tarotAlt": "Ocean Poseidon タロットカード",
+      "mayaAlt": "マヤ暦 Yellow Human トーテム",
+      "tasks": [
+        "まず無料診断で、自分のテーマを理解します。",
+        "会員は毎日200ポイントを受け取り、100ポイントで深い解説を開放できます。",
+        "先生用ブリーフが会員の文脈を相談につなげます。"
+      ]
+    },
+    "stats": [
+      {
+        "label": "毎日200ポイント",
+        "value": "200",
+        "hint": "ベータ会員の再訪習慣を作ります。"
+      },
+      {
+        "label": "開放ごとに100ポイント",
+        "value": "100",
+        "hint": "深い解説、流日、流月、流年を同じポイント設計で管理します。"
+      },
+      {
+        "label": "8つのツール入口",
+        "value": "8",
+        "hint": "タロット、ルーン、マヤ、八字、紫微、占星、人類図、数秘。"
+      },
+      {
+        "label": "毎日一つ選択",
+        "value": "1",
+        "hint": "タロットまたはルーンを一日一回選びます。"
+      }
+    ],
+    "marketsKicker": "MARKET GATEWAYS",
+    "marketsTitle": "多言語スピリチュアル市場入口",
+    "marketsBody": "ホームは台湾、ベトナム、インドネシア、英語国際版、そして準備中の日本・韓国市場へ導線を分けます。",
+    "toolsKicker": "FREE TESTS",
+    "toolsTitle": "支払い前に信頼を育てる",
+    "toolsBody": "各市場ページには無料診断、役割分析、記事、短尺動画、SNS導線、先生マッチング CTA を用意します。",
+    "roleKicker": "ROLE FLOW",
+    "roleTitle": "会員、先生、平台にそれぞれ明確な導線",
+    "roleBody": "会員は初級解説から始め、先生は文脈を受け取り、平台はコンテンツとSNSで成長します。",
+    "finalKicker": "READY FOR CLOSED BETA",
+    "finalTitle": "測れる、分かる、戻ってくる状態から有料化へ",
+    "finalBody": "多言語基盤は既存機能を保ちながら、公開コンテンツを管理しやすい JSON に移します。",
+    "proof": [
+      "多言語ルート",
+      "パス保持の言語切替",
+      "多市場ホーム",
+      "hreflang SEO",
+      "先生 CTA"
+    ],
+    "tools": [
+      {
+        "slug": "numerology",
+        "name": "数秘術",
+        "tag": "核心ナンバー",
+        "desc": "誕生日からライフパス、誕生日数、性格の原型を読み解きます。"
+      },
+      {
+        "slug": "humandesign",
+        "name": "ヒューマンデザイン",
+        "tag": "エネルギー戦略",
+        "desc": "タイプ、権威、プロファイル、センターから決断のリズムを見ます。"
+      },
+      {
+        "slug": "tarot",
+        "name": "タロット",
+        "tag": "無料スプレッド",
+        "desc": "カードの絵柄、位置、正逆から今のテーマを読みます。"
+      },
+      {
+        "slug": "runes",
+        "name": "ルーン",
+        "tag": "今日の印",
+        "desc": "障害、資源、行動に移せる小さな助言を確認します。"
+      },
+      {
+        "slug": "maya",
+        "name": "マヤ暦",
+        "tag": "20の紋章",
+        "desc": "Kin、音、紋章から才能とタイミングを見ます。"
+      },
+      {
+        "slug": "bazi",
+        "name": "四柱推命",
+        "tag": "五行",
+        "desc": "日主、五行バランス、季節の傾向から性格の土台を読みます。"
+      },
+      {
+        "slug": "ziwei",
+        "name": "紫微斗数",
+        "tag": "命盤宮位",
+        "desc": "宮位と主星から役割、問い、方向性を整理します。"
+      },
+      {
+        "slug": "astro",
+        "name": "占星術",
+        "tag": "星読み入門",
+        "desc": "太陽、月、上昇宮、惑星配置を自己理解の地図にします。"
+      }
+    ],
+    "roles": [
+      {
+        "role": "会員",
+        "title": "深掘りの前に自分を知る",
+        "body": "会員は簡単な解説から始め、ポイントで深い解説や流れを開放します。",
+        "href": "/account/charts",
+        "action": "会員アーカイブへ"
+      },
+      {
+        "role": "先生",
+        "title": "相談前に文脈を受け取る",
+        "body": "先生ページでは質問、チャート情報、要約ブリーフを確認できます。",
+        "href": "/teacher-portal",
+        "action": "先生ポータルへ"
+      },
+      {
+        "role": "平台",
+        "title": "市場別コンテンツで成長",
+        "body": "各市場に記事、短尺動画、SNS、先生 CTA を配置できます。",
+        "href": "/admin/launch",
+        "action": "公開チェックへ"
+      }
+    ]
+  },
+  "markets": {
+    "items": [
+      {
+        "locale": "zh-TW",
+        "name": "台湾入口",
+        "status": "主要市場",
+        "body": "繁体字、LINE、先生マッチング、毎日の儀式を中心にします。",
+        "href": "/zh-TW/spiritual"
+      },
+      {
+        "locale": "vi",
+        "name": "ベトナム入口",
+        "status": "主要市場",
+        "body": "ベトナム語診断、短尺動画、SNS導線を準備します。",
+        "href": "/vi/spiritual"
+      },
+      {
+        "locale": "id",
+        "name": "インドネシア入口",
+        "status": "主要市場",
+        "body": "インドネシア語コンテンツと先生協業を準備します。",
+        "href": "/id/spiritual"
+      },
+      {
+        "locale": "en",
+        "name": "英語国際入口",
+        "status": "国際版",
+        "body": "英語でツールと相談導線を説明します。",
+        "href": "/en/spiritual"
+      },
+      {
+        "locale": "ja",
+        "name": "日本入口",
+        "status": "準備中",
+        "body": "SEO と市場ページの骨格を先に用意します。",
+        "href": "/ja/spiritual"
+      },
+      {
+        "locale": "ko",
+        "name": "韓国入口",
+        "status": "準備中",
+        "body": "SEO と市場ページの骨格を先に用意します。",
+        "href": "/ko/spiritual"
+      }
+    ],
+    "page": {
+      "kicker": "SPIRITUAL MARKET",
+      "heroTitle": "スピリチュアル市場入口",
+      "heroBody": "無料診断、自己分析、記事、短尺動画、公式SNS、先生マッチングのためのローカルページです。",
+      "freeTests": "無料診断入口",
+      "freeTestsBody": "数秘術、ヒューマンデザイン、タロット、マヤ暦、毎日の儀式を最初の体験導線にします。",
+      "persona": "役割分析入口",
+      "personaBody": "強み、詰まり、今日の行動を分かりやすく伝えます。",
+      "articles": "記事一覧",
+      "articlesBody": "CMS または JSON の市場コンテンツを配置できます。",
+      "video": "短尺動画導線",
+      "videoBody": "TikTok、Reels、Shorts、地域平台へ誘導します。",
+      "social": "公式 LINE / SNS",
+      "socialBody": "台湾は LINE、他市場は現地SNSへ切り替えられます。",
+      "teacherCta": "先生マッチング CTA",
+      "teacherCtaBody": "初級解説の後、相性の良い先生へ案内します。",
+      "primaryCta": "無料診断を始める",
+      "teacherCtaButton": "先生を探す"
+    }
+  },
+  "language": {
+    "label": "言語を切り替える",
+    "current": "現在の言語"
+  }
+}

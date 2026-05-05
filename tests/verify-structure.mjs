@@ -249,6 +249,49 @@ for (const file of routeFiles) {
   log(`route ${file}`, existsSync(file));
 }
 
+for (const file of [
+  'apps/web/app/[locale]/layout.tsx',
+  'apps/web/app/[locale]/page.tsx',
+  'apps/web/app/[locale]/spiritual/page.tsx',
+  'apps/web/app/[locale]/tools/page.tsx',
+  'apps/web/app/sitemap.ts',
+  'apps/web/app/robots.ts',
+  'apps/web/components/LanguageSwitcher.tsx',
+  'apps/web/lib/i18n/config.ts',
+  'apps/web/lib/i18n/dictionaries.ts',
+  'apps/web/lib/i18n/seo.ts',
+]) {
+  log(`i18n file ${file}`, existsSync(file));
+}
+
+const requiredLocalizedTools = ['numerology', 'humandesign', 'tarot', 'runes', 'maya', 'bazi', 'ziwei', 'astro'];
+
+for (const locale of ['zh-TW', 'en', 'vi', 'id', 'ja', 'ko']) {
+  const localeFile = `locales/${locale}/common.json`;
+  const source = existsSync(localeFile) ? readFileSync(localeFile, 'utf8') : '';
+  log(`locale common.json ${locale}`, source.includes('"meta"') && source.includes('"nav"') && source.includes('"markets"'));
+  const dict = source ? JSON.parse(source) : {};
+  log(`locale ${locale} has tools navigation label`, Boolean(dict.nav?.tools));
+  const toolSlugs = dict.home?.tools?.map((tool) => tool.slug) ?? [];
+  log(`locale ${locale} exposes all eight tool entrances`, requiredLocalizedTools.every((tool) => toolSlugs.includes(tool)));
+}
+
+const i18nConfig = readFileSync('apps/web/lib/i18n/config.ts', 'utf8');
+const i18nMiddleware = readFileSync('apps/web/middleware.ts', 'utf8');
+const languageSwitcher = readFileSync('apps/web/components/LanguageSwitcher.tsx', 'utf8');
+const sitemapRoute = readFileSync('apps/web/app/sitemap.ts', 'utf8');
+log('i18n supports six market locales and default zh-TW', ['zh-TW', 'en', 'vi', 'id', 'ja', 'ko'].every((token) => i18nConfig.includes(token)) && i18nConfig.includes("DEFAULT_LOCALE: Locale = 'zh-TW'"));
+log('language switcher preserves the current path', languageSwitcher.includes('switchLocaleInPathname') && languageSwitcher.includes('usePathname') && languageSwitcher.includes('useSearchParams'));
+log('middleware redirects root and rewrites localized legacy routes', i18nMiddleware.includes('pathname === \'/\'') && i18nMiddleware.includes('NextResponse.redirect') && i18nMiddleware.includes('NextResponse.rewrite') && i18nMiddleware.includes('LOCALE_HEADER'));
+log('middleware lets localized market and tools lobbies render natively', i18nMiddleware.includes("'/spiritual'") && i18nMiddleware.includes("'/tools'"));
+log('sitemap emits localized hreflang alternates', sitemapRoute.includes('buildAlternateLanguages') && sitemapRoute.includes('alternates') && sitemapRoute.includes('languages'));
+const localizedMarketPage = readFileSync('apps/web/app/[locale]/spiritual/page.tsx', 'utf8');
+const localizedToolsPage = readFileSync('apps/web/app/[locale]/tools/page.tsx', 'utf8');
+log('market page links numerology and human design quick paths', localizedMarketPage.includes("toolLabel('numerology')") && localizedMarketPage.includes("toolLabel('humandesign')"));
+log('market page exposes all localized tool entrances', localizedMarketPage.includes('dict.home.tools.map') && localizedMarketPage.includes('`/tools/${tool.slug}`') && localizedMarketPage.includes('home-quick-grid'));
+log('localized tools lobby exposes all calculator entrances', localizedToolsPage.includes('dict.home.tools.map') && localizedToolsPage.includes('dict.nav.tools') && localizedToolsPage.includes('`/tools/${tool.slug}`'));
+log('sitemap includes the localized tools lobby', sitemapRoute.includes("'/tools'"));
+
 for (const tool of ['numerology', 'maya', 'bazi', 'tarot', 'runes', 'astro', 'ziwei', 'humandesign']) {
   const file = `apps/web/app/tools/${tool}/page.tsx`;
   const source = existsSync(file) ? readFileSync(file, 'utf8') : '';
@@ -313,7 +356,7 @@ const manifest = readFileSync('apps/web/public/manifest.json', 'utf8');
 const serviceWorker = readFileSync('apps/web/public/sw.js', 'utf8');
 log('PWA manifest is app-ready Traditional Chinese', manifest.includes('"name": "海底之星 MELE"') && manifest.includes('"short_name": "海底之星"') && manifest.includes('"start_url": "/mobile"') && manifest.includes('"display": "standalone"'));
 log('PWA service worker precaches mobile app shell', serviceWorker.includes("'/mobile'") && serviceWorker.includes('CACHE_NAME') && serviceWorker.includes("caches.match('/mobile')"));
-log('app metadata is clean and installable', appLayout.includes('海底之星 MELE') && appLayout.includes("manifest: '/manifest.json'") && appLayout.includes("applicationName: '海底之星 MELE'"));
+log('app metadata is localized and installable', appLayout.includes('generateMetadata') && appLayout.includes("manifest: '/manifest.json'") && appLayout.includes('applicationName: dictionary.meta.siteName') && appLayout.includes('buildLocalizedMetadata'));
 log('layout renders cookie consent banner', appLayout.includes('CookieConsentBanner'));
 
 const apiClient = readFileSync('apps/web/lib/api.ts', 'utf8');
@@ -482,20 +525,25 @@ log('LINE LIFF panel loads official SDK', linePanel.includes('static.line-scdn.n
 log('LINE LIFF panel upserts line_user_links', linePanel.includes("from('line_user_links')") && linePanel.includes('line_user_id'));
 log('LINE LIFF panel manages push settings', linePanel.includes('push_enabled') && linePanel.includes('daily_push_hour'));
 
-const homePage = readFileSync('apps/web/app/page.tsx', 'utf8');
+const rootHomePage = readFileSync('apps/web/app/page.tsx', 'utf8');
+const homePage = readFileSync('apps/web/app/[locale]/page.tsx', 'utf8');
+const zhCommon = readFileSync('locales/zh-TW/common.json', 'utf8');
 const homeGlobalCss = readFileSync('apps/web/app/globals.css', 'utf8');
 log('home page does not render AR stage directly', !homePage.includes('ArRelicStage'));
-log('home page has clear Traditional Chinese positioning', homePage.includes('海底之星 MELE') && homePage.includes('命理媒介中心') && homePage.includes('八種命理入口') && homePage.includes('從自助探索走向專業諮詢'));
+log('root home redirects to default Traditional Chinese locale', rootHomePage.includes("redirect(defaultCanonicalPath())"));
+log('localized home has clear Traditional Chinese positioning', zhCommon.includes('海底之星 MELE') && zhCommon.includes('命理媒介中心') && zhCommon.includes('八種命理入口') && zhCommon.includes('從自助探索走向專業諮詢'));
 log(
-  'home page presents premium closed-beta command center',
+  'localized home presents premium closed-beta command center',
   [
-    'BETA_STATS',
-    'HERO_TOOLS',
-    'ROLE_LANES',
+    'getDictionary',
+    'markets.items',
+    'home.roles',
     '封閉測試任務台',
     '今日可領 200 點',
     '會員付 100 點解鎖',
     '老師詳解備忘',
+  ].every((token) => homePage.includes(token) || zhCommon.includes(token)) &&
+  [
     'home-hero',
     'home-oracle-console',
     'home-tool-grid',
@@ -509,15 +557,13 @@ log(
       '.home-proof-strip',
       '.home-tool-grid',
       '.home-tool-card',
-    '.home-beta-roadmap',
-    '.home-role-lanes',
-    '.home-beta-mission',
+      '.home-role-lanes',
     ].every((token) => homeGlobalCss.includes(token)),
 );
 
 const mobileHeaderMenu = readFileSync('apps/web/components/MobileHeaderMenu.tsx', 'utf8');
 log('header uses controlled mobile drawer navigation', header.includes('MobileHeaderMenu') && mobileHeaderMenu.includes('usePathname') && mobileHeaderMenu.includes('setOpen(false)') && mobileHeaderMenu.includes('pointerdown') && mobileHeaderMenu.includes('Escape'));
-log('header has clean Chinese navigation', ['\u6bcf\u65e5\u5100\u5f0f', '\u624b\u6a5f\u7248', 'AR \u9ad4\u9a57', '\u8001\u5e2b\u5a92\u5408', '\u514d\u8cac\u8072\u660e', '\u767b\u5165', '\u8001\u5e2b\u7533\u8acb'].every((token) => mobileHeaderMenu.includes(token)) && header.includes('\u6bcf\u65e5\u5100\u5f0f') && header.includes('\u8001\u5e2b\u5a92\u5408'));
+log('header has localized navigation and language switcher', ['LanguageSwitcher', 'localizePath', 'getDictionary', 'LOCALE_HEADER'].every((token) => header.includes(token)) && ['\u6bcf\u65e5\u5100\u5f0f', '\u624b\u6a5f\u7248', 'AR \u9ad4\u9a57', '\u8001\u5e2b\u5a92\u5408', '\u514d\u8cac\u8072\u660e', '\u767b\u5165', '\u8001\u5e2b\u7533\u8acb'].every((token) => zhCommon.includes(token)));
 
 const teacherPortal = readFileSync('apps/web/app/teacher-portal/page.tsx', 'utf8');
 log('teacher portal localizes booking status', teacherPortal.includes('STATUS_LABEL') && teacherPortal.includes('已付款') && teacherPortal.includes('待付款'));

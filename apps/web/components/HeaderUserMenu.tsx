@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { DEFAULT_LOCALE, localizePath, type Locale } from '@/lib/i18n/config';
 import { createClient } from '@/lib/supabase/client';
 import { clearClientTestAuth } from '@/lib/test-auth';
 
@@ -11,12 +12,23 @@ const linkClass =
 export function HeaderUserMenu({
   displayName,
   isAdmin,
+  locale = DEFAULT_LOCALE,
   variant = 'inline',
+  labels,
   onNavigate,
 }: {
   displayName: string | null;
   isAdmin: boolean;
+  locale?: Locale;
   variant?: 'inline' | 'panel';
+  labels?: {
+    myBookings?: string;
+    charts?: string;
+    profile?: string;
+    dataRights?: string;
+    admin?: string;
+    signOut?: string;
+  };
   onNavigate?: () => void;
 }) {
   const router = useRouter();
@@ -38,12 +50,12 @@ export function HeaderUserMenu({
   return (
     <div className={wrapClass}>
       <span className={userClass}>{displayName?.slice(0, 12)}</span>
-      <Link href="/account/mybookings" className={itemClass} onClick={onNavigate}>我的諮詢</Link>
-      <Link href="/account/charts" className={itemClass} onClick={onNavigate}>我的命盤</Link>
-      <Link href="/account/profile" className={itemClass} onClick={onNavigate}>個人資料</Link>
-      <Link href="/account/privacy" className={itemClass} onClick={onNavigate}>資料權利</Link>
-      {isAdmin && <Link href="/admin" className={`${itemClass} text-accent-light`} onClick={onNavigate}>後台</Link>}
-      <button type="button" onClick={signOut} className={`${itemClass} cursor-pointer`}>登出</button>
+      <Link href={localizePath('/account/mybookings', locale)} className={itemClass} onClick={onNavigate}>{labels?.myBookings ?? '我的諮詢'}</Link>
+      <Link href={localizePath('/account/charts', locale)} className={itemClass} onClick={onNavigate}>{labels?.charts ?? '我的命盤'}</Link>
+      <Link href={localizePath('/account/profile', locale)} className={itemClass} onClick={onNavigate}>{labels?.profile ?? '個人資料'}</Link>
+      <Link href={localizePath('/account/privacy', locale)} className={itemClass} onClick={onNavigate}>{labels?.dataRights ?? '資料權利'}</Link>
+      {isAdmin && <Link href={localizePath('/admin', locale)} className={`${itemClass} text-accent-light`} onClick={onNavigate}>{labels?.admin ?? '後台'}</Link>}
+      <button type="button" onClick={signOut} className={`${itemClass} cursor-pointer`}>{labels?.signOut ?? '登出'}</button>
     </div>
   );
 }

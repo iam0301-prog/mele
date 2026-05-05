@@ -294,6 +294,8 @@ for (const token of [
 for (const token of [
   "['run', 'build']",
   'PLAYWRIGHT_USE_BUILD',
+  'findAvailablePort',
+  'Using available Playwright port',
   "['--prefix', 'apps/web', 'run', 'test:e2e'",
 ]) {
   ok(`web E2E runner covers ${token}`, webE2eRunner.includes(token));

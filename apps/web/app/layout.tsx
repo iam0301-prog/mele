@@ -1,9 +1,19 @@
 import type { Metadata, Viewport } from 'next';
+import { headers } from 'next/headers';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { ToastProvider } from '@/components/ToastProvider';
 import { ServiceWorkerRegister } from '@/components/ServiceWorkerRegister';
 import { CookieConsentBanner } from '@/components/CookieConsentBanner';
+import {
+  DEFAULT_LOCALE,
+  LOCALE_HEADER,
+  PATH_HEADER,
+  buildLocalizedMetadata,
+  getDictionary,
+  isLocale,
+  stripLocaleFromPathname,
+} from '@/lib/i18n';
 import './globals.css';
 
 const localPreviewCacheResetScript = `
@@ -33,33 +43,37 @@ const localPreviewCacheResetScript = `
 })();
 `;
 
-export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3006'),
-  title: {
-    default: '海底之星 MELE',
-    template: '%s | 海底之星 MELE',
-  },
-  description:
-    '海底之星 MELE 整合八字、紫微、占星、人類圖、馬雅曆、生命靈數、塔羅與盧恩，提供每日儀式、AR 解盤與老師媒合。',
-  keywords: ['命理', '八字', '紫微斗數', '塔羅', '盧恩', '馬雅曆', '人類圖', '生命靈數', '占星', 'AR 解盤'],
-  manifest: '/manifest.json',
-  applicationName: '海底之星 MELE',
-  appleWebApp: {
-    capable: true,
-    statusBarStyle: 'black-translucent',
-    title: '海底之星 MELE',
-  },
-  openGraph: {
-    type: 'website',
-    locale: 'zh_TW',
-    siteName: '海底之星 MELE',
-    title: '海底之星 MELE',
-    description: '用每日儀式、AR 解盤與老師媒合，陪使用者更清楚地理解自己。',
-  },
-  formatDetection: {
-    telephone: false,
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const requestHeaders = await headers();
+  const headerLocale = requestHeaders.get(LOCALE_HEADER);
+  const locale = isLocale(headerLocale) ? headerLocale : DEFAULT_LOCALE;
+  const dictionary = await getDictionary(locale);
+  const headerPathname = requestHeaders.get(PATH_HEADER) || `/${locale}`;
+  const pathname = stripLocaleFromPathname(headerPathname);
+  const localized = buildLocalizedMetadata({
+    locale,
+    dictionary,
+    pathname,
+  });
+
+  return {
+    ...localized,
+    title: {
+      default: dictionary.meta.title,
+      template: `%s | ${dictionary.meta.siteName}`,
+    },
+    manifest: '/manifest.json',
+    applicationName: dictionary.meta.siteName,
+    appleWebApp: {
+      capable: true,
+      statusBarStyle: 'black-translucent',
+      title: dictionary.meta.siteName,
+    },
+    formatDetection: {
+      telephone: false,
+    },
+  };
+}
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -69,9 +83,13 @@ export const viewport: Viewport = {
   viewportFit: 'cover',
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const requestHeaders = await headers();
+  const headerLocale = requestHeaders.get(LOCALE_HEADER);
+  const locale = isLocale(headerLocale) ? headerLocale : DEFAULT_LOCALE;
+
   return (
-    <html lang="zh-TW">
+    <html lang={locale}>
       <body className="font-sans">
         <script dangerouslySetInnerHTML={{ __html: localPreviewCacheResetScript }} />
         <ToastProvider>

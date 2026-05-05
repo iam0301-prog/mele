@@ -1,0 +1,246 @@
+{
+  "meta": {
+    "siteName": "MELE Sea Star",
+    "title": "MELE Sea Star | Nền tảng tâm linh, công cụ khám phá bản thân và kết nối giáo viên",
+    "description": "MELE Sea Star là nền tảng nội dung tâm linh đa ngôn ngữ với bài test miễn phí, công cụ huyền học, nghi thức hằng ngày, điểm thành viên và kết nối giáo viên.",
+    "keywords": [
+      "tâm linh",
+      "tarot",
+      "lịch Maya",
+      "bazi",
+      "kết nối giáo viên",
+      "phân tích tính cách"
+    ]
+  },
+  "nav": {
+    "tools": "Công cụ",
+    "daily": "Nghi thức ngày",
+    "mobile": "Di động",
+    "ar": "AR",
+    "teachers": "Giáo viên",
+    "login": "Đăng nhập",
+    "teacherApply": "Ứng tuyển",
+    "menu": "Menu",
+    "mobileMenu": "Menu di động",
+    "language": "Ngôn ngữ",
+    "myBookings": "Buổi tư vấn",
+    "charts": "Hồ sơ của tôi",
+    "profile": "Thông tin cá nhân",
+    "dataRights": "Quyền dữ liệu",
+    "admin": "Quản trị",
+    "signOut": "Đăng xuất"
+  },
+  "footer": {
+    "privacy": "Quyền riêng tư",
+    "tos": "Điều khoản",
+    "disclaimer": "Miễn trừ",
+    "teacherApply": "Ứng tuyển giáo viên",
+    "copyright": "© MELE Sea Star | DIVINATION HUB"
+  },
+  "home": {
+    "badge": "Bản thử nghiệm kín | TRUNG TÂM THỊ TRƯỜNG",
+    "title": "MELE Sea Star",
+    "subtitle": "Cổng khám phá thân-tâm-linh",
+    "description": "Cổng đa ngôn ngữ cho bài test miễn phí, công cụ huyền học, nghi thức hằng ngày, điểm thành viên và kết nối giáo viên cho Đài Loan, Việt Nam, Indonesia và thị trường quốc tế.",
+    "actions": {
+      "daily": "Bắt đầu nghi thức",
+      "tarot": "Thử tarot",
+      "teachers": "Tìm giáo viên"
+    },
+    "console": {
+      "ariaLabel": "Bảng nhiệm vụ beta",
+      "label": "Bảng nhiệm vụ beta",
+      "title": "Hành trình thành viên và cổng thị trường đã sẵn sàng",
+      "tarotAlt": "Lá tarot Ocean Poseidon",
+      "mayaAlt": "Totem Maya Yellow Human",
+      "tasks": [
+        "Bắt đầu bằng bài test miễn phí để người dùng hiểu mình trước.",
+        "Thành viên nhận 200 điểm mỗi ngày và mở khóa giải thích sâu với 100 điểm.",
+        "Tóm tắt cho giáo viên giúp buổi tư vấn có nhiều ngữ cảnh hơn."
+      ]
+    },
+    "stats": [
+      {
+        "label": "200 điểm mỗi ngày",
+        "value": "200",
+        "hint": "Tạo thói quen quay lại nhẹ nhàng cho thành viên beta."
+      },
+      {
+        "label": "100 điểm mỗi mở khóa",
+        "value": "100",
+        "hint": "Giải thích sâu, lưu ngày, lưu tháng, lưu năm dùng cùng logic điểm."
+      },
+      {
+        "label": "8 lối vào công cụ",
+        "value": "8",
+        "hint": "Tarot, rune, Maya, Bazi, Zi Wei, chiêm tinh, Human Design và numerology."
+      },
+      {
+        "label": "Một lựa chọn mỗi ngày",
+        "value": "1",
+        "hint": "Chọn tarot hoặc rune một lần mỗi ngày để tạo nhịp nghi thức."
+      }
+    ],
+    "marketsKicker": "MARKET GATEWAYS",
+    "marketsTitle": "Cổng thị trường tâm linh đa ngôn ngữ",
+    "marketsBody": "Trang chủ định tuyến Đài Loan, Việt Nam, Indonesia, tiếng Anh quốc tế, và các thị trường Nhật Hàn chuẩn bị.",
+    "toolsKicker": "FREE TESTS",
+    "toolsTitle": "Xây dựng niềm tin trước khi thu phí",
+    "toolsBody": "Mỗi trang thị trường chừa sẵn khu vực test miễn phí, phân tích vai trò, bài viết, video ngắn, kênh xã hội và CTA kết nối giáo viên.",
+    "roleKicker": "ROLE FLOW",
+    "roleTitle": "Hành trình rõ cho thành viên, giáo viên và nền tảng",
+    "roleBody": "Thành viên xem giải thích cơ bản trước, giáo viên nhận thêm ngữ cảnh, nền tảng tăng trưởng bằng nội dung và xã hội.",
+    "finalKicker": "READY FOR CLOSED BETA",
+    "finalTitle": "Kiểm thử, giải thích rõ, rồi mới tiến tới trả phí",
+    "finalBody": "Nền tảng đa ngôn ngữ giữ nguyên tính năng hiện có và đưa nội dung công khai vào JSON dễ bảo trì.",
+    "proof": [
+      "Route đa ngôn ngữ",
+      "Đổi ngôn ngữ giữ đường dẫn",
+      "Trang chủ đa thị trường",
+      "SEO hreflang",
+      "CTA giáo viên"
+    ],
+    "tools": [
+      {
+        "slug": "numerology",
+        "name": "Thần số học",
+        "tag": "Con số cốt lõi",
+        "desc": "Đọc đường đời, số ngày sinh và nguyên mẫu tính cách từ ngày sinh."
+      },
+      {
+        "slug": "humandesign",
+        "name": "Human Design",
+        "tag": "Chiến lược năng lượng",
+        "desc": "Hiểu loại năng lượng, quyền uy, hồ sơ và nhịp ra quyết định."
+      },
+      {
+        "slug": "tarot",
+        "name": "Tarot",
+        "tag": "Trải bài miễn phí",
+        "desc": "Dùng hình ảnh lá bài, vị trí và xuôi ngược để đọc chủ đề hiện tại."
+      },
+      {
+        "slug": "runes",
+        "name": "Rune",
+        "tag": "Ký hiệu hằng ngày",
+        "desc": "Nhìn thấy trở ngại, nguồn lực và lời nhắc có thể thực hành."
+      },
+      {
+        "slug": "maya",
+        "name": "Lịch Maya",
+        "tag": "20 biểu tượng",
+        "desc": "Dùng Kin, âm điệu và biểu tượng để hiểu quà tặng và nhịp thời gian."
+      },
+      {
+        "slug": "bazi",
+        "name": "Bát tự",
+        "tag": "Ngũ hành",
+        "desc": "Đọc nhật chủ, cân bằng ngũ hành và khuynh hướng theo mùa."
+      },
+      {
+        "slug": "ziwei",
+        "name": "Tử vi Đẩu số",
+        "tag": "Cung mệnh",
+        "desc": "Dùng cung và sao để phác họa vai trò, câu hỏi và phương hướng."
+      },
+      {
+        "slug": "astro",
+        "name": "Chiêm tinh",
+        "tag": "Bản đồ sao",
+        "desc": "Đọc Mặt trời, Mặt trăng, cung mọc và hành tinh như bản đồ tự hiểu."
+      }
+    ],
+    "roles": [
+      {
+        "role": "Thành viên",
+        "title": "Hiểu mình trước khi đi sâu",
+        "body": "Thành viên bắt đầu với giải thích dễ hiểu, rồi dùng điểm mở khóa phần sâu và lưu ngày/tháng/năm.",
+        "href": "/account/charts",
+        "action": "Mở kho giải đọc"
+      },
+      {
+        "role": "Giáo viên",
+        "title": "Có thêm ngữ cảnh trước buổi tư vấn",
+        "body": "Trang giáo viên có thể hiển thị câu hỏi, dữ liệu chart và tóm tắt hữu ích.",
+        "href": "/teacher-portal",
+        "action": "Mở cổng giáo viên"
+      },
+      {
+        "role": "Nền tảng",
+        "title": "Tăng trưởng bằng nội dung theo thị trường",
+        "body": "Mỗi thị trường có bài viết, video ngắn, liên kết xã hội và CTA giáo viên riêng.",
+        "href": "/admin/launch",
+        "action": "Mở checklist"
+      }
+    ]
+  },
+  "markets": {
+    "items": [
+      {
+        "locale": "zh-TW",
+        "name": "Cổng Đài Loan",
+        "status": "Thị trường chính",
+        "body": "Nội dung tiếng Hoa phồn thể, LINE, giáo viên và nghi thức ngày.",
+        "href": "/zh-TW/spiritual"
+      },
+      {
+        "locale": "vi",
+        "name": "Cổng Việt Nam",
+        "status": "Thị trường chính",
+        "body": "Bài test tiếng Việt, video ngắn và kênh xã hội.",
+        "href": "/vi/spiritual"
+      },
+      {
+        "locale": "id",
+        "name": "Cổng Indonesia",
+        "status": "Thị trường chính",
+        "body": "Nội dung Indonesia và hợp tác giáo viên.",
+        "href": "/id/spiritual"
+      },
+      {
+        "locale": "en",
+        "name": "Cổng tiếng Anh",
+        "status": "Quốc tế",
+        "body": "Onboarding tiếng Anh cho công cụ và tư vấn.",
+        "href": "/en/spiritual"
+      },
+      {
+        "locale": "ja",
+        "name": "Cổng Nhật Bản",
+        "status": "Chuẩn bị",
+        "body": "Khung SEO và nội dung sẽ bổ sung sau.",
+        "href": "/ja/spiritual"
+      },
+      {
+        "locale": "ko",
+        "name": "Cổng Hàn Quốc",
+        "status": "Chuẩn bị",
+        "body": "Khung SEO và nội dung sẽ bổ sung sau.",
+        "href": "/ko/spiritual"
+      }
+    ],
+    "page": {
+      "kicker": "SPIRITUAL MARKET",
+      "heroTitle": "Cổng thị trường tâm linh",
+      "heroBody": "Trang landing bản địa cho test miễn phí, phân tích vai trò, bài viết, video ngắn, kênh chính thức và giáo viên.",
+      "freeTests": "Bài test miễn phí",
+      "freeTestsBody": "Thần số học, Human Design, tarot, lịch Maya và nghi thức hằng ngày là lớp tương tác đầu tiên.",
+      "persona": "Phân tích vai trò",
+      "personaBody": "Giúp thành viên hiểu điểm mạnh, điểm kẹt và hành động hôm nay.",
+      "articles": "Danh sách bài viết",
+      "articlesBody": "Chừa sẵn cho CMS hoặc nội dung JSON theo thị trường.",
+      "video": "Video ngắn",
+      "videoBody": "Dẫn về TikTok, Reels, Shorts hoặc nền tảng địa phương.",
+      "social": "LINE / kênh xã hội chính thức",
+      "socialBody": "Đài Loan ưu tiên LINE; thị trường khác dùng kênh địa phương.",
+      "teacherCta": "CTA kết nối giáo viên",
+      "teacherCtaBody": "Sau phần đọc cơ bản, dẫn thành viên đến giáo viên phù hợp.",
+      "primaryCta": "Bắt đầu test miễn phí",
+      "teacherCtaButton": "Tìm giáo viên"
+    }
+  },
+  "language": {
+    "label": "Đổi ngôn ngữ",
+    "current": "Ngôn ngữ hiện tại"
+  }
+}

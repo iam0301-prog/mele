@@ -66,6 +66,28 @@ test.describe('Smoke: home and tools index', () => {
       expect(res?.status(), `tool=${tool}`).toBeLessThan(400);
     }
   });
+
+  test('localized market pages expose all 8 tool entrances', async ({ page }) => {
+    const tools = ['numerology', 'maya', 'bazi', 'tarot', 'runes', 'astro', 'ziwei', 'humandesign'];
+
+    for (const locale of ['en', 'vi', 'id', 'ja', 'ko']) {
+      await page.goto(`/${locale}/spiritual`, { waitUntil: 'domcontentloaded' });
+      for (const tool of tools) {
+        await expect(page.locator(`a[href="/${locale}/tools/${tool}"]`).first(), `${locale}/${tool}`).toBeVisible();
+      }
+    }
+  });
+
+  test('localized tools lobby exposes all 8 tool entrances', async ({ page }) => {
+    const tools = ['numerology', 'maya', 'bazi', 'tarot', 'runes', 'astro', 'ziwei', 'humandesign'];
+
+    for (const locale of ['zh-TW', 'en', 'vi', 'id', 'ja', 'ko']) {
+      await page.goto(`/${locale}/tools`, { waitUntil: 'domcontentloaded' });
+      for (const tool of tools) {
+        await expect(page.locator(`a[href="/${locale}/tools/${tool}"]`).first(), `${locale}/tools/${tool}`).toBeVisible();
+      }
+    }
+  });
 });
 
 test.describe('Closed beta premium flows', () => {
