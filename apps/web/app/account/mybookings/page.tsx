@@ -23,7 +23,7 @@ interface Booking {
 }
 
 const STATUS_LABEL: Record<string, string> = {
-  pending: '待付款', pending_payment: '待付款', paid: '已付款', confirmed: '已確認', in_progress: '進行中',
+  pending: '待付款', paid: '已付款', confirmed: '已確認', in_progress: '進行中',
   completed: '已完成', cancelled_customer: '客戶取消',
   cancelled_teacher: '老師取消', refunded: '已退款', no_show: '未出席',
 };
@@ -47,7 +47,7 @@ export default function MyBookingsPage() {
       .from('bookings')
       .select('*, teachers(display_name, line_url, instagram), teacher_services(name)')
       .eq('customer_id', user.id);
-    if (tab === 'upcoming') q = q.in('status', ['pending', 'pending_payment', 'paid', 'confirmed', 'in_progress']).gte('scheduled_at', now).order('scheduled_at');
+    if (tab === 'upcoming') q = q.in('status', ['pending', 'paid', 'confirmed', 'in_progress']).gte('scheduled_at', now).order('scheduled_at');
     else if (tab === 'past') q = q.eq('status', 'completed').order('scheduled_at', { ascending: false });
     else q = q.in('status', ['cancelled_customer', 'cancelled_teacher', 'refunded', 'no_show']).order('scheduled_at', { ascending: false });
     const { data } = await q;
@@ -144,7 +144,7 @@ export default function MyBookingsPage() {
                 )}
               </div>
               <div className="flex gap-2 flex-wrap">
-                {['pending', 'pending_payment'].includes(b.status) && b.payment_provider !== 'free_test' && (
+                {b.status === 'pending' && b.payment_provider !== 'free_test' && (
                   <Link href={`/account/payment/${b.id}`} className="mele-btn-primary !px-4 !py-2 !text-xs">前往付款</Link>
                 )}
                 {(b.status === 'paid' || b.status === 'confirmed') && (

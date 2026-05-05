@@ -521,7 +521,14 @@ log('teacher portal keeps booking table mobile readable', teacherPortal.includes
 log('teacher portal includes actionable readiness checklist', ['TeacherPortalReadiness', '後台準備度', '公開頁完整度', '服務項目已設定', '測試模式提醒'].every((token) => teacherPortal.includes(token)));
 
 const myBookingsPage = readFileSync('apps/web/app/account/mybookings/page.tsx', 'utf8');
-log('my bookings pending payment links to payment page', myBookingsPage.includes('/account/payment/${b.id}') && myBookingsPage.includes('pending_payment'));
+const bookingPaymentPageForStatus = readFileSync('apps/web/app/account/payment/[id]/page.tsx', 'utf8');
+const paymentResultPageForStatus = readFileSync('apps/web/app/account/payment/result/page.tsx', 'utf8');
+log(
+  'my bookings pending payment links use only valid booking_status enum values',
+  myBookingsPage.includes('/account/payment/${b.id}') &&
+    myBookingsPage.includes("b.status === 'pending'") &&
+    !myBookingsPage.includes('pending_payment'),
+);
 log(
   'my bookings uses RPC for booking mutations',
   myBookingsPage.includes("rpc('cancel_booking'") &&
@@ -536,6 +543,12 @@ log(
 );
 
 const bookingExperiencePage = readFileSync('apps/web/app/account/book/page.tsx', 'utf8');
+log(
+  'booking pages do not reference invalid booking_status enum values',
+  [myBookingsPage, bookingExperiencePage, bookingPaymentPageForStatus, paymentResultPageForStatus, teacherPortal].every(
+    (source) => !source.includes('pending_payment') && !source.includes("status === 'cancelled'"),
+  ),
+);
 log('booking flow explains payment and refund expectations', ['付款後可在「我的諮詢」查看狀態', '取消政策', 'question.length'].some((token) => bookingExperiencePage.includes(token)) && bookingExperiencePage.includes('系統仍會以資料庫狀態再次確認'));
 log(
   'booking flow supports free test mode through RPC',
@@ -736,11 +749,24 @@ log(
     toolResult.includes('reading.sections.map') &&
     !toolResult.includes('unlockedBody'),
 );
+log(
+  'tool result saves logged-in calculator results to chart_records',
+  toolResult.includes("from('chart_records')") &&
+    toolResult.includes('input_data: resultForSave.input') &&
+    toolResult.includes('output_data: resultForSave.data') &&
+    toolResult.includes('savedRecordKeys'),
+);
 log('result CSS includes point unlock panel', ['.point-unlock', '.point-unlock__balance', '.point-unlock__grid', '.point-unlock__option'].every((token) => globalCss.includes(token)));
 log(
   'charts page shows member wallet and unlock archive',
   ['member_wallets', 'content_unlocks', '會員點數', '解鎖紀錄', '每天可領 200 點', 'member-vault', 'member-unlock-history'].every((token) => chartsPage.includes(token)) &&
     ['.member-vault', '.member-vault__stats', '.member-unlock-history', '.chart-history-card'].every((token) => globalCss.includes(token)),
+);
+log(
+  'charts page reads content unlock timestamps from the migration schema',
+  chartsPage.includes('created_at') &&
+    chartsPage.includes(".order('created_at'") &&
+    !chartsPage.includes('unlocked_at'),
 );
 log(
   'teacher portal shows member detail briefs for booked customers',

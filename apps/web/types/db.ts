@@ -152,7 +152,7 @@ export interface ContentUnlock {
   scope_key: string;
   cost_points: number;
   metadata: Record<string, unknown>;
-  unlocked_at: string;
+  created_at: string;
 }
 
 export interface ArAsset {

@@ -82,7 +82,7 @@ function BookFormInner() {
         supabase.from('bookings')
           .select('scheduled_at, duration_minutes')
           .eq('teacher_id', teacherId)
-          .in('status', ['pending', 'pending_payment', 'paid', 'confirmed', 'in_progress'])
+          .in('status', ['pending', 'paid', 'confirmed', 'in_progress'])
           .gte('scheduled_at', new Date().toISOString()),
       ]);
 

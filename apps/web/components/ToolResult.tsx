@@ -1592,11 +1592,47 @@ function PointUnlockPanel({ result }: { result: CalcResponse }) {
 
 export function ToolResult({ result }: { result: CalcResponse | null }) {
   const ref = useRef<HTMLDivElement>(null);
+  const savedRecordKeys = useRef<Set<string>>(new Set());
 
   useEffect(() => {
     if (result && ref.current) {
       ref.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
+  }, [result]);
+
+  useEffect(() => {
+    if (!result) return;
+
+    const resultForSave = result;
+    const recordKey = `${resultForSave.tool}:${resultForSave.computed_at}:${JSON.stringify(resultForSave.input)}`;
+    if (savedRecordKeys.current.has(recordKey)) return;
+
+    let cancelled = false;
+
+    async function saveChartRecord() {
+      const supabase = createClient();
+      const { data: authData } = await supabase.auth.getUser();
+      if (cancelled || !authData.user) return;
+
+      const { error } = await supabase.from('chart_records').insert({
+        user_id: authData.user.id,
+        tool: resultForSave.tool,
+        input_data: resultForSave.input,
+        output_data: resultForSave.data,
+      });
+
+      if (error) {
+        console.warn('chart record save failed:', error);
+        return;
+      }
+      savedRecordKeys.current.add(recordKey);
+    }
+
+    void saveChartRecord();
+
+    return () => {
+      cancelled = true;
+    };
   }, [result]);
 
   if (!result) return null;

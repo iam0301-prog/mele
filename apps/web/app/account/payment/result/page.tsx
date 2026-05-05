@@ -26,12 +26,15 @@ function pickOne<T>(value: T | T[] | null): T | null {
 
 function statusLabel(status?: string) {
   const labels: Record<string, string> = {
-    pending_payment: '待付款',
+    pending: '待付款',
     paid: '已付款',
     confirmed: '已確認',
+    in_progress: '進行中',
     completed: '已完成',
-    cancelled: '已取消',
+    cancelled_customer: '客戶取消',
+    cancelled_teacher: '老師取消',
     refunded: '已退款',
+    no_show: '未出席',
   };
   return status ? labels[status] ?? status : '確認中';
 }
@@ -53,7 +56,7 @@ function statusCopy(status?: string) {
     };
   }
 
-  if (status === 'cancelled' || status === 'refunded') {
+  if (status === 'cancelled_customer' || status === 'cancelled_teacher' || status === 'refunded' || status === 'no_show') {
     return {
       title: status === 'refunded' ? '款項已退款' : '預約已取消',
       tone: 'warning',

@@ -22,7 +22,7 @@ interface ContentUnlockRow {
   tool: ChartTool;
   scope_key: string;
   cost_points: number;
-  unlocked_at: string;
+  created_at: string;
 }
 
 const TOOL_LABEL: Record<string, string> = {
@@ -98,9 +98,9 @@ export default function ChartsPage() {
           .maybeSingle(),
         supabase
           .from('content_unlocks')
-          .select('id, unlock_type, tool, scope_key, cost_points, unlocked_at')
+          .select('id, unlock_type, tool, scope_key, cost_points, created_at')
           .eq('user_id', user.id)
-          .order('unlocked_at', { ascending: false })
+          .order('created_at', { ascending: false })
           .limit(12),
         supabase
           .from('chart_records')
@@ -193,7 +193,7 @@ export default function ChartsPage() {
                 <span>{TOOL_LABEL[item.tool] ?? item.tool}</span>
                 <h3>{UNLOCK_LABEL[item.unlock_type] ?? item.unlock_type}</h3>
                 <p>已使用 {item.cost_points} 點開啟。老師諮詢時可依此脈絡延伸，不必從零開始。</p>
-                <time>{formatDate(item.unlocked_at)}</time>
+                <time>{formatDate(item.created_at)}</time>
               </article>
             ))}
           </div>

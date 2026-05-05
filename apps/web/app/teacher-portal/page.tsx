@@ -6,12 +6,15 @@ import { getServerTestUser } from '@/lib/test-auth-server';
 import type { Teacher } from '@/types/db';
 
 const STATUS_LABEL: Record<string, string> = {
-  pending_payment: '待付款',
+  pending: '待付款',
   paid: '已付款',
   confirmed: '已確認',
+  in_progress: '進行中',
   completed: '已完成',
-  cancelled: '已取消',
+  cancelled_customer: '客戶取消',
+  cancelled_teacher: '老師取消',
   refunded: '已退款',
+  no_show: '未出席',
 };
 
 type TeacherBriefCard = {
