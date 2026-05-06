@@ -36,11 +36,13 @@ const migrations = [
   'supabase/migrations/0009_member_points_unlocks.sql',
   'supabase/migrations/0010_kyc_auto_purge_cron.sql',
   'supabase/migrations/0011_admin_member_ops.sql',
+  'supabase/migrations/0012_beta_tester_ops.sql',
 ];
 
 const pointMigrationFile = 'supabase/migrations/0009_member_points_unlocks.sql';
 const kycPurgeMigrationFile = 'supabase/migrations/0010_kyc_auto_purge_cron.sql';
 const adminMemberOpsMigrationFile = 'supabase/migrations/0011_admin_member_ops.sql';
+const betaTesterOpsMigrationFile = 'supabase/migrations/0012_beta_tester_ops.sql';
 const SQL = migrations
   .map((file) => readFileSync(file, 'utf8'))
   .join('\n');
@@ -72,6 +74,7 @@ for (const table of [
   'point_transactions',
   'daily_point_claims',
   'content_unlocks',
+  'beta_testers',
 ]) {
   const re = new RegExp(`create\\s+table\\s+(if\\s+not\\s+exists\\s+)?public\\.${table}`, 'i');
   log(`table public.${table}`, re.test(SQL));
@@ -112,6 +115,8 @@ for (const fn of [
   'unlock_content',
   'admin_adjust_member_points',
   'admin_update_member_profile',
+  'admin_upsert_beta_tester',
+  'handle_new_beta_tester',
 ]) {
   const re = new RegExp(`create\\s+or\\s+replace\\s+function\\s+public\\.${fn}\\s*\\(`, 'i');
   log(`function public.${fn}`, re.test(SQL));
@@ -125,6 +130,7 @@ for (const trigger of [
   'trg_bookings_compute',
   'trg_support_updated',
   'on_auth_user_created',
+  'on_auth_user_created_beta_tester',
 ]) {
   log(`trigger ${trigger}`, SQL.includes(trigger));
 }
@@ -174,6 +180,8 @@ for (const policy of [
   'point_transactions_self_select',
   'daily_point_claims_self_select',
   'content_unlocks_self_select',
+  'beta_testers_admin_all',
+  'beta_testers_self_select',
   'ar_assets_public_select_active',
   'line_links_self_update',
   'match_sessions_self_select',
@@ -197,6 +205,7 @@ log(
 log('member points migration exists', existsSync(pointMigrationFile));
 log('KYC purge cron migration exists', existsSync(kycPurgeMigrationFile));
 log('admin member operations migration exists', existsSync(adminMemberOpsMigrationFile));
+log('beta tester operations migration exists', existsSync(betaTesterOpsMigrationFile));
 log(
   'member point economy uses 200 daily claim and 100 point unlocks',
   SQL.includes('p_daily_amount int default 200') &&
@@ -230,6 +239,7 @@ const routeFiles = [
   'apps/web/app/admin/launch/page.tsx',
   'apps/web/app/admin/members/page.tsx',
   'apps/web/app/admin/reviews/page.tsx',
+  'apps/web/app/admin/testers/page.tsx',
   'apps/web/app/admin/teachers/page.tsx',
   'apps/web/app/ar/page.tsx',
   'apps/web/app/daily/page.tsx',
@@ -341,6 +351,8 @@ const rpcChecks = [
   ['apps/web/app/admin/applications/page.tsx', 'activate_teacher'],
   ['apps/web/app/admin/members/page.tsx', 'admin_adjust_member_points'],
   ['apps/web/app/admin/members/page.tsx', 'admin_update_member_profile'],
+  ['apps/web/app/admin/testers/page.tsx', 'admin_adjust_member_points'],
+  ['apps/web/app/admin/testers/page.tsx', 'admin_upsert_beta_tester'],
   ['apps/web/app/admin/teachers/page.tsx', 'suspend_teacher'],
   ['apps/web/app/account/mybookings/page.tsx', 'cancel_booking'],
 ];
@@ -451,6 +463,7 @@ log('signup requires consent checkbox state', login.includes('agreed') && login.
 log('signup requires age confirmation', login.includes('ageConfirmed') && login.includes('未滿 13 歲不得自行註冊'));
 log('login supports password reset email', login.includes('resetPasswordForEmail') && login.includes('忘記密碼'));
 log('login supports resending signup confirmation email', login.includes("auth.resend") && login.includes("type: 'signup'") && login.includes('重新寄送驗證信') && login.includes('confirmationSending'));
+log('login supports beta invite signup metadata', ["search.get('invite')", "search.get('mode') === 'signup'", 'beta_invite_code', 'beta_segment'].every((token) => login.includes(token)));
 log('local test auth is gated to localhost free test mode', testAuth.includes('NEXT_PUBLIC_ENABLE_FREE_BOOKING_TEST_MODE') && testAuth.includes('isLocalTestHost') && testAuth.includes('localhost'));
 log('login offers local test auth fallback', login.includes('使用本機測試帳號') && login.includes('setClientTestAuth') && login.includes('canUseClientTestAuth'));
 log('server header recognizes local test auth cookie', header.includes('getServerTestUser') && header.includes('testUser'));
@@ -943,10 +956,17 @@ log(
   ['member_wallets', 'point_transactions', 'content_unlocks', 'profiles', 'admin_adjust_member_points', 'admin_update_member_profile', '調整原因'].every((token) => adminMembersPage.includes(token)) &&
     adminPage.includes('/admin/members'),
 );
+const adminTestersPage = readFileSync('apps/web/app/admin/testers/page.tsx', 'utf8');
+log(
+  'admin testers page manages invite tracking, feedback, and point support',
+  ['beta_testers', 'daily_point_claims', 'content_unlocks', 'admin_upsert_beta_tester', 'admin_adjust_member_points', 'copyInvite', 'closed-beta'].every((token) => adminTestersPage.includes(token)) &&
+    adminPage.includes('/admin/testers') &&
+    adminLayout.includes('/admin/testers'),
+);
 const launchPage = readFileSync('apps/web/app/admin/launch/page.tsx', 'utf8');
 log('admin launch checklist checks production env', launchPage.includes('NEXT_PUBLIC_LIFF_ID') && launchPage.includes('MELE_API_URL') && launchPage.includes('iPhone AR fallback'));
 log('admin launch checklist separates cloud manual checks', ['SQL migrations 檔案完整', 'ECPay checkout secrets', '封閉公測名單', 'Auth 驗證信與 Redirect URLs', 'ops:check-auth'].every((token) => launchPage.includes(token)));
-log('admin launch checklist covers current migrations', ['0009_member_points_unlocks.sql', '0010_kyc_auto_purge_cron.sql', '0011_admin_member_ops.sql', '0001-0011', 'member_wallets', 'content_unlocks', 'daily_point_claims'].every((token) => launchPage.includes(token)));
+log('admin launch checklist covers current migrations', ['0009_member_points_unlocks.sql', '0010_kyc_auto_purge_cron.sql', '0011_admin_member_ops.sql', '0012_beta_tester_ops.sql', '0001-0012', 'member_wallets', 'content_unlocks', 'daily_point_claims', 'beta_testers'].every((token) => launchPage.includes(token)));
 const retiredNumerologyFunction = existsSync('supabase/functions/calc-numerology/index.ts');
 log('retired calc-numerology edge function is removed', !retiredNumerologyFunction);
 

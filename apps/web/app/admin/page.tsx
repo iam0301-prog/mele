@@ -46,6 +46,7 @@ export default async function AdminDashboard() {
     dailyDraws,
     memberProfiles,
     activeWallets,
+    betaTesters,
   ] = await Promise.all([
     safeCount(supabase.from('teacher_applications').select('id', { count: 'exact', head: true }).eq('status', 'pending')),
     safeCount(supabase.from('teacher_applications').select('id', { count: 'exact', head: true }).in('status', ['reviewing', 'revision', 'interview', 'contracted'])),
@@ -59,6 +60,7 @@ export default async function AdminDashboard() {
     safeCount(supabase.from('daily_draws').select('id', { count: 'exact', head: true }).eq('draw_date', today)),
     safeCount(supabase.from('profiles').select('id', { count: 'exact', head: true })),
     safeCount(supabase.from('member_wallets').select('user_id', { count: 'exact', head: true }).gt('balance', 0)),
+    safeCount(supabase.from('beta_testers').select('user_id', { count: 'exact', head: true })),
   ]);
 
   const hasDataError = [
@@ -74,9 +76,17 @@ export default async function AdminDashboard() {
     dailyDraws,
     memberProfiles,
     activeWallets,
+    betaTesters,
   ].some((item) => item.error);
 
   const stats: StatCard[] = [
+    {
+      label: '封測名單',
+      value: countOf(betaTesters),
+      detail: '追蹤邀請碼、測試者狀態、回饋摘要與封測點數補給',
+      href: '/admin/testers',
+      tone: 'green',
+    },
     {
       label: '會員帳號',
       value: countOf(memberProfiles),

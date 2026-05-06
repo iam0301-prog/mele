@@ -6,7 +6,7 @@
 
 | 檔案 | 用途 |
 | --- | --- |
-| `all_migrations.sql` | 把 7 個 migrations 合成一份，適合貼到 Supabase SQL Editor |
+| `all_migrations.sql` | 把 12 個 migrations 合成一份，適合貼到 Supabase SQL Editor |
 | `setup_admin.sql` | 建立第一個 super admin，使用前要把 email 改成你的 |
 | `setup_storage_buckets.sql` | 建立 Storage policies |
 | `RUN_THIS.bat` | Windows CLI 輔助流程，會提示你輸入 Supabase project ref |

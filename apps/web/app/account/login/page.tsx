@@ -60,11 +60,13 @@ function LoginInner() {
   const search = useSearchParams();
   const toast = useToast();
   const returnUrl = search.get('return') || '/';
+  const inviteCode = search.get('invite')?.trim() || '';
+  const betaSegment = search.get('segment')?.trim() || 'invite';
   const authError = search.get('error');
   const authMessage = search.get('message');
   const authErrorMessage = authError ? (authMessage || AUTH_ERROR_COPY[authError] || '登入流程沒有完成，請再試一次。') : '';
 
-  const [mode, setMode] = useState<'signin' | 'signup'>('signin');
+  const [mode, setMode] = useState<'signin' | 'signup'>(() => (inviteCode || search.get('mode') === 'signup' ? 'signup' : 'signin'));
   const [email, setEmail] = useState('');
   const [pwd, setPwd] = useState('');
   const [displayName, setDisplayName] = useState('');
@@ -89,6 +91,10 @@ function LoginInner() {
   useEffect(() => {
     if (authErrorMessage) toast(authErrorMessage, 'error');
   }, [authErrorMessage, toast]);
+
+  useEffect(() => {
+    if (inviteCode) setMode('signup');
+  }, [inviteCode]);
 
   useEffect(() => {
     setTestAuthAvailable(canUseClientTestAuth());
@@ -175,6 +181,8 @@ function LoginInner() {
           tos_consent_at: consentedAt,
           consent_version: CONSENT_VERSION,
           marketing_opt_in: false,
+          beta_invite_code: inviteCode || null,
+          beta_segment: betaSegment,
         },
       },
     });
@@ -314,6 +322,11 @@ function LoginInner() {
         {signupNotice && (
           <div className="mb-4 rounded-lg border border-accent-dim bg-accent/[0.08] p-3 text-sm text-white/80">
             {signupNotice}
+          </div>
+        )}
+        {inviteCode && (
+          <div className="mb-4 rounded-lg border border-cyan-300/40 bg-cyan-300/[0.08] p-3 text-sm leading-loose text-cyan-100">
+            你正在使用封測邀請碼 <strong className="text-white">{inviteCode}</strong>。完成註冊後，後台會自動把你標記為封測測試者。
           </div>
         )}
         <div className="mb-6 flex border-b border-accent-dim">

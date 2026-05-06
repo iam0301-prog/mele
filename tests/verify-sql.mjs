@@ -45,6 +45,7 @@ const migrations = [
   'supabase/migrations/0009_member_points_unlocks.sql',
   'supabase/migrations/0010_kyc_auto_purge_cron.sql',
   'supabase/migrations/0011_admin_member_ops.sql',
+  'supabase/migrations/0012_beta_tester_ops.sql',
 ];
 
 function pgliteCompat(sql) {
@@ -340,6 +341,54 @@ console.log('\n[Test 13] admin member points and profile operations');
     log('non-admin cannot adjust member points', false, 'unexpected success');
   } catch (e) {
     log('non-admin cannot adjust member points', e.message.includes('forbidden'), e.message.substring(0, 80));
+  }
+}
+
+// === Test 14: beta tester operations ===
+console.log('\n[Test 14] beta tester invite tracking and admin updates');
+{
+  const invitedUser = '12121212-1212-1212-1212-121212121212';
+
+  await db.exec(`
+    insert into auth.users (id, email, aud, role, raw_user_meta_data)
+    values (
+      '${invitedUser}',
+      'invited@test',
+      'authenticated',
+      'authenticated',
+      '{"display_name":"Invite User","beta_invite_code":"closed-beta","beta_segment":"friends"}'::jsonb
+    );
+  `);
+
+  let tester = await db.query(`select status, invite_code, segment from public.beta_testers where user_id='${invitedUser}'`);
+  log('beta invite signup creates tester row', tester.rows[0]?.status === 'onboarded', `got ${JSON.stringify(tester.rows[0])}`);
+  log('beta invite code is recorded', tester.rows[0]?.invite_code === 'closed-beta');
+  log('beta invite segment is recorded', tester.rows[0]?.segment === 'friends');
+
+  await db.exec(`select set_config('request.jwt.claim.sub', '${adminUser}', false);`);
+  tester = await db.query(`
+    select status, segment, invite_code, preferred_contact, feedback_summary
+      from public.admin_upsert_beta_tester(
+        '${cust}',
+        'active',
+        'teacher-seed',
+        'closed-beta',
+        'admin',
+        'line:@tester',
+        'needs first chart review',
+        'likes tarot and maya',
+        now()
+      )
+  `);
+  log('admin can upsert beta tester status', tester.rows[0]?.status === 'active', `got ${JSON.stringify(tester.rows[0])}`);
+  log('admin beta tester feedback summary is saved', tester.rows[0]?.feedback_summary === 'likes tarot and maya');
+
+  await db.exec(`select set_config('request.jwt.claim.sub', '${cust}', false);`);
+  try {
+    await db.exec(`select public.admin_upsert_beta_tester('${teacherUser}', 'active', 'bad', 'closed-beta', 'self', null, null, null, null);`);
+    log('non-admin cannot upsert beta tester', false, 'unexpected success');
+  } catch (e) {
+    log('non-admin cannot upsert beta tester', e.message.includes('forbidden'), e.message.substring(0, 80));
   }
 }
 

@@ -1,39 +1,30 @@
 ﻿-- =====================================================================
--- Mele Supabase Schema (combined migrations 0001~0007)
--- Generated from supabase/migrations for SQL Editor setup.
+-- Source: 0001_initial_schema.sql
 -- =====================================================================
-
-
--- ---------------------------------------------------------------------
--- 0001_initial_schema.sql
--- ---------------------------------------------------------------------
 -- =====================================================================
--- 命理媒介中心 — 初始資料庫 Schema
+-- ?賜?慦?銝剖? ????鞈?摨?Schema
 -- =====================================================================
--- 日期：2026-04-27
--- 對應：Supabase (PostgreSQL 15+)
--- 啟用 UUID + Row Level Security
+-- ?交?嚗?026-04-27
+-- 撠?嚗upabase (PostgreSQL 15+)
+-- ? UUID + Row Level Security
 
 -- ---------- Extensions ----------
 create extension if not exists "uuid-ossp";
 create extension if not exists "pgcrypto";
 
 -- =====================================================================
--- 1. profiles — 客戶資料（延伸 auth.users）
--- =====================================================================
+-- 1. profiles ??摰Ｘ鞈?嚗辣隡?auth.users嚗?-- =====================================================================
 create table public.profiles (
   id uuid primary key references auth.users(id) on delete cascade,
   display_name text,
   avatar_url text,
   bio text,
-  line_user_id text unique,                -- LINE login 用
-  birth_date date,
-  birth_time time,                          -- 出生時間（本地時）
-  birth_location text,                      -- 文字地名
-  birth_lat numeric(8,5),                   -- 緯度
-  birth_lon numeric(8,5),                   -- 經度
+  line_user_id text unique,                -- LINE login ??  birth_date date,
+  birth_time time,                          -- ?箇???嚗?唳?嚗?  birth_location text,                      -- ???啣?
+  birth_lat numeric(8,5),                   -- 蝺臬漲
+  birth_lon numeric(8,5),                   -- 蝬漲
   birth_timezone text,                      -- e.g. 'Asia/Taipei'
-  gender text check (gender in ('男','女','其他','未填')),
+  gender text check (gender in ('??,'憟?,'?嗡?','?芸‵')),
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
@@ -41,48 +32,39 @@ create table public.profiles (
 create index idx_profiles_line_user_id on public.profiles(line_user_id);
 
 -- =====================================================================
--- 2. teacher_applications — 老師申請表（審核流程入口）
--- =====================================================================
+-- 2. teacher_applications ???葦?唾?銵剁?撖拇瘚??亙嚗?-- =====================================================================
 create type teacher_status as enum (
-  'pending',      -- 已送出、未審
-  'reviewing',    -- 審核中
-  'revision',     -- 需補件
-  'rejected',     -- 拒絕
-  'interview',    -- 試講中
-  'contracted',   -- 已簽約
-  'active',       -- 上架中
-  'paused',       -- 暫停接案（老師主動）
-  'suspended'     -- 停權（管理員強制）
-);
+  'pending',      -- 撌脤?撖?  'reviewing',    -- 撖拇銝?  'revision',     -- ?鋆辣
+  'rejected',     -- ??
+  'interview',    -- 閰西?銝?  'contracted',   -- 撌脩偷蝝?  'active',       -- 銝銝?  'paused',       -- ?怠??交?嚗葦銝餃?嚗?  'suspended'     -- ??嚗恣?撘瑕嚗?);
 
 create table public.teacher_applications (
   id uuid primary key default uuid_generate_v4(),
   user_id uuid not null references auth.users(id) on delete cascade,
   status teacher_status not null default 'pending',
 
-  -- 基本資料
-  legal_name text not null,                 -- 真實姓名
-  display_name text not null,               -- 對外顯示名稱
+  -- ?箸鞈?
+  legal_name text not null,                 -- ?祕憪?
+  display_name text not null,               -- 撠?憿舐內?迂
   birth_date date,
   email text not null,
   phone text not null,
   address text,
 
-  -- 專業資料
-  specialties text[] not null,              -- 專長領域 (e.g. ['八字','紫微','塔羅'])
+  -- 撠平鞈?
+  specialties text[] not null,              -- 撠?? (e.g. ['?怠?','蝝怠凝','憛?'])
   years_of_experience int,
-  intro_short text not null,                -- 30 字內自介
-  intro_long text,                          -- 長版介紹
-  quote text,                               -- 一句話格言
+  intro_short text not null,                -- 30 摮?芯?
+  intro_long text,                          -- ?瑞?隞晶
+  quote text,                               -- 銝?亥店?潸?
 
-  -- 上傳檔案（Supabase Storage URLs）
-  id_doc_front_url text,                    -- 證件正面
-  id_doc_back_url text,                     -- 證件背面
-  cert_urls text[],                          -- 證書/結業證明
-  portfolio_urls text[],                     -- 作品/案例
-  intro_video_url text,                     -- 自介影片
+  -- 銝瑼?嚗upabase Storage URLs嚗?  id_doc_front_url text,                    -- 霅辣甇?
+  id_doc_back_url text,                     -- 霅辣?
+  cert_urls text[],                          -- 霅/蝯平霅?
+  portfolio_urls text[],                     -- 雿?/獢?
+  intro_video_url text,                     -- ?芯?敶梁?
 
-  -- 社群連結
+  -- 蝷曄黎???
   line_url text,
   instagram text,
   facebook text,
@@ -90,21 +72,20 @@ create table public.teacher_applications (
   youtube text,
   website text,
 
-  -- 試講
+  -- 閰西?
   interview_video_url text,
   interview_score_pro int check (interview_score_pro between 1 and 5),
   interview_score_express int check (interview_score_express between 1 and 5),
   interview_score_warmth int check (interview_score_warmth between 1 and 5),
   interview_notes text,
 
-  -- 簽約
-  commission_rate numeric(4,3) default 0.200,  -- 抽成比例（預設 20%，正式比例以合約為準）
-  agreed_terms_at timestamptz,
+  -- 蝪賜?
+  commission_rate numeric(4,3) default 0.200,  -- ?賣?瘥?嚗?閮?20%嚗迤撘?靘誑???箸?嚗?  agreed_terms_at timestamptz,
 
   submitted_at timestamptz not null default now(),
   reviewed_at timestamptz,
   reviewer_id uuid references auth.users(id),
-  reviewer_notes text,                      -- 內部審核註記
+  reviewer_notes text,                      -- ?折撖拇閮餉?
 
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
@@ -114,7 +95,7 @@ create index idx_teacher_apps_status on public.teacher_applications(status);
 create index idx_teacher_apps_user on public.teacher_applications(user_id);
 
 -- =====================================================================
--- 3. teachers — 老師上架資料（status active 才會 join 顯示在前台）
+-- 3. teachers ???葦銝鞈?嚗tatus active ?? join 憿舐內?典??堆?
 -- =====================================================================
 create table public.teachers (
   id uuid primary key default uuid_generate_v4(),
@@ -122,17 +103,16 @@ create table public.teachers (
   application_id uuid references public.teacher_applications(id),
   status teacher_status not null default 'pending',
 
-  -- 公開資料
+  -- ?祇?鞈?
   display_name text not null,
   avatar_url text,
-  title text,                               -- 頭銜，如「資深紫微老師」
-  intro_short text,
+  title text,                               -- ?剝?嚗???瘛梁換敺株葦??  intro_short text,
   intro_long text,
   quote text,
   specialties text[] not null,
-  consultation_style text,                  -- 諮詢風格
+  consultation_style text,                  -- 隢株岷憸冽
 
-  -- 社群
+  -- 蝷曄黎
   line_url text,
   instagram text,
   facebook text,
@@ -140,11 +120,10 @@ create table public.teachers (
   youtube text,
   website text,
 
-  -- 統計（自動計算）
-  rating numeric(3,2) default 0,            -- 平均評分
+  -- 蝯梯?嚗??蝞?
+  rating numeric(3,2) default 0,            -- 撟喳?閰?
   total_reviews int default 0,
-  cases_count int default 0,                -- 完成的諮詢次數
-
+  cases_count int default 0,                -- 摰??垣閰Ｘ活??
   commission_rate numeric(4,3) default 0.200,
 
   approved_at timestamptz,
@@ -153,7 +132,7 @@ create table public.teachers (
   suspended_at timestamptz,
   suspended_reason text,
 
-  -- 後台專用：諮詢腳本（只有老師自己看得到）
+  -- 敺撠嚗垣閰Ｚ?穿??芣??葦?芸楛???堆?
   admin_script text,
 
   created_at timestamptz not null default now(),
@@ -164,15 +143,14 @@ create index idx_teachers_status on public.teachers(status);
 create index idx_teachers_specialties on public.teachers using gin(specialties);
 
 -- =====================================================================
--- 4. teacher_services — 老師服務項目
+-- 4. teacher_services ???葦???
 -- =====================================================================
 create table public.teacher_services (
   id uuid primary key default uuid_generate_v4(),
   teacher_id uuid not null references public.teachers(id) on delete cascade,
-  name text not null,                       -- 例「紫微全盤詳解」
-  description text,
+  name text not null,                       -- 靘換敺桀?方底閫??  description text,
   duration_minutes int not null,            -- 30 / 60 / 90...
-  price_ntd int not null,                   -- 價格（新台幣，元為單位）
+  price_ntd int not null,                   -- ?寞嚗?啣馳嚗??箏雿?
   is_active boolean not null default true,
   display_order int default 0,
   created_at timestamptz not null default now(),
@@ -182,11 +160,8 @@ create table public.teacher_services (
 create index idx_services_teacher on public.teacher_services(teacher_id) where is_active;
 
 -- =====================================================================
--- 5. teacher_availability — 老師可預約時段
--- =====================================================================
--- 兩種模式：
---   (a) 週循環模式：day_of_week (0=Sun..6=Sat) 設定每週固定時段
---   (b) 特定日期模式：specific_date 設定某日的特殊時段（覆蓋週循環）
+-- 5. teacher_availability ???葦?舫?蝝?畾?-- =====================================================================
+-- ?拍車璅∪?嚗?--   (a) ?勗儐?唳芋撘?day_of_week (0=Sun..6=Sat) 閮剖?瘥勗摰?畾?--   (b) ?孵??交?璅∪?嚗pecific_date 閮剖???畾?畾蛛?閬??勗儐?堆?
 create table public.teacher_availability (
   id uuid primary key default uuid_generate_v4(),
   teacher_id uuid not null references public.teachers(id) on delete cascade,
@@ -195,27 +170,22 @@ create table public.teacher_availability (
   start_time time not null,
   end_time time not null,
   timezone text not null default 'Asia/Taipei',
-  is_blocked boolean not null default false, -- true = 該時段封鎖（休假）
-  created_at timestamptz not null default now(),
+  is_blocked boolean not null default false, -- true = 閰脫?畾萄???隡?嚗?  created_at timestamptz not null default now(),
   check ((day_of_week is not null) or (specific_date is not null))
 );
 
 create index idx_availability_teacher on public.teacher_availability(teacher_id);
 
 -- =====================================================================
--- 6. bookings — 預約
+-- 6. bookings ????
 -- =====================================================================
 create type booking_status as enum (
-  'pending',        -- 已建立、待付款
-  'paid',           -- 已付款、待諮詢
-  'confirmed',      -- 老師已確認
-  'in_progress',    -- 諮詢進行中
-  'completed',      -- 完成
-  'cancelled_customer',  -- 客戶取消
-  'cancelled_teacher',   -- 老師取消
-  'refunded',       -- 退款完成
-  'no_show'         -- 客戶未出席
-);
+  'pending',        -- 撌脣遣蝡?隞狡
+  'paid',           -- 撌脖?甈整?隢株岷
+  'confirmed',      -- ?葦撌脩Ⅱ隤?  'in_progress',    -- 隢株岷?脰?銝?  'completed',      -- 摰?
+  'cancelled_customer',  -- 摰Ｘ??
+  'cancelled_teacher',   -- ?葦??
+  'refunded',       -- ?甈曉???  'no_show'         -- 摰Ｘ?芸撣?);
 
 create table public.bookings (
   id uuid primary key default uuid_generate_v4(),
@@ -229,7 +199,7 @@ create table public.bookings (
 
   status booking_status not null default 'pending',
 
-  -- 金額
+  -- ??
   amount_ntd int not null,
   platform_fee_ntd int not null,
   teacher_amount_ntd int not null,
@@ -237,23 +207,20 @@ create table public.bookings (
   payment_id text,
   paid_at timestamptz,
 
-  -- 諮詢前準備
-  customer_question text,                   -- 客戶提問
-  chart_tool text,                          -- 'bazi' | 'ziwei' | etc - 自動排盤工具
-  chart_data jsonb,                         -- 排盤結果，老師打開即看到
-
-  -- 諮詢進行
+  -- 隢株岷????  customer_question text,                   -- 摰Ｘ??
+  chart_tool text,                          -- 'bazi' | 'ziwei' | etc - ?芸??撌亙
+  chart_data jsonb,                         -- ?蝯?嚗葦???喟???
+  -- 隢株岷?脰?
   meeting_url text,                         -- LINE / Zoom / Google Meet
   started_at timestamptz,
   completed_at timestamptz,
 
-  -- 取消 / 退款
-  cancelled_at timestamptz,
+  -- ?? / ?甈?  cancelled_at timestamptz,
   cancellation_reason text,
   refunded_at timestamptz,
   refund_amount_ntd int,
 
-  -- 諮詢後補充（諮詢結束 7 天內可問 1 個免費追問）
+  -- 隢株岷敺???隢株岷蝯? 7 憭拙?臬? 1 ??鞎餉蕭??
   followup_question text,
   followup_answer text,
   followup_used_at timestamptz,
@@ -267,7 +234,7 @@ create index idx_bookings_teacher on public.bookings(teacher_id);
 create index idx_bookings_status_scheduled on public.bookings(status, scheduled_at);
 
 -- =====================================================================
--- 7. reviews — 客戶評價
+-- 7. reviews ??摰Ｘ閰
 -- =====================================================================
 create table public.reviews (
   id uuid primary key default uuid_generate_v4(),
@@ -277,16 +244,15 @@ create table public.reviews (
 
   rating int not null check (rating between 1 and 5),
   comment text,
-  is_anonymous boolean not null default false,  -- 靜默模式（評價但不顯示客戶）
-  is_visible boolean not null default true,     -- admin 可隱藏不當評論
-
+  is_anonymous boolean not null default false,  -- ??璅∪?嚗??嫣?銝＊蝷箏恥?塚?
+  is_visible boolean not null default true,     -- admin ?舫???嗉?隢?
   created_at timestamptz not null default now()
 );
 
 create index idx_reviews_teacher_visible on public.reviews(teacher_id) where is_visible;
 
 -- =====================================================================
--- 8. chart_records — 排盤紀錄（免費簡易版）
+-- 8. chart_records ???蝝???祥蝪⊥???
 -- =====================================================================
 create type chart_tool as enum (
   'numerology', 'maya', 'bazi', 'tarot', 'runes',
@@ -295,7 +261,7 @@ create type chart_tool as enum (
 
 create table public.chart_records (
   id uuid primary key default uuid_generate_v4(),
-  user_id uuid references auth.users(id) on delete set null,  -- 未登入也允許
+  user_id uuid references auth.users(id) on delete set null,  -- ?芰?乩??迂
   tool chart_tool not null,
   input_data jsonb not null,
   output_data jsonb not null,
@@ -306,8 +272,7 @@ create index idx_chart_records_user on public.chart_records(user_id) where user_
 create index idx_chart_records_tool on public.chart_records(tool);
 
 -- =====================================================================
--- 9. teacher_review_log — 老師狀態變更稽核日誌
--- =====================================================================
+-- 9. teacher_review_log ???葦????渡里?豢隤?-- =====================================================================
 create table public.teacher_review_log (
   id uuid primary key default uuid_generate_v4(),
   teacher_id uuid references public.teachers(id) on delete cascade,
@@ -323,7 +288,7 @@ create table public.teacher_review_log (
 create index idx_review_log_teacher on public.teacher_review_log(teacher_id, created_at desc);
 
 -- =====================================================================
--- 10. admins — 管理員（有審核權限的人）
+-- 10. admins ??蝞∠??∴??祟?豢???鈭綽?
 -- =====================================================================
 create table public.admins (
   user_id uuid primary key references auth.users(id) on delete cascade,
@@ -332,7 +297,7 @@ create table public.admins (
 );
 
 -- =====================================================================
--- 11. notifications — 站內通知
+-- 11. notifications ??蝡?
 -- =====================================================================
 create table public.notifications (
   id uuid primary key default uuid_generate_v4(),
@@ -340,15 +305,14 @@ create table public.notifications (
   type text not null,                       -- 'booking_reminder' | 'booking_confirmed' | 'review_request' | 'teacher_status_change' | etc
   title text not null,
   body text,
-  link text,                                -- 點擊後跳轉
-  read_at timestamptz,
+  link text,                                -- 暺?敺歲頧?  read_at timestamptz,
   created_at timestamptz not null default now()
 );
 
 create index idx_notifications_user_unread on public.notifications(user_id, created_at desc) where read_at is null;
 
 -- =====================================================================
--- updated_at 自動更新 trigger
+-- updated_at ?芸??湔 trigger
 -- =====================================================================
 create or replace function public.tg_set_updated_at()
 returns trigger as $$
@@ -370,17 +334,15 @@ create trigger trg_bookings_updated before update on public.bookings
   for each row execute function public.tg_set_updated_at();
 
 
--- ---------------------------------------------------------------------
--- 0002_rls_policies.sql
--- ---------------------------------------------------------------------
+-- =====================================================================
+-- Source: 0002_rls_policies.sql
+-- =====================================================================
 -- =====================================================================
 -- Row Level Security Policies
 -- =====================================================================
--- 原則：
---   - 客戶可看自己的所有資料、其他公開資料（active 老師、可見評價）
---   - 老師可看自己的所有資料 + 自己被預約的客戶基本資料
---   - 管理員可看一切
-
+-- ??嚗?--   - 摰Ｘ?舐??芸楛?????隞????active ?葦?閬??對?
+--   - ?葦?舐??芸楛??????+ ?芸楛鋡恍?蝝?摰Ｘ?箸鞈?
+--   - 蝞∠??∪????
 -- ---------- helper: is_admin ----------
 create or replace function public.is_admin(uid uuid)
 returns boolean as $$
@@ -398,19 +360,18 @@ $$ language sql stable security definer;
 -- ============================================================
 alter table public.profiles enable row level security;
 
--- 自己讀寫自己
-create policy "profiles_self_select" on public.profiles
+-- ?芸楛霈撖怨撌?create policy "profiles_self_select" on public.profiles
   for select using (auth.uid() = id);
 create policy "profiles_self_update" on public.profiles
   for update using (auth.uid() = id);
 create policy "profiles_self_insert" on public.profiles
   for insert with check (auth.uid() = id);
 
--- 管理員可讀全部
+-- 蝞∠??∪霈?券
 create policy "profiles_admin_select" on public.profiles
   for select using (public.is_admin(auth.uid()));
 
--- 老師可讀「曾預約過自己」的客戶 profile
+-- ?葦?航?????撌晞?摰Ｘ profile
 create policy "profiles_teacher_select_customers" on public.profiles
   for select using (
     public.is_teacher(auth.uid())
@@ -436,16 +397,13 @@ create policy "applications_admin_all" on public.teacher_applications
 -- ============================================================
 alter table public.teachers enable row level security;
 
--- 公開讀：active 狀態的老師全公開
-create policy "teachers_public_select_active" on public.teachers
+-- ?祇?霈嚗ctive ????葦?典??create policy "teachers_public_select_active" on public.teachers
   for select using (status = 'active');
 
--- 老師自己讀寫
-create policy "teachers_self_all" on public.teachers
+-- ?葦?芸楛霈撖?create policy "teachers_self_all" on public.teachers
   for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
 
--- 管理員全權
-create policy "teachers_admin_all" on public.teachers
+-- 蝞∠??∪甈?create policy "teachers_admin_all" on public.teachers
   for all using (public.is_admin(auth.uid())) with check (public.is_admin(auth.uid()));
 
 -- ============================================================
@@ -491,22 +449,20 @@ create policy "availability_teacher_self_all" on public.teacher_availability
 -- ============================================================
 alter table public.bookings enable row level security;
 
--- 客戶看自己的
+-- 摰Ｘ?撌梁?
 create policy "bookings_customer_self" on public.bookings
   for select using (auth.uid() = customer_id);
 
--- 老師看自己的
+-- ?葦?撌梁?
 create policy "bookings_teacher_self" on public.bookings
   for select using (
     teacher_id in (select id from public.teachers where user_id = auth.uid())
   );
 
--- 客戶更新（限自己取消）
+-- 摰Ｘ?湔嚗??芸楛??嚗?
+-- ?葦?湔嚗??芸楛??
 
--- 老師更新（限自己的）
-
--- 管理員
-create policy "bookings_admin_all" on public.bookings
+-- 蝞∠???create policy "bookings_admin_all" on public.bookings
   for all using (public.is_admin(auth.uid())) with check (public.is_admin(auth.uid()));
 
 -- ============================================================
@@ -527,20 +483,18 @@ create policy "reviews_admin_all" on public.reviews
   for all using (public.is_admin(auth.uid())) with check (public.is_admin(auth.uid()));
 
 -- ============================================================
--- chart_records (免費排盤紀錄)
+-- chart_records (?祥?蝝??
 -- ============================================================
 alter table public.chart_records enable row level security;
 
--- 寫入：登入用戶寫自己的、未登入也可寫（user_id = null）
-create policy "chart_records_insert" on public.chart_records
+-- 撖怠嚗?亦?嗅神?芸楛??餃銋撖恬?user_id = null嚗?create policy "chart_records_insert" on public.chart_records
   for insert with check (auth.uid() = user_id or user_id is null);
 
--- 讀：自己的
+-- 霈嚗撌梁?
 create policy "chart_records_self_select" on public.chart_records
   for select using (auth.uid() = user_id);
 
--- 老師可讀客戶的排盤紀錄（限自己的客戶）
-create policy "chart_records_teacher_select" on public.chart_records
+-- ?葦?航?摰Ｘ???斤????撌梁?摰Ｘ嚗?create policy "chart_records_teacher_select" on public.chart_records
   for select using (
     public.is_teacher(auth.uid())
     and user_id in (
@@ -557,7 +511,7 @@ alter table public.teacher_review_log enable row level security;
 create policy "review_log_admin_all" on public.teacher_review_log
   for all using (public.is_admin(auth.uid())) with check (public.is_admin(auth.uid()));
 
--- 老師可讀關於自己的 log
+-- ?葦?航???芸楛??log
 create policy "review_log_self_select" on public.teacher_review_log
   for select using (
     teacher_id in (select id from public.teachers where user_id = auth.uid())
@@ -586,15 +540,15 @@ create policy "notifications_self_all" on public.notifications
   for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
 
 
--- ---------------------------------------------------------------------
--- 0003_workflow_functions.sql
--- ---------------------------------------------------------------------
 -- =====================================================================
--- 業務流程函式
+-- Source: 0003_workflow_functions.sql
+-- =====================================================================
+-- =====================================================================
+-- 璆剖?瘚??賢?
 -- =====================================================================
 
 -- ---------- submit_teacher_application ----------
--- 老師送出申請（pending 狀態）
+-- ?葦??唾?嚗ending ???
 create or replace function public.submit_teacher_application(
   p_legal_name text,
   p_display_name text,
@@ -631,14 +585,14 @@ begin
   returning id into v_app_id;
 
   insert into public.teacher_review_log (application_id, action, new_status, notes)
-  values (v_app_id, 'submit', 'pending', '申請送出');
+  values (v_app_id, 'submit', 'pending', '?唾??');
 
   return v_app_id;
 end;
 $$ language plpgsql security definer;
 
 -- ---------- review_teacher_application ----------
--- 管理員審核：批准 / 拒絕 / 需補件 / 進入試講
+-- 蝞∠??∪祟?賂??孵? / ?? / ?鋆辣 / ?脣閰西?
 create or replace function public.review_teacher_application(
   p_application_id uuid,
   p_action text,                 -- 'approve' | 'reject' | 'request_revision' | 'interview'
@@ -651,7 +605,7 @@ declare
   v_new_status teacher_status;
   v_user_id uuid;
 begin
-  -- 權限檢查
+  -- 甈?瑼Ｘ
   if not public.is_admin(auth.uid()) then
     raise exception 'forbidden: not admin';
   end if;
@@ -687,17 +641,16 @@ begin
   insert into public.teacher_review_log (application_id, reviewer_id, action, old_status, new_status, notes)
   values (p_application_id, auth.uid(), p_action, v_old_status, v_new_status, p_notes);
 
-  -- 通知申請人
-  insert into public.notifications (user_id, type, title, body)
+  -- ??唾?鈭?  insert into public.notifications (user_id, type, title, body)
   values (
     v_user_id,
     'teacher_status_change',
     case p_action
-      when 'approve' then '🎉 老師申請審核通過'
-      when 'reject' then '老師申請未通過'
-      when 'request_revision' then '請補件'
-      when 'interview' then '請安排試講'
-      when 'review' then '審核中'
+      when 'approve' then '?? ?葦?唾?撖拇??'
+      when 'reject' then '?葦?唾??芷?'
+      when 'request_revision' then '隢?隞?
+      when 'interview' then '隢??岫雓?
+      when 'review' then '撖拇銝?
     end,
     p_notes
   );
@@ -705,8 +658,7 @@ end;
 $$ language plpgsql security definer;
 
 -- ---------- activate_teacher ----------
--- 老師正式上架（從 contracted → active），需先建立 teachers 紀錄
-create or replace function public.activate_teacher(p_application_id uuid)
+-- ?葦甇??銝嚗? contracted ??active嚗???遣蝡?teachers 蝝??create or replace function public.activate_teacher(p_application_id uuid)
 returns uuid as $$
 declare
   v_teacher_id uuid;
@@ -744,7 +696,7 @@ end;
 $$ language plpgsql security definer;
 
 -- ---------- suspend_teacher ----------
--- 管理員停權老師
+-- 蝞∠??∪?甈葦
 create or replace function public.suspend_teacher(p_teacher_id uuid, p_reason text)
 returns void as $$
 declare
@@ -766,8 +718,7 @@ end;
 $$ language plpgsql security definer;
 
 -- ---------- update_teacher_rating ----------
--- 自動更新老師評分（trigger on reviews）
-create or replace function public.tg_update_teacher_rating()
+-- ?芸??湔?葦閰?嚗rigger on reviews嚗?create or replace function public.tg_update_teacher_rating()
 returns trigger as $$
 begin
   update public.teachers t
@@ -805,7 +756,7 @@ create trigger trg_bookings_cases_count
   for each row execute function public.tg_update_cases_count();
 
 -- ---------- compute booking amounts ----------
--- 自動計算 platform_fee 與 teacher_amount
+-- ?芸?閮? platform_fee ??teacher_amount
 create or replace function public.tg_compute_booking_amounts()
 returns trigger as $$
 declare
@@ -825,44 +776,40 @@ create trigger trg_bookings_compute
   for each row execute function public.tg_compute_booking_amounts();
 
 
--- ---------------------------------------------------------------------
--- 0004_p0_fixes.sql
--- ---------------------------------------------------------------------
 -- =====================================================================
--- 0004 — P0 上線阻擋項補強
+-- Source: 0004_p0_fixes.sql
 -- =====================================================================
--- 1) 雙重預約防護
--- 2) cancel_booking 自動退款
--- 3) confirm_payment（金流 webhook 用）
--- 4) 評價邀請 auto trigger
--- 5) cases_count 退款反扣
--- 6) support_threads 客服工單
--- 7) bookings.settlement_id 結算
--- 8) profiles 隱私 / 條款同意紀錄
--- 9) v_teacher_open_slots view
+-- =====================================================================
+-- 0004 ??P0 銝??餅???撘?-- =====================================================================
+-- 1) ?????脰風
+-- 2) cancel_booking ?芸??甈?-- 3) confirm_payment嚗?瘚?webhook ?剁?
+-- 4) 閰?隢?auto trigger
+-- 5) cases_count ?甈曉???-- 6) support_threads 摰Ｘ?撌亙
+-- 7) bookings.settlement_id 蝯?
+-- 8) profiles ?梁? / 璇狡??蝝??-- 9) v_teacher_open_slots view
 -- =====================================================================
 
--- ---------- 1. profiles 隱私同意欄位 ----------
+-- ---------- 1. profiles ?梁???甈? ----------
 alter table public.profiles
   add column if not exists privacy_consent_at timestamptz,
   add column if not exists tos_consent_at timestamptz,
   add column if not exists privacy_consent_version text,
   add column if not exists marketing_opt_in boolean not null default false;
 
--- ---------- 2. bookings 補結算欄位 ----------
+-- ---------- 2. bookings 鋆?蝞?雿?----------
 alter table public.bookings
   add column if not exists settlement_id uuid,
   add column if not exists privacy_consent_at timestamptz,
   add column if not exists no_refund_consent boolean not null default false,
   add column if not exists dispute_status text check (dispute_status in ('none','open','resolved')) default 'none';
 
--- ---------- 3. 雙重預約防護（同老師同時段不可重複） ----------
--- 已成立的預約（不含取消/退款/no_show）才參與佔用
+-- ---------- 3. ?????脰風嚗??葦??畾萎??舫?銴? ----------
+-- 撌脫?蝡???嚗??怠?瘨??甈?no_show嚗???雿
 create unique index if not exists uniq_booking_teacher_slot
   on public.bookings(teacher_id, scheduled_at)
   where status in ('pending','paid','confirmed','in_progress','completed');
 
--- ---------- 4. settlements 結算批次表 ----------
+-- ---------- 4. settlements 蝯??寞活銵?----------
 create table if not exists public.settlements (
   id uuid primary key default uuid_generate_v4(),
   teacher_id uuid not null references public.teachers(id) on delete cascade,
@@ -889,7 +836,7 @@ create policy "settlements_teacher_self_select" on public.settlements
     teacher_id in (select id from public.teachers where user_id = auth.uid())
   );
 
--- ---------- 5. support_threads 客服工單 ----------
+-- ---------- 5. support_threads 摰Ｘ?撌亙 ----------
 create table if not exists public.support_threads (
   id uuid primary key default uuid_generate_v4(),
   user_id uuid not null references auth.users(id) on delete cascade,
@@ -910,7 +857,7 @@ create table if not exists public.support_messages (
   thread_id uuid not null references public.support_threads(id) on delete cascade,
   sender_id uuid not null references auth.users(id),
   body text not null,
-  is_internal boolean not null default false,  -- admin 內部備註
+  is_internal boolean not null default false,  -- admin ?折?酉
   created_at timestamptz not null default now()
 );
 create index if not exists idx_support_msg_thread on public.support_messages(thread_id, created_at);
@@ -946,7 +893,7 @@ create trigger trg_support_updated before update on public.support_threads
   for each row execute function public.tg_set_updated_at();
 
 -- ---------- 6. confirm_payment ----------
--- 給金流 webhook 呼叫（service_role）：把 booking 從 pending → paid
+-- 蝯阡?瘚?webhook ?澆嚗ervice_role嚗???booking 敺?pending ??paid
 create or replace function public.confirm_payment(
   p_booking_id uuid,
   p_provider text,
@@ -980,22 +927,22 @@ begin
          paid_at = now()
    where id = p_booking_id;
 
-  -- 通知客戶
+  -- ?摰Ｘ
   insert into public.notifications (user_id, type, title, body, link)
-  select customer_id, 'booking_paid', '✅ 付款成功', '您的預約已確認，老師將於諮詢前 24 小時聯繫您。',
+  select customer_id, 'booking_paid', '??隞狡??', '?函???撌脩Ⅱ隤??葦撠隢株岷??24 撠??舐鼠?具?,
          '/account/mybookings.html'
     from public.bookings where id = p_booking_id;
 
-  -- 通知老師
+  -- ??葦
   insert into public.notifications (user_id, type, title, body, link)
-  select t.user_id, 'booking_new', '🔔 新預約已付款', '請查看預約詳情並準備諮詢。',
+  select t.user_id, 'booking_new', '?? ?圈?蝝歇隞狡', '隢??蝝底?蒂皞?隢株岷??,
          '/teacher-portal/bookings.html'
     from public.bookings b join public.teachers t on t.id = b.teacher_id
    where b.id = p_booking_id;
 end;
 $$ language plpgsql security definer;
 
--- ---------- 7. cancel_booking（含 24h 退款規則） ----------
+-- ---------- 7. cancel_booking嚗 24h ?甈曇??? ----------
 -- ---------- 6a. create_booking_request ----------
 create or replace function public.create_booking_request(
   p_teacher_id uuid,
@@ -1064,15 +1011,15 @@ begin
 
   if p_free_test_mode then
     insert into public.notifications (user_id, type, title, body, link)
-    select customer_id, 'booking_paid', '免費測試預約已成立',
-           '目前網站測試期不收費，預約已直接成立。',
+    select customer_id, 'booking_paid', '?祥皜祈岫??撌脫?蝡?,
+           '?桀?蝬脩?皜祈岫???嗉祥嚗?蝝歇?湔????,
            '/account/mybookings'
       from public.bookings
      where id = v_booking_id;
 
     insert into public.notifications (user_id, type, title, body, link)
-    select t.user_id, 'booking_new', '新的免費測試預約',
-           '使用者已建立測試期免費預約，請至老師後台查看。',
+    select t.user_id, 'booking_new', '?啁??祥皜祈岫??',
+           '雿輻?歇撱箇?皜祈岫??鞎駁?蝝?隢?葦敺?亦???,
            '/teacher-portal/bookings.html'
       from public.bookings b
       join public.teachers t on t.id = b.teacher_id
@@ -1114,13 +1061,9 @@ begin
 
   v_hours_until := extract(epoch from (v_b.scheduled_at - now())) / 3600.0;
 
-  -- 取消政策：
-  --   老師取消 / admin 取消 → 100% 退款
-  --   客戶取消：
-  --     未付款 (pending) → 直接取消，無退款
-  --     >= 24h → 全退
-  --     < 24h  → 50% 退
-  --     已開始 → 0% 退
+  -- ???輻?嚗?  --   ?葦?? / admin ?? ??100% ?甈?  --   摰Ｘ??嚗?  --     ?芯?甈?(pending) ???湔??嚗?甈?  --     >= 24h ???券
+  --     < 24h  ??50% ?
+  --     撌脤?憪???0% ?
   if v_is_teacher and not v_is_customer and not v_is_admin then
     v_refund_pct := 1.0;
     v_new_status := 'cancelled_teacher';
@@ -1128,8 +1071,7 @@ begin
     v_refund_pct := 1.0;
     v_new_status := 'cancelled_teacher';
   else
-    -- 客戶取消（含同時是老師，但我們以客戶身份處理）
-    v_new_status := 'cancelled_customer';
+    -- 摰Ｘ??嚗???航葦嚗??誑摰Ｘ頨思遢??嚗?    v_new_status := 'cancelled_customer';
     if v_b.status = 'pending' then
       v_refund_pct := 0;
     elsif v_b.status = 'in_progress' then
@@ -1153,14 +1095,14 @@ begin
          refunded_at = case when v_refund > 0 then now() else null end
    where id = p_booking_id;
 
-  -- 通知雙方
+  -- ??
   insert into public.notifications (user_id, type, title, body)
   values
     (v_b.customer_id, 'booking_cancelled',
-      case when v_refund > 0 then '預約已取消（退款 NT$' || v_refund || '）' else '預約已取消' end,
+      case when v_refund > 0 then '??撌脣?瘨??甈?NT$' || v_refund || '嚗? else '??撌脣?瘨? end,
       p_reason),
     ((select user_id from public.teachers where id = v_b.teacher_id), 'booking_cancelled',
-      '預約已取消', p_reason);
+      '??撌脣?瘨?, p_reason);
 
   return jsonb_build_object(
     'cancelled', true,
@@ -1186,15 +1128,15 @@ begin
 
   update public.bookings set status='completed', completed_at = now() where id = p_booking_id;
 
-  -- 發評價邀請（含 7 天免費追問提醒）
+  -- ?潸??寥?隢???7 憭拙?鞎餉蕭????
   insert into public.notifications (user_id, type, title, body, link)
-  values (v_b.customer_id, 'review_request', '✨ 給老師一個鼓勵',
-    '諮詢已完成。歡迎留下評價，並可在 7 天內提出 1 個免費追問。',
+  values (v_b.customer_id, 'review_request', '??蝯西葦銝????,
+    '隢株岷撌脣??迭餈?銝??對?銝血??7 憭拙? 1 ??鞎餉蕭??,
     '/account/mybookings.html?id=' || p_booking_id);
 end;
 $$ language plpgsql security definer;
 
--- ---------- 8b. update_booking_followup（追問只走 RPC） ----------
+-- ---------- 8b. update_booking_followup嚗蕭?韏?RPC嚗?----------
 create or replace function public.update_booking_followup(
   p_booking_id uuid,
   p_question text
@@ -1228,15 +1170,15 @@ begin
 end;
 $$ language plpgsql security definer;
 
--- ---------- 9. cases_count 退款反扣 ----------
+-- ---------- 9. cases_count ?甈曉???----------
 create or replace function public.tg_update_cases_count()
 returns trigger as $$
 begin
-  -- 進入 completed → +1
+  -- ?脣 completed ??+1
   if new.status = 'completed' and (old.status is null or old.status <> 'completed') then
     update public.teachers set cases_count = cases_count + 1 where id = new.teacher_id;
   end if;
-  -- 從 completed → refunded/cancelled → -1
+  -- 敺?completed ??refunded/cancelled ??-1
   if old.status = 'completed' and new.status in ('refunded','cancelled_customer','cancelled_teacher') then
     update public.teachers set cases_count = greatest(cases_count - 1, 0) where id = new.teacher_id;
   end if;
@@ -1244,16 +1186,16 @@ begin
 end;
 $$ language plpgsql;
 
--- ---------- 10. v_teacher_open_slots（前端可預約時段 view） ----------
--- 把 weekly + specific_date + is_blocked + 已被預約 全部攤平
--- 給未來 30 天的可預約 30/60 分鐘 slot
+-- ---------- 10. v_teacher_open_slots嚗?蝡臬???挾 view嚗?----------
+-- ??weekly + specific_date + is_blocked + 撌脰◤?? ?券?文像
+-- 蝯行靘?30 憭拍??舫?蝝?30/60 ?? slot
 create or replace view public.v_teacher_busy as
   select teacher_id, scheduled_at as start_at,
          scheduled_at + (duration_minutes || ' minutes')::interval as end_at
     from public.bookings
    where status in ('pending','paid','confirmed','in_progress','completed');
 
--- ---------- 11. helper: 提交客服工單 ----------
+-- ---------- 11. helper: ?漱摰Ｘ?撌亙 ----------
 create or replace function public.create_support_thread(
   p_category text,
   p_subject text,
@@ -1270,9 +1212,8 @@ begin
   insert into public.support_messages (thread_id, sender_id, body)
   values (v_id, auth.uid(), p_body);
 
-  -- 通知所有 admin（簡化：抓全部 admin）
-  insert into public.notifications (user_id, type, title, body, link)
-  select user_id, 'support_new', '🆘 新客服工單：' || p_subject, p_body,
+  -- ????admin嚗陛?????admin嚗?  insert into public.notifications (user_id, type, title, body, link)
+  select user_id, 'support_new', '?? ?啣恥?極?殷?' || p_subject, p_body,
          '/admin/index.html?tab=support&id=' || v_id
     from public.admins;
 
@@ -1280,7 +1221,7 @@ begin
 end;
 $$ language plpgsql security definer;
 
--- ---------- 12. 後台統計 view ----------
+-- ---------- 12. 敺蝯梯? view ----------
 create or replace view public.v_admin_stats as
   select
     (select count(*) from public.teacher_applications where status = 'pending') as pending_apps,
@@ -1292,7 +1233,7 @@ create or replace view public.v_admin_stats as
     (select count(*) from public.reviews where rating <= 2 and is_visible) as low_reviews,
     (select coalesce(sum(platform_fee_ntd), 0) from public.bookings where status in ('completed','refunded')) as total_platform_revenue;
 
--- ---------- 13. 保留同意條款歷史（用於合規舉證） ----------
+-- ---------- 13. 靽???璇狡甇瑕嚗?澆?閬?霅? ----------
 create table if not exists public.consent_log (
   id uuid primary key default uuid_generate_v4(),
   user_id uuid not null references auth.users(id) on delete cascade,
@@ -1309,8 +1250,8 @@ create policy "consent_self_select" on public.consent_log for select using (auth
 create policy "consent_self_insert" on public.consent_log for insert with check (auth.uid() = user_id);
 create policy "consent_admin_select" on public.consent_log for select using (public.is_admin(auth.uid()));
 
--- ---------- 14. KYC 文件保留期限自動清除 ----------
--- 老師若 paused/suspended/rejected 超過 90 天，把證件 URL 清空
+-- ---------- 14. KYC ?辣靽????芸?皜 ----------
+-- ?葦??paused/suspended/rejected 頞? 90 憭抬???隞?URL 皜征
 create or replace function public.purge_old_kyc_docs() returns int as $$
 declare v_count int;
 begin
@@ -1329,9 +1270,9 @@ end;
 $$ language plpgsql security definer;
 
 
--- ---------------------------------------------------------------------
--- 0005_daily_ritual_center.sql
--- ---------------------------------------------------------------------
+-- =====================================================================
+-- Source: 0005_daily_ritual_center.sql
+-- =====================================================================
 -- =====================================================================
 -- Daily ritual center: LINE-linked daily readings, daily draws, AR assets
 -- =====================================================================
@@ -1384,7 +1325,7 @@ create table if not exists public.daily_draws (
   draw_date date not null,
   tool daily_draw_tool not null,
   seed text not null,
-  question text not null default '今日指引',
+  question text not null default '隞??',
   result_data jsonb not null,
   render_data jsonb not null default '{}'::jsonb,
   created_at timestamptz not null default now(),
@@ -1473,12 +1414,11 @@ values
 on conflict (tool, asset_kind, title) do nothing;
 
 
--- ---------------------------------------------------------------------
+-- =====================================================================
+-- Source: 0006_match_sessions.sql
+-- =====================================================================
 -- 0006_match_sessions.sql
--- ---------------------------------------------------------------------
--- 0006_match_sessions.sql
--- 手機優先命理媒合紀錄：保存使用者的媒合答案、排行榜與最後選擇的老師。
-
+-- ???芸??賜?慦?蝝??靽?雿輻??慦?蝑???銵???敺???葦??
 create table if not exists public.match_sessions (
   id uuid primary key default uuid_generate_v4(),
   user_id uuid not null references auth.users(id) on delete cascade,
@@ -1510,9 +1450,9 @@ create policy "match_sessions_admin_select" on public.match_sessions
   for select using (public.is_admin(auth.uid()));
 
 
--- ---------------------------------------------------------------------
--- 0007_auth_signup_mirror.sql
--- ---------------------------------------------------------------------
+-- =====================================================================
+-- Source: 0007_auth_signup_mirror.sql
+-- =====================================================================
 -- =====================================================================
 -- 0007 auth signup mirror
 -- =====================================================================
@@ -1553,14 +1493,14 @@ begin
     nullif(v_meta->>'birth_lon', '')::numeric,
     coalesce(nullif(v_meta->>'birth_timezone', ''), 'Asia/Taipei'),
     case lower(coalesce(nullif(v_meta->>'gender', ''), ''))
-      when 'female' then '女'
-      when 'male' then '男'
-      when 'other' then '其他'
-      when 'not_specified' then '未填'
-      when '女' then '女'
-      when '男' then '男'
-      when '其他' then '其他'
-      else '未填'
+      when 'female' then '憟?
+      when 'male' then '??
+      when 'other' then '?嗡?'
+      when 'not_specified' then '?芸‵'
+      when '憟? then '憟?
+      when '?? then '??
+      when '?嗡?' then '?嗡?'
+      else '?芸‵'
     end,
     case when v_consent_version is not null then v_privacy_at else null end,
     case when v_consent_version is not null then v_tos_at else null end,
@@ -1605,4 +1545,826 @@ drop trigger if exists on_auth_user_created on auth.users;
 create trigger on_auth_user_created
   after insert on auth.users
   for each row execute function public.handle_new_auth_user();
+
+
+-- =====================================================================
+-- Source: 0008_teacher_website_application.sql
+-- =====================================================================
+-- =====================================================================
+-- ?葦?唾?嚗?摮犖蝬脩?銝血葆?乩??嗉葦鞈?
+-- =====================================================================
+
+create or replace function public.submit_teacher_application(
+  p_legal_name text,
+  p_display_name text,
+  p_email text,
+  p_phone text,
+  p_specialties text[],
+  p_intro_short text,
+  p_intro_long text,
+  p_quote text,
+  p_id_doc_front_url text,
+  p_id_doc_back_url text,
+  p_intro_video_url text,
+  p_line_url text,
+  p_instagram text,
+  p_facebook text,
+  p_threads text,
+  p_youtube text,
+  p_website text default null
+)
+returns uuid as $$
+declare
+  v_app_id uuid;
+begin
+  insert into public.teacher_applications (
+    user_id, legal_name, display_name, email, phone,
+    specialties, intro_short, intro_long, quote,
+    id_doc_front_url, id_doc_back_url, intro_video_url,
+    line_url, instagram, facebook, threads, youtube, website
+  ) values (
+    auth.uid(), p_legal_name, p_display_name, p_email, p_phone,
+    p_specialties, p_intro_short, p_intro_long, p_quote,
+    p_id_doc_front_url, p_id_doc_back_url, p_intro_video_url,
+    p_line_url, p_instagram, p_facebook, p_threads, p_youtube, p_website
+  )
+  returning id into v_app_id;
+
+  insert into public.teacher_review_log (application_id, action, new_status, notes)
+  values (v_app_id, 'submit', 'pending', '?唾??');
+
+  return v_app_id;
+end;
+$$ language plpgsql security definer;
+
+create or replace function public.activate_teacher(p_application_id uuid)
+returns uuid as $$
+declare
+  v_teacher_id uuid;
+  v_app record;
+begin
+  if not public.is_admin(auth.uid()) then
+    raise exception 'forbidden: not admin';
+  end if;
+
+  select * into v_app from public.teacher_applications where id = p_application_id;
+  if v_app.status <> 'contracted' then
+    raise exception 'application not in contracted status';
+  end if;
+
+  insert into public.teachers (
+    user_id, application_id, status, display_name, intro_short, intro_long, quote,
+    specialties, line_url, instagram, facebook, threads, youtube, website,
+    commission_rate, approved_at, approved_by
+  ) values (
+    v_app.user_id, p_application_id, 'active'::teacher_status,
+    v_app.display_name, v_app.intro_short, v_app.intro_long, v_app.quote,
+    v_app.specialties, v_app.line_url, v_app.instagram, v_app.facebook,
+    v_app.threads, v_app.youtube, v_app.website, v_app.commission_rate,
+    now(), auth.uid()
+  )
+  returning id into v_teacher_id;
+
+  update public.teacher_applications set status = 'active' where id = p_application_id;
+
+  insert into public.teacher_review_log (teacher_id, application_id, reviewer_id, action, old_status, new_status)
+  values (v_teacher_id, p_application_id, auth.uid(), 'activate', 'contracted', 'active');
+
+  return v_teacher_id;
+end;
+$$ language plpgsql security definer;
+
+
+-- =====================================================================
+-- Source: 0009_member_points_unlocks.sql
+-- =====================================================================
+-- =====================================================================
+-- Member point economy: daily claims, one daily draw, paid unlocks
+-- =====================================================================
+
+create table if not exists public.member_wallets (
+  user_id uuid primary key references auth.users(id) on delete cascade,
+  balance int not null default 0 check (balance >= 0),
+  lifetime_earned int not null default 0 check (lifetime_earned >= 0),
+  lifetime_spent int not null default 0 check (lifetime_spent >= 0),
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create table if not exists public.point_transactions (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users(id) on delete cascade,
+  amount int not null check (amount > 0),
+  direction text not null check (direction in ('credit', 'debit')),
+  reason text not null,
+  reference_type text,
+  reference_id text,
+  balance_after int not null check (balance_after >= 0),
+  metadata jsonb not null default '{}'::jsonb,
+  created_at timestamptz not null default now()
+);
+
+create table if not exists public.daily_point_claims (
+  user_id uuid not null references auth.users(id) on delete cascade,
+  claim_date date not null,
+  amount int not null default 200 check (amount > 0),
+  created_at timestamptz not null default now(),
+  primary key (user_id, claim_date)
+);
+
+create table if not exists public.content_unlocks (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users(id) on delete cascade,
+  unlock_type text not null check (unlock_type in ('deep_reading', 'transit_day', 'transit_month', 'transit_year')),
+  tool chart_tool not null,
+  scope_key text not null,
+  cost_points int not null default 100 check (cost_points > 0),
+  metadata jsonb not null default '{}'::jsonb,
+  created_at timestamptz not null default now(),
+  unique (user_id, unlock_type, tool, scope_key)
+);
+
+alter table public.daily_draws
+  drop constraint if exists uniq_daily_draws_user_date_choice;
+
+alter table public.daily_draws
+  add constraint uniq_daily_draws_user_date_choice unique (user_id, draw_date);
+
+create index if not exists idx_point_transactions_user_created
+  on public.point_transactions(user_id, created_at desc);
+
+create index if not exists idx_content_unlocks_user_scope
+  on public.content_unlocks(user_id, unlock_type, tool, scope_key);
+
+alter table public.member_wallets enable row level security;
+alter table public.point_transactions enable row level security;
+alter table public.daily_point_claims enable row level security;
+alter table public.content_unlocks enable row level security;
+
+create policy "member_wallets_self_select" on public.member_wallets
+  for select using (auth.uid() = user_id);
+create policy "member_wallets_admin_all" on public.member_wallets
+  for all using (public.is_admin(auth.uid())) with check (public.is_admin(auth.uid()));
+
+create policy "point_transactions_self_select" on public.point_transactions
+  for select using (auth.uid() = user_id);
+create policy "point_transactions_admin_all" on public.point_transactions
+  for all using (public.is_admin(auth.uid())) with check (public.is_admin(auth.uid()));
+
+create policy "daily_point_claims_self_select" on public.daily_point_claims
+  for select using (auth.uid() = user_id);
+create policy "daily_point_claims_admin_all" on public.daily_point_claims
+  for all using (public.is_admin(auth.uid())) with check (public.is_admin(auth.uid()));
+
+create policy "content_unlocks_self_select" on public.content_unlocks
+  for select using (auth.uid() = user_id);
+create policy "content_unlocks_admin_all" on public.content_unlocks
+  for all using (public.is_admin(auth.uid())) with check (public.is_admin(auth.uid()));
+
+create trigger trg_member_wallets_updated
+before update on public.member_wallets
+for each row execute function public.tg_set_updated_at();
+
+create or replace function public.ensure_member_wallet(p_user_id uuid)
+returns public.member_wallets
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_wallet public.member_wallets;
+begin
+  insert into public.member_wallets (user_id)
+  values (p_user_id)
+  on conflict (user_id) do nothing;
+
+  select *
+    into v_wallet
+    from public.member_wallets
+   where user_id = p_user_id;
+
+  return v_wallet;
+end;
+$$;
+
+create or replace function public.claim_daily_points(
+  p_claim_date date default (timezone('Asia/Taipei', now())::date),
+  p_daily_amount int default 200
+)
+returns jsonb
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_user_id uuid := auth.uid();
+  v_inserted_count int := 0;
+  v_wallet public.member_wallets;
+begin
+  if v_user_id is null then
+    raise exception 'not_authenticated';
+  end if;
+
+  if p_daily_amount <= 0 then
+    raise exception 'daily_amount_must_be_positive';
+  end if;
+
+  perform public.ensure_member_wallet(v_user_id);
+
+  insert into public.daily_point_claims (user_id, claim_date, amount)
+  values (v_user_id, p_claim_date, p_daily_amount)
+  on conflict (user_id, claim_date) do nothing;
+
+  get diagnostics v_inserted_count = row_count;
+
+  if v_inserted_count > 0 then
+    update public.member_wallets
+       set balance = balance + p_daily_amount,
+           lifetime_earned = lifetime_earned + p_daily_amount
+     where user_id = v_user_id
+     returning * into v_wallet;
+
+    insert into public.point_transactions (
+      user_id, amount, direction, reason, reference_type, reference_id, balance_after, metadata
+    ) values (
+      v_user_id, p_daily_amount, 'credit', 'daily_claim', 'daily_point_claim', p_claim_date::text,
+      v_wallet.balance, jsonb_build_object('claim_date', p_claim_date)
+    );
+  else
+    select *
+      into v_wallet
+      from public.member_wallets
+     where user_id = v_user_id;
+  end if;
+
+  return jsonb_build_object(
+    'claimed', v_inserted_count > 0,
+    'amount', case when v_inserted_count > 0 then p_daily_amount else 0 end,
+    'balance', v_wallet.balance,
+    'claim_date', p_claim_date
+  );
+end;
+$$;
+
+create or replace function public.unlock_content(
+  p_unlock_type text,
+  p_tool chart_tool,
+  p_scope_key text,
+  p_cost int default 100,
+  p_metadata jsonb default '{}'::jsonb
+)
+returns jsonb
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_user_id uuid := auth.uid();
+  v_wallet public.member_wallets;
+  v_existing public.content_unlocks;
+  v_unlock public.content_unlocks;
+begin
+  if v_user_id is null then
+    raise exception 'not_authenticated';
+  end if;
+
+  if p_cost <= 0 then
+    raise exception 'cost_must_be_positive';
+  end if;
+
+  if p_unlock_type not in ('deep_reading', 'transit_day', 'transit_month', 'transit_year') then
+    raise exception 'invalid_unlock_type';
+  end if;
+
+  if nullif(trim(p_scope_key), '') is null then
+    raise exception 'scope_key_required';
+  end if;
+
+  perform public.ensure_member_wallet(v_user_id);
+
+  select *
+    into v_existing
+    from public.content_unlocks
+   where user_id = v_user_id
+     and unlock_type = p_unlock_type
+     and tool = p_tool
+     and scope_key = p_scope_key;
+
+  if found then
+    select *
+      into v_wallet
+      from public.member_wallets
+     where user_id = v_user_id;
+
+    return jsonb_build_object(
+      'unlocked', true,
+      'already_unlocked', true,
+      'balance', v_wallet.balance,
+      'unlock_id', v_existing.id
+    );
+  end if;
+
+  select *
+    into v_wallet
+    from public.member_wallets
+   where user_id = v_user_id
+   for update;
+
+  if v_wallet.balance < p_cost then
+    raise exception 'insufficient_points';
+  end if;
+
+  update public.member_wallets
+     set balance = balance - p_cost,
+         lifetime_spent = lifetime_spent + p_cost
+   where user_id = v_user_id
+   returning * into v_wallet;
+
+  insert into public.content_unlocks (
+    user_id, unlock_type, tool, scope_key, cost_points, metadata
+  ) values (
+    v_user_id, p_unlock_type, p_tool, p_scope_key, p_cost, p_metadata
+  )
+  returning * into v_unlock;
+
+  insert into public.point_transactions (
+    user_id, amount, direction, reason, reference_type, reference_id, balance_after, metadata
+  ) values (
+    v_user_id, p_cost, 'debit', p_unlock_type, 'content_unlock', v_unlock.id::text,
+    v_wallet.balance, jsonb_build_object('tool', p_tool, 'scope_key', p_scope_key) || p_metadata
+  );
+
+  return jsonb_build_object(
+    'unlocked', true,
+    'already_unlocked', false,
+    'balance', v_wallet.balance,
+    'unlock_id', v_unlock.id
+  );
+end;
+$$;
+
+grant execute on function public.claim_daily_points(date, int) to authenticated;
+grant execute on function public.unlock_content(text, chart_tool, text, int, jsonb) to authenticated;
+
+
+-- =====================================================================
+-- Source: 0010_kyc_auto_purge_cron.sql
+-- =====================================================================
+-- =====================================================================
+-- KYC ?辣 90 憭抵??????pg_cron ??
+-- =====================================================================
+-- ?交?嚗?026-05-04
+-- ?桃?嚗???/ ??瘜????葦?唾?鋡?reject 銝?reviewed_at 頞? 90 憭拇?嚗?--      ?芸???id_doc_front_url / id_doc_back_url / cert_urls 皜征??-- 靘陷嚗?004_p0_fixes.sql 撌脣遣蝡?public.purge_old_kyc_docs()
+-- 瘜冽?嚗g_cron ??Supabase Cloud ?舐嚗?嗉???CREATE EXTENSION pg_cron??--      ?亦憓 pg_cron 銋??葉?瑕隞?migration嚗F EXISTS 摰???
+create extension if not exists pg_cron;
+
+-- 蝝??甈⊥??斤?蝔賣銵剁?靘恣??亦?嚗?create table if not exists public.kyc_purge_log (
+  id uuid primary key default gen_random_uuid(),
+  ran_at timestamptz not null default now(),
+  purged_count int not null,
+  notes text
+);
+
+alter table public.kyc_purge_log enable row level security;
+
+do $$
+begin
+  if not exists (
+    select 1 from pg_policies
+    where schemaname = 'public' and tablename = 'kyc_purge_log' and policyname = 'kyc_purge_log_admin_select'
+  ) then
+    create policy "kyc_purge_log_admin_select"
+      on public.kyc_purge_log for select
+      using (public.is_admin(auth.uid()));
+  end if;
+end $$;
+
+-- ??撅?wrapper嚗銵?purge + 撖怎里??create or replace function public.run_kyc_purge_job() returns int as $$
+declare
+  v_count int;
+begin
+  v_count := public.purge_old_kyc_docs();
+  insert into public.kyc_purge_log (purged_count, notes)
+  values (v_count, 'pg_cron daily 03:15 UTC');
+  return v_count;
+end;
+$$ language plpgsql security definer;
+
+-- ??嚗???03:15 UTC嚗??11:15嚗銵?甈?-- ?亙歇摮?? job ?? unschedule嚗??銴遣蝡?
+do $$
+begin
+  if exists (select 1 from cron.job where jobname = 'kyc_purge_daily') then
+    perform cron.unschedule('kyc_purge_daily');
+  end if;
+  perform cron.schedule(
+    'kyc_purge_daily',
+    '15 3 * * *',
+    $job$ select public.run_kyc_purge_job(); $job$
+  );
+exception
+  -- ?亥府?啣???pg_cron extension嚗?嗆?嚗??仿???雿??撘?  when undefined_table then
+    raise notice 'pg_cron not installed; skip scheduling. Run run_kyc_purge_job() manually.';
+  when undefined_function then
+    raise notice 'pg_cron functions missing; skip scheduling.';
+end $$;
+
+
+-- =====================================================================
+-- Source: 0011_admin_member_ops.sql
+-- =====================================================================
+-- =====================================================================
+-- Admin member operations: wallet adjustments and profile maintenance
+-- =====================================================================
+
+create or replace function public.admin_adjust_member_points(
+  p_user_id uuid,
+  p_mode text,
+  p_amount int,
+  p_reason text,
+  p_metadata jsonb default '{}'::jsonb
+)
+returns jsonb
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_admin_id uuid := auth.uid();
+  v_wallet public.member_wallets;
+  v_mode text := lower(trim(coalesce(p_mode, '')));
+  v_reason text := trim(coalesce(p_reason, ''));
+  v_delta int := 0;
+  v_direction text;
+  v_transaction_id uuid;
+begin
+  if v_admin_id is null then
+    raise exception 'not_authenticated';
+  end if;
+
+  if not public.is_admin(v_admin_id) then
+    raise exception 'forbidden: not admin';
+  end if;
+
+  if p_user_id is null then
+    raise exception 'member_required';
+  end if;
+
+  if v_mode not in ('credit', 'debit', 'set') then
+    raise exception 'invalid_adjustment_mode';
+  end if;
+
+  if nullif(v_reason, '') is null then
+    raise exception 'reason_required';
+  end if;
+
+  if p_amount is null or p_amount < 0 or (v_mode in ('credit', 'debit') and p_amount <= 0) then
+    raise exception 'invalid_amount';
+  end if;
+
+  perform public.ensure_member_wallet(p_user_id);
+
+  select *
+    into v_wallet
+    from public.member_wallets
+   where user_id = p_user_id
+   for update;
+
+  if not found then
+    raise exception 'wallet_not_found';
+  end if;
+
+  if v_mode = 'credit' then
+    v_delta := p_amount;
+  elsif v_mode = 'debit' then
+    v_delta := -p_amount;
+  else
+    v_delta := p_amount - v_wallet.balance;
+  end if;
+
+  if v_delta = 0 then
+    return jsonb_build_object(
+      'adjusted', false,
+      'mode', v_mode,
+      'delta', 0,
+      'balance', v_wallet.balance
+    );
+  end if;
+
+  if v_wallet.balance + v_delta < 0 then
+    raise exception 'insufficient_points';
+  end if;
+
+  if v_delta > 0 then
+    update public.member_wallets
+       set balance = balance + v_delta,
+           lifetime_earned = lifetime_earned + v_delta
+     where user_id = p_user_id
+     returning * into v_wallet;
+
+    v_direction := 'credit';
+  else
+    update public.member_wallets
+       set balance = balance + v_delta,
+           lifetime_spent = lifetime_spent + abs(v_delta)
+     where user_id = p_user_id
+     returning * into v_wallet;
+
+    v_direction := 'debit';
+  end if;
+
+  insert into public.point_transactions (
+    user_id,
+    amount,
+    direction,
+    reason,
+    reference_type,
+    reference_id,
+    balance_after,
+    metadata
+  ) values (
+    p_user_id,
+    abs(v_delta),
+    v_direction,
+    'admin_adjustment:' || v_reason,
+    'admin_adjustment',
+    v_admin_id::text,
+    v_wallet.balance,
+    coalesce(p_metadata, '{}'::jsonb) || jsonb_build_object(
+      'admin_user_id', v_admin_id,
+      'mode', v_mode,
+      'reason', v_reason,
+      'delta', v_delta
+    )
+  )
+  returning id into v_transaction_id;
+
+  return jsonb_build_object(
+    'adjusted', true,
+    'mode', v_mode,
+    'direction', v_direction,
+    'delta', v_delta,
+    'amount', abs(v_delta),
+    'balance', v_wallet.balance,
+    'transaction_id', v_transaction_id
+  );
+end;
+$$;
+
+create or replace function public.admin_update_member_profile(
+  p_user_id uuid,
+  p_display_name text default null,
+  p_bio text default null,
+  p_birth_date date default null,
+  p_birth_time time default null,
+  p_birth_location text default null,
+  p_birth_timezone text default null,
+  p_gender text default null
+)
+returns public.profiles
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_admin_id uuid := auth.uid();
+  v_profile public.profiles;
+  v_gender text := nullif(trim(coalesce(p_gender, '')), '');
+begin
+  if v_admin_id is null then
+    raise exception 'not_authenticated';
+  end if;
+
+  if not public.is_admin(v_admin_id) then
+    raise exception 'forbidden: not admin';
+  end if;
+
+  if p_user_id is null then
+    raise exception 'member_required';
+  end if;
+
+  if v_gender is not null and v_gender not in ('??, '憟?, '?嗡?', '?芸‵') then
+    raise exception 'invalid_gender';
+  end if;
+
+  update public.profiles
+     set display_name = nullif(trim(coalesce(p_display_name, '')), ''),
+         bio = nullif(trim(coalesce(p_bio, '')), ''),
+         birth_date = p_birth_date,
+         birth_time = p_birth_time,
+         birth_location = nullif(trim(coalesce(p_birth_location, '')), ''),
+         birth_timezone = nullif(trim(coalesce(p_birth_timezone, '')), ''),
+         gender = coalesce(v_gender, '?芸‵'),
+         updated_at = now()
+   where id = p_user_id
+   returning * into v_profile;
+
+  if not found then
+    raise exception 'profile_not_found';
+  end if;
+
+  return v_profile;
+end;
+$$;
+
+grant execute on function public.admin_adjust_member_points(uuid, text, int, text, jsonb) to authenticated;
+grant execute on function public.admin_update_member_profile(uuid, text, text, date, time, text, text, text) to authenticated;
+
+
+-- =====================================================================
+-- Source: 0012_beta_tester_ops.sql
+-- =====================================================================
+-- =====================================================================
+-- Closed beta tester operations: invite tracking and admin notes
+-- =====================================================================
+
+create table if not exists public.beta_testers (
+  user_id uuid primary key references auth.users(id) on delete cascade,
+  status text not null default 'invited'
+    check (status in ('invited', 'onboarded', 'active', 'paused', 'done', 'blocked')),
+  segment text not null default 'general',
+  invite_code text not null,
+  invite_source text,
+  preferred_contact text,
+  notes text,
+  feedback_summary text,
+  invited_at timestamptz not null default now(),
+  onboarded_at timestamptz,
+  last_contacted_at timestamptz,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create index if not exists idx_beta_testers_status
+  on public.beta_testers(status, updated_at desc);
+
+create index if not exists idx_beta_testers_invite_code
+  on public.beta_testers(invite_code);
+
+alter table public.beta_testers enable row level security;
+
+create policy "beta_testers_admin_all" on public.beta_testers
+  for all using (public.is_admin(auth.uid())) with check (public.is_admin(auth.uid()));
+
+create policy "beta_testers_self_select" on public.beta_testers
+  for select using (auth.uid() = user_id);
+
+create trigger trg_beta_testers_updated
+before update on public.beta_testers
+for each row execute function public.tg_set_updated_at();
+
+create or replace function public.admin_upsert_beta_tester(
+  p_user_id uuid,
+  p_status text default 'active',
+  p_segment text default 'general',
+  p_invite_code text default null,
+  p_invite_source text default null,
+  p_preferred_contact text default null,
+  p_notes text default null,
+  p_feedback_summary text default null,
+  p_last_contacted_at timestamptz default null
+)
+returns public.beta_testers
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_admin_id uuid := auth.uid();
+  v_status text := lower(trim(coalesce(p_status, 'active')));
+  v_segment text := coalesce(nullif(trim(coalesce(p_segment, '')), ''), 'general');
+  v_invite_code text := nullif(trim(coalesce(p_invite_code, '')), '');
+  v_existing public.beta_testers;
+  v_result public.beta_testers;
+begin
+  if v_admin_id is null then
+    raise exception 'not_authenticated';
+  end if;
+
+  if not public.is_admin(v_admin_id) then
+    raise exception 'forbidden: not admin';
+  end if;
+
+  if p_user_id is null then
+    raise exception 'member_required';
+  end if;
+
+  if v_status not in ('invited', 'onboarded', 'active', 'paused', 'done', 'blocked') then
+    raise exception 'invalid_beta_tester_status';
+  end if;
+
+  if not exists(select 1 from auth.users where id = p_user_id) then
+    raise exception 'auth_user_not_found';
+  end if;
+
+  select *
+    into v_existing
+    from public.beta_testers
+   where user_id = p_user_id;
+
+  v_invite_code := coalesce(
+    v_invite_code,
+    v_existing.invite_code,
+    'manual-' || lower(substr(replace(gen_random_uuid()::text, '-', ''), 1, 10))
+  );
+
+  insert into public.beta_testers (
+    user_id,
+    status,
+    segment,
+    invite_code,
+    invite_source,
+    preferred_contact,
+    notes,
+    feedback_summary,
+    invited_at,
+    onboarded_at,
+    last_contacted_at
+  ) values (
+    p_user_id,
+    v_status,
+    v_segment,
+    v_invite_code,
+    nullif(trim(coalesce(p_invite_source, '')), ''),
+    nullif(trim(coalesce(p_preferred_contact, '')), ''),
+    nullif(trim(coalesce(p_notes, '')), ''),
+    nullif(trim(coalesce(p_feedback_summary, '')), ''),
+    now(),
+    case when v_status in ('onboarded', 'active') then now() else null end,
+    p_last_contacted_at
+  )
+  on conflict (user_id) do update
+     set status = excluded.status,
+         segment = excluded.segment,
+         invite_code = excluded.invite_code,
+         invite_source = excluded.invite_source,
+         preferred_contact = excluded.preferred_contact,
+         notes = excluded.notes,
+         feedback_summary = excluded.feedback_summary,
+         onboarded_at = coalesce(
+           public.beta_testers.onboarded_at,
+           case when excluded.status in ('onboarded', 'active') then now() else excluded.onboarded_at end
+         ),
+         last_contacted_at = coalesce(excluded.last_contacted_at, public.beta_testers.last_contacted_at)
+  returning * into v_result;
+
+  return v_result;
+end;
+$$;
+
+create or replace function public.handle_new_beta_tester()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_meta jsonb := coalesce(new.raw_user_meta_data, '{}'::jsonb);
+  v_invite_code text := nullif(trim(coalesce(v_meta->>'beta_invite_code', '')), '');
+begin
+  if v_invite_code is null then
+    return new;
+  end if;
+
+  insert into public.beta_testers (
+    user_id,
+    status,
+    segment,
+    invite_code,
+    invite_source,
+    preferred_contact,
+    notes,
+    invited_at,
+    onboarded_at
+  ) values (
+    new.id,
+    'onboarded',
+    coalesce(nullif(trim(coalesce(v_meta->>'beta_segment', '')), ''), 'invite'),
+    v_invite_code,
+    'signup',
+    nullif(trim(coalesce(v_meta->>'preferred_contact', '')), ''),
+    'signup invite code: ' || v_invite_code,
+    now(),
+    now()
+  )
+  on conflict (user_id) do update
+     set status = case
+           when public.beta_testers.status in ('blocked', 'done') then public.beta_testers.status
+           else 'onboarded'
+         end,
+         segment = excluded.segment,
+         invite_code = excluded.invite_code,
+         invite_source = excluded.invite_source,
+         preferred_contact = coalesce(excluded.preferred_contact, public.beta_testers.preferred_contact),
+         onboarded_at = coalesce(public.beta_testers.onboarded_at, now());
+
+  return new;
+end;
+$$;
+
+drop trigger if exists on_auth_user_created_beta_tester on auth.users;
+create trigger on_auth_user_created_beta_tester
+  after insert on auth.users
+  for each row execute function public.handle_new_beta_tester();
+
+grant execute on function public.admin_upsert_beta_tester(uuid, text, text, text, text, text, text, text, timestamptz) to authenticated;
 

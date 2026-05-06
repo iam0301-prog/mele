@@ -5,6 +5,7 @@ import { PATH_HEADER, isLocalizedPath, stripLocaleFromPathname } from '@/lib/i18
 import { createClient } from '@/lib/supabase/server';
 
 const TABS = [
+  { href: '/admin/testers', label: '封測名單' },
   { href: '/admin/members', label: '會員管理' },
   { href: '/admin', label: '統計', exact: true },
   { href: '/admin/applications', label: '申請審核' },

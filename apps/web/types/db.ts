@@ -114,6 +114,7 @@ export interface DailyDraw {
 export type ContentUnlockType = 'deep_reading' | 'transit_day' | 'transit_month' | 'transit_year';
 export type PointTransactionDirection = 'credit' | 'debit';
 export type AdminPointAdjustmentMode = 'credit' | 'debit' | 'set';
+export type BetaTesterStatus = 'invited' | 'onboarded' | 'active' | 'paused' | 'done' | 'blocked';
 export type ChartTool = 'numerology' | 'maya' | 'bazi' | 'ziwei' | 'tarot' | 'runes' | 'astro' | 'humandesign';
 
 export interface Profile {
@@ -171,6 +172,22 @@ export interface ContentUnlock {
   cost_points: number;
   metadata: Record<string, unknown>;
   created_at: string;
+}
+
+export interface BetaTester {
+  user_id: string;
+  status: BetaTesterStatus;
+  segment: string;
+  invite_code: string;
+  invite_source: string | null;
+  preferred_contact: string | null;
+  notes: string | null;
+  feedback_summary: string | null;
+  invited_at: string;
+  onboarded_at: string | null;
+  last_contacted_at: string | null;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface ArAsset {

@@ -43,7 +43,7 @@ npm run test:python
 
 ## 4. 公開公測前 P0
 
-- Supabase production project 已套用 `supabase/migrations/0001-0011`。
+- Supabase production project 已套用 `supabase/migrations/0001-0012`。
 - Supabase Auth redirect URLs 已加入正式網域與 `/auth/callback`。
 - `npm run ops:check-auth` 通過，並用真實信箱完成註冊驗證信、重新寄送驗證信、忘記密碼信。
 - Supabase Auth Logs 可以查到寄信成功或失敗原因；公開公測前建議完成 SMTP。

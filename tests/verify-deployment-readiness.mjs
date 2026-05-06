@@ -27,6 +27,7 @@ const oauthRunbook = read('docs/OAUTH_LOGIN_RUNBOOK.md');
 const backendBlueprint = read('docs/BACKEND_BLUEPRINT.md');
 const deployRunbook = read('docs/DEPLOYMENT_RUNBOOK.md');
 const setupReadme = read('scripts/setup-supabase/README.md');
+const setupAllMigrations = read('scripts/setup-supabase/all_migrations.sql');
 const authCheckScript = read('scripts/check-supabase-auth.mjs');
 const pythonDockerfile = read('python_api/Dockerfile');
 const pythonRequirementsDev = read('python_api/requirements-dev.txt');
@@ -121,6 +122,7 @@ for (const token of [
   '0009_member_points_unlocks.sql',
   '0010_kyc_auto_purge_cron.sql',
   '0011_admin_member_ops.sql',
+  '0012_beta_tester_ops.sql',
   'SUPABASE_SERVICE_ROLE_KEY',
   'teacher-docs',
   'service_role',
@@ -171,7 +173,7 @@ for (const token of [
   'Render',
   'Fly.io',
   'Python FastAPI',
-  '11 個 migrations',
+  '12 個 migrations',
   'Supabase',
   'ECPay',
   'LINE',
@@ -193,6 +195,14 @@ for (const token of [
   'ops:check-auth',
 ]) {
   ok(`setup helper README covers ${token}`, setupReadme.includes(token));
+}
+
+for (const token of [
+  '0012_beta_tester_ops.sql',
+  'beta_testers',
+  'admin_upsert_beta_tester',
+]) {
+  ok(`setup all_migrations includes ${token}`, setupAllMigrations.includes(token));
 }
 
 for (const token of [
