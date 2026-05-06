@@ -113,7 +113,25 @@ export interface DailyDraw {
 
 export type ContentUnlockType = 'deep_reading' | 'transit_day' | 'transit_month' | 'transit_year';
 export type PointTransactionDirection = 'credit' | 'debit';
+export type AdminPointAdjustmentMode = 'credit' | 'debit' | 'set';
 export type ChartTool = 'numerology' | 'maya' | 'bazi' | 'ziwei' | 'tarot' | 'runes' | 'astro' | 'humandesign';
+
+export interface Profile {
+  id: string;
+  display_name: string | null;
+  avatar_url: string | null;
+  bio: string | null;
+  line_user_id: string | null;
+  birth_date: string | null;
+  birth_time: string | null;
+  birth_location: string | null;
+  birth_lat: number | null;
+  birth_lon: number | null;
+  birth_timezone: string | null;
+  gender: '男' | '女' | '其他' | '未填' | null;
+  created_at: string;
+  updated_at: string;
+}
 
 export interface MemberWallet {
   user_id: string;

@@ -1,8 +1,11 @@
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
+import { headers } from 'next/headers';
+import { PATH_HEADER, isLocalizedPath, stripLocaleFromPathname } from '@/lib/i18n/config';
 import { createClient } from '@/lib/supabase/server';
 
 const TABS = [
+  { href: '/admin/members', label: '會員管理' },
   { href: '/admin', label: '統計', exact: true },
   { href: '/admin/applications', label: '申請審核' },
   { href: '/admin/teachers', label: '老師管理' },
@@ -11,10 +14,18 @@ const TABS = [
   { href: '/admin/launch', label: '上線檢查' },
 ];
 
+async function getAdminReturnPath() {
+  const headerStore = await headers();
+  const pathname = headerStore.get(PATH_HEADER) || '/admin';
+  const normalizedPath = isLocalizedPath(pathname) ? stripLocaleFromPathname(pathname) : pathname;
+  return normalizedPath.startsWith('/admin') ? normalizedPath : '/admin';
+}
+
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
+  const returnPath = await getAdminReturnPath();
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect('/account/login?return=/admin');
+  if (!user) redirect(`/account/login?return=${encodeURIComponent(returnPath)}`);
   const { data: admin } = await supabase.from('admins').select('role').eq('user_id', user.id).maybeSingle();
   if (!admin) redirect('/?error=not_admin');
 

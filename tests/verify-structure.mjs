@@ -35,10 +35,12 @@ const migrations = [
   'supabase/migrations/0008_teacher_website_application.sql',
   'supabase/migrations/0009_member_points_unlocks.sql',
   'supabase/migrations/0010_kyc_auto_purge_cron.sql',
+  'supabase/migrations/0011_admin_member_ops.sql',
 ];
 
 const pointMigrationFile = 'supabase/migrations/0009_member_points_unlocks.sql';
 const kycPurgeMigrationFile = 'supabase/migrations/0010_kyc_auto_purge_cron.sql';
+const adminMemberOpsMigrationFile = 'supabase/migrations/0011_admin_member_ops.sql';
 const SQL = migrations
   .map((file) => readFileSync(file, 'utf8'))
   .join('\n');
@@ -108,6 +110,8 @@ for (const fn of [
   'purge_old_kyc_docs',
   'claim_daily_points',
   'unlock_content',
+  'admin_adjust_member_points',
+  'admin_update_member_profile',
 ]) {
   const re = new RegExp(`create\\s+or\\s+replace\\s+function\\s+public\\.${fn}\\s*\\(`, 'i');
   log(`function public.${fn}`, re.test(SQL));
@@ -192,6 +196,7 @@ log(
 
 log('member points migration exists', existsSync(pointMigrationFile));
 log('KYC purge cron migration exists', existsSync(kycPurgeMigrationFile));
+log('admin member operations migration exists', existsSync(adminMemberOpsMigrationFile));
 log(
   'member point economy uses 200 daily claim and 100 point unlocks',
   SQL.includes('p_daily_amount int default 200') &&
@@ -223,6 +228,7 @@ const routeFiles = [
   'apps/web/app/admin/applications/page.tsx',
   'apps/web/app/admin/bookings/page.tsx',
   'apps/web/app/admin/launch/page.tsx',
+  'apps/web/app/admin/members/page.tsx',
   'apps/web/app/admin/reviews/page.tsx',
   'apps/web/app/admin/teachers/page.tsx',
   'apps/web/app/ar/page.tsx',
@@ -333,6 +339,8 @@ log('astro page sends latitude/longitude schema', astroSource.includes('latitude
 const rpcChecks = [
   ['apps/web/app/admin/applications/page.tsx', 'review_teacher_application'],
   ['apps/web/app/admin/applications/page.tsx', 'activate_teacher'],
+  ['apps/web/app/admin/members/page.tsx', 'admin_adjust_member_points'],
+  ['apps/web/app/admin/members/page.tsx', 'admin_update_member_profile'],
   ['apps/web/app/admin/teachers/page.tsx', 'suspend_teacher'],
   ['apps/web/app/account/mybookings/page.tsx', 'cancel_booking'],
 ];
@@ -926,11 +934,19 @@ log(
 );
 
 const adminPage = readFileSync('apps/web/app/admin/page.tsx', 'utf8');
+const adminLayout = readFileSync('apps/web/app/admin/layout.tsx', 'utf8');
 log('admin dashboard includes operational readiness widgets', ['營運總覽', '待審老師', '上架老師', '今日解盤', '公開發布檢查'].every((token) => adminPage.includes(token)));
+log('admin login redirect preserves the requested admin path', ['PATH_HEADER', 'stripLocaleFromPathname', 'encodeURIComponent(returnPath)', '/account/login?return='].every((token) => adminLayout.includes(token)));
+const adminMembersPage = readFileSync('apps/web/app/admin/members/page.tsx', 'utf8');
+log(
+  'admin members page manages wallet and profile through RPCs',
+  ['member_wallets', 'point_transactions', 'content_unlocks', 'profiles', 'admin_adjust_member_points', 'admin_update_member_profile', '調整原因'].every((token) => adminMembersPage.includes(token)) &&
+    adminPage.includes('/admin/members'),
+);
 const launchPage = readFileSync('apps/web/app/admin/launch/page.tsx', 'utf8');
 log('admin launch checklist checks production env', launchPage.includes('NEXT_PUBLIC_LIFF_ID') && launchPage.includes('MELE_API_URL') && launchPage.includes('iPhone AR fallback'));
 log('admin launch checklist separates cloud manual checks', ['SQL migrations 檔案完整', 'ECPay checkout secrets', '封閉公測名單', 'Auth 驗證信與 Redirect URLs', 'ops:check-auth'].every((token) => launchPage.includes(token)));
-log('admin launch checklist covers current migrations', ['0009_member_points_unlocks.sql', '0010_kyc_auto_purge_cron.sql', '0001-0010', 'member_wallets', 'content_unlocks', 'daily_point_claims'].every((token) => launchPage.includes(token)));
+log('admin launch checklist covers current migrations', ['0009_member_points_unlocks.sql', '0010_kyc_auto_purge_cron.sql', '0011_admin_member_ops.sql', '0001-0011', 'member_wallets', 'content_unlocks', 'daily_point_claims'].every((token) => launchPage.includes(token)));
 const retiredNumerologyFunction = existsSync('supabase/functions/calc-numerology/index.ts');
 log('retired calc-numerology edge function is removed', !retiredNumerologyFunction);
 

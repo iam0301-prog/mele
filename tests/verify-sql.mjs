@@ -44,6 +44,7 @@ const migrations = [
   'supabase/migrations/0007_auth_signup_mirror.sql',
   'supabase/migrations/0009_member_points_unlocks.sql',
   'supabase/migrations/0010_kyc_auto_purge_cron.sql',
+  'supabase/migrations/0011_admin_member_ops.sql',
 ];
 
 function pgliteCompat(sql) {
@@ -297,6 +298,49 @@ console.log('\n[Test 12] purge_old_kyc_docs');
   log('清除 1 筆過期 KYC', r.rows[0].n >= 1, `got ${r.rows[0].n}`);
   const a = await db.query(`select id_doc_front_url from public.teacher_applications where id='bbbb2222-bbbb-bbbb-bbbb-bbbbbbbbbbbb'`);
   log('id_doc_front_url 已被 NULL', a.rows[0].id_doc_front_url === null);
+}
+
+// === Test 13: admin member operations ===
+console.log('\n[Test 13] admin member points and profile operations');
+{
+  await db.exec(`select set_config('request.jwt.claim.sub', '${adminUser}', false);`);
+
+  let r = await db.query(`select public.admin_adjust_member_points('${cust}', 'credit', 300, 'beta top-up') as result`);
+  log('admin credit adds points', r.rows[0].result.adjusted === true && r.rows[0].result.balance === 300, `got ${JSON.stringify(r.rows[0].result)}`);
+
+  r = await db.query(`select public.admin_adjust_member_points('${cust}', 'debit', 100, 'manual correction') as result`);
+  log('admin debit subtracts points', r.rows[0].result.adjusted === true && r.rows[0].result.balance === 200, `got ${JSON.stringify(r.rows[0].result)}`);
+
+  r = await db.query(`select public.admin_adjust_member_points('${cust}', 'set', 50, 'reset closed beta balance') as result`);
+  log('admin set rewrites wallet balance', r.rows[0].result.adjusted === true && r.rows[0].result.balance === 50, `got ${JSON.stringify(r.rows[0].result)}`);
+
+  const tx = await db.query(`select count(*)::int as c from public.point_transactions where user_id='${cust}' and reference_type='admin_adjustment'`);
+  log('admin point adjustments write audit transactions', tx.rows[0].c === 3, `got ${tx.rows[0].c}`);
+
+  const profile = await db.query(`
+    select display_name, bio, birth_date, birth_time, birth_location, birth_timezone, gender
+      from public.admin_update_member_profile(
+        '${cust}',
+        '封測會員',
+        '客服補點後已通知',
+        '1990-01-02',
+        '08:30',
+        '台北市',
+        'Asia/Taipei',
+        '女'
+      )
+  `);
+  log('admin updates member profile display name', profile.rows[0].display_name === '封測會員');
+  log('admin updates member birth timezone', profile.rows[0].birth_timezone === 'Asia/Taipei');
+  log('admin updates member gender', profile.rows[0].gender === '女');
+
+  await db.exec(`select set_config('request.jwt.claim.sub', '${cust}', false);`);
+  try {
+    await db.exec(`select public.admin_adjust_member_points('${cust}', 'credit', 100, 'should fail');`);
+    log('non-admin cannot adjust member points', false, 'unexpected success');
+  } catch (e) {
+    log('non-admin cannot adjust member points', e.message.includes('forbidden'), e.message.substring(0, 80));
+  }
 }
 
 console.log(`\n============================`);

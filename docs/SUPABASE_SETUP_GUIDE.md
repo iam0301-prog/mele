@@ -68,6 +68,7 @@ npx supabase db push
 8. `supabase/migrations/0008_teacher_website_application.sql`
 9. `supabase/migrations/0009_member_points_unlocks.sql`
 10. `supabase/migrations/0010_kyc_auto_purge_cron.sql`
+11. `supabase/migrations/0011_admin_member_ops.sql`
 
 跑完後到 Table Editor，確認至少看得到 `profiles`、`teachers`、`bookings`、`support_threads`、`daily_readings`、`daily_draws`、`line_user_links`。
 

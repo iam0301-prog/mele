@@ -44,6 +44,8 @@ export default async function AdminDashboard() {
     hiddenReviews,
     dailyReadings,
     dailyDraws,
+    memberProfiles,
+    activeWallets,
   ] = await Promise.all([
     safeCount(supabase.from('teacher_applications').select('id', { count: 'exact', head: true }).eq('status', 'pending')),
     safeCount(supabase.from('teacher_applications').select('id', { count: 'exact', head: true }).in('status', ['reviewing', 'revision', 'interview', 'contracted'])),
@@ -55,6 +57,8 @@ export default async function AdminDashboard() {
     safeCount(supabase.from('reviews').select('id', { count: 'exact', head: true }).eq('is_visible', false)),
     safeCount(supabase.from('daily_readings').select('id', { count: 'exact', head: true }).eq('reading_date', today)),
     safeCount(supabase.from('daily_draws').select('id', { count: 'exact', head: true }).eq('draw_date', today)),
+    safeCount(supabase.from('profiles').select('id', { count: 'exact', head: true })),
+    safeCount(supabase.from('member_wallets').select('user_id', { count: 'exact', head: true }).gt('balance', 0)),
   ]);
 
   const hasDataError = [
@@ -68,9 +72,18 @@ export default async function AdminDashboard() {
     hiddenReviews,
     dailyReadings,
     dailyDraws,
+    memberProfiles,
+    activeWallets,
   ].some((item) => item.error);
 
   const stats: StatCard[] = [
+    {
+      label: '會員帳號',
+      value: countOf(memberProfiles),
+      detail: `${countOf(activeWallets)} 位會員目前持有點數，可進後台調整錢包與帳號內容`,
+      href: '/admin/members',
+      tone: 'blue',
+    },
     {
       label: '待審老師',
       value: countOf(pendingApplications),

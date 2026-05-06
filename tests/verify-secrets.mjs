@@ -16,6 +16,7 @@ function ok(name, condition, detail = '') {
 
 const ignoredDirs = new Set([
   '.git',
+  '.claude',
   '.next',
   '.next.prev-20260429-055018',
   '.py312-packages',
