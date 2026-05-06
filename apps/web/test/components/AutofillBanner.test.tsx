@@ -21,6 +21,6 @@ describe('<AutofillBanner />', () => {
   it('links to profile page', () => {
     render(<AutofillBanner show={true} />);
     const link = screen.getByRole('link', { name: /編輯資料/ });
-    expect(link).toHaveAttribute('href', '/account/profile');
+    expect(link).toHaveAttribute('href', '/zh-TW/account/profile');
   });
 });

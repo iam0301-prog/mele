@@ -9,8 +9,12 @@ import { DateOnlyField } from '@/components/BirthInputs';
 import { calc, CalcError, type CalcResponse } from '@/lib/api';
 import { useToast } from '@/components/ToastProvider';
 import { useProfile } from '@/lib/use-profile';
+import { useCurrentLocale } from '@/lib/i18n/use-current-locale';
+import { getToolPageCopy } from '@/lib/i18n/tool-page-copy';
 
 export default function NumerologyPage() {
+  const locale = useCurrentLocale();
+  const copy = getToolPageCopy(locale, 'numerology');
   const toast = useToast();
   const profile = useProfile();
   const [date, setDate] = useState('');
@@ -31,7 +35,7 @@ export default function NumerologyPage() {
   const onSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     if (!date) {
-      toast('請先選擇出生日期。', 'error');
+      toast(copy.validation.dateRequired ?? 'Please choose your birth date first.', 'error');
       return;
     }
 
@@ -53,33 +57,23 @@ export default function NumerologyPage() {
   };
 
   return (
-    <ToolShell
-      title="生命靈數"
-      subtitle="LIFE PATH NUMBER"
-      description="用出生日期計算生命靈數、生日數與主數 11 / 22 / 33，快速看見你的天賦傾向、人生課題與行動風格。"
-      spec="生命靈數"
-    >
+    <ToolShell locale={locale} title={copy.title} subtitle={copy.subtitle} description={copy.description} spec={copy.spec}>
       <form onSubmit={onSubmit} className="mele-card" noValidate>
-        <AutofillBanner show={autofilled} fields={['出生日期']} />
+        <AutofillBanner locale={locale} show={autofilled} fields={copy.autofillFields} />
 
-        <DateOnlyField
-          date={date}
-          onDateChange={setDate}
-          label="出生日期"
-          hint="生命靈數只需要出生日期，不需要出生時間。"
-        />
+        <DateOnlyField locale={locale} date={date} onDateChange={setDate} label={copy.birth?.dateLabel} hint={copy.dateHint} />
 
         <button type="submit" disabled={loading} className="mele-btn-primary w-full md:w-auto">
-          {loading ? '計算中...' : '開始解讀'}
+          {loading ? copy.submit.loading : copy.submit.idle}
         </button>
       </form>
 
-      {loading && <ToolLoading label="正在計算生命靈數..." />}
-      {error && !loading && <ToolError message={error} />}
+      {loading && <ToolLoading locale={locale} label={copy.loadingLabel} />}
+      {error && !loading && <ToolError locale={locale} message={error} />}
       {result && !loading && (
         <>
-          <ToolResultSection kind="numerology" result={result} />
-          <ConsultCTA spec="生命靈數" label="生命靈數" />
+          <ToolResultSection kind="numerology" result={result} locale={locale} />
+          <ConsultCTA locale={locale} spec={copy.spec} label={copy.title} />
         </>
       )}
     </ToolShell>

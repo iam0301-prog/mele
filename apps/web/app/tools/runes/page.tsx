@@ -6,35 +6,25 @@ import { ToolError, ToolLoading } from '@/components/ToolFeedback';
 import { ToolResultSection } from '@/components/ToolResultSection';
 import { calc, CalcError, type CalcResponse } from '@/lib/api';
 import { useToast } from '@/components/ToastProvider';
-
-const MATERIALS = [
-  { value: 'stone', label: '石面', desc: '霧面石紋與刻痕符號，適合穩定、現實、身體與資源問題。' },
-  { value: 'wood', label: '木頭', desc: '溫潤木紋與手工烙印，適合成長、關係、家庭與長期累積。' },
-  { value: 'crystal', label: '水晶', desc: '透明折射與光紋流動，適合直覺、夢境、能量與內在訊息。' },
-] as const;
-
-const SPREADS = [
-  { value: 'single', label: '單符文：今日指引', count: 1 },
-  { value: 'three', label: '三符文：過去 / 現在 / 未來', count: 3 },
-  { value: 'five', label: '五符文：核心、阻礙、資源、行動、結果', count: 5 },
-];
-
-type RuneMaterial = (typeof MATERIALS)[number]['value'];
+import { useCurrentLocale } from '@/lib/i18n/use-current-locale';
+import { getToolPageCopy } from '@/lib/i18n/tool-page-copy';
 
 export default function RunesPage() {
+  const locale = useCurrentLocale();
+  const copy = getToolPageCopy(locale, 'runes');
   const toast = useToast();
   const [question, setQuestion] = useState('');
-  const [material, setMaterial] = useState<RuneMaterial>('stone');
-  const [spread, setSpread] = useState('three');
+  const [material, setMaterial] = useState(copy.materials?.[0]?.value ?? 'stone');
+  const [spread, setSpread] = useState(copy.spreads?.[1]?.value ?? 'three');
   const [reversed, setReversed] = useState(true);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<CalcResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const onSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const onSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
     if (!question.trim()) {
-      toast('請先輸入你想詢問的問題。', 'error');
+      toast(copy.validation.questionRequired ?? 'Please enter a question first.', 'error');
       return;
     }
 
@@ -43,11 +33,11 @@ export default function RunesPage() {
     setResult(null);
 
     try {
-      const selectedSpread = SPREADS.find((item) => item.value === spread)!;
+      const selectedSpread = copy.spreads?.find((item) => item.value === spread) ?? copy.spreads?.[1];
       const response = await calc('runes', {
-        count: selectedSpread.count,
+        count: selectedSpread?.count ?? 3,
         reversed,
-        spread: selectedSpread.value,
+        spread: selectedSpread?.value ?? 'three',
         material,
         question: question.trim(),
       });
@@ -62,32 +52,25 @@ export default function RunesPage() {
   };
 
   return (
-    <ToolShell
-      title="盧恩符文解讀"
-      subtitle="三種材質與 AR 石面"
-      description="盧恩適合詢問行動方向、阻礙、資源與內在訊息。選擇石面、木頭或水晶材質後，結果會以符文石與 AR 形式呈現。"
-      spec="盧恩"
-    >
+    <ToolShell locale={locale} title={copy.title} subtitle={copy.subtitle} description={copy.description} spec={copy.spec}>
       <form onSubmit={onSubmit} className="mele-card">
         <div className="mb-5">
-          <label className="mele-label">這次想問什麼？ *</label>
+          <label className="mele-label">{copy.question?.label}</label>
           <textarea
             rows={3}
             required
             value={question}
-            onChange={(e) => setQuestion(e.target.value)}
-            placeholder="例：我現在面對這個選擇，最需要看見的提醒是什麼？"
+            onChange={(event) => setQuestion(event.target.value)}
+            placeholder={copy.question?.placeholder}
             className="mele-input"
           />
-          <p className="text-xs text-white/50 mt-2">
-            盧恩適合看當下局勢與行動提醒，問題保持簡潔會更清楚。
-          </p>
+          {copy.question?.hint && <p className="text-xs text-white/50 mt-2">{copy.question.hint}</p>}
         </div>
 
         <div className="mb-5">
-          <label className="mele-label">盧恩材質</label>
+          <label className="mele-label">{copy.materialLabel}</label>
           <div className="rune-material-grid">
-            {MATERIALS.map((item) => (
+            {copy.materials?.map((item) => (
               <button
                 key={item.value}
                 type="button"
@@ -105,34 +88,34 @@ export default function RunesPage() {
         </div>
 
         <div className="mb-5">
-          <label className="mele-label">符文陣</label>
-          <select value={spread} onChange={(e) => setSpread(e.target.value)} className="mele-input">
-            {SPREADS.map((item) => (
+          <label className="mele-label">{copy.spreadLabel}</label>
+          <select value={spread} onChange={(event) => setSpread(event.target.value)} className="mele-input">
+            {copy.spreads?.map((item) => (
               <option key={item.value} value={item.value}>{item.label}</option>
             ))}
           </select>
         </div>
 
         <label className="flex items-center gap-2 text-sm text-white/85 mb-5 cursor-pointer">
-          <input type="checkbox" checked={reversed} onChange={(e) => setReversed(e.target.checked)} />
-          啟用逆位
+          <input type="checkbox" checked={reversed} onChange={(event) => setReversed(event.target.checked)} />
+          {copy.reversedLabel}
         </label>
 
         <button type="submit" disabled={loading} className="mele-btn-primary w-full md:w-auto">
-          {loading ? '正在抽取符文...' : '開始抽符文'}
+          {loading ? copy.submit.loading : copy.submit.idle}
         </button>
       </form>
 
-      {loading && <ToolLoading label="正在抽取符文並整理訊息..." />}
-      {error && !loading && <ToolError message={error} />}
+      {loading && <ToolLoading locale={locale} label={copy.loadingLabel} />}
+      {error && !loading && <ToolError locale={locale} message={error} />}
       {result && !loading && (
         <>
           <div className="mele-card mt-6">
-            <div className="text-accent text-xs tracking-widest mb-2">本次問題</div>
-            <div className="text-white/85 italic">「{question}」</div>
+            <div className="text-accent text-xs tracking-widest mb-2">{copy.question?.resultLabel}</div>
+            <div className="text-white/85 italic">“{question}”</div>
           </div>
-          <ToolResultSection kind="runes" result={result} />
-          <ConsultCTA spec="盧恩" label="盧恩" />
+          <ToolResultSection kind="runes" result={result} locale={locale} />
+          <ConsultCTA locale={locale} spec={copy.spec} label={copy.title} />
         </>
       )}
     </ToolShell>

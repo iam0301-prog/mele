@@ -14,6 +14,7 @@ import {
   isLocale,
   stripLocaleFromPathname,
 } from '@/lib/i18n';
+import { LocaleProvider } from '@/lib/i18n/LocaleProvider';
 import './globals.css';
 
 const localPreviewCacheResetScript = `
@@ -93,10 +94,12 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <body className="font-sans">
         <script dangerouslySetInnerHTML={{ __html: localPreviewCacheResetScript }} />
         <ToastProvider>
-          <Header />
-          <main className="relative z-10 min-h-[calc(100vh-160px)]">{children}</main>
-          <Footer />
-          <CookieConsentBanner />
+          <LocaleProvider locale={locale}>
+            <Header />
+            <main className="relative z-10 min-h-[calc(100vh-160px)]">{children}</main>
+            <Footer />
+            <CookieConsentBanner />
+          </LocaleProvider>
         </ToastProvider>
         <ServiceWorkerRegister />
       </body>

@@ -13,6 +13,16 @@ import {
 import { updateSession } from './lib/supabase/middleware';
 
 const LOCALIZED_APP_ROUTES = new Set(['/', '/spiritual', '/tools']);
+const LOCALIZED_TOOL_ROUTES = new Set([
+  '/tools/numerology',
+  '/tools/maya',
+  '/tools/bazi',
+  '/tools/astro',
+  '/tools/ziwei',
+  '/tools/humandesign',
+  '/tools/tarot',
+  '/tools/runes',
+]);
 const UNTOUCHED_PREFIXES = ['/api', '/auth'];
 
 function localeFromRequest(request: NextRequest) {
@@ -32,6 +42,10 @@ function withLocaleHeaders(request: NextRequest, locale = localeFromRequest(requ
 
 function shouldLeaveUntouched(pathname: string) {
   return UNTOUCHED_PREFIXES.some((prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`));
+}
+
+function hasNativeLocalizedRoute(pathname: string) {
+  return LOCALIZED_APP_ROUTES.has(pathname) || LOCALIZED_TOOL_ROUTES.has(pathname);
 }
 
 export async function middleware(request: NextRequest) {
@@ -58,7 +72,7 @@ export async function middleware(request: NextRequest) {
   }
 
   const strippedPath = stripLocaleFromPathname(pathname);
-  if (!LOCALIZED_APP_ROUTES.has(strippedPath)) {
+  if (!hasNativeLocalizedRoute(strippedPath)) {
     const rewriteUrl = request.nextUrl.clone();
     rewriteUrl.pathname = strippedPath;
     const response = await updateSession(request, requestHeaders, (headers) =>

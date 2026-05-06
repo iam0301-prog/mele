@@ -88,6 +88,18 @@ test.describe('Smoke: home and tools index', () => {
       }
     }
   });
+
+  test('localized tool pages translate their visible shell and form controls', async ({ page }) => {
+    await page.goto('/en/tools/maya', { waitUntil: 'domcontentloaded' });
+    await expect(page.getByRole('heading', { name: 'Maya Calendar Kin' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Find my Kin' })).toBeVisible();
+    await expect(page.getByText('Back to spiritual hub')).toBeVisible();
+
+    await page.goto('/en/tools/tarot', { waitUntil: 'domcontentloaded' });
+    await expect(page.getByRole('heading', { name: 'Tarot Reading' })).toBeVisible();
+    await expect(page.getByText('Deck style', { exact: true })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Draw cards' })).toBeVisible();
+  });
 });
 
 test.describe('Closed beta premium flows', () => {
@@ -131,9 +143,9 @@ test.describe('Closed beta premium flows', () => {
     await page.goto('/tools/tarot');
 
     await expect(page.getByRole('heading', { name: '塔羅牌解讀' })).toBeVisible();
-    await expect(page.getByText('森林雅典娜')).toBeVisible();
-    await expect(page.getByText('大海波賽頓')).toBeVisible();
-    await expect(page.getByText('古老法老風')).toBeVisible();
+    await expect(page.getByText('森林女神')).toBeVisible();
+    await expect(page.getByText('海神星辰')).toBeVisible();
+    await expect(page.getByText('古埃及法老')).toBeVisible();
     await expect(page.getByRole('button', { name: '開始抽牌' })).toBeVisible();
   });
 });

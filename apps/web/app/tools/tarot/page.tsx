@@ -6,39 +6,16 @@ import { ToolError, ToolLoading } from '@/components/ToolFeedback';
 import { ToolResultSection } from '@/components/ToolResultSection';
 import { calc, CalcError, type CalcResponse } from '@/lib/api';
 import { useToast } from '@/components/ToastProvider';
-
-const SPREADS = [
-  { value: 'three_card', label: '三張牌：過去 / 現在 / 未來', count: 3 },
-  { value: 'celtic', label: '塞爾特十字：完整局勢與深層阻力', count: 10 },
-  { value: 'horseshoe', label: '馬蹄牌陣：事件走向與建議', count: 7 },
-  { value: 'single', label: '單張牌：今日提醒', count: 1 },
-];
-
-const TAROT_STYLES = [
-  {
-    value: 'forest_athena',
-    label: '森林雅典娜',
-    desc: '橄欖金、深林綠與智慧女神意象，適合事業、學習與內在判斷。',
-  },
-  {
-    value: 'ocean_poseidon',
-    label: '大海波賽頓',
-    desc: '海藍、銀白與浪潮神殿意象，適合情緒、關係與潛意識訊息。',
-  },
-  {
-    value: 'ancient_pharaoh',
-    label: '古老法老風',
-    desc: '金砂、青金石與古埃及神殿意象，適合命運課題、權力與靈魂契約。',
-  },
-] as const;
-
-type TarotStyle = (typeof TAROT_STYLES)[number]['value'];
+import { useCurrentLocale } from '@/lib/i18n/use-current-locale';
+import { getToolPageCopy } from '@/lib/i18n/tool-page-copy';
 
 export default function TarotPage() {
+  const locale = useCurrentLocale();
+  const copy = getToolPageCopy(locale, 'tarot');
   const toast = useToast();
   const [question, setQuestion] = useState('');
-  const [spread, setSpread] = useState('three_card');
-  const [tarotStyle, setTarotStyle] = useState<TarotStyle>('ocean_poseidon');
+  const [spread, setSpread] = useState(copy.spreads?.[0]?.value ?? 'three_card');
+  const [tarotStyle, setTarotStyle] = useState(copy.tarotStyles?.[1]?.value ?? 'ocean_poseidon');
   const [reversed, setReversed] = useState(true);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<CalcResponse | null>(null);
@@ -47,7 +24,7 @@ export default function TarotPage() {
   const onSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     if (!question.trim()) {
-      toast('請先輸入這次想詢問的問題。', 'error');
+      toast(copy.validation.questionRequired ?? 'Please enter a question first.', 'error');
       return;
     }
 
@@ -56,11 +33,11 @@ export default function TarotPage() {
     setResult(null);
 
     try {
-      const selectedSpread = SPREADS.find((item) => item.value === spread)!;
+      const selectedSpread = copy.spreads?.find((item) => item.value === spread) ?? copy.spreads?.[0];
       const response = await calc('tarot', {
-        count: selectedSpread.count,
+        count: selectedSpread?.count ?? 3,
         reversed,
-        spread: selectedSpread.value,
+        spread: selectedSpread?.value ?? 'three_card',
         question: question.trim(),
         tarot_style: tarotStyle,
       });
@@ -75,32 +52,25 @@ export default function TarotPage() {
   };
 
   return (
-    <ToolShell
-      title="塔羅牌解讀"
-      subtitle="三種藝術風格與 AR 牌面"
-      description="輸入清楚的問題，選擇你喜歡的牌組風格與牌陣。結果會呈現牌義、位置、正逆位與 AR 卡面資訊。"
-      spec="塔羅"
-    >
+    <ToolShell locale={locale} title={copy.title} subtitle={copy.subtitle} description={copy.description} spec={copy.spec}>
       <form onSubmit={onSubmit} className="mele-card">
         <div className="mb-5">
-          <label className="mele-label">這次想問什麼？ *</label>
+          <label className="mele-label">{copy.question?.label}</label>
           <textarea
             rows={3}
             required
             value={question}
             onChange={(event) => setQuestion(event.target.value)}
-            placeholder="例：我接下來三個月在工作上應該注意什麼？"
+            placeholder={copy.question?.placeholder}
             className="mele-input"
           />
-          <p className="text-xs text-white/50 mt-2">
-            問題越具體，解讀越容易聚焦。建議一次只問一個主題。
-          </p>
+          {copy.question?.hint && <p className="text-xs text-white/50 mt-2">{copy.question.hint}</p>}
         </div>
 
         <div className="mb-5">
-          <label className="mele-label">牌組風格</label>
+          <label className="mele-label">{copy.styleLabel}</label>
           <div className="tarot-style-grid">
-            {TAROT_STYLES.map((item) => (
+            {copy.tarotStyles?.map((item) => (
               <button
                 key={item.value}
                 type="button"
@@ -118,36 +88,34 @@ export default function TarotPage() {
         </div>
 
         <div className="mb-5">
-          <label className="mele-label">牌陣</label>
+          <label className="mele-label">{copy.spreadLabel}</label>
           <select value={spread} onChange={(event) => setSpread(event.target.value)} className="mele-input">
-            {SPREADS.map((item) => (
-              <option key={item.value} value={item.value}>
-                {item.label}
-              </option>
+            {copy.spreads?.map((item) => (
+              <option key={item.value} value={item.value}>{item.label}</option>
             ))}
           </select>
         </div>
 
         <label className="flex items-center gap-2 text-sm text-white/85 mb-5 cursor-pointer">
           <input type="checkbox" checked={reversed} onChange={(event) => setReversed(event.target.checked)} />
-          使用逆位
+          {copy.reversedLabel}
         </label>
 
         <button type="submit" disabled={loading} className="mele-btn-primary w-full md:w-auto">
-          {loading ? '正在抽牌...' : '開始抽牌'}
+          {loading ? copy.submit.loading : copy.submit.idle}
         </button>
       </form>
 
-      {loading && <ToolLoading label="正在洗牌並整理牌面訊息..." />}
-      {error && !loading && <ToolError message={error} />}
+      {loading && <ToolLoading locale={locale} label={copy.loadingLabel} />}
+      {error && !loading && <ToolError locale={locale} message={error} />}
       {result && !loading && (
         <>
           <div className="mele-card mt-6">
-            <div className="text-accent text-xs tracking-widest mb-2">本次問題</div>
-            <div className="text-white/85 italic">「{question}」</div>
+            <div className="text-accent text-xs tracking-widest mb-2">{copy.question?.resultLabel}</div>
+            <div className="text-white/85 italic">“{question}”</div>
           </div>
-          <ToolResultSection kind="tarot" result={result} />
-          <ConsultCTA spec="塔羅" label="塔羅" />
+          <ToolResultSection kind="tarot" result={result} locale={locale} />
+          <ConsultCTA locale={locale} spec={copy.spec} label={copy.title} />
         </>
       )}
     </ToolShell>

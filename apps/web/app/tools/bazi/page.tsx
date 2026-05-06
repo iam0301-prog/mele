@@ -9,8 +9,12 @@ import { ToolResultSection } from '@/components/ToolResultSection';
 import { calc, CalcError, type CalcResponse } from '@/lib/api';
 import { useProfile, normalizeTime } from '@/lib/use-profile';
 import { useToast } from '@/components/ToastProvider';
+import { useCurrentLocale } from '@/lib/i18n/use-current-locale';
+import { getToolPageCopy } from '@/lib/i18n/tool-page-copy';
 
 export default function BaziPage() {
+  const locale = useCurrentLocale();
+  const copy = getToolPageCopy(locale, 'bazi');
   const toast = useToast();
   const profile = useProfile();
   const [date, setDate] = useState('');
@@ -34,7 +38,7 @@ export default function BaziPage() {
   const onSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     if (!date || !time) {
-      toast('請先填寫出生日期與出生時間。', 'error');
+      toast(copy.validation.dateTimeRequired ?? 'Please enter both birth date and time.', 'error');
       return;
     }
 
@@ -65,43 +69,39 @@ export default function BaziPage() {
   };
 
   return (
-    <ToolShell
-      title="八字排盤"
-      subtitle="四柱、五行與十神"
-      description="依出生年月日時排出年柱、月柱、日柱、時柱，並整理五行分布、日主與十神脈絡，適合看性格底色與人生運勢結構。"
-      spec="八字"
-    >
+    <ToolShell locale={locale} title={copy.title} subtitle={copy.subtitle} description={copy.description} spec={copy.spec}>
       <form onSubmit={onSubmit} className="mele-card">
-        <AutofillBanner show={autofilled} fields={['出生日期', '出生時間', '出生地']} />
+        <AutofillBanner locale={locale} show={autofilled} fields={copy.autofillFields} />
 
         <BirthDateTimeFields
+          locale={locale}
           date={date}
           time={time}
           onDateChange={setDate}
           onTimeChange={setTime}
-          unknownTimeHint="八字對出生時辰敏感。若暫時不知道精準時間，可以先用 12:00 試排，但正式解讀建議確認出生證明或戶籍資料。"
+          dateLabel={copy.birth?.dateLabel}
+          timeLabel={copy.birth?.timeLabel}
+          unknownTimeHint={copy.unknownTimeHint}
         />
 
         <label className="flex items-center gap-2 text-sm text-white/85 mb-5 cursor-pointer">
           <input type="checkbox" checked={useTrueSolar} onChange={(event) => setUseTrueSolar(event.target.checked)} />
-          使用真太陽時修正
+          {copy.birth?.trueSolarLabel}
         </label>
 
-        {useTrueSolar && (
-          <LongitudeField longitude={longitude} onLongitudeChange={setLongitude} />
-        )}
+        {useTrueSolar && <LongitudeField locale={locale} longitude={longitude} onLongitudeChange={setLongitude} />}
 
         <button type="submit" disabled={loading} className="mele-btn-primary w-full md:w-auto">
-          {loading ? '正在排八字...' : '排出八字'}
+          {loading ? copy.submit.loading : copy.submit.idle}
         </button>
       </form>
 
-      {loading && <ToolLoading label="正在排出四柱與五行結構..." />}
-      {error && !loading && <ToolError message={error} />}
+      {loading && <ToolLoading locale={locale} label={copy.loadingLabel} />}
+      {error && !loading && <ToolError locale={locale} message={error} />}
       {result && !loading && (
         <>
-          <ToolResultSection kind="bazi" result={result} />
-          <ConsultCTA spec="八字" label="八字" />
+          <ToolResultSection kind="bazi" result={result} locale={locale} />
+          <ConsultCTA locale={locale} spec={copy.spec} label={copy.title} />
         </>
       )}
     </ToolShell>

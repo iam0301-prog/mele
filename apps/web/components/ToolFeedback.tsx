@@ -1,6 +1,17 @@
 'use client';
 
-export function ToolLoading({ label = '正在整理解讀...' }: { label?: string }) {
+import { DEFAULT_LOCALE, type Locale } from '@/lib/i18n/config';
+import { getToolLocaleCopy } from '@/lib/i18n/tool-page-copy';
+
+export function ToolLoading({
+  label,
+  locale = DEFAULT_LOCALE,
+}: {
+  label?: string;
+  locale?: Locale;
+}) {
+  const copy = getToolLocaleCopy(locale).feedback;
+
   return (
     <div className="tool-loading-ritual mele-card mt-6" aria-live="polite">
       <div className="tool-loading-ritual__portrait" aria-hidden="true">
@@ -14,9 +25,9 @@ export function ToolLoading({ label = '正在整理解讀...' }: { label?: strin
         </span>
       </div>
       <div className="tool-loading-ritual__copy">
-        <span>READING IN PROGRESS</span>
-        <strong>{label}</strong>
-        <p>你的問題已送進解盤流程，正在把盤面、符號與下一步提醒整理成可以帶走的訊息。</p>
+        <span>{copy.loadingKicker}</span>
+        <strong>{label ?? copy.loadingBody}</strong>
+        <p>{copy.loadingBody}</p>
       </div>
       <div className="tool-loading-ritual__steps" aria-hidden="true">
         <i />
@@ -27,14 +38,20 @@ export function ToolLoading({ label = '正在整理解讀...' }: { label?: strin
   );
 }
 
-export function ToolError({ message }: { message: string }) {
+export function ToolError({
+  message,
+  locale = DEFAULT_LOCALE,
+}: {
+  message: string;
+  locale?: Locale;
+}) {
+  const copy = getToolLocaleCopy(locale).feedback;
+
   return (
     <div className="rounded-2xl border border-reverse bg-reverse/[0.05] p-8 mt-6 text-center text-rose-300">
-      <div className="text-2xl mb-2">計算失敗</div>
+      <div className="text-2xl mb-2">{copy.errorTitle}</div>
       <div className="text-sm">{message}</div>
-      <div className="text-xs mt-3 text-white/50">
-        請稍後再試，或確認 API 服務是否已啟動。
-      </div>
+      <div className="text-xs mt-3 text-white/50">{copy.errorHint}</div>
     </div>
   );
 }

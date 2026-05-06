@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
-import { DateOnlyField } from '@/components/BirthInputs';
+import { DateOnlyField, LocationFields } from '@/components/BirthInputs';
 
 describe('<DateOnlyField />', () => {
   it('renders year/month/day selects', () => {
@@ -31,5 +31,29 @@ describe('<DateOnlyField />', () => {
   it('renders custom hint when provided', () => {
     render(<DateOnlyField date="" onDateChange={() => {}} hint="自訂提示文字" />);
     expect(screen.getByText('自訂提示文字')).toBeInTheDocument();
+  });
+  it('updates timezone when a birthplace preset is selected', () => {
+    const onLatitudeChange = vi.fn();
+    const onLongitudeChange = vi.fn();
+    const onTimezoneChange = vi.fn();
+
+    render(
+      <LocationFields
+        locale="en"
+        latitude={25.033}
+        longitude={121.5654}
+        timezoneDate="1990-07-01"
+        timezoneTime="12:00"
+        onLatitudeChange={onLatitudeChange}
+        onLongitudeChange={onLongitudeChange}
+        onTimezoneChange={onTimezoneChange}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: 'Los Angeles' }));
+
+    expect(onLatitudeChange).toHaveBeenCalledWith(34.0522);
+    expect(onLongitudeChange).toHaveBeenCalledWith(-118.2437);
+    expect(onTimezoneChange).toHaveBeenCalledWith(-7);
   });
 });

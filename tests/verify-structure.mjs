@@ -301,7 +301,7 @@ for (const tool of ['numerology', 'maya', 'bazi', 'tarot', 'runes', 'astro', 'zi
 const birthInputs = readFileSync('apps/web/components/BirthInputs.tsx', 'utf8');
 log(
   'birth input component offers refined quick time controls',
-  birthInputs.includes('QUICK_TIMES') &&
+  birthInputs.includes('quickTimes') &&
     birthInputs.includes('formatTimeDisplay') &&
     birthInputs.includes('birth-inputs__summary') &&
     birthInputs.includes('DateSegmentPicker') &&
@@ -310,10 +310,12 @@ log(
     birthInputs.includes('birth-inputs__chips--time') &&
     birthInputs.includes('item.hint'),
 );
-log('birth input component offers timezone presets', birthInputs.includes('台灣 / 香港 / 新加坡') && birthInputs.includes('UTC'));
-log('birth input component offers location presets', birthInputs.includes('常用出生地') && birthInputs.includes('台北') && birthInputs.includes('新加坡'));
+log('birth input component offers timezone presets', birthInputs.includes('Taiwan / Hong Kong / Singapore') && birthInputs.includes('UTC'));
+log('birth input component offers location presets', birthInputs.includes('Preset cities') && birthInputs.includes('Taipei') && birthInputs.includes('Singapore'));
 const toolShell = readFileSync('apps/web/components/ToolShell.tsx', 'utf8');
-log('tool shell has clean Chinese navigation and CTA', ['返回命理媒介中心', '線上解盤工具', '想把結果解得更細嗎？'].every((token) => toolShell.includes(token)));
+const toolPageCopy = readFileSync('apps/web/lib/i18n/tool-page-copy.ts', 'utf8');
+log('tool shell uses localized navigation and CTA copy', ['getToolLocaleCopy', "localizePath('/tools'", 'copy.shell.backLabel', '.consult'].every((token) => toolShell.includes(token) || toolPageCopy.includes(token)));
+log('tool page copy includes translated tool surfaces', ['Maya Calendar Kin', 'Lịch Maya Kin', 'Kalender Maya Kin', 'マヤ暦 Kin', '마야력 Kin', '馬雅曆 Kin'].every((token) => toolPageCopy.includes(token)));
 
 for (const tool of ['bazi', 'ziwei', 'astro', 'humandesign']) {
   const source = readFileSync(`apps/web/app/tools/${tool}/page.tsx`, 'utf8');
@@ -635,17 +637,17 @@ const ziweiToolPage = readFileSync('apps/web/app/tools/ziwei/page.tsx', 'utf8');
 const humanDesignToolPage = readFileSync('apps/web/app/tools/humandesign/page.tsx', 'utf8');
 log('tarot reading result includes AR stage', tarotPage.includes('ToolResultSection') && tarotPage.includes('kind="tarot"'));
 log('runes reading result includes AR stage', runesPage.includes('ToolResultSection') && runesPage.includes('kind="runes"'));
-log('tarot page offers three visual styles', ['forest_athena', 'ocean_poseidon', 'ancient_pharaoh'].every((style) => tarotPage.includes(style)) && tarotPage.includes('tarot_style: tarotStyle'));
-log('runes page offers three material choices', ['stone', 'wood', 'crystal'].every((material) => runesPage.includes(`value: '${material}'`)) && runesPage.includes('material,'));
-log('tarot and runes pages have readable Chinese form copy', ['森林雅典娜', '大海波賽頓', '古老法老風', '開始抽牌'].every((token) => tarotPage.includes(token)) && ['石面', '木頭', '水晶', '開始抽符文'].every((token) => runesPage.includes(token)));
+log('tarot page offers three visual styles', ['forest_athena', 'ocean_poseidon', 'ancient_pharaoh'].every((style) => toolPageCopy.includes(style)) && tarotPage.includes('tarot_style: tarotStyle'));
+log('runes page offers three material choices', ['stone', 'wood', 'crystal'].every((material) => toolPageCopy.includes(`value: '${material}'`)) && runesPage.includes('material,'));
+log('tarot and runes pages use localized form copy', ['Forest Athena', 'Ocean Poseidon', 'Ancient Pharaoh', 'Draw cards'].every((token) => toolPageCopy.includes(token)) && ['Stone', 'Wood', 'Crystal', 'Draw runes'].every((token) => toolPageCopy.includes(token)));
 log('core tool pages have clean Traditional Chinese copy', [
-  [numerologyPage, ["calc('numerology'", 'DateOnlyField', 'ToolResultSection']],
-  [mayaToolPage, ["calc('maya'", 'DateOnlyField', 'ToolResultSection']],
-  [baziToolPage, ["calc('bazi'", 'BirthDateTimeFields', 'ToolResultSection']],
-  [astroToolPage, ["calc('astro'", 'LocationFields', 'ToolResultSection']],
-  [ziweiToolPage, ["calc('ziwei'", 'BirthDateTimeFields', 'ToolResultSection']],
-  [humanDesignToolPage, ["calc('humandesign'", 'BodyGraph', 'ToolResultSection', '\u8996\u89ba\u5c55\u793a']],
-].every(([source, tokens]) => tokens.every((token) => source.includes(token))));
+  [numerologyPage, ["calc('numerology'", 'DateOnlyField', 'ToolResultSection', "getToolPageCopy(locale, 'numerology')"]],
+  [mayaToolPage, ["calc('maya'", 'DateOnlyField', 'ToolResultSection', "getToolPageCopy(locale, 'maya')"]],
+  [baziToolPage, ["calc('bazi'", 'BirthDateTimeFields', 'ToolResultSection', "getToolPageCopy(locale, 'bazi')"]],
+  [astroToolPage, ["calc('astro'", 'LocationFields', 'ToolResultSection', "getToolPageCopy(locale, 'astro')"]],
+  [ziweiToolPage, ["calc('ziwei'", 'BirthDateTimeFields', 'ToolResultSection', "getToolPageCopy(locale, 'ziwei')"]],
+  [humanDesignToolPage, ["calc('humandesign'", 'ToolResultSection', "getToolPageCopy(locale, 'humandesign')"]],
+].every(([source, tokens]) => tokens.every((token) => source.includes(token))) && ['生命靈數', '馬雅曆 Kin', '八字排盤', '紫微斗數', '人類圖'].every((token) => toolPageCopy.includes(token)));
 const pythonModels = readFileSync('python_api/models.py', 'utf8');
 log('Python tarot schema preserves selected visual style', pythonModels.includes('tarot_style') && pythonModels.includes('forest_athena'));
 const arToolPages = [

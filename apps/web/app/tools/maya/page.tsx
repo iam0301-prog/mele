@@ -7,8 +7,12 @@ import { ToolResultSection } from '@/components/ToolResultSection';
 import { DateOnlyField } from '@/components/BirthInputs';
 import { calc, CalcError, type CalcResponse } from '@/lib/api';
 import { useToast } from '@/components/ToastProvider';
+import { useCurrentLocale } from '@/lib/i18n/use-current-locale';
+import { getToolPageCopy } from '@/lib/i18n/tool-page-copy';
 
 export default function MayaPage() {
+  const locale = useCurrentLocale();
+  const copy = getToolPageCopy(locale, 'maya');
   const toast = useToast();
   const [date, setDate] = useState('');
   const [loading, setLoading] = useState(false);
@@ -18,7 +22,7 @@ export default function MayaPage() {
   const onSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     if (!date) {
-      toast('請先選擇出生日期。', 'error');
+      toast(copy.validation.dateRequired ?? 'Please choose your birth date first.', 'error');
       return;
     }
 
@@ -40,31 +44,21 @@ export default function MayaPage() {
   };
 
   return (
-    <ToolShell
-      title="馬雅曆 Kin"
-      subtitle="MAYAN TZOLKIN"
-      description="以 260 天 Tzolkin 與 Dreamspell 系統計算你的 Kin、調性、圖騰與五方力量，協助理解天賦節奏與每日能量。"
-      spec="馬雅曆"
-    >
+    <ToolShell locale={locale} title={copy.title} subtitle={copy.subtitle} description={copy.description} spec={copy.spec}>
       <form onSubmit={onSubmit} className="mele-card">
-        <DateOnlyField
-          date={date}
-          onDateChange={setDate}
-          label="出生日期"
-          hint="馬雅 Kin 以日期為主，不需要出生時間。"
-        />
+        <DateOnlyField locale={locale} date={date} onDateChange={setDate} label={copy.birth?.dateLabel} hint={copy.dateHint} />
 
         <button type="submit" disabled={loading} className="mele-btn-primary w-full md:w-auto">
-          {loading ? '計算 Kin 中...' : '查看 Kin'}
+          {loading ? copy.submit.loading : copy.submit.idle}
         </button>
       </form>
 
-      {loading && <ToolLoading label="正在計算馬雅 Kin 與圖騰..." />}
-      {error && !loading && <ToolError message={error} />}
+      {loading && <ToolLoading locale={locale} label={copy.loadingLabel} />}
+      {error && !loading && <ToolError locale={locale} message={error} />}
       {result && !loading && (
         <>
-          <ToolResultSection kind="maya" result={result} />
-          <ConsultCTA spec="馬雅曆" label="馬雅曆" />
+          <ToolResultSection kind="maya" result={result} locale={locale} />
+          <ConsultCTA locale={locale} spec={copy.spec} label={copy.title} />
         </>
       )}
     </ToolShell>

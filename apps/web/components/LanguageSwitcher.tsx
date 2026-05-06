@@ -6,9 +6,11 @@ import {
   LOCALE_LABELS,
   LOCALES,
   getLocaleFromPathname,
+  isLocalizedPath,
   switchLocaleInPathname,
   type Locale,
 } from '@/lib/i18n/config';
+import { useProvidedLocale } from '@/lib/i18n/LocaleProvider';
 
 const inlineLinkClass =
   'rounded-full border border-accent-dim bg-black/45 px-3 py-1.5 text-[11px] tracking-widest text-accent backdrop-blur transition hover:border-accent';
@@ -26,10 +28,11 @@ export function LanguageSwitcher({
   onNavigate?: () => void;
 }) {
   const pathname = usePathname() || '/';
+  const providedLocale = useProvidedLocale();
   const searchParams = useSearchParams();
   const query = searchParams?.toString();
   const pathWithQuery = query ? `${pathname}?${query}` : pathname;
-  const activeLocale = getLocaleFromPathname(pathname);
+  const activeLocale = isLocalizedPath(pathname) ? getLocaleFromPathname(pathname) : providedLocale;
   const linkClass = variant === 'panel' ? panelLinkClass : inlineLinkClass;
 
   return (

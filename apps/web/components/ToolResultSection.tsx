@@ -3,6 +3,7 @@
 import dynamic from 'next/dynamic';
 import { ToolResult } from '@/components/ToolResult';
 import type { CalcResponse, CalcTool } from '@/lib/api';
+import { DEFAULT_LOCALE, type Locale } from '@/lib/i18n/config';
 
 const ReadingArStage = dynamic(
   () => import('@/components/ReadingArStage').then((module) => module.ReadingArStage),
@@ -23,12 +24,15 @@ export function ToolResultSection({
   result,
   showAr = true,
   arFirst = false,
+  locale = DEFAULT_LOCALE,
 }: {
   kind: CalcTool;
   result: CalcResponse;
   showAr?: boolean;
   arFirst?: boolean;
+  locale?: Locale;
 }) {
+  void locale;
   const arStage = showAr ? <ReadingArStage kind={kind} result={result} /> : null;
   const shouldShowArFirst = arFirst || kind !== 'tarot';
 

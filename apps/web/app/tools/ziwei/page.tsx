@@ -9,6 +9,8 @@ import { BirthDateTimeFields } from '@/components/BirthInputs';
 import { calc, CalcError, type CalcResponse } from '@/lib/api';
 import { useToast } from '@/components/ToastProvider';
 import { useProfile, normalizeTime } from '@/lib/use-profile';
+import { useCurrentLocale } from '@/lib/i18n/use-current-locale';
+import { getToolPageCopy } from '@/lib/i18n/tool-page-copy';
 
 type Gender = '男' | '女';
 
@@ -21,6 +23,8 @@ function normalizeGender(value: string | null): Gender | null {
 }
 
 export default function ZiweiPage() {
+  const locale = useCurrentLocale();
+  const copy = getToolPageCopy(locale, 'ziwei');
   const toast = useToast();
   const profile = useProfile();
   const [date, setDate] = useState('');
@@ -44,7 +48,7 @@ export default function ZiweiPage() {
   const onSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     if (!date || !time) {
-      toast('請先填寫出生日期與出生時間。', 'error');
+      toast(copy.validation.dateTimeRequired ?? 'Please enter both birth date and time.', 'error');
       return;
     }
 
@@ -67,43 +71,40 @@ export default function ZiweiPage() {
   };
 
   return (
-    <ToolShell
-      title="紫微斗數"
-      subtitle="ZIWEI DOUSHU"
-      description="依出生年月日時排出十二宮、主星與命宮結構，適合觀察人生主軸、事業、人際、感情與長期運勢配置。"
-      spec="紫微斗數"
-    >
+    <ToolShell locale={locale} title={copy.title} subtitle={copy.subtitle} description={copy.description} spec={copy.spec}>
       <form onSubmit={onSubmit} className="mele-card">
-        <AutofillBanner show={autofilled} fields={['出生日期', '出生時間', '性別']} />
+        <AutofillBanner locale={locale} show={autofilled} fields={copy.autofillFields} />
 
         <BirthDateTimeFields
+          locale={locale}
           date={date}
           time={time}
           onDateChange={setDate}
           onTimeChange={setTime}
-          dateLabel="出生日期"
-          unknownTimeHint="紫微斗數會依出生時辰安命宮與排星曜。若暫時不知道精準時間，可以先用 12:00 試排，但正式解讀建議確認出生時間。"
+          dateLabel={copy.birth?.dateLabel}
+          timeLabel={copy.birth?.timeLabel}
+          unknownTimeHint={copy.unknownTimeHint}
         />
 
         <div className="mb-5">
-          <label className="mele-label">性別 *</label>
+          <label className="mele-label">{copy.birth?.genderLabel ?? 'Gender'} *</label>
           <select value={gender} onChange={(event) => setGender(event.target.value as Gender)} className="mele-input">
-            <option value="女">女</option>
-            <option value="男">男</option>
+            <option value="女">{copy.birth?.female ?? 'Female'}</option>
+            <option value="男">{copy.birth?.male ?? 'Male'}</option>
           </select>
         </div>
 
         <button type="submit" disabled={loading} className="mele-btn-primary w-full md:w-auto">
-          {loading ? '排盤中...' : '開始排盤'}
+          {loading ? copy.submit.loading : copy.submit.idle}
         </button>
       </form>
 
-      {loading && <ToolLoading label="正在排出十二宮與主星..." />}
-      {error && !loading && <ToolError message={error} />}
+      {loading && <ToolLoading locale={locale} label={copy.loadingLabel} />}
+      {error && !loading && <ToolError locale={locale} message={error} />}
       {result && !loading && (
         <>
-          <ToolResultSection kind="ziwei" result={result} />
-          <ConsultCTA spec="紫微斗數" label="紫微斗數" />
+          <ToolResultSection kind="ziwei" result={result} locale={locale} />
+          <ConsultCTA locale={locale} spec={copy.spec} label={copy.title} />
         </>
       )}
     </ToolShell>

@@ -9,13 +9,18 @@ import { BirthDateTimeFields, LocationFields } from '@/components/BirthInputs';
 import { calc, CalcError, type CalcResponse } from '@/lib/api';
 import { useToast } from '@/components/ToastProvider';
 import { useProfile, normalizeTime } from '@/lib/use-profile';
+import { useCurrentLocale } from '@/lib/i18n/use-current-locale';
+import { getToolPageCopy } from '@/lib/i18n/tool-page-copy';
+import { getBrowserTimeZone, timezoneOffsetAt } from '@/lib/timezone';
 
 export default function AstroPage() {
+  const locale = useCurrentLocale();
+  const copy = getToolPageCopy(locale, 'astro');
   const toast = useToast();
   const profile = useProfile();
   const [date, setDate] = useState('');
   const [time, setTime] = useState('');
-  const [timezone, setTimezone] = useState(8);
+  const [timezone, setTimezone] = useState(() => timezoneOffsetAt(getBrowserTimeZone()));
   const [lat, setLat] = useState(25.033);
   const [lon, setLon] = useState(121.5654);
   const [autofilled, setAutofilled] = useState(false);
@@ -29,6 +34,9 @@ export default function AstroPage() {
     if (time === '' && profile.birth_time) setTime(normalizeTime(profile.birth_time));
     if (profile.birth_lat) setLat(profile.birth_lat);
     if (profile.birth_lon) setLon(profile.birth_lon);
+    if (profile.birth_timezone) {
+      setTimezone(timezoneOffsetAt(profile.birth_timezone, profile.birth_date ?? date, profile.birth_time ? normalizeTime(profile.birth_time) : time));
+    }
     setAutofilled(true);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [profile.loaded]);
@@ -36,7 +44,7 @@ export default function AstroPage() {
   const onSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     if (!date || !time) {
-      toast('請先填寫出生日期與出生時間。', 'error');
+      toast(copy.validation.dateTimeRequired ?? 'Please enter both birth date and time.', 'error');
       return;
     }
 
@@ -68,45 +76,46 @@ export default function AstroPage() {
   };
 
   return (
-    <ToolShell
-      title="西洋占星命盤"
-      subtitle="NATAL CHART"
-      description="以出生時間與地點計算太陽、月亮、上升、行星宮位與主要相位，協助理解性格核心、情緒模式與生命發展方向。"
-      spec="占星"
-    >
+    <ToolShell locale={locale} title={copy.title} subtitle={copy.subtitle} description={copy.description} spec={copy.spec}>
       <form onSubmit={onSubmit} className="mele-card">
-        <AutofillBanner show={autofilled} fields={['出生日期', '出生時間', '出生地']} />
+        <AutofillBanner locale={locale} show={autofilled} fields={copy.autofillFields} />
 
         <BirthDateTimeFields
+          locale={locale}
           date={date}
           time={time}
           timezone={timezone}
           onDateChange={setDate}
           onTimeChange={setTime}
           onTimezoneChange={setTimezone}
-          dateLabel="出生日期"
-          unknownTimeHint="占星命盤的上升與宮位非常依賴出生時間。若不確定，可先用 12:00 查看行星星座，正式諮詢前建議再確認時間。"
+          dateLabel={copy.birth?.dateLabel}
+          timeLabel={copy.birth?.timeLabel}
+          unknownTimeHint={copy.unknownTimeHint}
         />
 
         <LocationFields
+          locale={locale}
           latitude={lat}
           longitude={lon}
+          timezoneDate={date}
+          timezoneTime={time}
           onLatitudeChange={setLat}
           onLongitudeChange={setLon}
+          onTimezoneChange={setTimezone}
         />
 
-        <p className="text-xs text-white/50 mb-5">若城市不在快捷選項中，可以用 Google Maps 查詢緯度與經度後填入。</p>
+        {copy.birth?.locationNote && <p className="text-xs text-white/50 mb-5">{copy.birth.locationNote}</p>}
         <button type="submit" disabled={loading} className="mele-btn-primary w-full md:w-auto">
-          {loading ? '正在繪製命盤...' : '開始排盤'}
+          {loading ? copy.submit.loading : copy.submit.idle}
         </button>
       </form>
 
-      {loading && <ToolLoading label="正在計算行星位置與宮位..." />}
-      {error && !loading && <ToolError message={error} />}
+      {loading && <ToolLoading locale={locale} label={copy.loadingLabel} />}
+      {error && !loading && <ToolError locale={locale} message={error} />}
       {result && !loading && (
         <>
-          <ToolResultSection kind="astro" result={result} />
-          <ConsultCTA spec="占星" label="占星" />
+          <ToolResultSection kind="astro" result={result} locale={locale} />
+          <ConsultCTA locale={locale} spec={copy.spec} label={copy.title} />
         </>
       )}
     </ToolShell>
