@@ -50,14 +50,14 @@ function TeachersInner() {
   return (
     <main className="container mx-auto max-w-6xl px-5 py-12">
       <header className="pb-8 text-center">
-        <div className="text-accent mb-4 text-base tracking-[0.5em] opacity-70">CONSULTATION MARKET</div>
-        <h1 className="font-serif text-4xl tracking-widest">命理媒合中心</h1>
+        <div className="text-accent mb-4 text-base tracking-[0.5em] opacity-70">GUIDANCE DIRECTORY</div>
+        <h1 className="font-serif text-4xl tracking-widest">諮詢老師入口</h1>
         <div className="mele-subtitle mt-2">OUR READERS</div>
         <p className="mx-auto mt-5 max-w-2xl text-sm leading-relaxed text-white/70">
-          你可以先用手機版媒合流程找到適合的老師，也可以在這裡依專長瀏覽所有上架老師、服務風格與評價。
+          MELE 的核心是讓使用者先透過工具理解自己；若需要更深的對話，可以在這裡依專長瀏覽老師、服務風格與評價。
         </p>
         <div className="mt-5 flex flex-wrap justify-center gap-3">
-          <Link href="/mobile" className="mele-btn-primary">進入手機媒合</Link>
+          <Link href="/mobile" className="mele-btn-primary">進入諮詢引導</Link>
           <Link href="/teachers/apply" className="mele-btn-secondary">我是老師，申請加入</Link>
         </div>
       </header>
@@ -84,7 +84,7 @@ function TeachersInner() {
 
         {!loading && demoMode && teachers.length > 0 && (
           <div className="mb-5 rounded-xl border border-accent-dim bg-black/25 p-4 text-sm leading-relaxed text-white/70">
-            目前資料庫尚未上架正式老師，以下顯示本機示範老師，方便測試媒合、老師詳情與服務呈現。正式上線後會自動改用 Supabase 內的真實老師資料。
+            目前資料庫尚未上架正式老師，以下顯示本機示範老師，方便測試諮詢引導、老師詳情與服務呈現。正式上線後會自動改用 Supabase 內的真實老師資料。
           </div>
         )}
 
@@ -94,7 +94,7 @@ function TeachersInner() {
             目前沒有符合條件的上架老師。
             <div className="mt-4">
               <Link href="/teachers/apply" className="text-accent text-xs tracking-widest hover:opacity-80">
-                申請成為 MELE 命理老師
+                申請成為 MELE 諮詢老師
               </Link>
             </div>
           </div>
@@ -122,7 +122,7 @@ function TeacherCard({ teacher }: { teacher: Teacher }) {
         {teacher.display_name.charAt(0)}
       </div>
       <div className="text-center font-serif text-xl text-accent">{teacher.display_name}</div>
-      <div className="mt-1 text-center text-xs text-white/60">{teacher.title || '命理諮詢老師'}</div>
+      <div className="mt-1 text-center text-xs text-white/60">{teacher.title || '自我探索諮詢老師'}</div>
       <div className="mt-3 text-center text-sm text-yellow-400">
         {Number(teacher.rating || 0).toFixed(1)} 分
         <span className="text-white/50">（{teacher.total_reviews || 0} 則評價） · {teacher.cases_count || 0} 次案例</span>

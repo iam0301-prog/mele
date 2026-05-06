@@ -3,7 +3,7 @@ import Link from 'next/link';
 
 export const metadata: Metadata = {
   title: '隱私權政策｜MELE',
-  description: 'MELE 命理媒介中心的資料蒐集、使用、保存與刪除說明。',
+  description: 'MELE 多元自我理解工具平台的資料蒐集、使用、保存與刪除說明。',
 };
 
 const sections = [

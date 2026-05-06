@@ -1,15 +1,16 @@
 {
   "meta": {
-    "siteName": "MELE Sea Star",
-    "title": "MELE Sea Star | Nền tảng tâm linh, công cụ khám phá bản thân và kết nối giáo viên",
-    "description": "MELE Sea Star là nền tảng nội dung tâm linh đa ngôn ngữ với bài test miễn phí, công cụ huyền học, nghi thức hằng ngày, điểm thành viên và kết nối giáo viên.",
+    "siteName": "MELE",
+    "title": "MELE | Self-discovery tools",
+    "description": "MELE is a multilingual self-discovery platform for free tests, tarot, runes, Maya calendar, Bazi, Human Design, astrology, numerology, daily rituals, and member points.",
     "keywords": [
-      "tâm linh",
+      "self-discovery",
+      "spiritual tools",
       "tarot",
-      "lịch Maya",
-      "bazi",
-      "kết nối giáo viên",
-      "phân tích tính cách"
+      "Maya calendar",
+      "Bazi",
+      "Human Design",
+      "numerology"
     ]
   },
   "nav": {
@@ -17,11 +18,11 @@
     "daily": "Nghi thức ngày",
     "mobile": "Di động",
     "ar": "AR",
-    "teachers": "Giáo viên",
+    "teachers": "Guides",
     "login": "Đăng nhập",
-    "teacherApply": "Ứng tuyển",
+    "teacherApply": "Apply",
     "menu": "Menu",
-    "mobileMenu": "Menu di động",
+    "mobileMenu": "Menu",
     "language": "Ngôn ngữ",
     "myBookings": "Buổi tư vấn",
     "charts": "Hồ sơ của tôi",
@@ -34,29 +35,29 @@
     "privacy": "Quyền riêng tư",
     "tos": "Điều khoản",
     "disclaimer": "Miễn trừ",
-    "teacherApply": "Ứng tuyển giáo viên",
-    "copyright": "© MELE Sea Star | DIVINATION HUB"
+    "teacherApply": "Đăng ký làm guide",
+    "copyright": "MELE | SELF DISCOVERY HUB"
   },
   "home": {
-    "badge": "Bản thử nghiệm kín | TRUNG TÂM THỊ TRƯỜNG",
-    "title": "MELE Sea Star",
-    "subtitle": "Cổng khám phá thân-tâm-linh",
-    "description": "Cổng đa ngôn ngữ cho bài test miễn phí, công cụ huyền học, nghi thức hằng ngày, điểm thành viên và kết nối giáo viên cho Đài Loan, Việt Nam, Indonesia và thị trường quốc tế.",
+    "badge": "Closed Beta | SELF DISCOVERY TOOLS",
+    "title": "MELE",
+    "subtitle": "Self-discovery tool space",
+    "description": "A multilingual tool space for people to understand themselves first: free tests, intuitive tools, daily rituals, member points, and deeper readings when they are ready.",
     "actions": {
-      "daily": "Bắt đầu nghi thức",
-      "tarot": "Thử tarot",
-      "teachers": "Tìm giáo viên"
+      "daily": "Start daily ritual",
+      "tarot": "Try tarot",
+      "teachers": "Find guidance"
     },
     "console": {
       "ariaLabel": "Bảng nhiệm vụ beta",
       "label": "Bảng nhiệm vụ beta",
-      "title": "Hành trình thành viên và cổng thị trường đã sẵn sàng",
+      "title": "Self-discovery journeys are ready",
       "tarotAlt": "Lá tarot Ocean Poseidon",
       "mayaAlt": "Totem Maya Yellow Human",
       "tasks": [
-        "Bắt đầu bằng bài test miễn phí để người dùng hiểu mình trước.",
-        "Thành viên nhận 200 điểm mỗi ngày và mở khóa giải thích sâu với 100 điểm.",
-        "Tóm tắt cho giáo viên giúp buổi tư vấn có nhiều ngữ cảnh hơn."
+        "Start with free tools so visitors can understand their rhythm, energy, and current state.",
+        "Members can claim 200 points daily and unlock deeper readings for 100 points when ready.",
+        "Guides are optional support for deeper conversations, not the center of the product."
       ]
     },
     "stats": [
@@ -81,15 +82,15 @@
         "hint": "Chọn tarot hoặc rune một lần mỗi ngày để tạo nhịp nghi thức."
       }
     ],
-    "marketsKicker": "MARKET GATEWAYS",
-    "marketsTitle": "Cổng thị trường tâm linh đa ngôn ngữ",
-    "marketsBody": "Trang chủ định tuyến Đài Loan, Việt Nam, Indonesia, tiếng Anh quốc tế, và các thị trường Nhật Hàn chuẩn bị.",
+    "marketsKicker": "MULTI-LANGUAGE ENTRY",
+    "marketsTitle": "A multilingual self-discovery entrance",
+    "marketsBody": "Taiwan, Vietnam, Indonesia, English, and future Japanese and Korean audiences can enter the same tool system in their own language.",
     "toolsKicker": "FREE TESTS",
-    "toolsTitle": "Xây dựng niềm tin trước khi thu phí",
-    "toolsBody": "Mỗi trang thị trường chừa sẵn khu vực test miễn phí, phân tích vai trò, bài viết, video ngắn, kênh xã hội và CTA kết nối giáo viên.",
+    "toolsTitle": "Understand yourself before going deeper",
+    "toolsBody": "Each market page reserves sections for free tests, persona analysis, articles, short-form video, social channels, and optional guidance.",
     "roleKicker": "ROLE FLOW",
-    "roleTitle": "Hành trình rõ cho thành viên, giáo viên và nền tảng",
-    "roleBody": "Thành viên xem giải thích cơ bản trước, giáo viên nhận thêm ngữ cảnh, nền tảng tăng trưởng bằng nội dung và xã hội.",
+    "roleTitle": "Clear journeys for members and guides",
+    "roleBody": "Members start with simple interactive tools; guides only step in when someone wants a deeper conversation.",
     "finalKicker": "READY FOR CLOSED BETA",
     "finalTitle": "Kiểm thử, giải thích rõ, rồi mới tiến tới trả phí",
     "finalBody": "Nền tảng đa ngôn ngữ giữ nguyên tính năng hiện có và đưa nội dung công khai vào JSON dễ bảo trì.",
@@ -98,7 +99,7 @@
       "Đổi ngôn ngữ giữ đường dẫn",
       "Trang chủ đa thị trường",
       "SEO hreflang",
-      "CTA giáo viên"
+      "Guidance entry"
     ],
     "tools": [
       {
@@ -159,16 +160,16 @@
         "action": "Mở kho giải đọc"
       },
       {
-        "role": "Giáo viên",
-        "title": "Có thêm ngữ cảnh trước buổi tư vấn",
-        "body": "Trang giáo viên có thể hiển thị câu hỏi, dữ liệu chart và tóm tắt hữu ích.",
+        "role": "Guide",
+        "title": "Hỗ trợ khi cần trò chuyện sâu hơn",
+        "body": "Guide là lựa chọn hỗ trợ thêm, nhận câu hỏi và bối cảnh của thành viên để dẫn vào cuộc trò chuyện kỹ hơn.",
         "href": "/teacher-portal",
-        "action": "Mở cổng giáo viên"
+        "action": "Mở màn hình guide"
       },
       {
         "role": "Nền tảng",
         "title": "Tăng trưởng bằng nội dung theo thị trường",
-        "body": "Mỗi thị trường có bài viết, video ngắn, liên kết xã hội và CTA giáo viên riêng.",
+        "body": "Mỗi thị trường có bài viết, video ngắn, liên kết xã hội và CTA tư vấn riêng.",
         "href": "/admin/launch",
         "action": "Mở checklist"
       }
@@ -180,7 +181,7 @@
         "locale": "zh-TW",
         "name": "Cổng Đài Loan",
         "status": "Thị trường chính",
-        "body": "Nội dung tiếng Hoa phồn thể, LINE, giáo viên và nghi thức ngày.",
+        "body": "Nội dung tiếng Hoa phồn thể, LINE, lối vào tư vấn và nghi thức ngày.",
         "href": "/zh-TW/spiritual"
       },
       {
@@ -194,7 +195,7 @@
         "locale": "id",
         "name": "Cổng Indonesia",
         "status": "Thị trường chính",
-        "body": "Nội dung Indonesia và hợp tác giáo viên.",
+        "body": "Nội dung Indonesia và hợp tác cùng guide.",
         "href": "/id/spiritual"
       },
       {
@@ -222,7 +223,7 @@
     "page": {
       "kicker": "SPIRITUAL MARKET",
       "heroTitle": "Cổng thị trường tâm linh",
-      "heroBody": "Trang landing bản địa cho test miễn phí, phân tích vai trò, bài viết, video ngắn, kênh chính thức và giáo viên.",
+      "heroBody": "Trang landing bản địa cho test miễn phí, phân tích vai trò, bài viết, video ngắn, kênh chính thức và lối vào tư vấn khi cần.",
       "freeTests": "Bài test miễn phí",
       "freeTestsBody": "Thần số học, Human Design, tarot, lịch Maya và nghi thức hằng ngày là lớp tương tác đầu tiên.",
       "persona": "Phân tích vai trò",
@@ -233,10 +234,10 @@
       "videoBody": "Dẫn về TikTok, Reels, Shorts hoặc nền tảng địa phương.",
       "social": "LINE / kênh xã hội chính thức",
       "socialBody": "Đài Loan ưu tiên LINE; thị trường khác dùng kênh địa phương.",
-      "teacherCta": "CTA kết nối giáo viên",
-      "teacherCtaBody": "Sau phần đọc cơ bản, dẫn thành viên đến giáo viên phù hợp.",
+      "teacherCta": "CTA tư vấn",
+      "teacherCtaBody": "Sau phần đọc cơ bản, thành viên chỉ đi tiếp tới guide phù hợp khi thật sự cần.",
       "primaryCta": "Bắt đầu test miễn phí",
-      "teacherCtaButton": "Tìm giáo viên"
+      "teacherCtaButton": "Tìm guide"
     }
   },
   "language": {

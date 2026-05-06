@@ -67,7 +67,7 @@ export function MobileHeaderMenu({
     { href: '/daily', label: '每日儀式' },
     { href: '/mobile', label: '手機版' },
     { href: '/ar', label: 'AR 體驗' },
-    { href: '/teachers', label: '老師媒合' },
+    { href: '/teachers', label: '諮詢老師' },
     { href: '/legal/disclaimer', label: '免責聲明' },
   ];
   const guestLinks = labels?.guestLinks ?? [
@@ -76,7 +76,7 @@ export function MobileHeaderMenu({
   ];
 
   return (
-    <div ref={rootRef} className="relative ml-auto md:hidden">
+    <div ref={rootRef} className="relative ml-auto">
       <button
         type="button"
         className="rounded-full border border-accent-dim bg-black/55 px-4 py-1.5 text-xs tracking-widest text-accent backdrop-blur transition hover:border-accent"
@@ -90,7 +90,7 @@ export function MobileHeaderMenu({
       {open && (
         <div
           id="mobile-header-menu"
-          className="absolute right-0 mt-2 w-[min(86vw,280px)] rounded-lg border border-accent-dim bg-primary/95 p-3 shadow-gold-soft backdrop-blur-xl"
+          className="absolute right-0 mt-2 w-[min(86vw,340px)] rounded-lg border border-accent-dim bg-primary/95 p-3 shadow-gold-soft backdrop-blur-xl"
         >
           <nav className="grid gap-2" aria-label={labels?.mobileMenu ?? '手機選單'}>
             {primaryLinks.map((item) => (

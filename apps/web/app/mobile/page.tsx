@@ -199,7 +199,7 @@ export default function MobilePage() {
 
   const saveMatch = async (result: TeacherMatchResult) => {
     if (isDemoTeacherId(result.teacher.id)) {
-      setMatchNotice('目前顯示的是本機示範老師。正式上架老師後，登入即可保存真實媒合紀錄。');
+      setMatchNotice('目前顯示的是本機示範老師。正式上架老師後，登入即可保存真實諮詢引導紀錄。');
       return;
     }
 
@@ -222,13 +222,13 @@ export default function MobilePage() {
       setMatchNotice(`保存失敗：${saveError.message}`);
       return;
     }
-    setMatchNotice('已保存這次媒合。你之後可以依照這份排行榜回來預約。');
+    setMatchNotice('已保存這次諮詢引導。你之後可以依照這份建議清單回來預約。');
   };
 
   const finishMatch = () => {
     setMatchCompleted(true);
     setMatchStep(5);
-    setMatchNotice('媒合完成。下方排行榜會依你的答案排序，分數越高代表越接近你的需求。');
+    setMatchNotice('諮詢建議已整理完成。下方清單會依你的答案排序，分數越高代表越接近你的需求。');
   };
 
   return (
@@ -328,12 +328,12 @@ export default function MobilePage() {
         {tab === 'match' && (
           <section className="mobile-match">
             <div className="mobile-hero mobile-hero--compact">
-              <div className="ritual-kicker">MATCHING QUEST</div>
-              <h1>命理媒合</h1>
-              <p>回答五個小問題，MELE 會依你的需求、命理形式、老師風格、預算與信任指標，排出最適合的老師排行榜。</p>
+              <div className="ritual-kicker">GUIDANCE PATH</div>
+              <h1>諮詢引導</h1>
+              <p>回答五個小問題，MELE 會依你的需求、工具偏好、老師風格、預算與信任指標，整理適合進一步諮詢的老師清單。</p>
             </div>
 
-            <div className="mobile-match-steps" aria-label="命理媒合進度">
+            <div className="mobile-match-steps" aria-label="諮詢引導進度">
               {MATCH_STEP_TITLES.map((title, index) => (
                 <button
                   key={title}
@@ -437,7 +437,7 @@ export default function MobilePage() {
                   </button>
                 ) : (
                   <button type="button" className="mele-btn-primary" onClick={finishMatch}>
-                    產生排行榜
+                    整理建議
                   </button>
                 )}
               </div>
@@ -449,14 +449,14 @@ export default function MobilePage() {
             {matchCompleted && (
               <section className="mobile-match-results">
                 <div className="mobile-match-results__header">
-                  <span>老師排行榜</span>
+                  <span>諮詢建議</span>
                   <h2>依你的需求排序</h2>
-                  <p>媒合分數是輔助判斷，不保證諮詢結果。預約前仍建議看老師介紹、服務內容與退款規則。</p>
+                  <p>契合分數是輔助判斷，不保證諮詢結果。預約前仍建議看老師介紹、服務內容與退款規則。</p>
                 </div>
 
                 {rankedMatches.length === 0 && (
                   <div className="mobile-match-empty">
-                    目前還沒有上架老師。你仍可以先保存需求，或稍後回到老師媒合中心查看新名單。
+                    目前還沒有上架老師。你仍可以先保存需求，或稍後回到諮詢老師入口查看新名單。
                   </div>
                 )}
 
@@ -470,7 +470,7 @@ export default function MobilePage() {
                     <div className="mobile-match-card__avatar">{result.teacher.display_name.charAt(0)}</div>
                     <div className="mobile-match-card__body">
                       <h3>{result.teacher.display_name}</h3>
-                      <p>{result.teacher.title || result.teacher.intro_short || '命理諮詢老師'}</p>
+                      <p>{result.teacher.title || result.teacher.intro_short || '自我探索諮詢老師'}</p>
                       <div className="mobile-match-card__meta">
                         <span>評分 {Number(result.teacher.rating || 0).toFixed(1)}</span>
                         <span>{result.teacher.total_reviews || 0} 則評價</span>
@@ -497,7 +497,7 @@ export default function MobilePage() {
                         ) : (
                           <Link href={`/teachers/${result.teacher.id}`}>查看服務</Link>
                         )}
-                        <button type="button" onClick={() => saveMatch(result)}>保存這次媒合</button>
+                        <button type="button" onClick={() => saveMatch(result)}>保存這次建議</button>
                       </div>
                     </div>
                   </article>
@@ -531,7 +531,7 @@ export default function MobilePage() {
             <div className="mobile-hero mobile-hero--compact">
               <div className="ritual-kicker">CONSULTATION MARKET</div>
               <h1>老師中心</h1>
-              <p>想直接看所有老師、服務價格與評價，可以進入完整老師列表。若你不確定該找誰，建議先回到「媒合」完成排行榜。</p>
+              <p>想直接看所有老師、服務價格與評價，可以進入完整老師列表。若你不確定該找誰，建議先回到「引導」完成建議清單。</p>
             </div>
             <Link href="/teachers" className="mele-btn-primary">查看所有老師</Link>
             <Link href="/teachers/apply" className="mele-btn-secondary">申請成為老師</Link>
@@ -540,7 +540,7 @@ export default function MobilePage() {
 
         <nav className="mobile-tabbar" aria-label="手機主功能">
           <button type="button" className={tab === 'daily' ? 'is-active' : ''} onClick={() => setTab('daily')}>每日</button>
-          <button type="button" className={tab === 'match' ? 'is-active' : ''} onClick={() => setTab('match')}>媒合</button>
+          <button type="button" className={tab === 'match' ? 'is-active' : ''} onClick={() => setTab('match')}>引導</button>
           <button type="button" className={tab === 'ar' ? 'is-active' : ''} onClick={() => setTab('ar')}>AR</button>
           <button type="button" className={tab === 'teachers' ? 'is-active' : ''} onClick={() => setTab('teachers')}>老師</button>
         </nav>

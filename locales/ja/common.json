@@ -1,15 +1,16 @@
 {
   "meta": {
-    "siteName": "MELE Sea Star",
-    "title": "MELE Sea Star｜スピリチュアル診断・命理ツール・先生マッチング",
-    "description": "MELE Sea Star は、無料診断、命理ツール、自己理解、毎日のリチュアル、会員ポイント、先生マッチングを備えた多言語スピリチュアルコンテンツ平台です。",
+    "siteName": "MELE",
+    "title": "MELE｜多彩な自己理解ツール",
+    "description": "MELE は無料診断、タロット、ルーン、マヤ暦、四柱推命、ヒューマンデザイン、占星術、数秘術、毎日の儀式を通じて、自分を少しずつ理解するための多言語プラットフォームです。",
     "keywords": [
-      "スピリチュアル",
+      "自己理解",
+      "スピリチュアルツール",
       "タロット",
       "マヤ暦",
-      "八字",
-      "先生マッチング",
-      "自己分析"
+      "四柱推命",
+      "ヒューマンデザイン",
+      "数秘術"
     ]
   },
   "nav": {
@@ -17,11 +18,11 @@
     "daily": "毎日の儀式",
     "mobile": "モバイル",
     "ar": "AR",
-    "teachers": "先生探し",
+    "teachers": "相談ガイド",
     "login": "ログイン",
-    "teacherApply": "先生申請",
+    "teacherApply": "ガイド申請",
     "menu": "メニュー",
-    "mobileMenu": "モバイルメニュー",
+    "mobileMenu": "メニュー",
     "language": "言語",
     "myBookings": "相談履歴",
     "charts": "命盤",
@@ -34,29 +35,29 @@
     "privacy": "プライバシー",
     "tos": "利用規約",
     "disclaimer": "免責事項",
-    "teacherApply": "先生申請",
-    "copyright": "© MELE Sea Star | DIVINATION HUB"
+    "teacherApply": "ガイド申請",
+    "copyright": "MELE | SELF DISCOVERY HUB"
   },
   "home": {
-    "badge": "クローズドベータ | MARKET COMMAND CENTER",
-    "title": "MELE Sea Star",
-    "subtitle": "スピリチュアル洞察ハブ",
-    "description": "台湾、ベトナム、インドネシア、国際市場に向けて、無料診断、命理ツール、毎日のリチュアル、会員ポイント、先生マッチングをつなぐ多言語入口です。",
+    "badge": "Closed Beta | SELF DISCOVERY TOOLS",
+    "title": "MELE",
+    "subtitle": "多彩な自己理解ツール",
+    "description": "自分を知り、状態を整理し、次の選択を見つけるためのツール空間です。無料診断、毎日の儀式、深い解説を通じて、まず自分を理解し、必要なときだけ相談へ進めます。",
     "actions": {
       "daily": "毎日の儀式を始める",
       "tarot": "タロットを試す",
-      "teachers": "先生を探す"
+      "teachers": "必要なとき相談する"
     },
     "console": {
       "ariaLabel": "ベータ任務ボード",
       "label": "ベータ任務ボード",
-      "title": "会員導線と市場入口を準備済み",
+      "title": "自己探索の流れは準備できています",
       "tarotAlt": "Ocean Poseidon タロットカード",
       "mayaAlt": "マヤ暦 Yellow Human トーテム",
       "tasks": [
-        "まず無料診断で、自分のテーマを理解します。",
-        "会員は毎日200ポイントを受け取り、100ポイントで深い解説を開放できます。",
-        "先生用ブリーフが会員の文脈を相談につなげます。"
+        "まず無料ツールで、自分のエネルギー、リズム、今の状態を理解します。",
+        "会員は毎日 200 ポイントを受け取り、深く見たいときだけ 100 ポイントで解放します。",
+        "ガイドは深い対話が必要なときの選択肢であり、中心は自分を理解する体験です。"
       ]
     },
     "stats": [
@@ -81,15 +82,15 @@
         "hint": "タロットまたはルーンを一日一回選びます。"
       }
     ],
-    "marketsKicker": "MARKET GATEWAYS",
-    "marketsTitle": "多言語スピリチュアル市場入口",
-    "marketsBody": "ホームは台湾、ベトナム、インドネシア、英語国際版、そして準備中の日本・韓国市場へ導線を分けます。",
+    "marketsKicker": "MULTI-LANGUAGE ENTRY",
+    "marketsTitle": "多言語の自己理解入口",
+    "marketsBody": "台湾、ベトナム、インドネシア、英語圏、そして将来の日本・韓国市場が、それぞれの言語で同じツール体系に入れます。",
     "toolsKicker": "FREE TESTS",
-    "toolsTitle": "支払い前に信頼を育てる",
-    "toolsBody": "各市場ページには無料診断、役割分析、記事、短尺動画、SNS導線、先生マッチング CTA を用意します。",
+    "toolsTitle": "深掘りの前に、まず自分を理解する",
+    "toolsBody": "各市場ページには無料診断、人物分析、記事、短尺動画、SNS、必要なときの相談入口を用意します。",
     "roleKicker": "ROLE FLOW",
-    "roleTitle": "会員、先生、平台にそれぞれ明確な導線",
-    "roleBody": "会員は初級解説から始め、先生は文脈を受け取り、平台はコンテンツとSNSで成長します。",
+    "roleTitle": "会員、ガイド、プラットフォームの関係を明確に",
+    "roleBody": "会員は簡単な説明とインタラクティブなツールから始め、ガイドは深い対話を望むときだけ支えます。",
     "finalKicker": "READY FOR CLOSED BETA",
     "finalTitle": "測れる、分かる、戻ってくる状態から有料化へ",
     "finalBody": "多言語基盤は既存機能を保ちながら、公開コンテンツを管理しやすい JSON に移します。",
@@ -98,7 +99,7 @@
       "パス保持の言語切替",
       "多市場ホーム",
       "hreflang SEO",
-      "先生 CTA"
+      "相談入口"
     ],
     "tools": [
       {
@@ -159,16 +160,16 @@
         "action": "会員アーカイブへ"
       },
       {
-        "role": "先生",
-        "title": "相談前に文脈を受け取る",
-        "body": "先生ページでは質問、チャート情報、要約ブリーフを確認できます。",
+        "role": "ガイド",
+        "title": "深い対話が必要なときだけ支える",
+        "body": "ガイドは任意のサポートとして、会員の問いと背景を受け取り、より丁寧な対話につなげます。",
         "href": "/teacher-portal",
-        "action": "先生ポータルへ"
+        "action": "ガイド画面へ"
       },
       {
         "role": "平台",
         "title": "市場別コンテンツで成長",
-        "body": "各市場に記事、短尺動画、SNS、先生 CTA を配置できます。",
+        "body": "各市場に記事、短尺動画、SNS、相談 CTA を配置できます。",
         "href": "/admin/launch",
         "action": "公開チェックへ"
       }
@@ -180,7 +181,7 @@
         "locale": "zh-TW",
         "name": "台湾入口",
         "status": "主要市場",
-        "body": "繁体字、LINE、先生マッチング、毎日の儀式を中心にします。",
+        "body": "繁体字、LINE、相談導線、毎日の儀式を中心にします。",
         "href": "/zh-TW/spiritual"
       },
       {
@@ -194,7 +195,7 @@
         "locale": "id",
         "name": "インドネシア入口",
         "status": "主要市場",
-        "body": "インドネシア語コンテンツと先生協業を準備します。",
+        "body": "インドネシア語コンテンツとガイド協業を準備します。",
         "href": "/id/spiritual"
       },
       {
@@ -222,7 +223,7 @@
     "page": {
       "kicker": "SPIRITUAL MARKET",
       "heroTitle": "スピリチュアル市場入口",
-      "heroBody": "無料診断、自己分析、記事、短尺動画、公式SNS、先生マッチングのためのローカルページです。",
+      "heroBody": "無料診断、自己分析、記事、短尺動画、公式SNS、必要なときの相談入口を持つローカルページです。",
       "freeTests": "無料診断入口",
       "freeTestsBody": "数秘術、ヒューマンデザイン、タロット、マヤ暦、毎日の儀式を最初の体験導線にします。",
       "persona": "役割分析入口",
@@ -233,10 +234,10 @@
       "videoBody": "TikTok、Reels、Shorts、地域平台へ誘導します。",
       "social": "公式 LINE / SNS",
       "socialBody": "台湾は LINE、他市場は現地SNSへ切り替えられます。",
-      "teacherCta": "先生マッチング CTA",
-      "teacherCtaBody": "初級解説の後、相性の良い先生へ案内します。",
+      "teacherCta": "相談入口 CTA",
+      "teacherCtaBody": "初級解説の後、必要なときだけ相性の良いガイドへ進めます。",
       "primaryCta": "無料診断を始める",
-      "teacherCtaButton": "先生を探す"
+      "teacherCtaButton": "ガイドを探す"
     }
   },
   "language": {

@@ -1,15 +1,16 @@
 {
   "meta": {
-    "siteName": "MELE Sea Star",
-    "title": "MELE Sea Star | Platform spiritual, tes diri, dan pencocokan guru",
-    "description": "MELE Sea Star adalah platform konten spiritual multibahasa untuk tes gratis, alat divinasi, insight kepribadian, ritual harian, poin member, dan pencocokan guru.",
+    "siteName": "MELE",
+    "title": "MELE | Alat multibahasa untuk memahami diri",
+    "description": "MELE adalah platform multibahasa untuk memahami diri melalui tes gratis, tarot, rune, kalender Maya, Bazi, Human Design, astrologi, numerologi, ritual harian, dan poin member.",
     "keywords": [
-      "spiritual",
+      "memahami diri",
+      "alat spiritual",
       "tarot",
       "kalender Maya",
-      "bazi",
-      "pencocokan guru",
-      "analisis kepribadian"
+      "Bazi",
+      "Human Design",
+      "numerologi"
     ]
   },
   "nav": {
@@ -17,11 +18,11 @@
     "daily": "Ritual Harian",
     "mobile": "Mobile",
     "ar": "AR",
-    "teachers": "Guru",
+    "teachers": "Pemandu",
     "login": "Masuk",
-    "teacherApply": "Daftar Guru",
+    "teacherApply": "Daftar",
     "menu": "Menu",
-    "mobileMenu": "Menu mobile",
+    "mobileMenu": "Menu",
     "language": "Bahasa",
     "myBookings": "Sesi saya",
     "charts": "Chart saya",
@@ -34,29 +35,29 @@
     "privacy": "Privasi",
     "tos": "Ketentuan",
     "disclaimer": "Disclaimer",
-    "teacherApply": "Daftar Guru",
-    "copyright": "© MELE Sea Star | DIVINATION HUB"
+    "teacherApply": "Daftar Pemandu",
+    "copyright": "MELE | SELF DISCOVERY HUB"
   },
   "home": {
-    "badge": "Closed Beta | PUSAT PASAR",
-    "title": "MELE Sea Star",
-    "subtitle": "Gerbang insight spiritual",
-    "description": "Gerbang multibahasa untuk tes gratis, alat divinasi, ritual harian, poin member, dan pencocokan guru untuk Taiwan, Vietnam, Indonesia, dan pasar internasional.",
+    "badge": "Closed Beta | ALAT MEMAHAMI DIRI",
+    "title": "MELE",
+    "subtitle": "Ruang alat memahami diri",
+    "description": "Ruang alat multibahasa agar orang dapat memahami dirinya lebih dulu: tes gratis, alat reflektif, ritual harian, poin member, dan bacaan mendalam saat siap.",
     "actions": {
-      "daily": "Mulai ritual",
+      "daily": "Mulai ritual harian",
       "tarot": "Coba tarot",
-      "teachers": "Cari guru"
+      "teachers": "Cari panduan"
     },
     "console": {
       "ariaLabel": "Papan tugas beta",
       "label": "Papan tugas beta",
-      "title": "Perjalanan member dan gerbang pasar sudah siap",
+      "title": "Perjalanan memahami diri sudah siap",
       "tarotAlt": "Kartu tarot Ocean Poseidon",
       "mayaAlt": "Totem Maya Yellow Human",
       "tasks": [
-        "Mulai dari tes gratis agar pengunjung memahami diri terlebih dahulu.",
-        "Member dapat klaim 200 poin harian dan membuka bacaan dalam dengan 100 poin.",
-        "Brief guru membawa konteks member ke sesi konsultasi."
+        "Mulai dari alat gratis untuk memahami ritme, energi, dan keadaan saat ini.",
+        "Member mendapat 200 poin setiap hari dan dapat membuka bacaan mendalam dengan 100 poin.",
+        "Pemandu hanya opsi dukungan ketika pengguna ingin percakapan lebih dalam."
       ]
     },
     "stats": [
@@ -81,15 +82,15 @@
         "hint": "Pilih tarot atau rune sekali sehari agar ritme ritual lebih kuat."
       }
     ],
-    "marketsKicker": "MARKET GATEWAYS",
-    "marketsTitle": "Gerbang pasar spiritual multibahasa",
-    "marketsBody": "Beranda mengarahkan pasar Taiwan, Vietnam, Indonesia, English internasional, serta Jepang dan Korea yang disiapkan.",
+    "marketsKicker": "PINTU MASUK MULTIBAHASA",
+    "marketsTitle": "Pintu masuk memahami diri multibahasa",
+    "marketsBody": "Taiwan, Vietnam, Indonesia, Inggris, serta pasar Jepang/Korea dapat masuk ke sistem alat yang sama dalam bahasa masing-masing.",
     "toolsKicker": "FREE TESTS",
-    "toolsTitle": "Bangun kepercayaan sebelum pembayaran",
-    "toolsBody": "Setiap halaman pasar menyiapkan tes gratis, analisis persona, artikel, video pendek, kanal sosial, dan CTA guru.",
+    "toolsTitle": "Pahami diri sebelum melangkah lebih dalam",
+    "toolsBody": "Setiap halaman pasar menyiapkan tes gratis, analisis persona, artikel, video pendek, kanal sosial, dan akses panduan opsional.",
     "roleKicker": "ROLE FLOW",
-    "roleTitle": "Perjalanan jelas untuk member, guru, dan platform",
-    "roleBody": "Member melihat penjelasan pemula, guru menerima konteks, dan platform tumbuh lewat konten serta sosial.",
+    "roleTitle": "Alur jelas untuk member, pemandu, dan operator",
+    "roleBody": "Member mulai dari alat interaktif sederhana; pemandu hadir hanya saat dibutuhkan untuk pembicaraan lebih dalam.",
     "finalKicker": "READY FOR CLOSED BETA",
     "finalTitle": "Uji, jelaskan, dan bawa member kembali sebelum paid launch",
     "finalBody": "Fondasi multibahasa menjaga fitur yang ada dan memindahkan konten publik ke JSON yang mudah dirawat.",
@@ -98,7 +99,7 @@
       "Switcher menjaga path",
       "Beranda multi-pasar",
       "SEO hreflang",
-      "CTA guru"
+      "Akses panduan"
     ],
     "tools": [
       {
@@ -159,16 +160,16 @@
         "action": "Buka arsip member"
       },
       {
-        "role": "Guru",
-        "title": "Menerima konteks sebelum sesi",
-        "body": "Portal guru dapat menampilkan pertanyaan member, data chart, dan brief yang membantu.",
+        "role": "Pemandu",
+        "title": "Dukungan opsional untuk percakapan lebih dalam",
+        "body": "Pemandu hanya opsi dukungan ketika pengguna ingin percakapan lebih dalam.",
         "href": "/teacher-portal",
-        "action": "Buka portal guru"
+        "action": "Cari panduan"
       },
       {
         "role": "Platform",
         "title": "Tumbuh lewat konten khusus pasar",
-        "body": "Setiap pasar punya artikel, video pendek, sosial, dan CTA guru masing-masing.",
+        "body": "Setiap pasar punya artikel, video pendek, sosial, dan CTA panduan opsional masing-masing.",
         "href": "/admin/launch",
         "action": "Buka checklist"
       }
@@ -180,7 +181,7 @@
         "locale": "zh-TW",
         "name": "Gerbang Taiwan",
         "status": "Pasar utama",
-        "body": "Konten Mandarin Tradisional, LINE, guru, dan ritual harian.",
+        "body": "Konten Mandarin Tradisional, LINE, alur konsultasi, dan ritual harian.",
         "href": "/zh-TW/spiritual"
       },
       {
@@ -194,7 +195,7 @@
         "locale": "id",
         "name": "Gerbang Indonesia",
         "status": "Pasar utama",
-        "body": "Konten Indonesia, sosial, dan kolaborasi guru.",
+        "body": "Konten Indonesia, sosial, dan kolaborasi pemandu.",
         "href": "/id/spiritual"
       },
       {
@@ -222,7 +223,7 @@
     "page": {
       "kicker": "SPIRITUAL MARKET",
       "heroTitle": "Gerbang pasar spiritual",
-      "heroBody": "Landing page lokal untuk tes gratis, insight persona, artikel, video pendek, kanal resmi, dan pencocokan guru.",
+      "heroBody": "Landing page lokal untuk tes gratis, insight persona, artikel, video pendek, kanal resmi, dan alur konsultasi saat dibutuhkan.",
       "freeTests": "Pintu tes gratis",
       "freeTestsBody": "Numerologi, Human Design, tarot, kalender Maya, dan ritual harian menjadi lapisan interaksi pertama.",
       "persona": "Analisis persona",
@@ -233,10 +234,10 @@
       "videoBody": "Arahkan ke TikTok, Reels, Shorts, atau platform lokal.",
       "social": "LINE / kanal sosial resmi",
       "socialBody": "Taiwan dapat memakai LINE; pasar lain memakai kanal lokal.",
-      "teacherCta": "CTA pencocokan guru",
-      "teacherCtaBody": "Setelah bacaan pemula, arahkan member ke guru yang sesuai.",
+      "teacherCta": "CTA panduan opsional",
+      "teacherCtaBody": "Setelah bacaan pemula, member bisa lanjut ke pemandu yang sesuai hanya saat butuh dukungan lebih dalam.",
       "primaryCta": "Mulai tes gratis",
-      "teacherCtaButton": "Cari guru"
+      "teacherCtaButton": "Cari panduan"
     }
   },
   "language": {

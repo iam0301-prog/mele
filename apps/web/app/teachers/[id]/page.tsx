@@ -42,13 +42,13 @@ export default async function TeacherDetailPage({ params }: PageProps) {
   return (
     <main className="container mx-auto max-w-4xl px-5 py-10">
       <Link href="/teachers" className="text-accent text-xs tracking-widest hover:opacity-80">
-        返回老師媒合中心
+        返回諮詢老師入口
       </Link>
 
       <section className="mele-card mt-5">
         {isDemo && (
           <div className="mb-5 rounded-xl border border-accent-dim bg-black/25 p-4 text-sm leading-relaxed text-white/70">
-            這是本機示範老師，用來確認前台媒合、老師詳情與服務卡片的完整體驗；正式上線後會顯示 Supabase 審核通過的真實老師。
+            這是本機示範老師，用來確認前台諮詢引導、老師詳情與服務卡片的完整體驗；正式上線後會顯示 Supabase 審核通過的真實老師。
           </div>
         )}
 
@@ -58,7 +58,7 @@ export default async function TeacherDetailPage({ params }: PageProps) {
           </div>
           <div>
             <h1 className="font-serif text-3xl tracking-widest text-accent">{teacher.display_name}</h1>
-            <div className="mt-1 text-sm text-white/60">{teacher.title || '命理諮詢老師'}</div>
+            <div className="mt-1 text-sm text-white/60">{teacher.title || '自我探索諮詢老師'}</div>
             <div className="mt-3 text-sm text-yellow-400">
               {Number(teacher.rating || 0).toFixed(1)} 分
               <span className="text-white/60">（{teacher.total_reviews || 0} 則評價 · {teacher.cases_count || 0} 次諮詢）</span>
@@ -125,7 +125,7 @@ export default async function TeacherDetailPage({ params }: PageProps) {
                   <div className="font-serif text-2xl text-accent">NT$ {service.price_ntd.toLocaleString('zh-TW')}</div>
                   {isDemo ? (
                     <Link href="/mobile" className="mele-btn-secondary mt-2 !px-5 !py-2 !text-xs">
-                      回到媒合
+                      回到引導
                     </Link>
                   ) : (
                     <Link
@@ -144,7 +144,7 @@ export default async function TeacherDetailPage({ params }: PageProps) {
         <section className="mele-card text-center">
           <div className="mele-section-title">尚未開放預約</div>
           <p className="text-sm leading-relaxed text-white/68">
-            這位老師目前沒有公開服務項目。你可以先回到媒合中心查看其他老師，或稍後再回來確認。
+            這位老師目前沒有公開服務項目。你可以先回到諮詢老師入口查看其他老師，或稍後再回來確認。
           </p>
         </section>
       )}

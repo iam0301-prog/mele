@@ -106,11 +106,11 @@ test.describe('Closed beta premium flows', () => {
   test('homepage exposes the beta task board, points economy, and visual assets', async ({ page }) => {
     await page.goto('/');
 
-    await expect(page.getByRole('heading', { name: '海底之星 MELE' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'MELE' })).toBeVisible();
     await expect(page.getByLabel('封閉測試任務台')).toBeVisible();
     await expect(page.getByText('今日可領 200 點')).toBeVisible();
     await expect(page.getByText('會員付 100 點解鎖')).toBeVisible();
-    await expect(page.getByText('老師詳解備忘承接會員脈絡')).toBeVisible();
+    await expect(page.getByLabel('封閉測試任務台').getByText('老師只作為進一步諮詢選項')).toBeVisible();
     await expect(page.getByAltText('大海波賽頓塔羅卡面')).toBeVisible();
     await expect(page.getByAltText('瑪雅黃色人圖騰')).toBeVisible();
   });

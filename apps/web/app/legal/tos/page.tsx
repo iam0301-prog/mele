@@ -3,7 +3,7 @@ import Link from 'next/link';
 
 export const metadata: Metadata = {
   title: '服務條款｜MELE',
-  description: 'MELE 命理媒介中心的會員、老師、預約、付款、退款與申訴規則。',
+  description: 'MELE 多元自我理解工具平台的會員、老師、預約、付款、退款與申訴規則。',
 };
 
 const userTerms = [

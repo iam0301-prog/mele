@@ -1,15 +1,10 @@
-import Link from 'next/link';
 import { headers } from 'next/headers';
-import { DEFAULT_LOCALE, LOCALE_HEADER, getDictionary, isLocale, localizePath } from '@/lib/i18n';
+import Link from 'next/link';
+import { DEFAULT_LOCALE, LOCALE_HEADER, getDictionary, isLocale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
 import { getServerTestUser } from '@/lib/test-auth-server';
-import { HeaderUserMenu } from './HeaderUserMenu';
-import { LanguageSwitcher } from './LanguageSwitcher';
 import { MobileHeaderMenu } from './MobileHeaderMenu';
 import { SeaStarLogo } from './SeaStarLogo';
-
-const linkClass =
-  'rounded-full border border-accent-dim bg-black/50 px-4 py-1.5 text-xs tracking-widest text-accent backdrop-blur transition-colors hover:border-accent';
 
 export async function Header() {
   const requestHeaders = await headers();
@@ -43,52 +38,11 @@ export async function Header() {
     { href: '/teachers/apply', label: dict.nav.teacherApply },
   ];
 
-  const publicLinks = (
-    <>
-      {primaryLinks.map((item) => (
-        <Link key={item.href} href={localizePath(item.href, locale)} className={linkClass}>
-          {item.label}
-        </Link>
-      ))}
-    </>
-  );
-
   return (
     <header className="fixed left-0 right-0 top-0 z-[100] flex items-start justify-between gap-2 px-4 py-3">
-      <Link
-        href={`/${locale}`}
-        className="header-brand-link"
-      >
+      <Link href={`/${locale}`} className="header-brand-link">
         <SeaStarLogo />
       </Link>
-
-      <nav className="ml-auto hidden gap-2 md:flex">
-        {publicLinks}
-        <LanguageSwitcher label={dict.language.label} />
-        {user || testUser ? (
-          <HeaderUserMenu
-            displayName={displayName}
-            isAdmin={isAdmin}
-            locale={locale}
-            labels={{
-              myBookings: dict.nav.myBookings,
-              charts: dict.nav.charts,
-              profile: dict.nav.profile,
-              dataRights: dict.nav.dataRights,
-              admin: dict.nav.admin,
-              signOut: dict.nav.signOut,
-            }}
-          />
-        ) : (
-          <>
-            {guestLinks.map((item) => (
-              <Link key={item.href} href={localizePath(item.href, locale)} className={linkClass}>
-                {item.label}
-              </Link>
-            ))}
-          </>
-        )}
-      </nav>
 
       <MobileHeaderMenu
         isSignedIn={Boolean(user || testUser)}

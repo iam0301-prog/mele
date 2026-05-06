@@ -1,16 +1,23 @@
 {
-  "name": "海底之星 MELE",
-  "short_name": "海底之星",
-  "description": "每日儀式、AR 解盤、命理工具與老師媒合的線上命理 App。",
+  "name": "MELE",
+  "short_name": "MELE",
+  "description": "多元自我理解工具、每日儀式、會員點數與深入解讀的自我探索 App。",
   "start_url": "/mobile",
   "scope": "/",
   "display": "standalone",
-  "display_override": ["standalone", "fullscreen", "browser"],
+  "display_override": [
+    "standalone",
+    "fullscreen",
+    "browser"
+  ],
   "orientation": "portrait",
   "theme_color": "#0D1B2A",
   "background_color": "#050B16",
   "lang": "zh-TW",
-  "categories": ["lifestyle", "utilities"],
+  "categories": [
+    "lifestyle",
+    "utilities"
+  ],
   "icons": [
     {
       "src": "/icons/icon.svg",
@@ -22,20 +29,20 @@
   "shortcuts": [
     {
       "name": "每日儀式",
-      "short_name": "每日",
-      "description": "查看今日解讀、抽塔羅與盧恩。",
+      "short_name": "儀式",
+      "description": "領取點數並完成今日練習",
       "url": "/daily"
     },
     {
-      "name": "手機版",
-      "short_name": "手機",
-      "description": "開啟 App 版每日儀式。",
+      "name": "手機工具",
+      "short_name": "工具",
+      "description": "開啟自我探索工具入口",
       "url": "/mobile"
     },
     {
-      "name": "找老師",
-      "short_name": "老師",
-      "description": "尋找適合的命理老師。",
+      "name": "諮詢入口",
+      "short_name": "諮詢",
+      "description": "需要時尋找進一步引導",
       "url": "/teachers"
     }
   ]

@@ -193,7 +193,7 @@ function BookFormInner() {
   if (!teacherId || !serviceId) {
     return (
       <div className="container mx-auto px-5 py-16 text-center text-white/60">
-        缺少老師或服務參數。請回到老師媒合中心重新選擇。
+        缺少老師或服務參數。請回到諮詢老師入口重新選擇。
       </div>
     );
   }

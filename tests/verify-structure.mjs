@@ -356,7 +356,14 @@ log(
 const appLayout = readFileSync('apps/web/app/layout.tsx', 'utf8');
 const manifest = readFileSync('apps/web/public/manifest.json', 'utf8');
 const serviceWorker = readFileSync('apps/web/public/sw.js', 'utf8');
-log('PWA manifest is app-ready Traditional Chinese', manifest.includes('"name": "海底之星 MELE"') && manifest.includes('"short_name": "海底之星"') && manifest.includes('"start_url": "/mobile"') && manifest.includes('"display": "standalone"'));
+log(
+  'PWA manifest is app-ready Traditional Chinese',
+  manifest.includes('"name": "MELE"') &&
+    manifest.includes('"short_name": "MELE"') &&
+    manifest.includes('自我探索 App') &&
+    manifest.includes('"start_url": "/mobile"') &&
+    manifest.includes('"display": "standalone"'),
+);
 log('PWA service worker precaches mobile app shell', serviceWorker.includes("'/mobile'") && serviceWorker.includes('CACHE_NAME') && serviceWorker.includes("caches.match('/mobile')"));
 log('app metadata is localized and installable', appLayout.includes('generateMetadata') && appLayout.includes("manifest: '/manifest.json'") && appLayout.includes('applicationName: dictionary.meta.siteName') && appLayout.includes('buildLocalizedMetadata'));
 log('layout renders cookie consent banner', appLayout.includes('CookieConsentBanner'));
@@ -439,11 +446,13 @@ log('local test auth is gated to localhost free test mode', testAuth.includes('N
 log('login offers local test auth fallback', login.includes('使用本機測試帳號') && login.includes('setClientTestAuth') && login.includes('canUseClientTestAuth'));
 log('server header recognizes local test auth cookie', header.includes('getServerTestUser') && header.includes('testUser'));
 log(
-  'header uses Sea Star brand mark instead of text-only logo',
+  'header uses compact MELE brand mark and right-side menu',
   header.includes('SeaStarLogo') &&
-    brandLogo.includes('海底之星') &&
     brandLogo.includes('MELE') &&
+    !brandLogo.includes('海底' + '之星') &&
     brandLogo.includes('sea-star-logo') &&
+    header.includes('MobileHeaderMenu') &&
+    !header.includes('LanguageSwitcher') &&
     brandGlobalCss.includes('.sea-star-logo'),
 );
 log(
@@ -533,7 +542,15 @@ const zhCommon = readFileSync('locales/zh-TW/common.json', 'utf8');
 const homeGlobalCss = readFileSync('apps/web/app/globals.css', 'utf8');
 log('home page does not render AR stage directly', !homePage.includes('ArRelicStage'));
 log('root home redirects to default Traditional Chinese locale', rootHomePage.includes("redirect(defaultCanonicalPath())"));
-log('localized home has clear Traditional Chinese positioning', zhCommon.includes('海底之星 MELE') && zhCommon.includes('命理媒介中心') && zhCommon.includes('八種命理入口') && zhCommon.includes('從自助探索走向專業諮詢'));
+log(
+  'localized home has clear Traditional Chinese self-discovery positioning',
+  zhCommon.includes('MELE｜多元自我理解工具平台') &&
+    zhCommon.includes('多元自我理解工具') &&
+    zhCommon.includes('先理解自己，再決定要不要深入') &&
+    zhCommon.includes('八種命理入口') &&
+    !zhCommon.includes('海底' + '之星') &&
+    !zhCommon.includes('老師' + '媒合'),
+);
 log(
   'localized home presents premium closed-beta command center',
   [
@@ -543,7 +560,7 @@ log(
     '封閉測試任務台',
     '今日可領 200 點',
     '會員付 100 點解鎖',
-    '老師詳解備忘',
+    '老師只作為進一步諮詢選項',
   ].every((token) => homePage.includes(token) || zhCommon.includes(token)) &&
   [
     'home-hero',
@@ -565,7 +582,12 @@ log(
 
 const mobileHeaderMenu = readFileSync('apps/web/components/MobileHeaderMenu.tsx', 'utf8');
 log('header uses controlled mobile drawer navigation', header.includes('MobileHeaderMenu') && mobileHeaderMenu.includes('usePathname') && mobileHeaderMenu.includes('setOpen(false)') && mobileHeaderMenu.includes('pointerdown') && mobileHeaderMenu.includes('Escape'));
-log('header has localized navigation and language switcher', ['LanguageSwitcher', 'localizePath', 'getDictionary', 'LOCALE_HEADER'].every((token) => header.includes(token)) && ['\u6bcf\u65e5\u5100\u5f0f', '\u624b\u6a5f\u7248', 'AR \u9ad4\u9a57', '\u8001\u5e2b\u5a92\u5408', '\u514d\u8cac\u8072\u660e', '\u767b\u5165', '\u8001\u5e2b\u7533\u8acb'].every((token) => zhCommon.includes(token)));
+log(
+  'header has localized right-side navigation and language switcher',
+  ['getDictionary', 'LOCALE_HEADER', 'primaryLinks', 'guestLinks', 'MobileHeaderMenu'].every((token) => header.includes(token)) &&
+    ['LanguageSwitcher', 'localizePath'].every((token) => mobileHeaderMenu.includes(token)) &&
+    ['\u6bcf\u65e5\u5100\u5f0f', '\u624b\u6a5f\u7248', 'AR \u9ad4\u9a57', '\u8aee\u8a62\u8001\u5e2b', '\u514d\u8cac\u8072\u660e', '\u767b\u5165', '\u8001\u5e2b\u7533\u8acb'].every((token) => zhCommon.includes(token)),
+);
 
 const teacherPortal = readFileSync('apps/web/app/teacher-portal/page.tsx', 'utf8');
 log('teacher portal localizes booking status', teacherPortal.includes('STATUS_LABEL') && teacherPortal.includes('已付款') && teacherPortal.includes('待付款'));
@@ -615,7 +637,7 @@ log(
 const teacherDetailPage = readFileSync('apps/web/app/teachers/[id]/page.tsx', 'utf8');
 log('teacher detail page supports conversion trust blocks', ['適合對象', '諮詢方式', '平台保障', '尚未開放預約'].every((token) => teacherDetailPage.includes(token)));
 const teachersPage = readFileSync('apps/web/app/teachers/page.tsx', 'utf8');
-log('teacher list page has clean matching copy', ['命理媒合中心', '進入手機媒合', '查看老師詳情', '申請成為 MELE 命理老師'].every((token) => teachersPage.includes(token)));
+log('teacher list page has self-discovery consultation copy', ['諮詢老師入口', '進入諮詢引導', '查看老師詳情', '申請成為 MELE 諮詢老師'].every((token) => teachersPage.includes(token)) && !teachersPage.includes('命理' + '媒合中心'));
 
 const teacherApplyPage = readFileSync('apps/web/app/teachers/apply/page.tsx', 'utf8');
 log(
@@ -670,9 +692,9 @@ log('mobile page has phone app shell', mobilePage.includes('mobile-shell') && mo
 log('mobile page opens AR only after a reading result', mobilePage.includes('ToolResultSection') && mobilePage.includes('activeResult.tool') && !mobilePage.includes('ArRelicStage'));
 log('mobile page supports daily tarot and runes', mobilePage.includes("draw('tarot')") && mobilePage.includes("draw('runes')"));
 log('mobile page preserves tarot styles and rune materials', ['MOBILE_TAROT_STYLES', 'MOBILE_RUNE_MATERIALS', 'tarot_style: tarotStyle', 'material: runeMaterial', 'mobile-style-panel'].every((token) => mobilePage.includes(token)));
-log('mobile page includes matching quest flow', ['MATCHING QUEST', '命理媒合', '產生排行榜', '保存這次媒合', 'match_sessions'].every((token) => mobilePage.includes(token)));
+log('mobile page includes guidance flow', ['GUIDANCE PATH', '諮詢引導', '整理建議', '保存這次建議', 'match_sessions'].every((token) => mobilePage.includes(token)) && !mobilePage.includes('命理' + '媒合'));
 const matchingHelper = readFileSync('apps/web/lib/teacher-matching.ts', 'utf8');
-log('teacher matching helper scores fixed dimensions', ['scoreTeacherMatch', 'rankTeacherMatches', 'buildMatchReasons', 'return 40', 'styleScore', 'trustScore', 'keywordScore'].every((token) => matchingHelper.includes(token)));
+log('guidance helper scores fixed dimensions', ['scoreTeacherMatch', 'rankTeacherMatches', 'buildMatchReasons', 'return 40', 'styleScore', 'trustScore', 'keywordScore'].every((token) => matchingHelper.includes(token)));
 log('matching types are exposed', ['MatchAnswers', 'TeacherMatchResult', 'MatchSession'].every((token) => readFileSync('apps/web/types/db.ts', 'utf8').includes(token)));
 const mobileGlobalCss = readFileSync('apps/web/app/globals.css', 'utf8');
 log('mobile result SVGs do not create horizontal empty space', ['.mobile-app .mele-svg-wrap', 'overflow-x: hidden', '.mobile-app .mele-svg-wrap--tarot svg', 'max-width: 100%'].every((token) => mobileGlobalCss.includes(token)));

@@ -1,16 +1,16 @@
 {
   "meta": {
-    "siteName": "海底之星 MELE",
-    "title": "海底之星 MELE｜身心靈、命理工具與老師媒合平台",
-    "description": "海底之星 MELE 是多市場身心靈內容平台，提供免費測驗、命理工具、角色分析、每日儀式、會員點數與老師媒合。",
+    "siteName": "MELE",
+    "title": "MELE｜多元自我理解工具平台",
+    "description": "MELE 是多語系自我理解工具平台，提供免費測驗、塔羅、盧恩、瑪雅曆、八字、紫微、人類圖、占星、生命靈數與每日儀式，陪使用者一步步認識自己。",
     "keywords": [
-      "身心靈",
-      "命理",
+      "自我理解",
+      "身心靈工具",
       "塔羅",
-      "馬雅曆",
+      "瑪雅曆",
       "八字",
-      "老師媒合",
-      "人格分析"
+      "人類圖",
+      "生命靈數"
     ]
   },
   "nav": {
@@ -18,11 +18,11 @@
     "daily": "每日儀式",
     "mobile": "手機版",
     "ar": "AR 體驗",
-    "teachers": "老師媒合",
+    "teachers": "諮詢老師",
     "login": "登入",
     "teacherApply": "老師申請",
     "menu": "選單",
-    "mobileMenu": "手機選單",
+    "mobileMenu": "選單",
     "language": "語言",
     "myBookings": "我的諮詢",
     "charts": "我的命盤",
@@ -36,28 +36,28 @@
     "tos": "服務條款",
     "disclaimer": "免責聲明",
     "teacherApply": "老師申請",
-    "copyright": "© 海底之星 MELE ｜ DIVINATION HUB"
+    "copyright": "MELE | SELF DISCOVERY HUB"
   },
   "home": {
-    "badge": "封閉測試版 ｜ CLOSED BETA COMMAND CENTER",
-    "title": "海底之星 MELE",
-    "subtitle": "命理媒介中心",
-    "description": "從免費測驗、八種命理入口、每日儀式到老師媒合，陪會員先認識自己，再從自助探索走向專業諮詢。",
+    "badge": "Closed Beta | SELF DISCOVERY TOOLS",
+    "title": "MELE",
+    "subtitle": "多元自我理解工具",
+    "description": "一個讓使用者先認識自己、整理狀態、看見選擇的多元工具平台。從免費測驗、每日儀式到深入解讀，先陪你理解自己，再決定是否需要進一步諮詢。",
     "actions": {
       "daily": "開始每日儀式",
-      "tarot": "先抽一組塔羅",
-      "teachers": "尋找適合老師"
+      "tarot": "試抽塔羅",
+      "teachers": "需要時找老師"
     },
     "console": {
       "ariaLabel": "封閉測試任務台",
       "label": "封閉測試任務台",
-      "title": "會員旅程與市場入口已上線",
+      "title": "自我探索流程已準備好",
       "tarotAlt": "大海波賽頓塔羅卡面",
       "mayaAlt": "瑪雅黃色人圖騰",
       "tasks": [
-        "先用免費測驗理解自己的主題。",
-        "每天可領 200 點，付 100 點解鎖深入解釋。",
-        "老師詳解備忘承接會員脈絡，諮詢前更好準備。"
+        "先用免費工具了解自己的能量、節奏與當下狀態。",
+        "會員每天領 200 點，想深入時再用 100 點解鎖詳解。",
+        "老師只作為進一步諮詢選項，平台核心仍是讓使用者先看懂自己。"
       ]
     },
     "stats": [
@@ -82,15 +82,15 @@
         "hint": "每日塔羅或每日盧恩擇一，讓互動更有節奏。"
       }
     ],
-    "marketsKicker": "MARKET GATEWAYS",
-    "marketsTitle": "多市場身心靈入口",
-    "marketsBody": "首頁先作為台灣、越南、印尼與國際市場的總入口；日文與韓文先保留預備入口，之後可由 JSON 或後台擴充內容。",
+    "marketsKicker": "MULTI-LANGUAGE ENTRY",
+    "marketsTitle": "多語系自我理解入口",
+    "marketsBody": "台灣、越南、印尼、英文與未來日韓市場，都能用各自語言進入同一套自我探索工具。",
     "toolsKicker": "FREE TESTS",
-    "toolsTitle": "先用免費測驗建立信任",
-    "toolsBody": "每個市場都預留免費測驗、角色分析、文章、短影音、社群導流與老師媒合 CTA，讓新會員不用一開始就付費。",
+    "toolsTitle": "先理解自己，再決定要不要深入",
+    "toolsBody": "每個市場頁保留免費測驗、角色分析、文章、短影音、社群導流與諮詢入口，讓新會員不用一開始就付費。",
     "roleKicker": "ROLE FLOW",
-    "roleTitle": "會員、老師、平台各有清楚路徑",
-    "roleBody": "會員先看初階解釋，老師能看更完整脈絡，平台則用內容與社群導流持續養成信任。",
+    "roleTitle": "會員、老師與平台的關係更清楚",
+    "roleBody": "會員先看到初階解釋與可互動工具；老師只在會員需要深聊時承接更完整的背景。",
     "finalKicker": "READY FOR CLOSED BETA",
     "finalTitle": "先做到能測、能懂、能回訪，再走向正式收費",
     "finalBody": "多語系骨架會保留既有功能，並把公開入口改成可長期維護的內容架構。",
@@ -99,7 +99,7 @@
       "語言切換保留路徑",
       "多市場首頁",
       "hreflang SEO",
-      "老師媒合 CTA"
+      "諮詢入口"
     ],
     "tools": [
       {
@@ -160,16 +160,16 @@
         "action": "查看會員解讀庫"
       },
       {
-        "role": "老師",
-        "title": "承接會員詳解與問題脈絡",
-        "body": "老師後台可看到會員已附資料、提問與詳解備忘，諮詢前能更快掌握重點。",
+        "role": "諮詢老師",
+        "title": "需要深聊時再找老師",
+        "body": "老師只作為進一步諮詢選項，平台核心仍是讓使用者先看懂自己。",
         "href": "/teacher-portal",
-        "action": "前往老師後台"
+        "action": "需要時找老師"
       },
       {
         "role": "平台",
         "title": "用內容與市場入口養成信任",
-        "body": "台灣、越南、印尼與國際入口能分別放文章、短影音、社群帳號與老師媒合 CTA。",
+        "body": "台灣、越南、印尼與國際入口能分別放文章、短影音、社群帳號與諮詢入口。",
         "href": "/admin/launch",
         "action": "查看發布檢查"
       }
@@ -181,7 +181,7 @@
         "locale": "zh-TW",
         "name": "台灣身心靈入口",
         "status": "主要市場",
-        "body": "以繁體中文、LINE 導流、老師媒合與每日儀式為核心。",
+        "body": "以繁體中文、LINE 導流、自我理解工具與每日儀式為核心。",
         "href": "/zh-TW/spiritual"
       },
       {
@@ -223,7 +223,7 @@
     "page": {
       "kicker": "SPIRITUAL MARKET",
       "heroTitle": "身心靈市場入口",
-      "heroBody": "這裡預留該市場的免費測驗、角色分析、文章、短影音、官方社群與老師媒合入口。",
+      "heroBody": "這裡預留該市場的免費測驗、角色分析、文章、短影音、官方社群與諮詢入口。",
       "freeTests": "免費測驗入口",
       "freeTestsBody": "生命靈數、人類圖、塔羅、馬雅曆與每日儀式適合作為第一層互動。",
       "persona": "角色分析入口",
@@ -234,7 +234,7 @@
       "videoBody": "預留 TikTok、Reels、Shorts 或在地平台的內容導流。",
       "social": "官方 LINE / 社群帳號",
       "socialBody": "台灣以 LINE 為主，其他市場可切換成當地社群帳號。",
-      "teacherCta": "老師媒合 CTA",
+      "teacherCta": "諮詢入口",
       "teacherCtaBody": "當會員完成初階探索後，引導他找合適老師進一步解讀。",
       "primaryCta": "開始免費測驗",
       "teacherCtaButton": "尋找老師"
