@@ -1,21 +1,18 @@
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
+import { headers } from 'next/headers';
+import { DEFAULT_LOCALE, LOCALE_HEADER, isLocale, localizePath, type Locale } from '@/lib/i18n';
+import {
+  getTeacherCopy,
+  localizeDemoService,
+  localizeDemoTeacher,
+  teacherLocaleTag,
+  type TeacherCopy,
+} from '@/lib/i18n/teacher-copy';
 import { createClient } from '@/lib/supabase/server';
 import { buildTeacherReadingBrief, type TeacherReadingBrief } from '@/lib/member-unlocks';
 import { getServerTestUser } from '@/lib/test-auth-server';
 import type { Teacher } from '@/types/db';
-
-const STATUS_LABEL: Record<string, string> = {
-  pending: '待付款',
-  paid: '已付款',
-  confirmed: '已確認',
-  in_progress: '進行中',
-  completed: '已完成',
-  cancelled_customer: '客戶取消',
-  cancelled_teacher: '老師取消',
-  refunded: '已退款',
-  no_show: '未出席',
-};
 
 type TeacherBriefCard = {
   id: string;
@@ -37,23 +34,29 @@ type BookingRow = {
 
 function TeacherMemberBriefPanel({
   cards,
+  copy,
+  statusLabels,
+  localeTag,
   demoMode = false,
 }: {
   cards: TeacherBriefCard[];
+  copy: TeacherCopy['portal']['memberBrief'];
+  statusLabels: TeacherCopy['statusLabels'];
+  localeTag: string;
   demoMode?: boolean;
 }) {
   return (
-    <section className="teacher-member-brief" aria-label="會員詳解備忘">
+    <section className="teacher-member-brief" aria-label={copy.aria}>
       <div className="teacher-member-brief__header">
-        <span>MEMBER CONTEXT</span>
-        <h2>會員詳解備忘</h2>
+        <span>{copy.kicker}</span>
+        <h2>{copy.title}</h2>
         <p>
-          會員前台先看簡易解釋；深入解釋、流日、流月、流年會以點數或付費解鎖。老師端在諮詢前可先看會員提問與盤面脈絡，使解讀有本可循。
+          {copy.body}
         </p>
       </div>
       {cards.length === 0 && (
         <div className="teacher-member-brief__empty">
-          尚未有可讀取的會員盤面。待會員預約並附上提問或排盤資料後，這裡會整理成老師用備忘卡。
+          {copy.empty}
         </div>
       )}
       {cards.length > 0 && (
@@ -61,8 +64,8 @@ function TeacherMemberBriefPanel({
           {cards.map((card) => (
             <article key={card.id} className="teacher-member-brief__item">
               <div className="teacher-member-brief__meta">
-                <span>{STATUS_LABEL[card.status] ?? card.status}</span>
-                {card.scheduledAt && <time>{new Date(card.scheduledAt).toLocaleString('zh-TW')}</time>}
+                <span>{statusLabels[card.status] ?? card.status}</span>
+                {card.scheduledAt && <time>{new Date(card.scheduledAt).toLocaleString(localeTag)}</time>}
               </div>
               <h3>{card.brief.title}</h3>
               <p>{card.brief.summary}</p>
@@ -80,9 +83,69 @@ function TeacherMemberBriefPanel({
       )}
       {demoMode && (
         <p className="teacher-member-brief__note">
-          本機測試模式僅示範資料結構；正式會員付點數解鎖後，後台會依預約與排盤紀錄銜接。
+          {copy.demoNote}
         </p>
       )}
+    </section>
+  );
+}
+
+function TeacherReadingAssistPanel({
+  cards,
+  copy,
+}: {
+  cards: TeacherBriefCard[];
+  copy: TeacherCopy['portal']['assist'];
+}) {
+  const primary = cards[0];
+  const question = primary?.brief.items.find((item) => item.label === '所問')?.body ?? primary?.brief.summary;
+  const chart = primary?.brief.items.find((item) => item.label === '所附')?.body;
+  const prep = primary?.brief.items.find((item) => item.label === '老師備註')?.body;
+
+  return (
+    <section className="teacher-member-brief teacher-reading-assist" aria-label={copy.aria}>
+      <div className="teacher-member-brief__header">
+        <span>{copy.kicker}</span>
+        <h2>{copy.title}</h2>
+        <p>{copy.body}</p>
+      </div>
+
+      {!primary && <div className="teacher-member-brief__empty">{copy.empty}</div>}
+
+      {primary && (
+        <div className="teacher-member-brief__grid">
+          <article className="teacher-member-brief__item">
+            <div className="teacher-member-brief__meta"><span>{copy.questionTitle}</span></div>
+            <h3>{primary.brief.title}</h3>
+            <p>{question}</p>
+          </article>
+          <article className="teacher-member-brief__item">
+            <div className="teacher-member-brief__meta"><span>{copy.chartTitle}</span></div>
+            <p>{chart}</p>
+          </article>
+          <article className="teacher-member-brief__item">
+            <div className="teacher-member-brief__meta"><span>{copy.prepTitle}</span></div>
+            <p>{prep}</p>
+          </article>
+        </div>
+      )}
+
+      <div className="teacher-member-brief__grid">
+        {[
+          [copy.openingTitle, copy.openingQuestions],
+          [copy.boundaryTitle, copy.boundaries],
+          [copy.transitTitle, copy.transitPrompts],
+        ].map(([title, items]) => (
+          <article key={title as string} className="teacher-member-brief__item">
+            <h3>{title as string}</h3>
+            <ul>
+              {(items as string[]).map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+          </article>
+        ))}
+      </div>
     </section>
   );
 }
@@ -92,12 +155,16 @@ function TeacherPortalReadiness({
   activeServiceCount,
   pendingActionCount,
   isFreeTestMode,
+  copy,
+  locale,
   demoMode = false,
 }: {
   teacher: Teacher;
   activeServiceCount: number;
   pendingActionCount: number;
   isFreeTestMode: boolean;
+  copy: TeacherCopy['portal'];
+  locale: Locale;
   demoMode?: boolean;
 }) {
   const profileReady = Boolean(
@@ -109,39 +176,39 @@ function TeacherPortalReadiness({
   const contactReady = Boolean(teacher.line_url || teacher.instagram || teacher.facebook || teacher.website);
   const items = [
     {
-      title: '公開頁完整度',
-      body: profileReady ? '名稱、頭銜、簡介與專長已具備，客人能快速判斷是否適合。' : '請補齊頭銜、短介紹與專長，公開頁才會像一位可信任的老師。',
+      title: copy.readiness.items.profile[0],
+      body: profileReady ? copy.readiness.items.profile[1] : copy.readiness.items.profile[2],
       done: profileReady,
     },
     {
-      title: '服務項目已設定',
-      body: activeServiceCount > 0 ? `目前有 ${activeServiceCount} 個上架服務，可承接預約。` : '請先請平台管理員設定服務名稱、時長與測試期價格。',
+      title: copy.readiness.items.services[0],
+      body: activeServiceCount > 0 ? copy.readiness.items.services[1](activeServiceCount) : copy.readiness.items.services[2],
       done: activeServiceCount > 0,
     },
     {
-      title: '預約處理節奏',
-      body: pendingActionCount > 0 ? `有 ${pendingActionCount} 筆諮詢需要留意，請在諮詢前主動確認問題。` : '目前沒有待處理預約，可以先檢查服務介紹與聯絡方式。',
+      title: copy.readiness.items.bookings[0],
+      body: pendingActionCount > 0 ? copy.readiness.items.bookings[1](pendingActionCount) : copy.readiness.items.bookings[2],
       done: pendingActionCount === 0,
     },
     {
-      title: '測試模式提醒',
-      body: isFreeTestMode ? '目前為免費測試期，先用真實流程驗證預約與通知，不向客人收費。' : '正式收費模式下，請先確認金流、取消政策與客服回覆節奏。',
+      title: copy.readiness.items.testMode[0],
+      body: isFreeTestMode ? copy.readiness.items.testMode[1] : copy.readiness.items.testMode[2],
       done: isFreeTestMode,
     },
     {
-      title: '聯絡資訊',
-      body: contactReady ? '已有 LINE 或社群連結，平台能在補件與諮詢前快速聯繫。' : '建議至少補 LINE 或一個公開社群，減少預約前溝通落差。',
+      title: copy.readiness.items.contact[0],
+      body: contactReady ? copy.readiness.items.contact[1] : copy.readiness.items.contact[2],
       done: contactReady,
     },
   ];
   const completed = items.filter((item) => item.done).length;
 
   return (
-    <section className="teacher-readiness" aria-label="後台準備度">
+    <section className="teacher-readiness" aria-label={copy.readiness.aria}>
       <div className="teacher-readiness__header">
-        <span>後台準備度</span>
-        <h2>{completed} / {items.length} 項已完成</h2>
-        <p>這裡把老師後台最容易漏掉的營運事項整理成清單，測試網站時可以一項一項驗。</p>
+        <span>{copy.readiness.kicker}</span>
+        <h2>{copy.readiness.title(completed, items.length)}</h2>
+        <p>{copy.readiness.body}</p>
       </div>
       <div className="teacher-readiness__progress" aria-hidden="true">
         <i style={{ width: `${completed / items.length * 100}%` }} />
@@ -149,15 +216,15 @@ function TeacherPortalReadiness({
       <div className="teacher-readiness__grid">
         {items.map((item) => (
           <article key={item.title} className={`teacher-readiness__item${item.done ? ' is-complete' : ''}`}>
-            <strong>{item.done ? 'OK' : '待確認'}</strong>
+            <strong>{item.done ? copy.readiness.ok : copy.readiness.todo}</strong>
             <h3>{item.title}</h3>
             <p>{item.body}</p>
           </article>
         ))}
       </div>
       <div className="teacher-readiness__actions">
-        <Link href={demoMode ? '/teachers' : `/teachers/${teacher.id}`}>查看公開頁</Link>
-        <Link href="/account/mybookings">查看我的諮詢</Link>
+        <Link href={demoMode ? localizePath('/teachers', locale) : localizePath(`/teachers/${teacher.id}`, locale)}>{copy.publicPage}</Link>
+        <Link href={localizePath('/account/mybookings', locale)}>{copy.bookings}</Link>
       </div>
     </section>
   );
@@ -194,12 +261,18 @@ const demoTeacher: Teacher = {
 };
 
 export default async function TeacherPortalPage() {
+  const requestHeaders = await headers();
+  const headerLocale = requestHeaders.get(LOCALE_HEADER);
+  const locale = isLocale(headerLocale) ? headerLocale : DEFAULT_LOCALE;
+  const copy = getTeacherCopy(locale);
+  const localeTag = teacherLocaleTag(locale);
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   const testUser = user ? null : await getServerTestUser();
-  if (!user && !testUser) redirect('/account/login?return=/teacher-portal');
+  if (!user && !testUser) redirect(localizePath('/account/login?return=/teacher-portal', locale));
 
   if (testUser) {
+    const localizedDemoTeacher = localizeDemoTeacher(demoTeacher, locale);
     const demoBookings = [
       { id: 'demo-1', status: 'confirmed', amount_ntd: 0, scheduled_at: new Date(Date.now() + 86400000).toISOString() },
       { id: 'demo-2', status: 'completed', amount_ntd: 0, scheduled_at: new Date(Date.now() - 86400000 * 2).toISOString() },
@@ -207,7 +280,7 @@ export default async function TeacherPortalPage() {
     const demoServices = [
       { id: 'service-1', name: '測試塔羅諮詢', duration_minutes: 30, price_ntd: 0, is_active: true },
       { id: 'service-2', name: '測試八字初談', duration_minutes: 45, price_ntd: 0, is_active: true },
-    ];
+    ].map((service) => localizeDemoService(service, locale));
     const pendingActionCount = demoBookings.filter((b) => ['paid', 'confirmed'].includes(b.status)).length;
     const demoBriefCards: TeacherBriefCard[] = [
       {
@@ -226,65 +299,75 @@ export default async function TeacherPortalPage() {
       <div className="container mx-auto max-w-5xl px-5 py-10">
         <header className="text-center pb-6">
           <div className="text-accent tracking-[0.5em] text-sm mb-3 opacity-70">◆ ◆ ◆</div>
-          <h1 className="font-serif text-3xl tracking-widest mb-1">老師後台</h1>
-          <div className="mele-subtitle">TEACHER PORTAL</div>
-          <p className="mt-3 text-white/70 text-sm">{demoTeacher.display_name} · 本機測試模式</p>
+          <h1 className="font-serif text-3xl tracking-widest mb-1">{copy.portal.title}</h1>
+          <div className="mele-subtitle">{copy.portal.subtitle}</div>
+          <p className="mt-3 text-white/70 text-sm">{localizedDemoTeacher.display_name} · {copy.portal.demoMode}</p>
         </header>
 
         <div className="mb-5 rounded-lg border border-accent-dim bg-accent/[0.08] p-4 text-sm leading-relaxed text-white/72">
-          目前使用本機測試帳號，所以這裡顯示示範老師資料。正式老師資料會在 Supabase 登入與 Email 驗證信修好後，依你的帳號讀取。
+          {copy.portal.demoNotice}
         </div>
 
         <TeacherPortalReadiness
-          teacher={demoTeacher}
+          teacher={localizedDemoTeacher}
           activeServiceCount={demoServices.filter((service) => service.is_active).length}
           pendingActionCount={pendingActionCount}
           isFreeTestMode
+          copy={copy.portal}
+          locale={locale}
           demoMode
         />
 
-        <TeacherMemberBriefPanel cards={demoBriefCards} demoMode />
+        <TeacherMemberBriefPanel
+          cards={demoBriefCards}
+          copy={copy.portal.memberBrief}
+          statusLabels={copy.statusLabels}
+          localeTag={localeTag}
+          demoMode
+        />
+
+        <TeacherReadingAssistPanel cards={demoBriefCards} copy={copy.portal.assist} />
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
           <div className="mele-card text-center !p-5">
             <div className="font-serif text-3xl text-accent">1</div>
-            <div className="text-xs text-white/70 tracking-widest mt-2">待諮詢</div>
+            <div className="text-xs text-white/70 tracking-widest mt-2">{copy.portal.stats.upcoming}</div>
           </div>
           <div className="mele-card text-center !p-5">
             <div className="font-serif text-3xl text-accent">1</div>
-            <div className="text-xs text-white/70 tracking-widest mt-2">已完成</div>
+            <div className="text-xs text-white/70 tracking-widest mt-2">{copy.portal.stats.completed}</div>
           </div>
           <div className="mele-card text-center !p-5">
             <div className="font-serif text-3xl text-accent">4.90</div>
-            <div className="text-xs text-white/70 tracking-widest mt-2">平均評分</div>
+            <div className="text-xs text-white/70 tracking-widest mt-2">{copy.portal.stats.rating}</div>
           </div>
           <div className="mele-card text-center !p-5">
             <div className="font-serif text-3xl text-accent">{demoServices.length}</div>
-            <div className="text-xs text-white/70 tracking-widest mt-2">服務項目</div>
+            <div className="text-xs text-white/70 tracking-widest mt-2">{copy.portal.stats.services}</div>
           </div>
         </div>
 
         <div className="mele-card">
-          <div className="mele-section-title">最近預約</div>
-          <div className="mele-section-subtitle">RECENT BOOKINGS</div>
+          <div className="mele-section-title">{copy.portal.recentTitle}</div>
+          <div className="mele-section-subtitle">{copy.portal.recentSubtitle}</div>
           <div className="overflow-x-auto">
             <table className="w-full min-w-[520px] text-sm">
               <thead>
                 <tr className="text-accent text-xs tracking-widest border-b border-accent-dim">
-                  <th className="py-3 px-3 text-left">時間</th>
-                  <th className="py-3 px-3 text-left">狀態</th>
-                  <th className="py-3 px-3 text-left">金額</th>
-                  <th className="py-3 px-3 text-left">提醒</th>
+                  <th className="py-3 px-3 text-left">{copy.portal.tableTime}</th>
+                  <th className="py-3 px-3 text-left">{copy.portal.tableStatus}</th>
+                  <th className="py-3 px-3 text-left">{copy.portal.tableAmount}</th>
+                  <th className="py-3 px-3 text-left">{copy.portal.tableReminder}</th>
                 </tr>
               </thead>
               <tbody>
                 {demoBookings.map((b) => (
                   <tr key={b.id} className="border-b border-accent-dim/30">
-                    <td className="py-3 px-3 text-xs">{new Date(b.scheduled_at).toLocaleString('zh-TW')}</td>
-                    <td className="py-3 px-3 text-xs">{STATUS_LABEL[b.status] ?? b.status}</td>
-                    <td className="py-3 px-3">免費測試</td>
+                    <td className="py-3 px-3 text-xs">{new Date(b.scheduled_at).toLocaleString(localeTag)}</td>
+                    <td className="py-3 px-3 text-xs">{copy.statusLabels[b.status] ?? b.status}</td>
+                    <td className="py-3 px-3">{copy.portal.freeTest}</td>
                     <td className="py-3 px-3 text-xs text-white/62">
-                      {['paid', 'confirmed'].includes(b.status) ? '請確認諮詢前聯繫' : '無需立即處理'}
+                      {['paid', 'confirmed'].includes(b.status) ? copy.portal.paidReminder : copy.portal.noAction}
                     </td>
                   </tr>
                 ))}
@@ -294,15 +377,15 @@ export default async function TeacherPortalPage() {
         </div>
 
         <div className="mele-card mt-6">
-          <div className="mele-section-title">服務項目（{demoServices.length}）</div>
-          <div className="mele-section-subtitle">SERVICES</div>
+          <div className="mele-section-title">{copy.portal.serviceTitle(demoServices.length)}</div>
+          <div className="mele-section-subtitle">{copy.portal.serviceSubtitle}</div>
           {demoServices.map((s) => (
             <div key={s.id} className="flex justify-between items-center border-b border-accent-dim/30 py-3">
               <div>
                 <div className="text-sm">{s.name}</div>
-                <div className="text-xs text-white/60">{s.duration_minutes} 分 · 免費測試</div>
+                <div className="text-xs text-white/60">{s.duration_minutes} min · {copy.portal.freeTest}</div>
               </div>
-              <span className="px-2 py-0.5 rounded text-xs bg-success/30 text-success">上架中</span>
+              <span className="px-2 py-0.5 rounded text-xs bg-success/30 text-success">{copy.portal.active}</span>
             </div>
           ))}
         </div>
@@ -310,7 +393,7 @@ export default async function TeacherPortalPage() {
     );
   }
 
-  if (!user) redirect('/account/login?return=/teacher-portal');
+  if (!user) redirect(localizePath('/account/login?return=/teacher-portal', locale));
 
   const { data: teacher } = await supabase
     .from('teachers')
@@ -322,9 +405,9 @@ export default async function TeacherPortalPage() {
     return (
       <div className="container mx-auto max-w-2xl px-5 py-16 text-center">
         <div className="mele-card">
-          <div className="font-serif text-2xl text-accent mb-3">您還不是上架老師</div>
-          <p className="text-white/70 mb-5">想成為命理老師？歡迎送出申請。</p>
-          <Link href="/teachers/apply" className="mele-btn-primary inline-block">送出申請</Link>
+          <div className="font-serif text-2xl text-accent mb-3">{copy.portal.noTeacherTitle}</div>
+          <p className="text-white/70 mb-5">{copy.portal.noTeacherBody}</p>
+          <Link href={localizePath('/teachers/apply', locale)} className="mele-btn-primary inline-block">{copy.portal.applyCta}</Link>
         </div>
       </div>
     );
@@ -384,8 +467,8 @@ export default async function TeacherPortalPage() {
     <div className="container mx-auto max-w-5xl px-5 py-10">
       <header className="text-center pb-6">
         <div className="text-accent tracking-[0.5em] text-sm mb-3 opacity-70">◆ ◆ ◆</div>
-        <h1 className="font-serif text-3xl tracking-widest mb-1">老師後台</h1>
-        <div className="mele-subtitle">TEACHER PORTAL</div>
+        <h1 className="font-serif text-3xl tracking-widest mb-1">{copy.portal.title}</h1>
+        <div className="mele-subtitle">{copy.portal.subtitle}</div>
         <p className="mt-3 text-white/70 text-sm">{t.display_name} · {t.title ?? ''}</p>
       </header>
 
@@ -394,57 +477,66 @@ export default async function TeacherPortalPage() {
         activeServiceCount={activeServiceCount}
         pendingActionCount={pendingActionCount}
         isFreeTestMode={isFreeTestMode}
+        copy={copy.portal}
+        locale={locale}
       />
 
-      <TeacherMemberBriefPanel cards={teacherBriefCards} />
+      <TeacherMemberBriefPanel
+        cards={teacherBriefCards}
+        copy={copy.portal.memberBrief}
+        statusLabels={copy.statusLabels}
+        localeTag={localeTag}
+      />
+
+      <TeacherReadingAssistPanel cards={teacherBriefCards} copy={copy.portal.assist} />
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
         <div className="mele-card text-center !p-5">
           <div className="font-serif text-3xl text-accent">{upcomingCount}</div>
-          <div className="text-xs text-white/70 tracking-widest mt-2">待諮詢</div>
+          <div className="text-xs text-white/70 tracking-widest mt-2">{copy.portal.stats.upcoming}</div>
         </div>
         <div className="mele-card text-center !p-5">
           <div className="font-serif text-3xl text-accent">{completedCount}</div>
-          <div className="text-xs text-white/70 tracking-widest mt-2">已完成</div>
+          <div className="text-xs text-white/70 tracking-widest mt-2">{copy.portal.stats.completed}</div>
         </div>
         <div className="mele-card text-center !p-5">
           <div className="font-serif text-3xl text-accent">{avgRating}</div>
-          <div className="text-xs text-white/70 tracking-widest mt-2">平均評分</div>
+          <div className="text-xs text-white/70 tracking-widest mt-2">{copy.portal.stats.rating}</div>
         </div>
         <div className="mele-card text-center !p-5">
           <div className="font-serif text-3xl text-accent">{services.data?.length ?? 0}</div>
-          <div className="text-xs text-white/70 tracking-widest mt-2">服務項目</div>
+          <div className="text-xs text-white/70 tracking-widest mt-2">{copy.portal.stats.services}</div>
         </div>
       </div>
 
       <div className="mele-card">
-        <div className="mele-section-title">最近預約</div>
-        <div className="mele-section-subtitle">RECENT BOOKINGS</div>
+        <div className="mele-section-title">{copy.portal.recentTitle}</div>
+        <div className="mele-section-subtitle">{copy.portal.recentSubtitle}</div>
         <div className="mb-4 rounded-lg border border-accent-dim bg-white/[0.035] p-4 text-sm text-white/72">
-          目前有 <span className="text-accent">{pendingActionCount}</span> 筆需要留意的諮詢。請確認已付款與已確認的預約時間，並在諮詢前透過 LINE 或站內訊息與客人確認問題。
+          {copy.portal.pendingNotice(pendingActionCount)}
         </div>
         {bookingRows.length === 0 && (
-          <div className="text-center py-8 text-white/60">還沒有預約</div>
+          <div className="text-center py-8 text-white/60">{copy.portal.noBookings}</div>
         )}
         {bookingRows.length > 0 && (
           <div className="overflow-x-auto">
             <table className="w-full min-w-[520px] text-sm">
               <thead>
                 <tr className="text-accent text-xs tracking-widest border-b border-accent-dim">
-                  <th className="py-3 px-3 text-left">時間</th>
-                  <th className="py-3 px-3 text-left">狀態</th>
-                  <th className="py-3 px-3 text-left">金額</th>
-                  <th className="py-3 px-3 text-left">提醒</th>
+                  <th className="py-3 px-3 text-left">{copy.portal.tableTime}</th>
+                  <th className="py-3 px-3 text-left">{copy.portal.tableStatus}</th>
+                  <th className="py-3 px-3 text-left">{copy.portal.tableAmount}</th>
+                  <th className="py-3 px-3 text-left">{copy.portal.tableReminder}</th>
                 </tr>
               </thead>
               <tbody>
                 {bookingRows.map((b) => (
                   <tr key={b.id} className="border-b border-accent-dim/30">
-                    <td className="py-3 px-3 text-xs">{new Date(b.scheduled_at).toLocaleString('zh-TW')}</td>
-                    <td className="py-3 px-3 text-xs">{STATUS_LABEL[b.status] ?? b.status}</td>
-                    <td className="py-3 px-3">NT$ {b.amount_ntd.toLocaleString()}</td>
+                    <td className="py-3 px-3 text-xs">{new Date(b.scheduled_at).toLocaleString(localeTag)}</td>
+                    <td className="py-3 px-3 text-xs">{copy.statusLabels[b.status] ?? b.status}</td>
+                    <td className="py-3 px-3">NT$ {b.amount_ntd.toLocaleString(localeTag)}</td>
                     <td className="py-3 px-3 text-xs text-white/62">
-                      {['paid', 'confirmed'].includes(b.status) ? '請確認諮詢前聯繫' : '無需立即處理'}
+                      {['paid', 'confirmed'].includes(b.status) ? copy.portal.paidReminder : copy.portal.noAction}
                     </td>
                   </tr>
                 ))}
@@ -455,21 +547,21 @@ export default async function TeacherPortalPage() {
       </div>
 
       <div className="mele-card mt-6">
-        <div className="mele-section-title">服務項目（{services.data?.length ?? 0}）</div>
-        <div className="mele-section-subtitle">SERVICES</div>
+        <div className="mele-section-title">{copy.portal.serviceTitle(services.data?.length ?? 0)}</div>
+        <div className="mele-section-subtitle">{copy.portal.serviceSubtitle}</div>
         {services.data?.map((s) => (
           <div key={s.id} className="flex justify-between items-center border-b border-accent-dim/30 py-3">
             <div>
               <div className="text-sm">{s.name}</div>
-              <div className="text-xs text-white/60">{s.duration_minutes} 分 · NT$ {s.price_ntd.toLocaleString()}</div>
+              <div className="text-xs text-white/60">{s.duration_minutes} min · NT$ {s.price_ntd.toLocaleString(localeTag)}</div>
             </div>
             <span className={`px-2 py-0.5 rounded text-xs ${s.is_active ? 'bg-success/30 text-success' : 'bg-white/10 text-white/60'}`}>
-              {s.is_active ? '上架中' : '已下架'}
+              {s.is_active ? copy.portal.active : copy.portal.inactive}
             </span>
           </div>
         ))}
         <p className="text-xs text-white/50 mt-4">
-          服務新增、價格調整與時段管理會進入下一階段後台功能；目前可先由平台管理員協助設定，避免老師端操作不完整造成錯單。
+          {copy.portal.serviceFootnote}
         </p>
       </div>
     </div>

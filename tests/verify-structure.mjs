@@ -428,6 +428,7 @@ const accountPrivacyPage = readFileSync('apps/web/app/account/privacy/page.tsx',
 const profilePage = readFileSync('apps/web/app/account/profile/page.tsx', 'utf8');
 const chartsPage = readFileSync('apps/web/app/account/charts/page.tsx', 'utf8');
 const teacherPortalPage = readFileSync('apps/web/app/teacher-portal/page.tsx', 'utf8');
+const teacherCopy = readFileSync('apps/web/lib/i18n/teacher-copy.ts', 'utf8');
 const testAuth = readFileSync('apps/web/lib/test-auth.ts', 'utf8');
 const testAuthServer = readFileSync('apps/web/lib/test-auth-server.ts', 'utf8');
 const headerUserMenu = readFileSync('apps/web/components/HeaderUserMenu.tsx', 'utf8');
@@ -467,7 +468,13 @@ log(
 );
 log('local test signout clears browser state', headerUserMenu.includes('clearClientTestAuth'));
 log('charts page allows local test auth without Supabase session', chartsPage.includes('readClientTestUser') && chartsPage.includes('本機測試帳號'));
-log('teacher portal shows demo backend in local test auth', teacherPortalPage.includes('getServerTestUser') && teacherPortalPage.includes('demoTeacher') && teacherPortalPage.includes('本機測試模式'));
+log(
+  'teacher portal shows demo backend in local test auth',
+  teacherPortalPage.includes('getServerTestUser') &&
+    teacherPortalPage.includes('demoTeacher') &&
+    teacherPortalPage.includes('copy.portal.demoNotice') &&
+    teacherCopy.includes('本機測試模式'),
+);
 log('server test auth is restricted to local host cookie', testAuthServer.includes('cookies()') && testAuthServer.includes('headers()') && testAuthServer.includes('isLocalTestHost'));
 log('social login providers use Supabase settings and env gates', ['NEXT_PUBLIC_ENABLE_GOOGLE_LOGIN', 'NEXT_PUBLIC_ENABLE_LINE_LOGIN', 'NEXT_PUBLIC_LINE_OAUTH_PROVIDER', '/auth/v1/settings', 'custom:line'].every((token) => login.includes(token)));
 log('auth callback rejects provider errors and unsafe next URLs', authCallback.includes('auth_callback_failed') && authCallback.includes('error_description') && authCallback.includes('startsWith(\'/\')') && authCallback.includes('!nextParam.startsWith(\'//\')'));
@@ -590,9 +597,19 @@ log(
 );
 
 const teacherPortal = readFileSync('apps/web/app/teacher-portal/page.tsx', 'utf8');
-log('teacher portal localizes booking status', teacherPortal.includes('STATUS_LABEL') && teacherPortal.includes('已付款') && teacherPortal.includes('待付款'));
+log(
+  'teacher portal localizes booking status',
+  teacherPortal.includes('copy.statusLabels') &&
+    teacherCopy.includes("pending: '待付款'") &&
+    teacherCopy.includes("paid: '已付款'") &&
+    teacherCopy.includes("pending: 'Pending payment'"),
+);
 log('teacher portal keeps booking table mobile readable', teacherPortal.includes('overflow-x-auto') && teacherPortal.includes('min-w-[520px]'));
-log('teacher portal includes actionable readiness checklist', ['TeacherPortalReadiness', '後台準備度', '公開頁完整度', '服務項目已設定', '測試模式提醒'].every((token) => teacherPortal.includes(token)));
+log(
+  'teacher portal includes actionable readiness checklist',
+  ['TeacherPortalReadiness', 'copy.readiness.items.profile', 'copy.readiness.items.services', 'copy.readiness.items.testMode'].every((token) => teacherPortal.includes(token)) &&
+    ['後台準備度', '公開頁完整度', '服務項目已設定', '測試模式提醒'].every((token) => teacherCopy.includes(token)),
+);
 
 const myBookingsPage = readFileSync('apps/web/app/account/mybookings/page.tsx', 'utf8');
 const bookingPaymentPageForStatus = readFileSync('apps/web/app/account/payment/[id]/page.tsx', 'utf8');
@@ -635,18 +652,31 @@ log(
 );
 
 const teacherDetailPage = readFileSync('apps/web/app/teachers/[id]/page.tsx', 'utf8');
-log('teacher detail page supports conversion trust blocks', ['適合對象', '諮詢方式', '平台保障', '尚未開放預約'].every((token) => teacherDetailPage.includes(token)));
+log(
+  'teacher detail page supports conversion trust blocks',
+  ['copy.detail.fitTitle', 'copy.detail.styleTitle', 'copy.detail.safetyTitle', 'copy.detail.unavailableTitle'].every((token) => teacherDetailPage.includes(token)) &&
+    ['適合對象', '諮詢方式', '平台保障', '尚未開放預約'].every((token) => teacherCopy.includes(token)),
+);
 const teachersPage = readFileSync('apps/web/app/teachers/page.tsx', 'utf8');
-log('teacher list page has self-discovery consultation copy', ['諮詢老師入口', '進入諮詢引導', '查看老師詳情', '申請成為 MELE 諮詢老師'].every((token) => teachersPage.includes(token)) && !teachersPage.includes('命理' + '媒合中心'));
+log(
+  'teacher list page has self-discovery consultation copy',
+  ['copy.directory.title', 'copy.directory.guidanceCta', 'copy.directory.detailAction', 'copy.directory.emptyAction'].every((token) => teachersPage.includes(token)) &&
+    ['諮詢老師入口', '進入諮詢引導', '查看老師詳情', '申請成為 MELE 諮詢老師'].every((token) => teacherCopy.includes(token)) &&
+    !teacherCopy.includes('命理' + '媒合中心'),
+);
 
 const teacherApplyPage = readFileSync('apps/web/app/teachers/apply/page.tsx', 'utf8');
 log(
   'teacher application signup uses email confirmation callback',
   teacherApplyPage.includes('emailRedirectTo') &&
     teacherApplyPage.includes('/auth/callback?next=') &&
-    teacherApplyPage.includes('encodeURIComponent(\'/teachers/apply\')'),
+    teacherApplyPage.includes("localizePath('/teachers/apply', locale)"),
 );
-log('teacher application has pre-submit readiness guidance', ['TeacherApplyChecklist', '申請前自我檢查', '證件與自介影片', '審核進度', '送出後可以到老師後台看狀態'].every((token) => teacherApplyPage.includes(token)));
+log(
+  'teacher application has pre-submit readiness guidance',
+  ['TeacherApplyChecklist', 'copy.apply.checklist', 'TeacherApplyChecklist'].every((token) => teacherApplyPage.includes(token)) &&
+    ['申請前自我檢查', '證件與自介影片', '審核進度', '送出後可以到老師後台看狀態'].every((token) => teacherCopy.includes(token)),
+);
 log('teacher application persists website through submit and activation', teacherApplyPage.includes('p_website: website') && ['p_website text', 'website', 'v_app.website'].every((token) => SQL.includes(token)));
 
 const tarotPage = readFileSync('apps/web/app/tools/tarot/page.tsx', 'utf8');
@@ -844,7 +874,8 @@ log(
 );
 log(
   'teacher portal shows member detail briefs for booked customers',
-  ['chart_records', 'buildTeacherReadingBrief', '會員詳解備忘', 'customer_question', 'chart_data', 'teacher-member-brief'].every((token) => teacherPortal.includes(token)) &&
+  ['chart_records', 'buildTeacherReadingBrief', 'customer_question', 'chart_data', 'teacher-member-brief', 'TeacherMemberBriefPanel', 'TeacherReadingAssistPanel'].every((token) => teacherPortal.includes(token)) &&
+    ['會員詳解備忘', '輔助解盤工作台', '流日 / 流月 / 流年延伸'].every((token) => teacherCopy.includes(token)) &&
     ['.teacher-member-brief', '.teacher-member-brief__grid', '.teacher-member-brief__item'].every((token) => globalCss.includes(token)),
 );
 const explanations = readFileSync('python_api/engines/explanations.py', 'utf8');

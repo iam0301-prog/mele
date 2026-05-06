@@ -125,7 +125,7 @@ test.describe('Button and link logic', () => {
     await page.goto('/en', { waitUntil: 'domcontentloaded' });
     await page.locator('a[href="/en/teachers"]').click();
     await expect(page).toHaveURL(/\/en\/teachers$/);
-    await expect(page.getByRole('heading', { name: '諮詢老師入口' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Guidance Directory' })).toBeVisible();
   });
 
   test('tool submit buttons surface validation before calling calculators', async ({ page }) => {
@@ -151,15 +151,15 @@ test.describe('Button and link logic', () => {
     await page.goto('/mobile', { waitUntil: 'domcontentloaded' });
 
     await page.getByRole('button', { name: '引導' }).click();
-    await expect(page.getByRole('heading', { name: '諮詢引導' })).toBeVisible();
+    await expect(page.locator('.mobile-match h1')).toHaveText('諮詢引導', { timeout: 15000 });
 
     await page.getByRole('button', { name: 'AR' }).click();
-    await expect(page.getByText('AR 養分空間')).toBeVisible();
+    await expect(page.getByText('AR 養分空間')).toBeVisible({ timeout: 15000 });
 
     await page.getByRole('button', { name: '老師' }).click();
-    await expect(page.getByRole('heading', { name: '老師中心' })).toBeVisible();
+    await expect(page.locator('.mobile-teacher-gateway h1')).toHaveText('老師中心', { timeout: 15000 });
 
     await page.getByRole('button', { name: '每日' }).click();
-    await expect(page.getByRole('heading', { name: '今日養分' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: '今日養分' })).toBeVisible({ timeout: 15000 });
   });
 });

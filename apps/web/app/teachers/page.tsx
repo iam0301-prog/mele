@@ -4,14 +4,22 @@ import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { DEMO_TEACHERS } from '@/lib/demo-teachers';
+import { useProvidedLocale } from '@/lib/i18n/LocaleProvider';
+import { localizePath } from '@/lib/i18n/config';
+import {
+  getTeacherCopy,
+  localizeDemoTeacher,
+  normalizeSpecialtyFilter,
+  specialtyLabel,
+} from '@/lib/i18n/teacher-copy';
 import { createClient } from '@/lib/supabase/client';
 import type { Teacher } from '@/types/db';
 
-const SPECIALTIES = ['全部', '八字', '紫微', '塔羅', '盧恩', '占星', '人類圖', '生命靈數', '馬雅'];
-
 function TeachersInner() {
+  const locale = useProvidedLocale();
+  const copy = getTeacherCopy(locale);
   const search = useSearchParams();
-  const initialSpec = search.get('spec') || '全部';
+  const initialSpec = normalizeSpecialtyFilter(search.get('spec'));
   const [filter, setFilter] = useState(initialSpec);
   const [teachers, setTeachers] = useState<Teacher[]>([]);
   const [demoMode, setDemoMode] = useState(false);
@@ -50,51 +58,51 @@ function TeachersInner() {
   return (
     <main className="container mx-auto max-w-6xl px-5 py-12">
       <header className="pb-8 text-center">
-        <div className="text-accent mb-4 text-base tracking-[0.5em] opacity-70">GUIDANCE DIRECTORY</div>
-        <h1 className="font-serif text-4xl tracking-widest">諮詢老師入口</h1>
-        <div className="mele-subtitle mt-2">OUR READERS</div>
+        <div className="text-accent mb-4 text-base tracking-[0.5em] opacity-70">{copy.directory.kicker}</div>
+        <h1 className="font-serif text-4xl tracking-widest">{copy.directory.title}</h1>
+        <div className="mele-subtitle mt-2">{copy.directory.subtitle}</div>
         <p className="mx-auto mt-5 max-w-2xl text-sm leading-relaxed text-white/70">
-          MELE 的核心是讓使用者先透過工具理解自己；若需要更深的對話，可以在這裡依專長瀏覽老師、服務風格與評價。
+          {copy.directory.body}
         </p>
         <div className="mt-5 flex flex-wrap justify-center gap-3">
-          <Link href="/mobile" className="mele-btn-primary">進入諮詢引導</Link>
-          <Link href="/teachers/apply" className="mele-btn-secondary">我是老師，申請加入</Link>
+          <Link href={localizePath('/mobile', locale)} className="mele-btn-primary">{copy.directory.guidanceCta}</Link>
+          <Link href={localizePath('/teachers/apply', locale)} className="mele-btn-secondary">{copy.directory.applyCta}</Link>
         </div>
       </header>
 
       <section className="mele-card">
         <div className="mb-6 flex flex-wrap gap-2">
-          {SPECIALTIES.map((specialty) => (
+          {copy.specialties.map((specialty) => (
             <button
-              key={specialty}
+              key={specialty.value}
               type="button"
-              onClick={() => setFilter(specialty)}
+              onClick={() => setFilter(specialty.value)}
               className={`rounded-full border px-4 py-2 text-sm transition-all ${
-                filter === specialty
+                filter === specialty.value
                   ? 'border-accent bg-accent text-primary font-semibold'
                   : 'border-accent-dim bg-white/5 hover:border-accent'
               }`}
             >
-              {specialty}
+              {specialty.label}
             </button>
           ))}
         </div>
 
-        {loading && <div className="py-12 text-center text-white/60">正在讀取老師名單...</div>}
+        {loading && <div className="py-12 text-center text-white/60">{copy.directory.loading}</div>}
 
         {!loading && demoMode && teachers.length > 0 && (
           <div className="mb-5 rounded-xl border border-accent-dim bg-black/25 p-4 text-sm leading-relaxed text-white/70">
-            目前資料庫尚未上架正式老師，以下顯示本機示範老師，方便測試諮詢引導、老師詳情與服務呈現。正式上線後會自動改用 Supabase 內的真實老師資料。
+            {copy.directory.demoNotice}
           </div>
         )}
 
         {!loading && teachers.length === 0 && (
           <div className="py-16 text-center text-white/60">
             <div className="mb-3 text-4xl text-accent opacity-50">MELE</div>
-            目前沒有符合條件的上架老師。
+            {copy.directory.emptyTitle}
             <div className="mt-4">
-              <Link href="/teachers/apply" className="text-accent text-xs tracking-widest hover:opacity-80">
-                申請成為 MELE 諮詢老師
+              <Link href={localizePath('/teachers/apply', locale)} className="text-accent text-xs tracking-widest hover:opacity-80">
+                {copy.directory.emptyAction}
               </Link>
             </div>
           </div>
@@ -113,30 +121,33 @@ function TeachersInner() {
 }
 
 function TeacherCard({ teacher }: { teacher: Teacher }) {
+  const locale = useProvidedLocale();
+  const copy = getTeacherCopy(locale);
+  const displayTeacher = teacher.id.startsWith('demo-') ? localizeDemoTeacher(teacher, locale) : teacher;
   return (
     <Link
-      href={`/teachers/${teacher.id}`}
+      href={localizePath(`/teachers/${teacher.id}`, locale)}
       className="block rounded-2xl border border-accent-dim bg-white/[0.03] p-6 transition-all hover:-translate-y-1 hover:border-accent hover:shadow-gold-soft"
     >
       <div className="mx-auto mb-3 flex h-20 w-20 items-center justify-center rounded-full bg-mele-gold font-serif text-3xl font-bold text-primary">
-        {teacher.display_name.charAt(0)}
+        {displayTeacher.display_name.charAt(0)}
       </div>
-      <div className="text-center font-serif text-xl text-accent">{teacher.display_name}</div>
-      <div className="mt-1 text-center text-xs text-white/60">{teacher.title || '自我探索諮詢老師'}</div>
+      <div className="text-center font-serif text-xl text-accent">{displayTeacher.display_name}</div>
+      <div className="mt-1 text-center text-xs text-white/60">{displayTeacher.title || copy.directory.fallbackTitle}</div>
       <div className="mt-3 text-center text-sm text-yellow-400">
-        {Number(teacher.rating || 0).toFixed(1)} 分
-        <span className="text-white/50">（{teacher.total_reviews || 0} 則評價） · {teacher.cases_count || 0} 次案例</span>
+        {Number(teacher.rating || 0).toFixed(1)} {copy.directory.ratingUnit}
+        <span className="text-white/50">（{teacher.total_reviews || 0} {copy.directory.reviewsUnit}） · {teacher.cases_count || 0} {copy.directory.casesUnit}</span>
       </div>
       <div className="mt-3 flex flex-wrap justify-center gap-1.5">
         {(teacher.specialties || []).slice(0, 4).map((specialty) => (
-          <span key={specialty} className="rounded-md border border-accent-dim px-2 py-0.5 text-[11px]">{specialty}</span>
+          <span key={specialty} className="rounded-md border border-accent-dim px-2 py-0.5 text-[11px]">{specialtyLabel(locale, specialty)}</span>
         ))}
       </div>
       <div className="mt-3 min-h-[44px] text-center text-xs leading-relaxed text-white/70">
-        {teacher.quote || teacher.intro_short || '查看老師介紹、專長與可預約服務。'}
+        {displayTeacher.quote || displayTeacher.intro_short || copy.directory.fallbackBody}
       </div>
       <div className="mt-4 border-t border-accent-dim pt-3 text-center text-xs tracking-widest text-accent">
-        查看老師詳情
+        {copy.directory.detailAction}
       </div>
     </Link>
   );
@@ -144,7 +155,7 @@ function TeacherCard({ teacher }: { teacher: Teacher }) {
 
 export default function TeachersPage() {
   return (
-    <Suspense fallback={<div className="container mx-auto px-5 py-16 text-center text-white/60">正在讀取老師名單...</div>}>
+    <Suspense fallback={<div className="container mx-auto px-5 py-16 text-center text-white/60">Loading...</div>}>
       <TeachersInner />
     </Suspense>
   );
