@@ -72,7 +72,7 @@ export default function ZiweiPage() {
 
   return (
     <ToolShell locale={locale} title={copy.title} subtitle={copy.subtitle} description={copy.description} spec={copy.spec}>
-      <form onSubmit={onSubmit} className="mele-card">
+      <form onSubmit={onSubmit} className="mele-card" noValidate>
         <AutofillBanner locale={locale} show={autofilled} fields={copy.autofillFields} />
 
         <BirthDateTimeFields

@@ -45,7 +45,7 @@ export default function MayaPage() {
 
   return (
     <ToolShell locale={locale} title={copy.title} subtitle={copy.subtitle} description={copy.description} spec={copy.spec}>
-      <form onSubmit={onSubmit} className="mele-card">
+      <form onSubmit={onSubmit} className="mele-card" noValidate>
         <DateOnlyField locale={locale} date={date} onDateChange={setDate} label={copy.birth?.dateLabel} hint={copy.dateHint} />
 
         <button type="submit" disabled={loading} className="mele-btn-primary w-full md:w-auto">

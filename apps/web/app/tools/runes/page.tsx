@@ -53,7 +53,7 @@ export default function RunesPage() {
 
   return (
     <ToolShell locale={locale} title={copy.title} subtitle={copy.subtitle} description={copy.description} spec={copy.spec}>
-      <form onSubmit={onSubmit} className="mele-card">
+      <form onSubmit={onSubmit} className="mele-card" noValidate>
         <div className="mb-5">
           <label className="mele-label">{copy.question?.label}</label>
           <textarea
