@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="zh-Hant"><head><meta charset="utf-8">
+<title>03 — Render Environment</title>
+<link rel="stylesheet" href="_common.css">
+<style>
+.render-shell {
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  overflow: hidden;
+}
+.render-topbar {
+  background: #14181f;
+  color: white;
+  padding: 14px 24px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.render-logo { font-weight: 800; color: #46e3b7; font-size: 16px; }
+.render-crumb { font-size: 13px; color: #9ca3af; }
+.render-crumb b { color: white; font-weight: 600; }
+
+.render-side-tabs {
+  background: #fafafa;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 0 24px;
+  display: flex;
+  gap: 4px;
+}
+.render-tab {
+  padding: 12px 16px;
+  font-size: 13px;
+  color: #6b7280;
+  border-bottom: 2px solid transparent;
+}
+.render-tab.active {
+  color: #7c3aed;
+  border-bottom-color: #7c3aed;
+  font-weight: 600;
+}
+
+.render-content { padding: 24px 28px; }
+
+.env-row {
+  display: grid;
+  grid-template-columns: 280px 1fr 80px;
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  background: white;
+  align-items: center;
+}
+.env-row.placeholder {
+  background: #fffbeb;
+  border-color: #f59e0b;
+  border-style: dashed;
+}
+.env-row.locked {
+  background: #f9fafb;
+}
+.env-key {
+  font-family: "JetBrains Mono", Consolas, monospace;
+  font-size: 12px;
+  font-weight: 700;
+  color: #1f2937;
+}
+.env-val {
+  font-family: "JetBrains Mono", Consolas, monospace;
+  font-size: 12px;
+  padding: 8px 12px;
+  background: #f3f4f6;
+  border-radius: 6px;
+  color: #1e3a8a;
+}
+.env-val.todo { background: #fef3c7; color: #92400e; font-style: italic; border: 1px dashed #f59e0b; }
+.env-action {
+  text-align: right;
+  font-size: 11px;
+  color: #6b7280;
+}
+.env-action .pill {
+  background: #ede9fe;
+  color: #6d28d9;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 600;
+}
+
+.section-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #111827;
+  margin: 24px 0 8px;
+}
+.section-help {
+  font-size: 13px;
+  color: #6b7280;
+  margin-bottom: 16px;
+}
+
+.add-btn {
+  background: white;
+  border: 1.5px dashed #d1d5db;
+  color: #6b7280;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  width: 100%;
+  text-align: center;
+  cursor: pointer;
+}
+</style>
+</head>
+<body>
+<div class="canvas">
+  <div class="title-bar">
+    <div class="step-badge">5</div>
+    <div>
+      <div class="title">Render：環境變數（部署完才回來填）</div>
+      <div class="subtitle">mele-api 服務 → Environment 分頁。把前端 Vercel 網址填進 MELE_ALLOWED_ORIGINS，存檔後 Render 自動重啟。</div>
+    </div>
+  </div>
+
+  <div class="render-shell">
+    <div class="render-topbar">
+      <div class="render-logo">▲ Render</div>
+      <div class="render-crumb">Services › <b>mele-api</b></div>
+    </div>
+
+    <div class="render-side-tabs">
+      <div class="render-tab">Events</div>
+      <div class="render-tab">Logs</div>
+      <div class="render-tab active">Environment</div>
+      <div class="render-tab">Settings</div>
+      <div class="render-tab">Metrics</div>
+      <div class="render-tab">Shell</div>
+    </div>
+
+    <div class="render-content">
+      <div class="section-title">Environment Variables</div>
+      <div class="section-help">這些變數來自 <code>render.yaml</code>，但有 1 個要你手動填值。</div>
+
+      <div class="env-row placeholder">
+        <div class="env-key">MELE_ALLOWED_ORIGINS</div>
+        <div class="env-val todo">https://mele.vercel.app</div>
+        <div class="env-action"><span class="pill" style="background:#fef3c7; color:#92400e;">⚠ 你來填</span></div>
+      </div>
+
+      <div class="env-row locked">
+        <div class="env-key">MELE_RATE_LIMIT_MAX_REQUESTS</div>
+        <div class="env-val">90</div>
+        <div class="env-action">已預設</div>
+      </div>
+
+      <div class="env-row locked">
+        <div class="env-key">MELE_RATE_LIMIT_WINDOW_SECONDS</div>
+        <div class="env-val">60</div>
+        <div class="env-action">已預設</div>
+      </div>
+
+      <div class="env-row locked">
+        <div class="env-key">MELE_HEAVY_MAX_CONCURRENCY</div>
+        <div class="env-val">4</div>
+        <div class="env-action">已預設</div>
+      </div>
+
+      <button class="add-btn">+ Add Environment Variable</button>
+
+      <div style="margin-top: 24px; display:flex; gap: 12px; justify-content: flex-end;">
+        <button class="btn-cancel" style="background:white; color:#374151; border:1px solid #d1d5db; padding:10px 20px; border-radius:8px; font-weight:600;">Cancel</button>
+        <button class="btn blue lg">💾 Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- callouts -->
+  <div class="callout red" style="top: 322px; right: 80px; max-width: 360px; z-index: 10;">
+    ⚠ 必填！把 Vercel 部署完拿到的網址<br>
+    （例如 <span style="font-family:monospace; font-size:11px;">https://mele.vercel.app</span>）<br>
+    填進這欄。沒填的話前端會 CORS error。
+  </div>
+  <div class="callout green" style="bottom: 92px; right: 80px;">
+    ✅ 存檔後 Render 會自動重啟服務
+  </div>
+  <div class="callout" style="top: 168px; left: 200px;">
+    👉 切到 Environment 分頁
+  </div>
+</div>
+</body></html>

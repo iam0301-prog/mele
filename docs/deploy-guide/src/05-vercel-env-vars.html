@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="zh-Hant"><head><meta charset="utf-8">
+<title>05 — Vercel Env Vars</title>
+<link rel="stylesheet" href="_common.css">
+<style>
+.vc-shell {
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  overflow: hidden;
+}
+.vc-topbar {
+  background: black;
+  color: white;
+  padding: 14px 24px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.vc-logo {
+  width: 28px; height: 28px;
+  background: white;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 900;
+  color: black;
+  font-size: 18px;
+}
+.vc-crumb { font-size: 13px; color: #a1a1aa; }
+.vc-crumb b { color: white; }
+
+.vc-page-header {
+  padding: 24px 28px 20px;
+  border-bottom: 1px solid #e5e7eb;
+}
+.vc-page-title { font-size: 22px; font-weight: 700; color: #111827; }
+.vc-page-sub { font-size: 13px; color: #6b7280; margin-top: 4px; }
+
+.vc-content { padding: 24px 28px; }
+
+.env-table {
+  width: 100%;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  overflow: hidden;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.env-table thead th {
+  background: #fafafa;
+  text-align: left;
+  padding: 12px 16px;
+  border-bottom: 1px solid #e5e7eb;
+  font-weight: 600;
+  color: #525252;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+}
+.env-table td {
+  padding: 14px 16px;
+  border-bottom: 1px solid #f3f4f6;
+  vertical-align: middle;
+}
+.env-table tr:last-child td { border-bottom: none; }
+.env-table .key {
+  font-family: "JetBrains Mono", Consolas, monospace;
+  font-weight: 700;
+  color: #1f2937;
+  font-size: 12px;
+}
+.env-table .val {
+  font-family: "JetBrains Mono", Consolas, monospace;
+  font-size: 12px;
+  background: #eff6ff;
+  color: #1e3a8a;
+  padding: 5px 10px;
+  border-radius: 4px;
+  display: inline-block;
+}
+.env-table .val.secret { background: #f3f4f6; color: #525252; }
+.env-table .scope-pills { display: flex; gap: 4px; }
+.env-table .pill {
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  background: #ede9fe;
+  color: #6d28d9;
+}
+.env-table .source {
+  font-size: 11px;
+  color: #6b7280;
+  font-style: italic;
+}
+
+.add-form {
+  margin-top: 24px;
+  background: #fafafa;
+  border: 1.5px dashed #d1d5db;
+  border-radius: 8px;
+  padding: 20px;
+}
+.add-form-title { font-size: 14px; font-weight: 700; margin-bottom: 12px; }
+</style>
+</head>
+<body>
+<div class="canvas">
+  <div class="title-bar">
+    <div class="step-badge">4</div>
+    <div>
+      <div class="title">Vercel：環境變數（4 個一定要填）</div>
+      <div class="subtitle">Settings → Environment Variables → 一個一個 Add，3 個 scope（Production / Preview / Development）都勾起來。</div>
+    </div>
+  </div>
+
+  <div class="vc-shell">
+    <div class="vc-topbar">
+      <div class="vc-logo">▲</div>
+      <div style="font-weight:700;">Vercel</div>
+      <div class="vc-crumb">iam0301-prog › <b>mele</b> › Settings › Environment Variables</div>
+    </div>
+
+    <div class="vc-page-header">
+      <div class="vc-page-title">Environment Variables</div>
+      <div class="vc-page-sub">Variables are encrypted and only exposed to your app at build time and runtime.</div>
+    </div>
+
+    <div class="vc-content">
+      <table class="env-table">
+        <thead>
+          <tr>
+            <th style="width: 32%;">Key</th>
+            <th style="width: 38%;">Value</th>
+            <th style="width: 18%;">Environments</th>
+            <th>來源說明</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><div class="key">NEXT_PUBLIC_SUPABASE_URL</div></td>
+            <td><span class="val">https://xxxxxx.supabase.co</span></td>
+            <td><div class="scope-pills"><span class="pill">Prod</span><span class="pill">Prev</span><span class="pill">Dev</span></div></td>
+            <td><div class="source">Supabase → Settings → API<br>「Project URL」</div></td>
+          </tr>
+          <tr>
+            <td><div class="key">NEXT_PUBLIC_SUPABASE_ANON_KEY</div></td>
+            <td><span class="val secret">eyJhbGciOi••••••••••••</span></td>
+            <td><div class="scope-pills"><span class="pill">Prod</span><span class="pill">Prev</span><span class="pill">Dev</span></div></td>
+            <td><div class="source">Supabase → Settings → API<br>「anon / public」key</div></td>
+          </tr>
+          <tr style="background:#fffbeb;">
+            <td><div class="key">MELE_API_URL</div></td>
+            <td><span class="val" style="background:#fef3c7; color:#92400e; border:1px dashed #f59e0b;">https://mele-api-xxxx.onrender.com</span></td>
+            <td><div class="scope-pills"><span class="pill">Prod</span><span class="pill">Prev</span><span class="pill">Dev</span></div></td>
+            <td><div class="source" style="color:#92400e; font-weight:600;">⚠ 從 Render mele-api 服務頁<br>頂端複製的網址</div></td>
+          </tr>
+          <tr>
+            <td><div class="key">NEXT_PUBLIC_SITE_URL</div></td>
+            <td><span class="val">https://mele.vercel.app</span></td>
+            <td><div class="scope-pills"><span class="pill">Prod</span><span class="pill">Prev</span><span class="pill">Dev</span></div></td>
+            <td><div class="source">Vercel 部署完<br>給你的網址</div></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="add-form">
+        <div class="add-form-title">+ Add New</div>
+        <div style="display:grid; grid-template-columns: 1fr 1fr 200px auto; gap:8px;">
+          <input class="input code" placeholder="Key (e.g. NEXT_PUBLIC_SUPABASE_URL)">
+          <input class="input code" placeholder="Value">
+          <div style="display:flex; gap:6px; align-items:center; font-size:12px;">
+            <label><input type="checkbox" checked> Production</label>
+          </div>
+          <button class="btn" style="background:#000;">Save</button>
+        </div>
+        <div style="font-size:11px; color:#6b7280; margin-top:8px;">
+          ☑ Production &nbsp; ☑ Preview &nbsp; ☑ Development &nbsp;（3 個都勾）
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- callouts -->
+  <div class="callout red" style="top: 458px; right: 60px; max-width: 280px;">
+    ⚠ 這個值要等 Render 部好<br>才會有！先做完步驟 2
+  </div>
+  <div class="callout green" style="bottom: 76px; right: 60px;">
+    ✅ 4 個都加完後到<br>Deployments 點 Redeploy
+  </div>
+</div>
+</body></html>

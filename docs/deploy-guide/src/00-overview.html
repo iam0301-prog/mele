@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="zh-Hant"><head><meta charset="utf-8">
+<title>00 — 上線總覽</title>
+<link rel="stylesheet" href="_common.css">
+<style>
+.hero {
+  background: linear-gradient(135deg, #1e3a8a 0%, #7c3aed 100%);
+  color: white;
+  padding: 32px 36px;
+  border-radius: 16px;
+  margin-bottom: 28px;
+}
+.hero h1 { font-size: 30px; font-weight: 800; margin-bottom: 6px; }
+.hero p { font-size: 15px; opacity: .85; }
+
+.diagram {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 36px 24px;
+  display: grid;
+  grid-template-columns: 1fr 60px 1fr 60px 1fr;
+  align-items: center;
+  gap: 0;
+}
+.node {
+  background: #f9fafb;
+  border: 2px solid #d1d5db;
+  border-radius: 12px;
+  padding: 22px 16px;
+  text-align: center;
+  position: relative;
+}
+.node.user     { border-color: #6366f1; background: #eef2ff; }
+.node.frontend { border-color: #16a34a; background: #f0fdf4; }
+.node.backend  { border-color: #f59e0b; background: #fffbeb; }
+.node.db       { border-color: #ec4899; background: #fdf2f8; }
+
+.node-icon { font-size: 36px; margin-bottom: 8px; }
+.node-name { font-weight: 700; font-size: 16px; color: #111827; margin-bottom: 4px; }
+.node-platform { font-size: 12px; color: #6b7280; }
+.node-stack { font-size: 11px; color: #4b5563; margin-top: 6px; font-family: monospace; }
+
+.arrow-h {
+  text-align: center;
+  color: #9ca3af;
+  font-size: 28px;
+  font-weight: 900;
+}
+
+.order-section {
+  margin-top: 32px;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 24px 28px;
+}
+.order-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.order-list { list-style: none; counter-reset: step; }
+.order-list li {
+  counter-increment: step;
+  padding: 12px 0 12px 56px;
+  border-bottom: 1px solid #f3f4f6;
+  position: relative;
+  font-size: 14px;
+}
+.order-list li::before {
+  content: counter(step);
+  position: absolute;
+  left: 0;
+  top: 10px;
+  width: 38px; height: 38px;
+  background: #2563eb;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 16px;
+}
+.order-list li:last-child { border-bottom: none; }
+.order-list li b { color: #1e3a8a; }
+.order-list li .img-ref {
+  display: inline-block;
+  background: #eff6ff;
+  color: #1e3a8a;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: monospace;
+  font-size: 12px;
+  margin-left: 6px;
+}
+</style>
+</head>
+<body>
+<div class="canvas">
+  <div class="hero">
+    <h1>📍 MELE 上線總覽</h1>
+    <p>三個平台、五個步驟，照順序做就會通。每一步都有對應的截圖，比對著操作即可。</p>
+  </div>
+
+  <div class="diagram">
+    <div class="node user">
+      <div class="node-icon">👤</div>
+      <div class="node-name">使用者</div>
+      <div class="node-platform">瀏覽器 / 手機</div>
+    </div>
+    <div class="arrow-h">→</div>
+    <div class="node frontend">
+      <div class="node-icon">🟢</div>
+      <div class="node-name">前端</div>
+      <div class="node-platform">Vercel</div>
+      <div class="node-stack">apps/web · Next.js</div>
+    </div>
+    <div class="arrow-h">→</div>
+    <div class="node backend">
+      <div class="node-icon">🟡</div>
+      <div class="node-name">後端 API</div>
+      <div class="node-platform">Render</div>
+      <div class="node-stack">python_api · FastAPI</div>
+    </div>
+  </div>
+  <div style="text-align:center; margin-top:16px; color:#6b7280; font-size:13px;">
+    ⬆ 前端與後端都會連到 ⬇
+  </div>
+  <div style="display:flex; justify-content:center; margin-top:8px;">
+    <div class="node db" style="width:280px;">
+      <div class="node-icon">🟣</div>
+      <div class="node-name">資料庫 + Auth</div>
+      <div class="node-platform">Supabase</div>
+      <div class="node-stack">PostgreSQL · RLS</div>
+    </div>
+  </div>
+
+  <div class="order-section">
+    <div class="order-title">🚀 部署順序（由上而下做）</div>
+    <ol class="order-list">
+      <li><b>跑 Supabase migrations</b> — 建表 / 設權限 / 把自己設 admin <span class="img-ref">01-supabase-migrations.png</span></li>
+      <li><b>Render 用 Blueprint 部 Python API</b> — 拿到 <code>https://mele-api-xxx.onrender.com</code> <span class="img-ref">02-render-blueprint.png</span></li>
+      <li><b>Vercel 設定 Root Directory = apps/web</b> — 不然 build 會炸 <span class="img-ref">04-vercel-root-directory.png</span></li>
+      <li><b>Vercel 加 4 個環境變數</b> — Supabase 公鑰、API URL、站台網址 <span class="img-ref">05-vercel-env-vars.png</span></li>
+      <li><b>回頭設 Render 環境變數</b> — 把前端網址填進 MELE_ALLOWED_ORIGINS <span class="img-ref">03-render-env-vars.png</span></li>
+    </ol>
+  </div>
+</div>
+</body></html>

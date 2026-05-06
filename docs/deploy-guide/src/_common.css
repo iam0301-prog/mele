@@ -1,0 +1,216 @@
+/* Shared styles for all deploy-guide mockups */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", "Microsoft JhengHei", "Segoe UI", Roboto, sans-serif;
+  background: #f4f5f7;
+  color: #1f2937;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.canvas {
+  width: 1280px;
+  min-height: 800px;
+  margin: 0 auto;
+  padding: 32px;
+  position: relative;
+}
+
+.title-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.step-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px; height: 44px;
+  background: #2563eb;
+  color: white;
+  border-radius: 50%;
+  font-weight: 700;
+  font-size: 20px;
+}
+.title { font-size: 24px; font-weight: 700; color: #111827; }
+.subtitle { font-size: 14px; color: #6b7280; margin-top: 2px; }
+
+.mock-window {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,.08);
+  overflow: hidden;
+  border: 1px solid #e5e7eb;
+}
+
+.mock-window-bar {
+  background: #fafafa;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.mock-window-bar .dot { width: 12px; height: 12px; border-radius: 50%; }
+.mock-window-bar .dot.r { background: #ff5f57; }
+.mock-window-bar .dot.y { background: #ffbd2e; }
+.mock-window-bar .dot.g { background: #28c840; }
+.mock-window-bar .url {
+  margin-left: 12px;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  padding: 4px 12px;
+  font-size: 12px;
+  color: #6b7280;
+  flex: 1;
+  max-width: 600px;
+}
+
+.mock-body { padding: 28px; }
+
+.field-row {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 24px;
+  padding: 18px 0;
+  border-bottom: 1px solid #f3f4f6;
+}
+.field-row:last-child { border-bottom: none; }
+.field-label { font-weight: 600; color: #111827; font-size: 14px; }
+.field-help { font-size: 12px; color: #6b7280; margin-top: 4px; }
+
+.input {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1.5px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+  background: white;
+}
+.input.filled {
+  border-color: #2563eb;
+  background: #eff6ff;
+  font-weight: 600;
+  color: #1e3a8a;
+}
+.input.code {
+  font-family: "JetBrains Mono", "Fira Code", "Consolas", monospace;
+  font-size: 13px;
+}
+
+.callout {
+  position: absolute;
+  background: #fef3c7;
+  border: 2px solid #f59e0b;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 13px;
+  color: #92400e;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(245, 158, 11, .25);
+  max-width: 280px;
+}
+.callout.red {
+  background: #fee2e2;
+  border-color: #ef4444;
+  color: #991b1b;
+}
+.callout.green {
+  background: #dcfce7;
+  border-color: #16a34a;
+  color: #166534;
+}
+
+.arrow {
+  position: absolute;
+  font-size: 28px;
+  color: #f59e0b;
+  font-weight: 900;
+}
+
+.btn {
+  background: #7c3aed;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.btn.green { background: #16a34a; }
+.btn.blue  { background: #2563eb; }
+.btn.lg    { padding: 14px 28px; font-size: 16px; }
+
+.kv-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.kv-table th {
+  text-align: left;
+  padding: 12px 16px;
+  background: #f9fafb;
+  border-bottom: 1px solid #e5e7eb;
+  font-weight: 600;
+  color: #374151;
+}
+.kv-table td {
+  padding: 14px 16px;
+  border-bottom: 1px solid #f3f4f6;
+  vertical-align: middle;
+}
+.kv-table .key {
+  font-family: "JetBrains Mono", "Consolas", monospace;
+  font-size: 12px;
+  color: #1f2937;
+  font-weight: 600;
+}
+.kv-table .val {
+  font-family: "JetBrains Mono", "Consolas", monospace;
+  font-size: 12px;
+  color: #1e3a8a;
+  background: #eff6ff;
+  padding: 6px 10px;
+  border-radius: 4px;
+  display: inline-block;
+}
+.kv-table .val.placeholder {
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px dashed #f59e0b;
+}
+
+.tag {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  margin-left: 8px;
+}
+.tag.required { background: #fee2e2; color: #991b1b; }
+.tag.optional { background: #f3f4f6; color: #6b7280; }
+.tag.later    { background: #fef3c7; color: #92400e; }
+
+.legend {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 16px;
+  margin-top: 24px;
+  font-size: 13px;
+}
+.legend-title { font-weight: 700; margin-bottom: 8px; color: #111827; }
+.legend-row { display: flex; align-items: center; gap: 8px; padding: 4px 0; }
+.legend-dot {
+  width: 16px; height: 16px;
+  border-radius: 4px;
+}
