@@ -192,6 +192,20 @@ function LoginInner() {
       return toast(error.message, 'error');
     }
 
+    const likelyExistingSignup =
+      data.user &&
+      !data.session &&
+      Array.isArray(data.user.identities) &&
+      data.user.identities.length === 0;
+    if (likelyExistingSignup) {
+      setLoading(false);
+      setMode('signin');
+      setPwd('');
+      setSignupNotice('這個 Email 可能已經註冊或完成驗證，因此系統不一定會再寄新的註冊驗證信。請先嘗試直接登入；若忘記密碼，請使用「忘記密碼」寄送重設信。');
+      toast('這個 Email 可能已經註冊，請改用登入或忘記密碼。', 'error');
+      return;
+    }
+
     if (data.user && data.session) {
       const { error: profileError } = await supabase.from('profiles').upsert({
         id: data.user.id,

@@ -493,6 +493,7 @@ log('signup requires consent checkbox state', login.includes('agreed') && login.
 log('signup requires age confirmation', login.includes('ageConfirmed') && login.includes('未滿 13 歲不得自行註冊'));
 log('login supports password reset email', login.includes('resetPasswordForEmail') && login.includes('忘記密碼'));
 log('login supports resending signup confirmation email', login.includes("auth.resend") && login.includes("type: 'signup'") && login.includes('重新寄送驗證信') && login.includes('confirmationSending'));
+log('signup explains already-registered confirmed emails', login.includes('data.user.identities.length === 0') && login.includes('可能已經註冊'));
 log('login supports beta invite signup metadata', ["search.get('invite')", "search.get('mode') === 'signup'", 'beta_invite_code', 'beta_segment'].every((token) => login.includes(token)));
 log('local test auth is gated to localhost free test mode', testAuth.includes('NEXT_PUBLIC_ENABLE_FREE_BOOKING_TEST_MODE') && testAuth.includes('isLocalTestHost') && testAuth.includes('localhost'));
 log('login offers local test auth fallback', login.includes('使用本機測試帳號') && login.includes('setClientTestAuth') && login.includes('canUseClientTestAuth'));
