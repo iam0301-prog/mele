@@ -5,7 +5,7 @@ services:
     plan: starter
     rootDir: python_api
     healthCheckPath: /ready
-    autoDeploy: false
+    autoDeploy: true
     envVars:
       - key: MELE_ALLOWED_ORIGINS
         value: https://mele-chi.vercel.app

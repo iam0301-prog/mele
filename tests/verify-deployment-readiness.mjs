@@ -255,6 +255,8 @@ ok('Python pytest runner supports bundled Codex Python', pythonPytestRunner.incl
 
 ok('Render blueprint uses python_api rootDir', renderYaml.includes('rootDir: python_api'));
 ok('Render blueprint has /ready health check', renderYaml.includes('healthCheckPath: /ready'));
+ok('Render blueprint auto-deploys API updates from main', renderYaml.includes('autoDeploy: true'));
+ok('Render blueprint allows production Vercel origin', renderYaml.includes('MELE_ALLOWED_ORIGINS') && renderYaml.includes('https://mele-chi.vercel.app'));
 ok('Railway config points at API Dockerfile', railwayJson.includes('"dockerfilePath": "python_api/Dockerfile"'));
 ok('Railway config has /ready health check', railwayJson.includes('"healthcheckPath": "/ready"'));
 

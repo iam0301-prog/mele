@@ -128,7 +128,7 @@ curl -s https://<API>/health
    - 如果要丟到任何公開頻道：改 false，否則陌生人會無限佔老師時段。
 2. 把 Vercel URL 與 Render URL 寫進你個人筆記。
 3. 設一個 UptimeRobot（免費）監控 `/ready` 每 5 分鐘 ping 一次。
-4. 之後每次推 commit，Vercel 會自動 deploy；Render 因為 `autoDeploy: false`，要手動 trigger（這是刻意的，避免半夜部署破生產）。
+4. 之後每次推 commit，Vercel 會自動 deploy；Render Blueprint 目前設為 `autoDeploy: true`，Python API 也會跟著 main 更新。
 
 ---
 
