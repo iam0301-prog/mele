@@ -102,8 +102,83 @@ function mask(value) {
 function redactConfig(config) {
   const clone = { ...config };
   if (clone.smtp_pass) clone.smtp_pass = mask(clone.smtp_pass);
+  for (const key of Object.keys(clone)) {
+    if (key.startsWith('mailer_templates_') && typeof clone[key] === 'string') {
+      clone[key] = `<${clone[key].length} chars>`;
+    }
+  }
   return clone;
 }
+
+function mailTemplate({ title, eyebrow, body, button, fallback }) {
+  return `<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>${title}</title>
+  </head>
+  <body style="margin:0;background:#07111f;color:#f8f0dd;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans TC','Microsoft JhengHei',Arial,sans-serif;line-height:1.7;">
+    <div style="display:none;max-height:0;overflow:hidden;color:transparent;">${fallback}</div>
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#07111f;padding:28px 12px;">
+      <tr>
+        <td align="center">
+          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:560px;border:1px solid rgba(225,190,88,.42);border-radius:18px;background:#0b1727;">
+            <tr>
+              <td style="padding:28px 26px 10px;">
+                <div style="letter-spacing:.22em;color:#e1be58;font-size:12px;font-weight:700;">MELE</div>
+                <h1 style="margin:12px 0 8px;font-size:26px;line-height:1.25;color:#fff7df;font-family:Georgia,'Times New Roman',serif;">${title}</h1>
+                <p style="margin:0;color:#9de4ee;font-size:13px;font-weight:700;">${eyebrow}</p>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:10px 26px 8px;color:#e8dfcc;font-size:15px;">
+                ${body}
+              </td>
+            </tr>
+            <tr>
+              <td align="center" style="padding:18px 26px 22px;">
+                <a href="{{ .ConfirmationURL }}" style="display:inline-block;background:#e7c34b;color:#07111f;text-decoration:none;border-radius:999px;padding:13px 24px;font-weight:800;letter-spacing:.12em;">${button}</a>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:0 26px 26px;color:#b8c1cc;font-size:13px;">
+                <p style="margin:0 0 8px;">若按鈕無法開啟，請複製以下連結到瀏覽器：</p>
+                <p style="margin:0;word-break:break-all;color:#9de4ee;">{{ .ConfirmationURL }}</p>
+                <p style="margin:18px 0 0;color:#8793a0;">若你沒有申請 MELE 帳號，可以直接忽略這封信。</p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>`;
+}
+
+const confirmationTemplate = mailTemplate({
+  title: '確認你的 MELE 帳號',
+  eyebrow: '帳號驗證信',
+  body: '<p style="margin:0 0 12px;">歡迎來到 MELE。請點下方按鈕完成 Email 驗證，之後即可保存解讀、領取點數，並使用會員功能。</p><p style="margin:0;">這封信由系統自動寄出，驗證連結有時效限制。</p>',
+  button: '確認帳號',
+  fallback: '請開啟信件並點擊確認帳號按鈕完成 MELE 註冊。',
+});
+
+const recoveryTemplate = mailTemplate({
+  title: '重設你的 MELE 密碼',
+  eyebrow: '密碼重設信',
+  body: '<p style="margin:0 0 12px;">我們收到你的密碼重設申請。請點下方按鈕回到 MELE 設定新密碼。</p><p style="margin:0;">若不是你本人提出申請，請忽略這封信。</p>',
+  button: '重設密碼',
+  fallback: '請開啟信件並點擊重設密碼按鈕。',
+});
+
+const magicLinkTemplate = mailTemplate({
+  title: '登入 MELE',
+  eyebrow: '安全登入連結',
+  body: '<p style="margin:0 0 12px;">請點下方按鈕登入 MELE。若你沒有要求登入，可以直接忽略這封信。</p>',
+  button: '登入 MELE',
+  fallback: '請開啟信件並點擊登入 MELE 按鈕。',
+});
 
 const projectRef = required('SUPABASE_PROJECT_REF or NEXT_PUBLIC_SUPABASE_URL', deriveProjectRef());
 const accessToken = required('SUPABASE_ACCESS_TOKEN', env.SUPABASE_ACCESS_TOKEN);
@@ -147,6 +222,9 @@ const authConfig = {
   mailer_subjects_confirmation: env.MELE_MAIL_SUBJECT_CONFIRMATION || '確認你的 MELE 帳號',
   mailer_subjects_recovery: env.MELE_MAIL_SUBJECT_RECOVERY || '重設你的 MELE 密碼',
   mailer_subjects_magic_link: env.MELE_MAIL_SUBJECT_MAGIC_LINK || '登入 MELE',
+  mailer_templates_confirmation_content: env.MELE_MAIL_TEMPLATE_CONFIRMATION || confirmationTemplate,
+  mailer_templates_recovery_content: env.MELE_MAIL_TEMPLATE_RECOVERY || recoveryTemplate,
+  mailer_templates_magic_link_content: env.MELE_MAIL_TEMPLATE_MAGIC_LINK || magicLinkTemplate,
 };
 
 const managementUrl = `https://api.supabase.com/v1/projects/${projectRef}/config/auth`;
@@ -189,6 +267,10 @@ function printSafeStatus(data) {
     smtp_user: data?.smtp_user ? mask(data.smtp_user) : data?.smtp_user,
     smtp_sender_name: data?.smtp_sender_name,
     smtp_max_frequency: data?.smtp_max_frequency,
+    mailer_subjects_confirmation: data?.mailer_subjects_confirmation,
+    mailer_templates_confirmation_content_chars: data?.mailer_templates_confirmation_content?.length ?? null,
+    mailer_templates_recovery_content_chars: data?.mailer_templates_recovery_content?.length ?? null,
+    mailer_templates_magic_link_content_chars: data?.mailer_templates_magic_link_content?.length ?? null,
   };
   console.log(JSON.stringify(picked, null, 2));
 }
