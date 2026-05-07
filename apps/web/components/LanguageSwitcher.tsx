@@ -1,6 +1,5 @@
 'use client';
 
-import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
 import {
   LOCALE_LABELS,
@@ -48,13 +47,12 @@ export function LanguageSwitcher({
       {LOCALES.map((locale: Locale) => {
         const isActive = locale === activeLocale;
         return (
-          <Link
+          <a
             key={locale}
             href={switchLocaleInPathname(pathWithQuery, locale)}
             hrefLang={locale}
             aria-current={isActive ? 'page' : undefined}
             className={`${linkClass} ${isActive ? 'border-accent bg-accent/[0.14] text-accent-light' : ''}`}
-            onClick={onNavigate}
           >
             {variant === 'panel' ? (
               <span>{LOCALE_LABELS[locale].nativeName}</span>
@@ -64,7 +62,7 @@ export function LanguageSwitcher({
                 <span aria-hidden="true">{LOCALE_LABELS[locale].shortName}</span>
               </>
             )}
-          </Link>
+          </a>
         );
       })}
     </div>

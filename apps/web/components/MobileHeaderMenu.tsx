@@ -1,6 +1,5 @@
 'use client';
 
-import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { DEFAULT_LOCALE, localizePath, type Locale } from '@/lib/i18n/config';
@@ -53,17 +52,12 @@ export function MobileHeaderMenu({
   useEffect(() => {
     if (!open) return;
 
-    const onPointerDown = (event: PointerEvent) => {
-      if (!rootRef.current?.contains(event.target as Node)) close();
-    };
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') close();
     };
 
-    document.addEventListener('pointerdown', onPointerDown);
     document.addEventListener('keydown', onKeyDown);
     return () => {
-      document.removeEventListener('pointerdown', onPointerDown);
       document.removeEventListener('keydown', onKeyDown);
     };
   }, [open]);
@@ -98,13 +92,13 @@ export function MobileHeaderMenu({
           id="mobile-header-menu"
           className="absolute right-0 mt-2 w-[min(86vw,340px)] rounded-lg border border-accent-dim bg-primary/95 p-3 shadow-gold-soft backdrop-blur-xl"
         >
-          <nav className="grid gap-2" aria-label={labels?.mobileMenu ?? '手機選單'}>
+          <nav className="grid gap-2" aria-label={labels?.mobileMenu ?? 'Menu'}>
             {primaryLinks.map((item) => (
-              <Link key={item.href} href={localizePath(item.href, locale)} className={mobileLinkClass} onClick={close}>
+              <a key={item.href} href={localizePath(item.href, locale)} className={mobileLinkClass}>
                 {item.label}
-              </Link>
+              </a>
             ))}
-            <LanguageSwitcher label={labels?.language ?? '切換語言'} variant="panel" onNavigate={close} />
+            <LanguageSwitcher label={labels?.language ?? 'Language'} variant="panel" onNavigate={close} />
             {isSignedIn ? (
               <HeaderUserMenu
                 displayName={displayName}
@@ -123,9 +117,9 @@ export function MobileHeaderMenu({
               />
             ) : (
               guestLinks.map((item) => (
-                <Link key={item.href} href={localizePath(item.href, locale)} className={mobileLinkClass} onClick={close}>
+                <a key={item.href} href={localizePath(item.href, locale)} className={mobileLinkClass}>
                   {item.label}
-                </Link>
+                </a>
               ))
             )}
           </nav>

@@ -62,6 +62,26 @@ test.describe('Button and link logic', () => {
     });
   });
 
+  test('root entry respects browser language when no locale was chosen yet', async ({ request }) => {
+    const cases = [
+      ['en-US,en;q=0.9', '/en'],
+      ['vi-VN,vi;q=0.9,en;q=0.7', '/vi'],
+      ['id-ID,id;q=0.9,en;q=0.7', '/id'],
+      ['ja-JP,ja;q=0.9,en;q=0.7', '/ja'],
+      ['ko-KR,ko;q=0.9,en;q=0.7', '/ko'],
+    ] as const;
+
+    for (const [acceptLanguage, expectedPath] of cases) {
+      const response = await request.get('/', {
+        headers: { 'accept-language': acceptLanguage, cookie: 'mele-locale=' },
+        maxRedirects: 0,
+        failOnStatusCode: false,
+      });
+      expect(response.status(), acceptLanguage).toBe(307);
+      expect(response.headers().location, acceptLanguage).toBe(expectedPath);
+    }
+  });
+
   test('all localized release routes respond before any button sends users there', async ({ request }) => {
     test.setTimeout(120_000);
     const failures: string[] = [];

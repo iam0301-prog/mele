@@ -315,6 +315,7 @@ log('i18n supports six market locales and default zh-TW', ['zh-TW', 'en', 'vi', 
 log('language switcher preserves the current path', languageSwitcher.includes('switchLocaleInPathname') && languageSwitcher.includes('usePathname') && languageSwitcher.includes('useSearchParams'));
 log('language switcher renders panel locale names once', !languageSwitcher.includes("className={variant === 'panel' ? '' : 'sr-only'}"));
 log('middleware redirects root and rewrites localized legacy routes', i18nMiddleware.includes('pathname === \'/\'') && i18nMiddleware.includes('NextResponse.redirect') && i18nMiddleware.includes('NextResponse.rewrite') && i18nMiddleware.includes('LOCALE_HEADER'));
+log('middleware detects browser language before defaulting to Traditional Chinese', i18nMiddleware.includes('localeFromAcceptLanguage') && i18nMiddleware.includes("tag.startsWith('en')") && i18nMiddleware.includes("tag.startsWith('vi')") && i18nMiddleware.includes("tag.startsWith('id')") && i18nMiddleware.includes("tag.startsWith('ja')") && i18nMiddleware.includes("tag.startsWith('ko')"));
 log('middleware lets localized beta, market, and tools lobbies render natively', i18nMiddleware.includes("'/beta'") && i18nMiddleware.includes("'/spiritual'") && i18nMiddleware.includes("'/tools'"));
 log('sitemap emits localized hreflang alternates', sitemapRoute.includes('buildAlternateLanguages') && sitemapRoute.includes('alternates') && sitemapRoute.includes('languages'));
 const localizedMarketPage = readFileSync('apps/web/app/[locale]/spiritual/page.tsx', 'utf8');
@@ -531,7 +532,7 @@ log('server test auth is restricted to local host cookie', testAuthServer.includ
 log('social login providers use Supabase settings and env gates', ['NEXT_PUBLIC_ENABLE_GOOGLE_LOGIN', 'NEXT_PUBLIC_ENABLE_LINE_LOGIN', 'NEXT_PUBLIC_LINE_OAUTH_PROVIDER', '/auth/v1/settings', 'custom:line'].every((token) => login.includes(token)));
 log('auth callback rejects provider errors and unsafe next URLs', authCallback.includes('auth_callback_failed') && authCallback.includes('error_description') && authCallback.includes('startsWith(\'/\')') && authCallback.includes('!nextParam.startsWith(\'//\')'));
 log('account privacy page lets users request data rights', ['資料權利中心', 'create_support_thread', '匯出我的資料', '刪除帳號與資料', '停止特定使用'].every((token) => accountPrivacyPage.includes(token)));
-log('profile and account menu expose data rights', profilePage.includes('/account/privacy') && headerUserMenu.includes('/account/privacy') && headerUserMenu.includes('資料權利'));
+log('profile and account menu expose data rights', profilePage.includes('/account/privacy') && headerUserMenu.includes('/account/privacy') && headerUserMenu.includes('labels?.dataRights'));
 log('cookie consent explains local storage and links privacy policy', ['Cookie 與資料使用提示', 'localStorage', '/legal/privacy', 'mele_cookie_consent_v1'].every((token) => cookieConsent.includes(token)));
 warn('signup records consent_log row', login.includes('consent_log'), 'recommended for audit completeness');
 warn('signup writes privacy_consent_at', login.includes('privacy_consent_at'), 'recommended for audit completeness');
@@ -640,7 +641,7 @@ log(
 );
 
 const mobileHeaderMenu = readFileSync('apps/web/components/MobileHeaderMenu.tsx', 'utf8');
-log('header uses controlled mobile drawer navigation', header.includes('MobileHeaderMenu') && mobileHeaderMenu.includes('usePathname') && mobileHeaderMenu.includes('setOpen(false)') && mobileHeaderMenu.includes('pointerdown') && mobileHeaderMenu.includes('Escape'));
+log('header uses route-driven mobile drawer navigation', header.includes('MobileHeaderMenu') && mobileHeaderMenu.includes('usePathname') && mobileHeaderMenu.includes('setOpen(false)') && !mobileHeaderMenu.includes('pointerdown') && mobileHeaderMenu.includes('Escape'));
 log('header menu waits for hydration before accepting clicks', mobileHeaderMenu.includes('setHydrated(true)') && mobileHeaderMenu.includes('disabled={!hydrated}'));
 log(
   'header has localized right-side navigation and language switcher',

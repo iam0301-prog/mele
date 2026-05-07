@@ -63,7 +63,38 @@ function localeFromRequest(request: NextRequest) {
   if (isLocalizedPath(pathname)) return getLocaleFromPathname(pathname);
 
   const cookieLocale = request.cookies.get(LOCALE_COOKIE)?.value;
-  return isLocale(cookieLocale) ? cookieLocale : DEFAULT_LOCALE;
+  if (isLocale(cookieLocale)) return cookieLocale;
+
+  return localeFromAcceptLanguage(request.headers.get('accept-language')) ?? DEFAULT_LOCALE;
+}
+
+function localeFromAcceptLanguage(header: string | null): Locale | null {
+  if (!header) return null;
+
+  const ranked = header
+    .split(',')
+    .map((entry) => {
+      const [rawTag, ...params] = entry.trim().split(';');
+      const qParam = params.find((param) => param.trim().startsWith('q='));
+      const q = qParam ? Number(qParam.trim().slice(2)) : 1;
+      return {
+        tag: rawTag.toLowerCase(),
+        q: Number.isFinite(q) ? q : 0,
+      };
+    })
+    .filter((entry) => entry.tag && entry.q > 0)
+    .sort((a, b) => b.q - a.q);
+
+  for (const { tag } of ranked) {
+    if (tag === 'zh-tw' || tag.startsWith('zh-hant') || tag.startsWith('zh-tw')) return 'zh-TW';
+    if (tag.startsWith('en')) return 'en';
+    if (tag.startsWith('vi')) return 'vi';
+    if (tag.startsWith('id')) return 'id';
+    if (tag.startsWith('ja')) return 'ja';
+    if (tag.startsWith('ko')) return 'ko';
+  }
+
+  return null;
 }
 
 function requestHeadersWithLocale(request: NextRequest, locale = localeFromRequest(request)) {
