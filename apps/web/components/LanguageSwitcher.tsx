@@ -56,13 +56,13 @@ export function LanguageSwitcher({
             className={`${linkClass} ${isActive ? 'border-accent bg-accent/[0.14] text-accent-light' : ''}`}
             onClick={onNavigate}
           >
-            <span className={variant === 'panel' ? '' : 'sr-only'}>
-              {LOCALE_LABELS[locale].nativeName}
-            </span>
             {variant === 'panel' ? (
               <span>{LOCALE_LABELS[locale].nativeName}</span>
             ) : (
-              <span aria-hidden="true">{LOCALE_LABELS[locale].shortName}</span>
+              <>
+                <span className="sr-only">{LOCALE_LABELS[locale].nativeName}</span>
+                <span aria-hidden="true">{LOCALE_LABELS[locale].shortName}</span>
+              </>
             )}
           </Link>
         );

@@ -284,13 +284,25 @@ for (const file of [
 
 const requiredLocalizedTools = ['numerology', 'humandesign', 'tarot', 'runes', 'maya', 'bazi', 'ziwei', 'astro'];
 
+function hasPlaceholderText(value) {
+  if (typeof value === 'string') return /\?{2,}/.test(value);
+  if (Array.isArray(value)) return value.some(hasPlaceholderText);
+  if (value && typeof value === 'object') return Object.values(value).some(hasPlaceholderText);
+  return false;
+}
+
 for (const locale of ['zh-TW', 'en', 'vi', 'id', 'ja', 'ko']) {
   const localeFile = `locales/${locale}/common.json`;
   const source = existsSync(localeFile) ? readFileSync(localeFile, 'utf8') : '';
   log(`locale common.json ${locale}`, source.includes('"meta"') && source.includes('"nav"') && source.includes('"markets"'));
   const dict = source ? JSON.parse(source) : {};
   log(`locale ${locale} has tools navigation label`, Boolean(dict.nav?.tools));
-  log(`locale ${locale} has beta entrance copy`, Boolean(dict.nav?.beta && dict.beta?.primaryCta && dict.beta?.quests?.length === 3));
+  log(
+    `locale ${locale} has beta entrance copy`,
+    Boolean(dict.nav?.beta && dict.beta?.primaryCta && dict.beta?.quests?.length === 3) &&
+      !hasPlaceholderText(dict.nav?.beta) &&
+      !hasPlaceholderText(dict.beta),
+  );
   const toolSlugs = dict.home?.tools?.map((tool) => tool.slug) ?? [];
   log(`locale ${locale} exposes all eight tool entrances`, requiredLocalizedTools.every((tool) => toolSlugs.includes(tool)));
 }
@@ -301,6 +313,7 @@ const languageSwitcher = readFileSync('apps/web/components/LanguageSwitcher.tsx'
 const sitemapRoute = readFileSync('apps/web/app/sitemap.ts', 'utf8');
 log('i18n supports six market locales and default zh-TW', ['zh-TW', 'en', 'vi', 'id', 'ja', 'ko'].every((token) => i18nConfig.includes(token)) && i18nConfig.includes("DEFAULT_LOCALE: Locale = 'zh-TW'"));
 log('language switcher preserves the current path', languageSwitcher.includes('switchLocaleInPathname') && languageSwitcher.includes('usePathname') && languageSwitcher.includes('useSearchParams'));
+log('language switcher renders panel locale names once', !languageSwitcher.includes("className={variant === 'panel' ? '' : 'sr-only'}"));
 log('middleware redirects root and rewrites localized legacy routes', i18nMiddleware.includes('pathname === \'/\'') && i18nMiddleware.includes('NextResponse.redirect') && i18nMiddleware.includes('NextResponse.rewrite') && i18nMiddleware.includes('LOCALE_HEADER'));
 log('middleware lets localized beta, market, and tools lobbies render natively', i18nMiddleware.includes("'/beta'") && i18nMiddleware.includes("'/spiritual'") && i18nMiddleware.includes("'/tools'"));
 log('sitemap emits localized hreflang alternates', sitemapRoute.includes('buildAlternateLanguages') && sitemapRoute.includes('alternates') && sitemapRoute.includes('languages'));

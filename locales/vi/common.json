@@ -247,74 +247,74 @@
   },
   "beta": {
     "seoTitle": "Closed Beta | MELE",
-    "seoDescription": "Tham gia b?n th? nghi?m MELE ?? d?ng c?ng c? mi?n ph?, nghi th?c h?ng ng?y, ?i?m th?nh vi?n v? ph?n ??c s?u h?n.",
+    "seoDescription": "Tham gia bản thử nghiệm MELE để dùng công cụ miễn phí, nghi thức hằng ngày, điểm thành viên và phần đọc sâu hơn.",
     "badge": "CLOSED BETA INVITATION",
-    "title": "Hi?u b?n th?n tr??c, r?i ch?n l?a r? r?ng h?n",
-    "description": "Trang n?y d?nh cho ng??i th? nghi?m s?m. H?y b?t ??u b?ng c?ng c? mi?n ph?, nh?n 200 ?i?m m?i ng?y, m? kh?a n?i dung s?u h?n v?i 100 ?i?m v? g?i ph?n h?i cho ch?ng t?i.",
+    "title": "Hiểu bản thân trước, rồi chọn lựa rõ ràng hơn",
+    "description": "Trang này dành cho người thử nghiệm sớm. Hãy bắt đầu bằng công cụ miễn phí, nhận 200 điểm mỗi ngày, mở khóa nội dung sâu hơn với 100 điểm và gửi phản hồi cho chúng tôi.",
     "primaryCta": "Tham gia beta",
-    "secondaryCta": "Xem c?ng c?",
-    "dailyCta": "Nghi th?c h?m nay",
-    "inviteNote": "M? m?i s? t? ??ng ?i c?ng trang ??ng k?. N?u ?? c? t?i kho?n, b?n c? th? ??ng nh?p ?? xem l?i h? s?.",
+    "secondaryCta": "Xem công cụ",
+    "dailyCta": "Nghi thức hôm nay",
+    "inviteNote": "Mã mời sẽ tự động đi cùng trang đăng ký. Nếu đã có tài khoản, bạn có thể đăng nhập để xem lại hồ sơ.",
     "panelLabel": "BETA TASK BOARD",
-    "panelTitle": "H?m nay h?y th? ba vi?c n?y",
+    "panelTitle": "Hôm nay hãy thử ba việc này",
     "panelItems": [
-      "L?m m?t b?i th? mi?n ph? v? xem k?t qu? c? d? hi?u kh?ng.",
-      "Nh?n 200 ?i?m m?i ng?y v? m? kh?a m?t ph?n ??c s?u.",
-      "B?o l?i ?i?u kh? hi?u, l?i, ho?c ?i?m b?n th?y h?u ?ch."
+      "Làm một bài thử miễn phí và xem kết quả có dễ hiểu không.",
+      "Nhận 200 điểm mỗi ngày và mở khóa một phần đọc sâu.",
+      "Báo lại điều khó hiểu, lỗi, hoặc điểm bạn thấy hữu ích."
     ],
-    "rulesTitle": "Quy t?c ?i?m beta",
+    "rulesTitle": "Quy tắc điểm beta",
     "rules": [
       {
-        "label": "M?i ng?y nh?n",
-        "value": "200 ?i?m",
-        "body": "Th?nh vi?n c? th? nh?n m?t l?n m?i ng?y."
+        "label": "Mỗi ngày nhận",
+        "value": "200 điểm",
+        "body": "Thành viên có thể nhận một lần mỗi ngày."
       },
       {
-        "label": "M?i m? kh?a",
-        "value": "100 ?i?m",
-        "body": "N?i dung ??c s?u d?ng c?ng nh?p n?y."
+        "label": "Mỗi mở khóa",
+        "value": "100 điểm",
+        "body": "Nội dung đọc sâu dùng cùng nhịp này."
       },
       {
-        "label": "R?t h?ng ng?y",
-        "value": "1 l?n",
-        "body": "Ch?n tarot ho?c rune m?i ng?y."
+        "label": "Rút hằng ngày",
+        "value": "1 lần",
+        "body": "Chọn tarot hoặc rune mỗi ngày."
       },
       {
-        "label": "M?c ti?u",
-        "value": "3 ph?t",
-        "body": "Ng??i m?i n?n bi?t c?n l?m g? trong ba ph?t."
+        "label": "Mục tiêu",
+        "value": "3 phút",
+        "body": "Người mới nên biết cần làm gì trong ba phút."
       }
     ],
-    "questsTitle": "L? tr?nh th? nghi?m",
-    "questsBody": "Kh?ng c?n th? h?t m?i th?. ?i theo l? tr?nh n?y ?? c?m nh?n v?ng l?p ch?nh.",
+    "questsTitle": "Lộ trình thử nghiệm",
+    "questsBody": "Không cần thử hết mọi thứ. Đi theo lộ trình này để cảm nhận vòng lặp chính.",
     "quests": [
       {
-        "title": "B??c 1: Hi?u b?n th?n mi?n ph?",
-        "body": "Th? numerology, Human Design, Maya ho?c tarot.",
+        "title": "Bước 1: Hiểu bản thân miễn phí",
+        "body": "Thử numerology, Human Design, Maya hoặc tarot.",
         "href": "/tools",
-        "action": "M? c?ng c?"
+        "action": "Mở công cụ"
       },
       {
-        "title": "B??c 2: Nh?p h?ng ng?y",
-        "body": "Th? r?t h?ng ng?y, ?i?m h?ng ng?y v? l? do quay l?i.",
+        "title": "Bước 2: Nhịp hằng ngày",
+        "body": "Thử rút hằng ngày, điểm hằng ngày và lý do quay lại.",
         "href": "/daily",
-        "action": "B?t ??u"
+        "action": "Bắt đầu"
       },
       {
-        "title": "B??c 3: L?u v? m? kh?a",
-        "body": "??ng nh?p ?? xem h? s?, ?i?m v? n?i dung ?? m?.",
+        "title": "Bước 3: Lưu và mở khóa",
+        "body": "Đăng nhập để xem hồ sơ, điểm và nội dung đã mở.",
         "href": "/account/charts",
-        "action": "Xem h? s?"
+        "action": "Xem hồ sơ"
       }
     ],
-    "feedbackTitle": "B?n c? th? ph?n h?i g?",
-    "feedbackBody": "V?n b?n kh? hi?u, n?t kh?ng r?, giao di?n ?i?n tho?i ch?t, k?t qu? r?t ??ng ho?c ch?a c? c?m gi?c ??u r?t h?u ?ch.",
+    "feedbackTitle": "Bạn có thể phản hồi gì",
+    "feedbackBody": "Văn bản khó hiểu, nút không rõ, giao diện điện thoại chật, kết quả rất đúng hoặc chưa có cảm giác đều rất hữu ích.",
     "proof": [
-      "C?ng c? mi?n ph? tr??c",
-      "200 ?i?m m?i ng?y",
-      "M? kh?a 100 ?i?m",
-      "Guide l? t?y ch?n",
-      "?u ti?n ?i?n tho?i"
+      "Công cụ miễn phí trước",
+      "200 điểm mỗi ngày",
+      "Mở khóa 100 điểm",
+      "Guide là tùy chọn",
+      "Ưu tiên điện thoại"
     ]
   }
 }
