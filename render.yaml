@@ -8,7 +8,7 @@ services:
     autoDeploy: false
     envVars:
       - key: MELE_ALLOWED_ORIGINS
-        sync: false
+        value: https://mele-chi.vercel.app
       - key: MELE_RATE_LIMIT_MAX_REQUESTS
         value: "90"
       - key: MELE_RATE_LIMIT_WINDOW_SECONDS

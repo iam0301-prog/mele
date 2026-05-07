@@ -63,9 +63,11 @@ app = FastAPI(
 )
 
 
-# Local defaults are for development and device testing. Production should set
+# Defaults cover local development plus the first closed-beta Vercel domain.
+# Production can still override with
 # MELE_ALLOWED_ORIGINS="https://example.com,https://www.example.com".
 _default_origins = [
+    "https://mele-chi.vercel.app",
     "http://localhost:3000",
     "http://localhost:3001",
     "http://localhost:3006",

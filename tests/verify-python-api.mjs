@@ -91,6 +91,12 @@ try {
   check('/ready is reachable', readyCheck.response.status === 200);
   check('/ready exposes cache status', Boolean(readyCheck.body?.cache?.numerology));
   check('/ready exposes rate limit status', Boolean(readyCheck.body?.rate_limit?.max_requests_per_tool));
+  check('/ready default CORS includes Vercel production origin', readyCheck.body?.allowed_origins?.includes('https://mele-chi.vercel.app'));
+
+  const corsReady = await fetch(`${baseUrl}/ready`, {
+    headers: { Origin: 'https://mele-chi.vercel.app' },
+  });
+  check('/ready allows Vercel production origin through CORS', corsReady.headers.get('access-control-allow-origin') === 'https://mele-chi.vercel.app');
 
   const cases = [
     ['numerology', { year: 1990, month: 5, day: 15 }, (data) => data.lifePath === 3 && data.birthDay === 6],
