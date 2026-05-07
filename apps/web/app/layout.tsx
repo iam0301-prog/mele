@@ -22,7 +22,7 @@ const localPreviewCacheResetScript = `
   try {
     var host = window.location.hostname;
     if (host !== 'localhost' && host !== '127.0.0.1' && host !== '::1') return;
-    var key = 'mele_local_preview_cache_reset_v1';
+    var key = 'mele_local_preview_cache_reset_v2';
     if (window.sessionStorage && window.sessionStorage.getItem(key)) return;
     if (window.sessionStorage) window.sessionStorage.setItem(key, '1');
     var clearCaches = 'caches' in window

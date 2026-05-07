@@ -2,11 +2,11 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { useProvidedLocale } from '@/lib/i18n/LocaleProvider';
 import { localizePath, type Locale } from '@/lib/i18n/config';
 import { getTeacherCopy, type TeacherCopy } from '@/lib/i18n/teacher-copy';
 import { createClient } from '@/lib/supabase/client';
+import { readClientTestUser } from '@/lib/test-auth';
 import { useToast } from '@/components/ToastProvider';
 import type { TeacherApplication } from '@/types/db';
 
@@ -68,12 +68,12 @@ export default function ApplyPage() {
   const locale = useProvidedLocale();
   const copy = getTeacherCopy(locale);
   const toast = useToast();
-  const router = useRouter();
   const [user, setUser] = useState<{ id: string; email: string | null } | null>(null);
   const [existing, setExisting] = useState<TeacherApplication | null>(null);
   const [authMode, setAuthMode] = useState<'signin' | 'signup' | null>('signin');
   const [authEmail, setAuthEmail] = useState('');
   const [authPwd, setAuthPwd] = useState('');
+  const [authing, setAuthing] = useState(false);
 
   // Form state
   const [legalName, setLegalName] = useState('');
@@ -96,42 +96,70 @@ export default function ApplyPage() {
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
+    let mounted = true;
     (async () => {
-      const supabase = createClient();
-      const { data: { user: u } } = await supabase.auth.getUser();
-      if (u) {
-        setUser({ id: u.id, email: u.email ?? null });
-        setEmailField(u.email ?? '');
-        const { data: app } = await supabase
-          .from('teacher_applications')
-          .select('*')
-          .eq('user_id', u.id)
-          .order('submitted_at', { ascending: false })
-          .limit(1);
-        if (app && app.length) setExisting(app[0] as TeacherApplication);
+      const testUser = readClientTestUser();
+      if (testUser) {
+        if (!mounted) return;
+        setUser({ id: testUser.id, email: testUser.email });
+        setEmailField(testUser.email);
+        return;
+      }
+
+      try {
+        const supabase = createClient();
+        const { data: { user: u }, error: userError } = await supabase.auth.getUser();
+        if (userError) throw userError;
+        if (u) {
+          if (!mounted) return;
+          setUser({ id: u.id, email: u.email ?? null });
+          setEmailField(u.email ?? '');
+          const { data: app, error: appError } = await supabase
+            .from('teacher_applications')
+            .select('*')
+            .eq('user_id', u.id)
+            .order('submitted_at', { ascending: false })
+            .limit(1);
+          if (appError) throw appError;
+          if (mounted && app && app.length) setExisting(app[0] as TeacherApplication);
+        }
+      } catch (error) {
+        const message = error instanceof Error ? error.message : copy.apply.authLoadFailed;
+        toast(message, 'error');
       }
     })();
-  }, []);
+    return () => {
+      mounted = false;
+    };
+  }, [copy.apply.authLoadFailed, toast]);
 
   const auth = async (mode: 'signin' | 'signup') => {
-    const supabase = createClient();
-    if (mode === 'signin') {
-      const { error } = await supabase.auth.signInWithPassword({ email: authEmail, password: authPwd });
-      if (error) return toast(error.message, 'error');
-      router.refresh();
-      location.reload();
-    } else {
-      if (authPwd.length < 6) return toast(copy.apply.passwordTooShort, 'error');
-      const { error } = await supabase.auth.signUp({
-        email: authEmail,
-        password: authPwd,
-        options: {
-          emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(localizePath('/teachers/apply', locale))}`,
-        },
-      });
-      if (error) return toast(error.message, 'error');
-      toast(copy.apply.signupSuccess);
-      setTimeout(() => location.reload(), 1500);
+    if (authing) return;
+    setAuthing(true);
+    try {
+      const supabase = createClient();
+      if (mode === 'signin') {
+        const { error } = await supabase.auth.signInWithPassword({ email: authEmail, password: authPwd });
+        if (error) return toast(error.message, 'error');
+        window.location.assign(localizePath('/teachers/apply', locale));
+      } else {
+        if (authPwd.length < 6) return toast(copy.apply.passwordTooShort, 'error');
+        const { error } = await supabase.auth.signUp({
+          email: authEmail,
+          password: authPwd,
+          options: {
+            emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(localizePath('/teachers/apply', locale))}`,
+          },
+        });
+        if (error) return toast(error.message, 'error');
+        toast(copy.apply.signupSuccess);
+        setAuthMode('signin');
+      }
+    } catch (error) {
+      const message = error instanceof Error ? error.message : copy.apply.authUnexpectedError;
+      toast(message, 'error');
+    } finally {
+      setAuthing(false);
     }
   };
 
@@ -211,8 +239,8 @@ export default function ApplyPage() {
           </div>
           <input type="email" placeholder={copy.apply.email} value={authEmail} onChange={(e) => setAuthEmail(e.target.value)} className="mele-input" />
           <input type="password" placeholder={copy.apply.password} minLength={6} value={authPwd} onChange={(e) => setAuthPwd(e.target.value)} className="mele-input" />
-          <button onClick={() => auth(authMode!)} className="mele-btn-primary w-full">
-            {authMode === 'signin' ? copy.apply.signIn : copy.apply.signUp}
+          <button onClick={() => auth(authMode!)} disabled={authing} className="mele-btn-primary w-full">
+            {authing ? copy.apply.authing : authMode === 'signin' ? copy.apply.signIn : copy.apply.signUp}
           </button>
         </div>
       </div>

@@ -62,6 +62,9 @@ export type TeacherCopy = {
     passwordMin: string;
     passwordTooShort: string;
     signupSuccess: string;
+    authing: string;
+    authLoadFailed: string;
+    authUnexpectedError: string;
     existingTitle: string;
     existingSubtitle: string;
     submittedAt: string;
@@ -287,6 +290,9 @@ export const teacherCopies: Record<Locale, TeacherCopy> = {
       passwordMin: '密碼至少 6 字',
       passwordTooShort: '密碼至少 6 字',
       signupSuccess: '註冊成功 ✦ 請查收 Email',
+      authing: '處理中...',
+      authLoadFailed: '登入狀態讀取失敗，請重新整理後再試一次。',
+      authUnexpectedError: '登入流程暫時異常，請稍後再試一次。',
       existingTitle: '你的申請',
       existingSubtitle: 'YOUR APPLICATION',
       submittedAt: '送出於',
@@ -485,6 +491,9 @@ export const teacherCopies: Record<Locale, TeacherCopy> = {
       passwordMin: 'Password must be at least 6 characters',
       passwordTooShort: 'Password must be at least 6 characters',
       signupSuccess: 'Account created. Please check your email.',
+      authing: 'Processing...',
+      authLoadFailed: 'Could not load your sign-in state. Refresh and try again.',
+      authUnexpectedError: 'Sign-in is temporarily unavailable. Please try again shortly.',
       existingTitle: 'Your Application',
       existingSubtitle: 'YOUR APPLICATION',
       submittedAt: 'Submitted on',

@@ -281,6 +281,7 @@ for (const file of [
   'apps/web/app/[locale]/legal/disclaimer/page.tsx',
   'apps/web/app/sitemap.ts',
   'apps/web/app/robots.ts',
+  'apps/web/app/favicon.ico/route.ts',
   'apps/web/components/LanguageSwitcher.tsx',
   'apps/web/components/LocalizedDailyClient.tsx',
   'apps/web/components/LocalizedLoginClient.tsx',
@@ -544,6 +545,10 @@ log(
 log('local test signout clears browser state', headerUserMenu.includes('clearClientTestAuth'));
 log('charts page allows local test auth without Supabase session', chartsPage.includes('readClientTestUser') && chartsPage.includes('本機測試帳號'));
 log(
+  'local preview cache reset advances after client/server chunk changes',
+  appLayout.includes('mele_local_preview_cache_reset_v2') && appLayout.includes('caches.delete') && appLayout.includes('serviceWorker.getRegistrations'),
+);
+log(
   'teacher portal shows demo backend in local test auth',
   teacherPortalPage.includes('getServerTestUser') &&
     teacherPortalPage.includes('demoTeacher') &&
@@ -752,6 +757,14 @@ log(
   teacherApplyPage.includes('emailRedirectTo') &&
     teacherApplyPage.includes('/auth/callback?next=') &&
     teacherApplyPage.includes("localizePath('/teachers/apply', locale)"),
+);
+log(
+  'teacher application auth flow is resilient after sign-in',
+  teacherApplyPage.includes('readClientTestUser') &&
+    teacherApplyPage.includes('try {') &&
+    teacherApplyPage.includes('authLoadFailed') &&
+    teacherApplyPage.includes("window.location.assign(localizePath('/teachers/apply', locale))") &&
+    !teacherApplyPage.includes('router.refresh()'),
 );
 log(
   'teacher application has pre-submit readiness guidance',
