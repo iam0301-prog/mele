@@ -42,6 +42,8 @@ const playwrightConfig = read('apps/web/playwright.config.ts');
 const webE2eRunner = read('scripts/run-web-e2e.mjs');
 const webPackage = JSON.parse(read('apps/web/package.json') || '{}');
 const webLayout = read('apps/web/app/layout.tsx');
+const localizedBetaPage = read('apps/web/app/[locale]/beta/page.tsx');
+const sitemapRoute = read('apps/web/app/sitemap.ts');
 const nextConfig = read('apps/web/next.config.mjs');
 const pkg = JSON.parse(read('package.json') || '{}');
 
@@ -319,6 +321,8 @@ ok('web package targets patched Next 15 line', /^\^15\.5\.15/.test(webPackage.de
 ok('web package targets patched Playwright', /^\^1\.59\.1/.test(webPackage.devDependencies?.['@playwright/test'] || ''));
 ok('layout avoids build-time Google font network fetches', !webLayout.includes('next/font/google'));
 ok('Next config sets outputFileTracingRoot for multiple lockfiles', nextConfig.includes('outputFileTracingRoot'));
+ok('localized beta entry exists for tester invite flow', localizedBetaPage.includes('dictionary.beta') && localizedBetaPage.includes("mode: 'signup'"));
+ok('sitemap includes localized beta entry', sitemapRoute.includes("'/beta'") && sitemapRoute.includes('buildAlternateLanguages'));
 
 console.log('\n=== Browser e2e coverage ===\n');
 

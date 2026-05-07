@@ -43,6 +43,28 @@ export interface Dictionary {
     tools: Array<{ slug: string; name: string; tag: string; desc: string }>;
     roles: Array<{ role: string; title: string; body: string; href: string; action: string }>;
   };
+  beta: {
+    seoTitle: string;
+    seoDescription: string;
+    badge: string;
+    title: string;
+    description: string;
+    primaryCta: string;
+    secondaryCta: string;
+    dailyCta: string;
+    inviteNote: string;
+    panelLabel: string;
+    panelTitle: string;
+    panelItems: string[];
+    rulesTitle: string;
+    rules: Array<{ label: string; value: string; body: string }>;
+    questsTitle: string;
+    questsBody: string;
+    quests: Array<{ title: string; body: string; href: string; action: string }>;
+    feedbackTitle: string;
+    feedbackBody: string;
+    proof: string[];
+  };
   markets: {
     items: Array<{ locale: Locale; name: string; status: string; body: string; href: string }>;
     page: Record<string, string>;

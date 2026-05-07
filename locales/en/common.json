@@ -29,7 +29,8 @@
     "profile": "Profile",
     "dataRights": "Data rights",
     "admin": "Admin",
-    "signOut": "Sign out"
+    "signOut": "Sign out",
+    "beta": "Join beta"
   },
   "footer": {
     "privacy": "Privacy",
@@ -243,5 +244,77 @@
   "language": {
     "label": "Change language",
     "current": "Current language"
+  },
+  "beta": {
+    "seoTitle": "Closed Beta | MELE",
+    "seoDescription": "Join the MELE closed beta and test free self-discovery tools, daily rituals, member points, and deeper readings.",
+    "badge": "CLOSED BETA INVITATION",
+    "title": "Understand yourself first, then choose with more clarity",
+    "description": "This page is for early testers. Start with free tools, claim 200 daily points, unlock deeper readings for 100 points, and tell us what feels clear or confusing.",
+    "primaryCta": "Join beta",
+    "secondaryCta": "Explore tools",
+    "dailyCta": "Daily ritual",
+    "inviteNote": "The invite code will be carried into signup automatically. Existing members can log in and return to their chart archive.",
+    "panelLabel": "BETA TASK BOARD",
+    "panelTitle": "Please test these three things today",
+    "panelItems": [
+      "Run one free test and check whether the result is readable.",
+      "Claim 200 daily points and unlock one deeper reading.",
+      "Report anything confusing, broken, or surprisingly useful."
+    ],
+    "rulesTitle": "Beta point rules",
+    "rules": [
+      {
+        "label": "Daily claim",
+        "value": "200 pts",
+        "body": "Members can claim once per day."
+      },
+      {
+        "label": "Unlock cost",
+        "value": "100 pts",
+        "body": "Deep readings and transit content use this rhythm."
+      },
+      {
+        "label": "Daily draw",
+        "value": "1 time",
+        "body": "Choose tarot or runes once per day."
+      },
+      {
+        "label": "Test target",
+        "value": "3 min",
+        "body": "New visitors should know what to do within three minutes."
+      }
+    ],
+    "questsTitle": "Suggested test path",
+    "questsBody": "You do not need to test everything at once. This path shows the core loop.",
+    "quests": [
+      {
+        "title": "Step 1: Free self-discovery",
+        "body": "Try numerology, Human Design, Maya, or tarot first.",
+        "href": "/tools",
+        "action": "Open tools"
+      },
+      {
+        "title": "Step 2: Daily rhythm",
+        "body": "Test daily draw, daily points, and the reason to return.",
+        "href": "/daily",
+        "action": "Start daily ritual"
+      },
+      {
+        "title": "Step 3: Save and unlock",
+        "body": "Log in to review saved charts, points, and unlocked content.",
+        "href": "/account/charts",
+        "action": "Open chart archive"
+      }
+    ],
+    "feedbackTitle": "What to report",
+    "feedbackBody": "Confusing copy, unclear buttons, mobile crowding, strong readings, weak readings, or anything that blocks trust.",
+    "proof": [
+      "Free tools first",
+      "200 daily points",
+      "100-point unlocks",
+      "Guides are optional",
+      "Mobile-first testing"
+    ]
   }
 }

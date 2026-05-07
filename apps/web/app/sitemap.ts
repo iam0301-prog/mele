@@ -4,6 +4,7 @@ import { SITE_URL } from '@/lib/i18n/seo';
 
 const PUBLIC_ROUTES = [
   '/',
+  '/beta',
   '/spiritual',
   '/tools',
   '/daily',

@@ -29,7 +29,8 @@
     "profile": "Profil",
     "dataRights": "Hak data",
     "admin": "Admin",
-    "signOut": "Keluar"
+    "signOut": "Keluar",
+    "beta": "Ikut beta"
   },
   "footer": {
     "privacy": "Privasi",
@@ -243,5 +244,77 @@
   "language": {
     "label": "Ganti bahasa",
     "current": "Bahasa saat ini"
+  },
+  "beta": {
+    "seoTitle": "Closed Beta | MELE",
+    "seoDescription": "Ikuti beta tertutup MELE untuk mencoba alat gratis, ritual harian, poin anggota, dan bacaan yang lebih dalam.",
+    "badge": "CLOSED BETA INVITATION",
+    "title": "Kenali diri dulu, lalu memilih dengan lebih jernih",
+    "description": "Halaman ini untuk penguji awal. Mulai dari alat gratis, klaim 200 poin harian, buka bacaan lebih dalam dengan 100 poin, lalu beri tahu kami bagian yang jelas atau membingungkan.",
+    "primaryCta": "Ikut beta",
+    "secondaryCta": "Lihat alat",
+    "dailyCta": "Ritual harian",
+    "inviteNote": "Kode undangan akan otomatis masuk ke halaman daftar. Anggota lama bisa langsung login dan kembali ke arsip chart.",
+    "panelLabel": "BETA TASK BOARD",
+    "panelTitle": "Coba tiga hal ini hari ini",
+    "panelItems": [
+      "Jalankan satu tes gratis dan cek apakah hasilnya mudah dibaca.",
+      "Klaim 200 poin harian dan buka satu bacaan mendalam.",
+      "Laporkan hal yang membingungkan, rusak, atau terasa berguna."
+    ],
+    "rulesTitle": "Aturan poin beta",
+    "rules": [
+      {
+        "label": "Klaim harian",
+        "value": "200 poin",
+        "body": "Anggota bisa klaim sekali per hari."
+      },
+      {
+        "label": "Biaya buka",
+        "value": "100 poin",
+        "body": "Bacaan mendalam dan transit memakai ritme ini."
+      },
+      {
+        "label": "Tarikan harian",
+        "value": "1 kali",
+        "body": "Pilih tarot atau rune sekali per hari."
+      },
+      {
+        "label": "Target tes",
+        "value": "3 menit",
+        "body": "Pengunjung baru harus tahu harus melakukan apa dalam tiga menit."
+      }
+    ],
+    "questsTitle": "Rute tes yang disarankan",
+    "questsBody": "Tidak perlu mencoba semuanya sekaligus. Rute ini menunjukkan inti produk.",
+    "quests": [
+      {
+        "title": "Langkah 1: Kenali diri gratis",
+        "body": "Coba numerology, Human Design, Maya, atau tarot.",
+        "href": "/tools",
+        "action": "Buka alat"
+      },
+      {
+        "title": "Langkah 2: Ritme harian",
+        "body": "Coba tarikan harian, poin harian, dan alasan untuk kembali.",
+        "href": "/daily",
+        "action": "Mulai ritual"
+      },
+      {
+        "title": "Langkah 3: Simpan dan buka",
+        "body": "Login untuk melihat chart, poin, dan konten terbuka.",
+        "href": "/account/charts",
+        "action": "Buka arsip"
+      }
+    ],
+    "feedbackTitle": "Apa yang perlu dilaporkan",
+    "feedbackBody": "Teks membingungkan, tombol tidak jelas, tampilan mobile terlalu padat, hasil terasa kuat, atau hasil terasa lemah.",
+    "proof": [
+      "Alat gratis dulu",
+      "200 poin harian",
+      "Buka 100 poin",
+      "Guide opsional",
+      "Tes mobile-first"
+    ]
   }
 }

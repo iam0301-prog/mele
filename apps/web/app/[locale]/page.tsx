@@ -47,6 +47,9 @@ export default async function LocalizedHomePage({ params }: PageProps) {
           <h1>{home.title}</h1>
           <p>{home.description}</p>
           <div className="home-hero__actions">
+            <Link href={localizePath('/beta', locale)} className="mele-btn-primary">
+              {dict.nav.beta}
+            </Link>
             <Link href={localizePath('/daily', locale)} className="mele-btn-primary">
               {home.actions.daily}
             </Link>

@@ -27,6 +27,7 @@ export async function Header() {
   }
 
   const primaryLinks = [
+    { href: '/beta', label: dict.nav.beta },
     { href: '/tools', label: dict.nav.tools },
     { href: '/daily', label: dict.nav.daily },
     { href: '/mobile', label: dict.nav.mobile },

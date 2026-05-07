@@ -74,6 +74,7 @@ export default function MobilePage() {
   const router = useRouter();
   const dateKey = useMemo(() => taipeiDateKey(), []);
   const reading = useMemo(() => buildDailyReading(dateKey, 'mobile-preview'), [dateKey]);
+  const [isHydrated, setIsHydrated] = useState(false);
   const [tab, setTab] = useState<MobileTab>('daily');
   const [draws, setDraws] = useState<Draws>(() => {
     const tarot = getLocalDraw('tarot', dateKey);
@@ -96,6 +97,10 @@ export default function MobilePage() {
   const [matchNotice, setMatchNotice] = useState<string | null>(null);
   const selectedDailyDraw = draws.tarot ? 'tarot' : draws.runes ? 'runes' : null;
   const hasAnyDailyDraw = Boolean(selectedDailyDraw);
+
+  useEffect(() => {
+    setIsHydrated(true);
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -539,10 +544,10 @@ export default function MobilePage() {
         )}
 
         <nav className="mobile-tabbar" aria-label="手機主功能">
-          <button type="button" className={tab === 'daily' ? 'is-active' : ''} onClick={() => setTab('daily')}>每日</button>
-          <button type="button" className={tab === 'match' ? 'is-active' : ''} onClick={() => setTab('match')}>引導</button>
-          <button type="button" className={tab === 'ar' ? 'is-active' : ''} onClick={() => setTab('ar')}>AR</button>
-          <button type="button" className={tab === 'teachers' ? 'is-active' : ''} onClick={() => setTab('teachers')}>老師</button>
+          <button type="button" disabled={!isHydrated} className={tab === 'daily' ? 'is-active' : ''} onClick={() => setTab('daily')}>每日</button>
+          <button type="button" disabled={!isHydrated} className={tab === 'match' ? 'is-active' : ''} onClick={() => setTab('match')}>引導</button>
+          <button type="button" disabled={!isHydrated} className={tab === 'ar' ? 'is-active' : ''} onClick={() => setTab('ar')}>AR</button>
+          <button type="button" disabled={!isHydrated} className={tab === 'teachers' ? 'is-active' : ''} onClick={() => setTab('teachers')}>老師</button>
         </nav>
       </section>
     </main>

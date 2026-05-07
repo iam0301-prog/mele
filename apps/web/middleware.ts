@@ -12,7 +12,7 @@ import {
 } from './lib/i18n/config';
 import { updateSession } from './lib/supabase/middleware';
 
-const LOCALIZED_APP_ROUTES = new Set(['/', '/spiritual', '/tools']);
+const LOCALIZED_APP_ROUTES = new Set(['/', '/spiritual', '/tools', '/beta']);
 const LOCALIZED_TOOL_ROUTES = new Set([
   '/tools/numerology',
   '/tools/maya',

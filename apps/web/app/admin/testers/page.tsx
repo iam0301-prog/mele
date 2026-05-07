@@ -113,12 +113,10 @@ function rowName(row: TesterRow) {
 
 function buildInviteUrl(origin: string, inviteCode: string, segment = 'closed-beta') {
   const params = new URLSearchParams({
-    mode: 'signup',
     invite: inviteCode || DEFAULT_INVITE_CODE,
     segment,
-    return: '/account/charts',
   });
-  return `${origin}/account/login?${params.toString()}`;
+  return `${origin}/zh-TW/beta?${params.toString()}`;
 }
 
 export default function AdminTestersPage() {

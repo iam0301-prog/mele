@@ -233,6 +233,7 @@ const routeFiles = [
   'apps/web/app/account/payment/result/page.tsx',
   'apps/web/app/account/profile/page.tsx',
   'apps/web/app/account/privacy/page.tsx',
+  'apps/web/app/beta/page.tsx',
   'apps/web/app/admin/page.tsx',
   'apps/web/app/admin/applications/page.tsx',
   'apps/web/app/admin/bookings/page.tsx',
@@ -268,6 +269,7 @@ for (const file of routeFiles) {
 for (const file of [
   'apps/web/app/[locale]/layout.tsx',
   'apps/web/app/[locale]/page.tsx',
+  'apps/web/app/[locale]/beta/page.tsx',
   'apps/web/app/[locale]/spiritual/page.tsx',
   'apps/web/app/[locale]/tools/page.tsx',
   'apps/web/app/sitemap.ts',
@@ -288,6 +290,7 @@ for (const locale of ['zh-TW', 'en', 'vi', 'id', 'ja', 'ko']) {
   log(`locale common.json ${locale}`, source.includes('"meta"') && source.includes('"nav"') && source.includes('"markets"'));
   const dict = source ? JSON.parse(source) : {};
   log(`locale ${locale} has tools navigation label`, Boolean(dict.nav?.tools));
+  log(`locale ${locale} has beta entrance copy`, Boolean(dict.nav?.beta && dict.beta?.primaryCta && dict.beta?.quests?.length === 3));
   const toolSlugs = dict.home?.tools?.map((tool) => tool.slug) ?? [];
   log(`locale ${locale} exposes all eight tool entrances`, requiredLocalizedTools.every((tool) => toolSlugs.includes(tool)));
 }
@@ -299,14 +302,28 @@ const sitemapRoute = readFileSync('apps/web/app/sitemap.ts', 'utf8');
 log('i18n supports six market locales and default zh-TW', ['zh-TW', 'en', 'vi', 'id', 'ja', 'ko'].every((token) => i18nConfig.includes(token)) && i18nConfig.includes("DEFAULT_LOCALE: Locale = 'zh-TW'"));
 log('language switcher preserves the current path', languageSwitcher.includes('switchLocaleInPathname') && languageSwitcher.includes('usePathname') && languageSwitcher.includes('useSearchParams'));
 log('middleware redirects root and rewrites localized legacy routes', i18nMiddleware.includes('pathname === \'/\'') && i18nMiddleware.includes('NextResponse.redirect') && i18nMiddleware.includes('NextResponse.rewrite') && i18nMiddleware.includes('LOCALE_HEADER'));
-log('middleware lets localized market and tools lobbies render natively', i18nMiddleware.includes("'/spiritual'") && i18nMiddleware.includes("'/tools'"));
+log('middleware lets localized beta, market, and tools lobbies render natively', i18nMiddleware.includes("'/beta'") && i18nMiddleware.includes("'/spiritual'") && i18nMiddleware.includes("'/tools'"));
 log('sitemap emits localized hreflang alternates', sitemapRoute.includes('buildAlternateLanguages') && sitemapRoute.includes('alternates') && sitemapRoute.includes('languages'));
 const localizedMarketPage = readFileSync('apps/web/app/[locale]/spiritual/page.tsx', 'utf8');
 const localizedToolsPage = readFileSync('apps/web/app/[locale]/tools/page.tsx', 'utf8');
+const localizedBetaPage = readFileSync('apps/web/app/[locale]/beta/page.tsx', 'utf8');
+log(
+  'localized beta page routes invite testers into signup',
+  [
+    'dictionary.beta',
+    'new URLSearchParams',
+    'inviteCode',
+    'segment',
+    "mode: 'signup'",
+    'betaSignupHref(locale, inviteCode, segment)',
+    'home-beta-roadmap',
+  ].every((token) => localizedBetaPage.includes(token)),
+);
 log('market page links numerology and human design quick paths', localizedMarketPage.includes("toolLabel('numerology')") && localizedMarketPage.includes("toolLabel('humandesign')"));
 log('market page exposes all localized tool entrances', localizedMarketPage.includes('dict.home.tools.map') && localizedMarketPage.includes('`/tools/${tool.slug}`') && localizedMarketPage.includes('home-quick-grid'));
 log('localized tools lobby exposes all calculator entrances', localizedToolsPage.includes('dict.home.tools.map') && localizedToolsPage.includes('dict.nav.tools') && localizedToolsPage.includes('`/tools/${tool.slug}`'));
 log('sitemap includes the localized tools lobby', sitemapRoute.includes("'/tools'"));
+log('sitemap includes the localized beta entry', sitemapRoute.includes("'/beta'"));
 
 for (const tool of ['numerology', 'maya', 'bazi', 'tarot', 'runes', 'astro', 'ziwei', 'humandesign']) {
   const file = `apps/web/app/tools/${tool}/page.tsx`;
@@ -959,7 +976,7 @@ log(
 const adminTestersPage = readFileSync('apps/web/app/admin/testers/page.tsx', 'utf8');
 log(
   'admin testers page manages invite tracking, feedback, and point support',
-  ['beta_testers', 'daily_point_claims', 'content_unlocks', 'admin_upsert_beta_tester', 'admin_adjust_member_points', 'copyInvite', 'closed-beta'].every((token) => adminTestersPage.includes(token)) &&
+  ['beta_testers', 'daily_point_claims', 'content_unlocks', 'admin_upsert_beta_tester', 'admin_adjust_member_points', 'copyInvite', 'closed-beta', '/zh-TW/beta'].every((token) => adminTestersPage.includes(token)) &&
     adminPage.includes('/admin/testers') &&
     adminLayout.includes('/admin/testers'),
 );
