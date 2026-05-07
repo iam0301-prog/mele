@@ -30,6 +30,7 @@ const goLiveExternalSettings = read('docs/GO_LIVE_EXTERNAL_SETTINGS.md');
 const setupReadme = read('scripts/setup-supabase/README.md');
 const setupAllMigrations = read('scripts/setup-supabase/all_migrations.sql');
 const authCheckScript = read('scripts/check-supabase-auth.mjs');
+const configureAuthScript = read('scripts/configure-supabase-auth.mjs');
 const pythonDockerfile = read('python_api/Dockerfile');
 const pythonRequirementsDev = read('python_api/requirements-dev.txt');
 const pythonPackage = read('python_api/package.json');
@@ -59,6 +60,7 @@ for (const file of [
   'docs/GO_LIVE_EXTERNAL_SETTINGS.md',
   'scripts/setup-supabase/README.md',
   'scripts/check-supabase-auth.mjs',
+  'scripts/configure-supabase-auth.mjs',
   'python_api/Dockerfile',
   'python_api/.dockerignore',
   'python_api/package.json',
@@ -235,6 +237,16 @@ for (const token of [
   'NEXT_PUBLIC_LINE_OAUTH_PROVIDER',
 ]) {
   ok(`auth diagnostic script checks ${token}`, authCheckScript.includes(token));
+}
+
+for (const token of [
+  'mailer_templates_confirmation_content',
+  'ENGLISH VERSION',
+  'Confirm your MELE account',
+  'Reset your MELE password',
+  'Log in to MELE',
+]) {
+  ok(`auth configure script templates include ${token}`, configureAuthScript.includes(token));
 }
 
 console.log('\n=== Python API deployment ===\n');
