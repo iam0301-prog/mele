@@ -6,7 +6,19 @@ const LOCALE_COOKIE = 'mele-locale';
 const LOCALE_HEADER = 'x-mele-locale';
 const PATH_HEADER = 'x-mele-pathname';
 
-const LOCALIZED_APP_ROUTES = new Set(['/', '/spiritual', '/tools', '/beta']);
+const LOCALIZED_APP_ROUTES = new Set([
+  '/',
+  '/spiritual',
+  '/tools',
+  '/beta',
+  '/daily',
+  '/mobile',
+  '/ar',
+  '/account/login',
+  '/legal/privacy',
+  '/legal/tos',
+  '/legal/disclaimer',
+]);
 const LOCALIZED_TOOL_ROUTES = new Set([
   '/tools/numerology',
   '/tools/maya',

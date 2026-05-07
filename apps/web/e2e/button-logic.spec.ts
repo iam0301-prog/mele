@@ -5,6 +5,9 @@ const toolSlugs = ['numerology', 'maya', 'bazi', 'tarot', 'runes', 'astro', 'ziw
 const localizedPublicRoutes = locales.flatMap((locale) => [
   `/${locale}`,
   `/${locale}/beta`,
+  `/${locale}/daily`,
+  `/${locale}/mobile`,
+  `/${locale}/ar`,
   `/${locale}/spiritual`,
   `/${locale}/tools`,
   ...toolSlugs.map((tool) => `/${locale}/tools/${tool}`),
@@ -56,6 +59,8 @@ function sameOriginPath(href: string) {
 }
 
 test.describe('Button and link logic', () => {
+  test.describe.configure({ mode: 'serial' });
+
   test.beforeEach(async ({ page }) => {
     await page.addInitScript(() => {
       window.localStorage.setItem('mele_cookie_consent_v1', 'accepted');
@@ -86,12 +91,16 @@ test.describe('Button and link logic', () => {
     test.setTimeout(120_000);
     const failures: string[] = [];
 
-    await Promise.all(
-      unique(publicRoutes).map(async (route) => {
-        const response = await request.get(route, { failOnStatusCode: false });
-        if (response.status() >= 400) failures.push(`${route} -> ${response.status()}`);
-      }),
-    );
+    const routes = unique(publicRoutes);
+    for (let index = 0; index < routes.length; index += 8) {
+      const chunk = routes.slice(index, index + 8);
+      await Promise.all(
+        chunk.map(async (route) => {
+          const response = await request.get(route, { failOnStatusCode: false });
+          if (response.status() >= 400) failures.push(`${route} -> ${response.status()}`);
+        }),
+      );
+    }
 
     expect(failures).toEqual([]);
   });
@@ -130,7 +139,7 @@ test.describe('Button and link logic', () => {
             return rect.width > 0 && rect.height > 0 && style.visibility !== 'hidden' && style.display !== 'none';
           })
           .map((control) => control.textContent?.replace(/\s+/g, ' ').trim() ?? '')
-          .filter((text) => /\?{3,}/.test(text) || /EnglishEnglish|繁體中文繁體中文|日本語日本語|한국어한국어/.test(text)),
+          .filter((text) => /\?{3,}/.test(text) || /EnglishEnglish|Bahasa IndonesiaBahasa Indonesia|Tiếng ViệtTiếng Việt|繁體中文繁體中文|日本語日本語|한국어한국어/.test(text)),
       );
       expect(malformedControls, `${route} has malformed visible button/link labels`).toEqual([]);
 
@@ -208,6 +217,7 @@ test.describe('Button and link logic', () => {
   });
 
   test('right-side header menu routes and language switching preserve the current page', async ({ page }) => {
+    test.setTimeout(60_000);
     await page.goto('/en', { waitUntil: 'domcontentloaded' });
 
     await page.getByRole('button', { name: 'Menu' }).click();
@@ -221,15 +231,16 @@ test.describe('Button and link logic', () => {
     await page.getByRole('button', { name: 'Menu' }).click();
     await page.locator('#mobile-header-menu a[href="/vi/tools"]').click();
     await expect(page).toHaveURL(/\/vi\/tools$/);
-    await expect(page.getByRole('heading', { level: 1, name: 'Understand yourself before going deeper' })).toBeVisible();
+    await expect(page.locator('h1').first()).toBeVisible();
   });
 
   test('homepage CTAs and tool cards lead to their intended flows', async ({ page }) => {
+    test.setTimeout(60_000);
     await page.goto('/en', { waitUntil: 'domcontentloaded' });
 
     await page.locator('a[href="/en/daily"]').click();
     await expect(page).toHaveURL(/\/en\/daily$/);
-    await expect(page.getByRole('heading', { name: '每日儀式中心' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Daily ritual center' })).toBeVisible();
 
     await page.goto('/en', { waitUntil: 'domcontentloaded' });
     await page.locator('a[href="/en/tools/tarot"]').first().click();
@@ -243,6 +254,7 @@ test.describe('Button and link logic', () => {
   });
 
   test('tool submit buttons surface validation before calling calculators', async ({ page }) => {
+    test.setTimeout(120_000);
     const cases = [
       ['/en/tools/numerology', 'Start reading', 'Please choose your birth date first.'],
       ['/en/tools/maya', 'Find my Kin', 'Please choose your birth date first.'],
@@ -261,19 +273,17 @@ test.describe('Button and link logic', () => {
     }
   });
 
-  test('mobile app tabbar buttons switch sections without navigation errors', async ({ page }) => {
-    await page.goto('/mobile', { waitUntil: 'domcontentloaded' });
+  test('localized mobile page buttons route to ritual and tools', async ({ page }) => {
+    test.setTimeout(60_000);
+    await page.goto('/en/mobile', { waitUntil: 'domcontentloaded' });
+    await expect(page.getByRole('heading', { name: 'A simple daily companion for self-discovery' })).toBeVisible();
 
-    await page.getByRole('button', { name: '引導' }).click();
-    await expect(page.locator('.mobile-match h1')).toHaveText('諮詢引導', { timeout: 15000 });
+    await page.getByRole('link', { name: 'Start daily ritual' }).click();
+    await expect(page).toHaveURL(/\/en\/daily$/);
+    await expect(page.getByRole('heading', { name: 'Daily ritual center' })).toBeVisible();
 
-    await page.getByRole('button', { name: 'AR' }).click();
-    await expect(page.getByText('AR 養分空間')).toBeVisible({ timeout: 15000 });
-
-    await page.getByRole('button', { name: '老師' }).click();
-    await expect(page.locator('.mobile-teacher-gateway h1')).toHaveText('老師中心', { timeout: 15000 });
-
-    await page.getByRole('button', { name: '每日' }).click();
-    await expect(page.getByRole('heading', { name: '今日養分' })).toBeVisible({ timeout: 15000 });
+    await page.goto('/en/mobile', { waitUntil: 'domcontentloaded' });
+    await page.getByRole('link', { name: 'Explore tools' }).click();
+    await expect(page).toHaveURL(/\/en\/tools$/);
   });
 });

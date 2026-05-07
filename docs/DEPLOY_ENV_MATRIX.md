@@ -105,7 +105,7 @@ supabase secrets set \
 | Authentication → Providers → Email | Confirm email = enabled |
 | Authentication → Email Templates | Confirm signup / Magic Link / Reset Password 三個都要確認連結是 `{{ .SiteURL }}/auth/callback` |
 | Storage → Buckets | `teacher-kyc` 設 private（如果還沒建，等 KYC 流程再開） |
-| Database → Migrations | `supabase/migrations/0001`–`0010` 全跑完 |
+| Database → Migrations | `supabase/migrations/0001`–`0012` 全跑完 |
 
 ---
 

@@ -9,12 +9,12 @@ export const LOCALE_HEADER = 'x-mele-locale';
 export const PATH_HEADER = 'x-mele-pathname';
 
 export const LOCALE_LABELS: Record<Locale, { nativeName: string; marketName: string; shortName: string }> = {
-  'zh-TW': { nativeName: '繁體中文', marketName: '台灣', shortName: '繁中' },
+  'zh-TW': { nativeName: '\u7e41\u9ad4\u4e2d\u6587', marketName: '\u53f0\u7063', shortName: '\u7e41\u4e2d' },
   en: { nativeName: 'English', marketName: 'International', shortName: 'EN' },
-  vi: { nativeName: 'Tiếng Việt', marketName: 'Việt Nam', shortName: 'VI' },
+  vi: { nativeName: 'Ti\u1ebfng Vi\u1ec7t', marketName: 'Vi\u1ec7t Nam', shortName: 'VI' },
   id: { nativeName: 'Bahasa Indonesia', marketName: 'Indonesia', shortName: 'ID' },
-  ja: { nativeName: '日本語', marketName: '日本', shortName: 'JA' },
-  ko: { nativeName: '한국어', marketName: '한국', shortName: 'KO' },
+  ja: { nativeName: '\u65e5\u672c\u8a9e', marketName: '\u65e5\u672c', shortName: 'JA' },
+  ko: { nativeName: '\ud55c\uad6d\uc5b4', marketName: '\ud55c\uad6d', shortName: 'KO' },
 };
 
 export function isLocale(value: string | undefined | null): value is Locale {

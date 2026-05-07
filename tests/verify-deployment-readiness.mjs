@@ -26,6 +26,7 @@ const authEmailRunbook = read('docs/SUPABASE_AUTH_EMAIL_RUNBOOK.md');
 const oauthRunbook = read('docs/OAUTH_LOGIN_RUNBOOK.md');
 const backendBlueprint = read('docs/BACKEND_BLUEPRINT.md');
 const deployRunbook = read('docs/DEPLOYMENT_RUNBOOK.md');
+const goLiveExternalSettings = read('docs/GO_LIVE_EXTERNAL_SETTINGS.md');
 const setupReadme = read('scripts/setup-supabase/README.md');
 const setupAllMigrations = read('scripts/setup-supabase/all_migrations.sql');
 const authCheckScript = read('scripts/check-supabase-auth.mjs');
@@ -55,6 +56,7 @@ for (const file of [
   'docs/OAUTH_LOGIN_RUNBOOK.md',
   'docs/BACKEND_BLUEPRINT.md',
   'docs/DEPLOYMENT_RUNBOOK.md',
+  'docs/GO_LIVE_EXTERNAL_SETTINGS.md',
   'scripts/setup-supabase/README.md',
   'scripts/check-supabase-auth.mjs',
   'python_api/Dockerfile',
@@ -83,8 +85,10 @@ for (const key of [
   'NEXT_PUBLIC_ENABLE_FREE_BOOKING_TEST_MODE',
   'MELE_API_URL',
   'MELE_ALLOWED_ORIGINS',
-  'MELE_RATE_LIMIT_PER_MINUTE',
+  'MELE_RATE_LIMIT_MAX_REQUESTS',
+  'MELE_RATE_LIMIT_WINDOW_SECONDS',
   'MELE_HEAVY_MAX_CONCURRENCY',
+  'MELE_TRUST_PROXY_HEADERS',
   'SUPABASE_SERVICE_ROLE_KEY',
   'ECPAY_MERCHANT_ID',
   'ECPAY_HASH_KEY',
@@ -186,6 +190,21 @@ for (const token of [
   'custom:line',
 ]) {
   ok(`deployment runbook covers ${token}`, deployRunbook.includes(token));
+}
+
+for (const token of [
+  'Supabase Auth',
+  'Google Login',
+  'LINE Login / LIFF',
+  'Render Python API',
+  'Vercel Frontend',
+  'Smoke Test',
+  'No-Go',
+  'MELE_RATE_LIMIT_MAX_REQUESTS',
+  'MELE_TRUST_PROXY_HEADERS',
+  'SUPABASE_SERVICE_ROLE_KEY',
+]) {
+  ok(`go-live external settings covers ${token}`, goLiveExternalSettings.includes(token));
 }
 
 for (const token of [

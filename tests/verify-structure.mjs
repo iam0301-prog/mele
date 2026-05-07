@@ -270,13 +270,24 @@ for (const file of [
   'apps/web/app/[locale]/layout.tsx',
   'apps/web/app/[locale]/page.tsx',
   'apps/web/app/[locale]/beta/page.tsx',
+  'apps/web/app/[locale]/daily/page.tsx',
+  'apps/web/app/[locale]/mobile/page.tsx',
+  'apps/web/app/[locale]/ar/page.tsx',
   'apps/web/app/[locale]/spiritual/page.tsx',
   'apps/web/app/[locale]/tools/page.tsx',
+  'apps/web/app/[locale]/account/login/page.tsx',
+  'apps/web/app/[locale]/legal/privacy/page.tsx',
+  'apps/web/app/[locale]/legal/tos/page.tsx',
+  'apps/web/app/[locale]/legal/disclaimer/page.tsx',
   'apps/web/app/sitemap.ts',
   'apps/web/app/robots.ts',
   'apps/web/components/LanguageSwitcher.tsx',
+  'apps/web/components/LocalizedDailyClient.tsx',
+  'apps/web/components/LocalizedLoginClient.tsx',
+  'apps/web/components/LocalizedStaticPage.tsx',
   'apps/web/lib/i18n/config.ts',
   'apps/web/lib/i18n/dictionaries.ts',
+  'apps/web/lib/i18n/release-page-copy.ts',
   'apps/web/lib/i18n/seo.ts',
 ]) {
   log(`i18n file ${file}`, existsSync(file));
@@ -312,12 +323,15 @@ const i18nMiddleware = readFileSync('apps/web/middleware.ts', 'utf8');
 const languageSwitcher = readFileSync('apps/web/components/LanguageSwitcher.tsx', 'utf8');
 const sitemapRoute = readFileSync('apps/web/app/sitemap.ts', 'utf8');
 log('i18n supports six market locales and default zh-TW', ['zh-TW', 'en', 'vi', 'id', 'ja', 'ko'].every((token) => i18nConfig.includes(token)) && i18nConfig.includes("DEFAULT_LOCALE: Locale = 'zh-TW'"));
+log('locale labels are stable and not duplicated', ['\\u7e41\\u9ad4\\u4e2d\\u6587', 'English', 'Ti\\u1ebfng Vi\\u1ec7t', 'Bahasa Indonesia', '\\u65e5\\u672c\\u8a9e', '\\ud55c\\uad6d\\uc5b4'].every((token) => i18nConfig.includes(token)) && !/EnglishEnglish|\?{3,}/.test(i18nConfig));
 log('language switcher preserves the current path', languageSwitcher.includes('switchLocaleInPathname') && languageSwitcher.includes('usePathname') && languageSwitcher.includes('useSearchParams'));
 log('language switcher renders panel locale names once', !languageSwitcher.includes("className={variant === 'panel' ? '' : 'sr-only'}"));
 log('middleware redirects root and rewrites localized legacy routes', i18nMiddleware.includes('pathname === \'/\'') && i18nMiddleware.includes('NextResponse.redirect') && i18nMiddleware.includes('NextResponse.rewrite') && i18nMiddleware.includes('LOCALE_HEADER'));
 log('middleware detects browser language before defaulting to Traditional Chinese', i18nMiddleware.includes('localeFromAcceptLanguage') && i18nMiddleware.includes("tag.startsWith('en')") && i18nMiddleware.includes("tag.startsWith('vi')") && i18nMiddleware.includes("tag.startsWith('id')") && i18nMiddleware.includes("tag.startsWith('ja')") && i18nMiddleware.includes("tag.startsWith('ko')"));
 log('middleware lets localized beta, market, and tools lobbies render natively', i18nMiddleware.includes("'/beta'") && i18nMiddleware.includes("'/spiritual'") && i18nMiddleware.includes("'/tools'"));
+log('middleware lets localized release utility pages render natively', ["'/daily'", "'/mobile'", "'/ar'", "'/account/login'", "'/legal/privacy'", "'/legal/tos'", "'/legal/disclaimer'"].every((token) => i18nMiddleware.includes(token)));
 log('sitemap emits localized hreflang alternates', sitemapRoute.includes('buildAlternateLanguages') && sitemapRoute.includes('alternates') && sitemapRoute.includes('languages'));
+log('sitemap includes localized utility pages', ["'/daily'", "'/mobile'", "'/ar'", "'/legal/privacy'", "'/legal/tos'", "'/legal/disclaimer'"].every((token) => sitemapRoute.includes(token)));
 const localizedMarketPage = readFileSync('apps/web/app/[locale]/spiritual/page.tsx', 'utf8');
 const localizedToolsPage = readFileSync('apps/web/app/[locale]/tools/page.tsx', 'utf8');
 const localizedBetaPage = readFileSync('apps/web/app/[locale]/beta/page.tsx', 'utf8');

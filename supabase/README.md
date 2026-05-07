@@ -15,6 +15,10 @@ supabase/
     0006_match_sessions.sql
     0007_auth_signup_mirror.sql
     0008_teacher_website_application.sql
+    0009_member_points_unlocks.sql
+    0010_kyc_auto_purge_cron.sql
+    0011_admin_member_ops.sql
+    0012_beta_tester_ops.sql
   functions/
     _shared/
     ecpay-checkout/
@@ -43,6 +47,10 @@ Or paste each migration into the Supabase SQL Editor in order:
 6. `0006_match_sessions.sql`
 7. `0007_auth_signup_mirror.sql`
 8. `0008_teacher_website_application.sql`
+9. `0009_member_points_unlocks.sql`
+10. `0010_kyc_auto_purge_cron.sql`
+11. `0011_admin_member_ops.sql`
+12. `0012_beta_tester_ops.sql`
 
 After applying migrations, create the first admin:
 
@@ -103,7 +111,7 @@ See `docs/SUPABASE_AUTH_EMAIL_RUNBOOK.md` for the exact troubleshooting flow whe
 
 Before public beta, verify:
 
-- All eight migrations are applied to the production Supabase project.
+- All twelve migrations are applied to the production Supabase project.
 - RLS is enabled and normal users cannot read admin-only rows.
 - Auth confirmation email, resend confirmation, password reset, and `/auth/callback` all work with a real mailbox.
 - `ecpay-checkout` creates an ECPay sandbox form.

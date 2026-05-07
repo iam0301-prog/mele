@@ -146,7 +146,7 @@
     <ol class="order-list">
       <li><b>跑 Supabase migrations</b> — 建表 / 設權限 / 把自己設 admin <span class="img-ref">01-supabase-migrations.png</span></li>
       <li><b>Render 用 Blueprint 部 Python API</b> — 拿到 <code>https://mele-api-xxx.onrender.com</code> <span class="img-ref">02-render-blueprint.png</span></li>
-      <li><b>Vercel 設定 Root Directory = apps/web</b> — 不然 build 會炸 <span class="img-ref">04-vercel-root-directory.png</span></li>
+      <li><b>Vercel Root Directory 保持 repo root</b> — 用根目錄 build script 進入 apps/web <span class="img-ref">04-vercel-root-directory.png</span></li>
       <li><b>Vercel 加 4 個環境變數</b> — Supabase 公鑰、API URL、站台網址 <span class="img-ref">05-vercel-env-vars.png</span></li>
       <li><b>回頭設 Render 環境變數</b> — 把前端網址填進 MELE_ALLOWED_ORIGINS <span class="img-ref">03-render-env-vars.png</span></li>
     </ol>

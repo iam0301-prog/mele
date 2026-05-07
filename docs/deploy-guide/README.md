@@ -44,7 +44,7 @@
    - 按右上角 **▶ Run**（或 `Ctrl+Enter`）
    - 看到綠色 ✓ Success 後，按 **+ New query**
    - 換貼下一個檔（`0002_rls_policies.sql`）
-   - 重複到 `0010_*.sql` 跑完
+   - 重複到 `0012_*.sql` 跑完
 6. 全部跑完後，最後再多跑一個 query 把自己設成 super admin（換成你的 Email）：
    ```sql
    insert into public.admins (user_id, role)
@@ -97,15 +97,14 @@
 2. 點進去 → 上方分頁切到 **Settings**
 3. 左邊欄選 **Build & Deployment**
 4. 找到 **Root Directory** 區塊：
-   - 點右邊的 **Override** 切換到 ON（變綠色 ✓）
-   - 在輸入框填 `apps/web`
-5. **其他欄位全部留空**（Build Command、Install Command、Output Directory 都不要動）
+   - 不要切到 `apps/web`
+   - 保持 repo root，也就是 `./`
+5. Build Command 用 `npm run build`；Install Command 用 `npm install`；Output Directory 留空
 6. 滾到頁面底，按黑色 **Save** 按鈕
 
 ### 為什麼一定要這樣？
-你的 Next.js 在 `apps/web/`，不是 repo 根目錄。
-不設 Root Directory 的話，Vercel 會在根目錄跑 `npm install`，
-但根目錄沒有 Next.js 套件，所以 build 時會報 **`next: command not found`**。
+根目錄 `package.json` 已經把 build 轉到 `apps/web`，而 `apps/web/next.config.mjs`
+也需要 repo root 做 output tracing。切到 `apps/web` 反而可能讓 monorepo trace 與路徑解析出錯。
 
 ---
 

@@ -25,7 +25,7 @@
 
 | 項目 | 目前狀態 | 下一步 |
 |---|---|---|
-| Supabase production migrations | 未實際雲端驗證 | 套用 `0001-0010`，截圖留存 |
+| Supabase production migrations | 未實際雲端驗證 | 套用 `0001-0012`，截圖留存 |
 | RLS 實測 | 靜態檢查通過，雲端未逐頁測 | 用會員/老師/admin 三種帳號測權限 |
 | ECPay sandbox | 程式存在，完整流程未實測 | 跑付款、webhook、回跳、重送 webhook |
 | 律師審閱 | 產品草案已補 | 找律師審 privacy/tos/disclaimer/老師合約 |

@@ -15,3 +15,5 @@ services:
         value: "60"
       - key: MELE_HEAVY_MAX_CONCURRENCY
         value: "4"
+      - key: MELE_TRUST_PROXY_HEADERS
+        value: "true"

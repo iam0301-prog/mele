@@ -128,7 +128,7 @@
     <div class="step-badge">3</div>
     <div>
       <div class="title">Vercel：設 Root Directory（最關鍵的一步）</div>
-      <div class="subtitle">Project → Settings → Build &amp; Deployment → Root Directory 改 <code>apps/web</code>，不然 build 會報「next: not found」。</div>
+      <div class="subtitle">Project → Settings → Build &amp; Deployment → Root Directory 保持 repo root，也就是 <code>./</code>。根目錄 build script 會進入 apps/web。</div>
     </div>
   </div>
 
@@ -173,16 +173,16 @@
 
         <div class="section-card" style="border: 2px solid #2563eb; box-shadow: 0 0 0 4px rgba(37,99,235,.1);">
           <div class="section-card-head" style="background: #eff6ff;">
-            <div class="section-card-title">Root Directory <span class="tag required">必改</span></div>
-            <div class="section-card-sub">The directory where your application's source code is located. Use <code>apps/web</code> for monorepo.</div>
+            <div class="section-card-title">Root Directory <span class="tag required">保留</span></div>
+            <div class="section-card-sub">The directory where your application's source code is located. Use repo root for this monorepo.</div>
           </div>
           <div class="section-card-body">
             <div class="input-row">
-              <input class="input filled code" value="apps/web">
+              <input class="input filled code" value="./">
               <div class="toggle-override on">✓ Override</div>
             </div>
             <div style="font-size:11px; color:#dc2626; margin-top:8px; font-weight:600;">
-              ⚠ 留空會炸：Vercel 會在根目錄 build，但根目錄沒有 next 套件。
+              ⚠ 不要切到 apps/web；根目錄 build script 會進入 apps/web。
             </div>
           </div>
         </div>
@@ -222,7 +222,7 @@
 
   <!-- callouts -->
   <div class="callout red" style="top: 380px; right: 60px; max-width: 320px;">
-    ⚠ 這欄是上次 build 失敗的原因！<br>務必填 <span style="font-family:monospace;">apps/web</span>
+    ⚠ 不要切到 apps/web！<br>務必保留 <span style="font-family:monospace;">./</span>
   </div>
   <div class="callout green" style="bottom: 92px; right: 60px;">
     ✅ Save 後到 Deployments<br>頁籤點 Redeploy

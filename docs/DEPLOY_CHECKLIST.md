@@ -1,7 +1,7 @@
 # MELE 上線檢查 + 風險清單
 
 最後更新：2026-05-06
-產品總監交叉印證版（搭配 `DEPLOY_ENV_MATRIX.md`、`DEPLOY_SMOKE_TEST.md`）
+產品總監交叉印證版（搭配 `DEPLOY_ENV_MATRIX.md`、`DEPLOY_SMOKE_TEST.md`、`GO_LIVE_EXTERNAL_SETTINGS.md`）
 
 > 結論：**程式碼已可上線封閉測試**。在按下 Vercel + Render 部署之前，請先看完下面 9 個風險點，並照「最短部署路線」順序執行。
 
@@ -28,8 +28,8 @@
    - 為什麼：`python_api/main.py` 預設 origins 只允許 localhost。沒在 Render 設這個環境變數，瀏覽器一律 CORS error。
    - 做法：Render 環境變數加 `MELE_ALLOWED_ORIGINS=https://你的-vercel-網址`，多網址用逗號分隔，**不要結尾斜線**。
 
-5. **`MELE_RATE_LIMIT_PER_MINUTE` 是錯的環境變數名**
-   - 為什麼：`.env.example` 與舊 runbook 都寫 `MELE_RATE_LIMIT_PER_MINUTE=60`，**但程式實際讀的是 `MELE_RATE_LIMIT_MAX_REQUESTS` 與 `MELE_RATE_LIMIT_WINDOW_SECONDS`**（在 `python_api/main.py` 第 93-94 行）。
+5. **Rate limit 變數必須用正式名稱**
+   - 為什麼：程式實際讀的是 `MELE_RATE_LIMIT_MAX_REQUESTS` 與 `MELE_RATE_LIMIT_WINDOW_SECONDS`，舊文件曾經出現的 `MELE_RATE_LIMIT_PER_MINUTE` 不會被後端讀取。
    - 做法：Render 環境變數設：
      - `MELE_RATE_LIMIT_MAX_REQUESTS=90`
      - `MELE_RATE_LIMIT_WINDOW_SECONDS=60`
@@ -41,9 +41,9 @@
    - 為什麼：所有 `NEXT_PUBLIC_*` 在 build 時被內嵌進 client bundle。在 Vercel 改了值卻沒按 Redeploy，瀏覽器看到的還是舊值。
    - 做法：每次改完 `NEXT_PUBLIC_SUPABASE_URL` / `NEXT_PUBLIC_SITE_URL` 等，到 Deployments → 點最新 deployment 右上 ... → **Redeploy**（記得**取消 Use existing Build Cache**）。
 
-7. **Supabase migrations 0001-0010 必須先全部跑完，再上線**
-   - 為什麼：repo 有 10 個 migrations，包含 `0009_member_points_unlocks.sql`（會員點數核心）、`0010_kyc_auto_purge_cron.sql`（KYC 排程）。少跑任何一個，會員點數扣款 / 老師申請 / 預約 SQL function 會炸。
-   - 做法：Supabase Dashboard → SQL Editor → 依序貼 0001 → 0010 → Run。完成後跑 `npm run ops:check-auth` 確認設定。
+7. **Supabase migrations 0001-0012 必須先全部跑完，再上線**
+   - 為什麼：repo 有 12 個 migrations，包含 `0009_member_points_unlocks.sql`（會員點數核心）、`0010_kyc_auto_purge_cron.sql`（KYC 排程）、`0011_admin_member_ops.sql`（管理員會員操作）、`0012_beta_tester_ops.sql`（封測名單）。少跑任何一個，會員點數扣款 / 老師申請 / 後台管理 / 封測入口可能會炸。
+   - 做法：Supabase Dashboard → SQL Editor → 依序貼 0001 → 0012 → Run。完成後跑 `npm run ops:check-auth` 確認設定。
 
 8. **Supabase Auth Redirect URL 一定要兩條都加**
    - 為什麼：少了正式網址，OAuth/Email 驗證信點下去會跳到 localhost。
@@ -69,7 +69,7 @@
 > 順序很重要，跳順序會卡關。
 
 ```
-Step 0  Supabase project + 跑 0001-0010 migrations
+Step 0  Supabase project + 跑 0001-0012 migrations
         ↓
 Step 1  Render：Docker 部署 python_api（拿到 API URL）
         ↓
@@ -85,7 +85,7 @@ Step 5  跑 DEPLOY_SMOKE_TEST.md 的 5 分鐘驗證
 ### Step 0：Supabase（已做過可跳）
 
 1. 建 project（Region 選 ap-northeast-1 / Singapore，看你目標客戶）。
-2. SQL Editor 依序貼 `supabase/migrations/0001_initial_schema.sql` 到 `0010_kyc_auto_purge_cron.sql`。
+2. SQL Editor 依序貼 `supabase/migrations/0001_initial_schema.sql` 到 `0012_beta_tester_ops.sql`。
 3. 把自己設 super admin：
    ```sql
    insert into public.admins (user_id, role)
@@ -109,6 +109,7 @@ Step 5  跑 DEPLOY_SMOKE_TEST.md 的 5 分鐘驗證
    - `MELE_RATE_LIMIT_MAX_REQUESTS=90`
    - `MELE_RATE_LIMIT_WINDOW_SECONDS=60`
    - `MELE_HEAVY_MAX_CONCURRENCY=4`
+   - `MELE_TRUST_PROXY_HEADERS=true`
 4. Create Web Service → 等 build 完（第一次約 5-8 分鐘）。
 5. 開 `https://mele-api.onrender.com/ready`，要看到 JSON `{"status":"ready", ...}`。
 
@@ -180,7 +181,7 @@ Step 5  跑 DEPLOY_SMOKE_TEST.md 的 5 分鐘驗證
 
 ## 5. 簽核
 
-- [ ] Step 0 Supabase migrations 0001-0010 完成
+- [ ] Step 0 Supabase migrations 0001-0012 完成
 - [ ] Step 1 Render `/ready` 回 200
 - [ ] Step 2 Vercel build 成功
 - [ ] Step 3 Supabase Redirect URLs 已加
