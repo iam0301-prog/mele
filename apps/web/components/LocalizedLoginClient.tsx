@@ -1,5 +1,6 @@
 'use client';
 
+import type { Provider } from '@supabase/supabase-js';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import { useToast } from '@/components/ToastProvider';
@@ -9,6 +10,30 @@ import { localizePath, type Locale } from '@/lib/i18n/config';
 import { getReleasePageCopy } from '@/lib/i18n/release-page-copy';
 
 type Mode = 'signin' | 'signup';
+type SocialProviderKey = 'google' | 'line';
+type ProviderStatus = { loading: boolean; google: boolean; line: boolean; error: boolean };
+
+const GOOGLE_LOGIN_FLAG = process.env.NEXT_PUBLIC_ENABLE_GOOGLE_LOGIN;
+const LINE_LOGIN_FLAG = process.env.NEXT_PUBLIC_ENABLE_LINE_LOGIN;
+const LINE_OAUTH_PROVIDER = (process.env.NEXT_PUBLIC_LINE_OAUTH_PROVIDER || 'custom:line') as Provider;
+
+const SOCIAL_PROVIDERS: Record<SocialProviderKey, { provider: Provider; scopes?: string }> = {
+  google: { provider: 'google' },
+  line: { provider: LINE_OAUTH_PROVIDER, scopes: 'openid profile email' },
+};
+
+function detectLineProvider(settings: { external?: Record<string, unknown> }) {
+  const external = settings.external ?? {};
+  const providerName = String(LINE_OAUTH_PROVIDER).replace(/^custom:/, '');
+  const candidates = [LINE_OAUTH_PROVIDER, providerName, 'line', `custom_${providerName}`, `custom:${providerName}`];
+
+  return candidates.some((key) => external[String(key)] === true)
+    || (
+      typeof external.custom === 'object'
+      && external.custom !== null
+      && (external.custom as Record<string, unknown>)[providerName] === true
+    );
+}
 
 function safeReturnUrl(value: string | null, locale: Locale) {
   if (!value || !value.startsWith('/') || value.startsWith('//')) {
@@ -32,13 +57,83 @@ export function LocalizedLoginClient({ locale }: { locale: Locale }) {
   const [age, setAge] = useState(false);
   const [loading, setLoading] = useState(false);
   const [testAuth, setTestAuth] = useState(false);
+  const [signupNotice, setSignupNotice] = useState('');
+  const [providerStatus, setProviderStatus] = useState<ProviderStatus>({
+    loading: true,
+    google: false,
+    line: false,
+    error: false,
+  });
+
+  const buildAuthCallbackUrl = (next: string) =>
+    `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`;
+
+  function friendlyAuthError(err: unknown, fallback: string) {
+    const message = err instanceof Error ? err.message : '';
+    const normalized = message.toLowerCase();
+    if (
+      normalized.includes('error sending confirmation email') ||
+      normalized.includes('error sending recovery email') ||
+      normalized.includes('email rate limit') ||
+      normalized.includes('smtp')
+    ) {
+      return copy.validation.emailDelivery;
+    }
+    if (normalized.includes('already registered') || normalized.includes('user already registered')) {
+      return copy.validation.existingAccount;
+    }
+    return message || fallback;
+  }
+
+  function isSocialProviderEnabled(provider: SocialProviderKey) {
+    if (provider === 'google') return GOOGLE_LOGIN_FLAG !== 'false' && providerStatus.google;
+    return LINE_LOGIN_FLAG === 'true' && providerStatus.line;
+  }
 
   useEffect(() => {
     setTestAuth(canUseClientTestAuth());
   }, []);
 
+  useEffect(() => {
+    const authError = search.get('error');
+    if (authError) toast(copy.validation.authCallback, 'error');
+  }, [copy.validation.authCallback, search, toast]);
+
+  useEffect(() => {
+    const loadAuthSettings = async () => {
+      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+      const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+      if (!supabaseUrl || !anonKey) {
+        setProviderStatus({ loading: false, google: false, line: false, error: true });
+        return;
+      }
+
+      try {
+        const response = await fetch(`${supabaseUrl.replace(/\/$/, '')}/auth/v1/settings`, {
+          headers: {
+            apikey: anonKey,
+            Authorization: `Bearer ${anonKey}`,
+          },
+        });
+        if (!response.ok) throw new Error(`Auth settings HTTP ${response.status}`);
+        const settings = await response.json();
+        setProviderStatus({
+          loading: false,
+          google: settings.external?.google === true,
+          line: detectLineProvider(settings),
+          error: false,
+        });
+      } catch {
+        setProviderStatus({ loading: false, google: false, line: false, error: true });
+      }
+    };
+
+    void loadAuthSettings();
+  }, []);
+
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    setSignupNotice('');
     if (!email || password.length < 6) return toast(copy.validation.emailPassword, 'error');
     if (mode === 'signup' && !displayName.trim()) return toast(copy.validation.displayName, 'error');
     if (mode === 'signup' && !agreed) return toast(copy.validation.consent, 'error');
@@ -61,7 +156,7 @@ export function LocalizedLoginClient({ locale }: { locale: Locale }) {
         email,
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(returnUrl)}`,
+          emailRedirectTo: buildAuthCallbackUrl(returnUrl),
           data: {
             display_name: displayName,
             privacy_consent_at: consentedAt,
@@ -72,15 +167,29 @@ export function LocalizedLoginClient({ locale }: { locale: Locale }) {
         },
       });
       if (error) throw error;
+      const likelyExistingSignup =
+        data.user &&
+        !data.session &&
+        Array.isArray(data.user.identities) &&
+        data.user.identities.length === 0;
+      if (likelyExistingSignup) {
+        setMode('signin');
+        setPassword('');
+        setSignupNotice(copy.validation.existingAccount);
+        toast(copy.validation.existingAccount, 'error');
+        return;
+      }
       if (data.session) {
         router.push(returnUrl);
         router.refresh();
       } else {
         setMode('signin');
+        setPassword('');
+        setSignupNotice(copy.successSignUp);
         toast(copy.successSignUp, 'success');
       }
     } catch (err) {
-      toast(err instanceof Error ? err.message : copy.validation.emailPassword, 'error');
+      toast(friendlyAuthError(err, copy.validation.emailPassword), 'error');
     } finally {
       setLoading(false);
     }
@@ -92,12 +201,12 @@ export function LocalizedLoginClient({ locale }: { locale: Locale }) {
     try {
       const supabase = createClient();
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(localizePath('/account/profile', locale))}`,
+        redirectTo: buildAuthCallbackUrl(localizePath('/account/profile', locale)),
       });
       if (error) throw error;
       toast(copy.resetSent, 'success');
     } catch (err) {
-      toast(err instanceof Error ? err.message : copy.validation.emailPassword, 'error');
+      toast(friendlyAuthError(err, copy.validation.emailPassword), 'error');
     } finally {
       setLoading(false);
     }
@@ -112,20 +221,34 @@ export function LocalizedLoginClient({ locale }: { locale: Locale }) {
         type: 'signup',
         email,
         options: {
-          emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(returnUrl)}`,
+          emailRedirectTo: buildAuthCallbackUrl(returnUrl),
         },
       });
       if (error) throw error;
       toast(copy.confirmationSent, 'success');
     } catch (err) {
-      toast(err instanceof Error ? err.message : copy.validation.emailPassword, 'error');
+      toast(friendlyAuthError(err, copy.validation.emailPassword), 'error');
     } finally {
       setLoading(false);
     }
   }
 
-  async function social(provider: 'google' | 'line') {
-    toast(`${provider} ${copy.disabled}`, 'error');
+  async function social(provider: SocialProviderKey) {
+    const meta = SOCIAL_PROVIDERS[provider];
+    if (providerStatus.loading || !isSocialProviderEnabled(provider)) {
+      toast(copy.validation.authProviderSetup, 'error');
+      return;
+    }
+
+    const supabase = createClient();
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: meta.provider,
+      options: {
+        redirectTo: buildAuthCallbackUrl(returnUrl),
+        scopes: meta.scopes,
+      },
+    });
+    if (error) toast(friendlyAuthError(error, copy.validation.authProviderSetup), 'error');
   }
 
   function useLocalAccount() {
@@ -163,6 +286,12 @@ export function LocalizedLoginClient({ locale }: { locale: Locale }) {
               {copy.signUp}
             </button>
           </div>
+
+          {signupNotice && (
+            <div className="rounded-2xl border border-accent-dim bg-accent/[0.08] p-3 text-sm leading-relaxed text-white/78">
+              {signupNotice}
+            </div>
+          )}
 
           {mode === 'signup' && (
             <label className="grid gap-2 text-sm">
@@ -210,9 +339,28 @@ export function LocalizedLoginClient({ locale }: { locale: Locale }) {
 
           <div className="border-t border-white/10 pt-5">
             <div className="ritual-kicker">{copy.socialTitle}</div>
+            {providerStatus.error && (
+              <p className="mt-2 text-xs leading-relaxed text-white/55">{copy.validation.authProviderSetup}</p>
+            )}
             <div className="mt-3 grid gap-3 sm:grid-cols-2">
-              <button type="button" className="mele-btn-secondary" onClick={() => social('google')}>{copy.google} - {copy.disabled}</button>
-              <button type="button" className="mele-btn-secondary" onClick={() => social('line')}>{copy.line} - {copy.disabled}</button>
+              <button
+                type="button"
+                className={`mele-btn-secondary ${isSocialProviderEnabled('google') ? '' : 'opacity-65'}`}
+                onClick={() => social('google')}
+                disabled={loading}
+                aria-disabled={!isSocialProviderEnabled('google')}
+              >
+                {copy.google}{isSocialProviderEnabled('google') ? '' : ` - ${copy.disabled}`}
+              </button>
+              <button
+                type="button"
+                className={`mele-btn-secondary ${isSocialProviderEnabled('line') ? '' : 'opacity-65'}`}
+                onClick={() => social('line')}
+                disabled={loading}
+                aria-disabled={!isSocialProviderEnabled('line')}
+              >
+                {copy.line}{isSocialProviderEnabled('line') ? '' : ` - ${copy.disabled}`}
+              </button>
             </div>
           </div>
         </form>

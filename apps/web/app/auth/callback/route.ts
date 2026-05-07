@@ -3,7 +3,16 @@
  * 接收 Supabase 的 ?code=xxx，換成 session 後 redirect 回原頁。
  */
 import { NextResponse, type NextRequest } from 'next/server';
+import { getLocaleFromPathname, localizePath } from '@/lib/i18n/config';
 import { createClient } from '@/lib/supabase/server';
+
+function localizedLoginUrl(origin: string, next: string, error: string, message?: string) {
+  const locale = getLocaleFromPathname(next);
+  const url = new URL(localizePath('/account/login', locale), origin);
+  url.searchParams.set('error', error);
+  if (message) url.searchParams.set('message', message);
+  return url;
+}
 
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url);
@@ -14,7 +23,7 @@ export async function GET(request: NextRequest) {
 
   if (providerError) {
     return NextResponse.redirect(
-      `${origin}/account/login?error=auth_callback_failed&message=${encodeURIComponent(providerError)}`,
+      localizedLoginUrl(origin, next, 'auth_callback_failed', providerError),
     );
   }
 
@@ -27,5 +36,5 @@ export async function GET(request: NextRequest) {
   }
 
   // 失敗回登入頁
-  return NextResponse.redirect(`${origin}/account/login?error=auth_failed`);
+  return NextResponse.redirect(localizedLoginUrl(origin, next, 'auth_failed'));
 }

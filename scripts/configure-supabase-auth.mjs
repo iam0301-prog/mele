@@ -202,17 +202,13 @@ info(`SMTP sender: ${smtpAdminEmail} (${authConfig.smtp_sender_name})`);
 if (statusOnly) {
   const status = await managementRequest('GET');
   printSafeStatus(status);
-  process.exit(0);
-}
-
-if (!apply) {
+} else if (!apply) {
   info('Dry run only. No remote settings were changed. Add --apply to update Supabase Auth.');
   console.log(JSON.stringify(redactConfig(authConfig), null, 2));
-  process.exit(0);
+} else {
+  await managementRequest('PATCH', authConfig);
+  ok('Supabase Auth config updated.');
+
+  const updated = await managementRequest('GET');
+  printSafeStatus(updated);
 }
-
-await managementRequest('PATCH', authConfig);
-ok('Supabase Auth config updated.');
-
-const updated = await managementRequest('GET');
-printSafeStatus(updated);

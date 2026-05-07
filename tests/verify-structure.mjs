@@ -488,6 +488,7 @@ log('operational SOP docs cover legal payment deployment assets algorithms and Q
 ].every(Boolean));
 
 const login = readFileSync('apps/web/app/account/login/page.tsx', 'utf8');
+const localizedLoginClient = readFileSync('apps/web/components/LocalizedLoginClient.tsx', 'utf8');
 const authCallback = readFileSync('apps/web/app/auth/callback/route.ts', 'utf8');
 const accountPrivacyPage = readFileSync('apps/web/app/account/privacy/page.tsx', 'utf8');
 const profilePage = readFileSync('apps/web/app/account/profile/page.tsx', 'utf8');
@@ -509,6 +510,13 @@ log('signup requires age confirmation', login.includes('ageConfirmed') && login.
 log('login supports password reset email', login.includes('resetPasswordForEmail') && login.includes('忘記密碼'));
 log('login supports resending signup confirmation email', login.includes("auth.resend") && login.includes("type: 'signup'") && login.includes('重新寄送驗證信') && login.includes('confirmationSending'));
 log('signup explains already-registered confirmed emails', login.includes('data.user.identities.length === 0') && login.includes('可能已經註冊'));
+log(
+  'localized signup explains already-registered emails and email delivery failures',
+  localizedLoginClient.includes('data.user.identities.length === 0') &&
+    localizedLoginClient.includes('friendlyAuthError') &&
+    localizedLoginClient.includes('emailDelivery') &&
+    localizedLoginClient.includes('existingAccount'),
+);
 log('login supports beta invite signup metadata', ["search.get('invite')", "search.get('mode') === 'signup'", 'beta_invite_code', 'beta_segment'].every((token) => login.includes(token)));
 log('local test auth is gated to localhost free test mode', testAuth.includes('NEXT_PUBLIC_ENABLE_FREE_BOOKING_TEST_MODE') && testAuth.includes('isLocalTestHost') && testAuth.includes('localhost'));
 log('login offers local test auth fallback', login.includes('使用本機測試帳號') && login.includes('setClientTestAuth') && login.includes('canUseClientTestAuth'));
@@ -544,7 +552,12 @@ log(
 );
 log('server test auth is restricted to local host cookie', testAuthServer.includes('cookies()') && testAuthServer.includes('headers()') && testAuthServer.includes('isLocalTestHost'));
 log('social login providers use Supabase settings and env gates', ['NEXT_PUBLIC_ENABLE_GOOGLE_LOGIN', 'NEXT_PUBLIC_ENABLE_LINE_LOGIN', 'NEXT_PUBLIC_LINE_OAUTH_PROVIDER', '/auth/v1/settings', 'custom:line'].every((token) => login.includes(token)));
+log(
+  'localized login providers use Supabase settings and env gates',
+  ['NEXT_PUBLIC_ENABLE_GOOGLE_LOGIN', 'NEXT_PUBLIC_ENABLE_LINE_LOGIN', 'NEXT_PUBLIC_LINE_OAUTH_PROVIDER', '/auth/v1/settings', 'custom:line', 'signInWithOAuth'].every((token) => localizedLoginClient.includes(token)),
+);
 log('auth callback rejects provider errors and unsafe next URLs', authCallback.includes('auth_callback_failed') && authCallback.includes('error_description') && authCallback.includes('startsWith(\'/\')') && authCallback.includes('!nextParam.startsWith(\'//\')'));
+log('auth callback returns errors to the localized login page', authCallback.includes('localizedLoginUrl') && authCallback.includes("localizePath('/account/login'"));
 log('account privacy page lets users request data rights', ['資料權利中心', 'create_support_thread', '匯出我的資料', '刪除帳號與資料', '停止特定使用'].every((token) => accountPrivacyPage.includes(token)));
 log('profile and account menu expose data rights', profilePage.includes('/account/privacy') && headerUserMenu.includes('/account/privacy') && headerUserMenu.includes('labels?.dataRights'));
 log('cookie consent explains local storage and links privacy policy', ['Cookie 與資料使用提示', 'localStorage', '/legal/privacy', 'mele_cookie_consent_v1'].every((token) => cookieConsent.includes(token)));
