@@ -35,6 +35,12 @@ function sameOriginPath(href: string) {
 }
 
 test.describe('Button and link logic', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.addInitScript(() => {
+      window.localStorage.setItem('mele_cookie_consent_v1', 'accepted');
+    });
+  });
+
   test('core public pages expose named buttons and non-broken same-origin links', async ({ page, request }) => {
     test.setTimeout(120_000);
     const brokenLinks = new Set<string>();

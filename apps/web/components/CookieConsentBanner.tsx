@@ -32,7 +32,7 @@ export function CookieConsentBanner() {
       <div>
         <strong>Cookie 與資料使用提示</strong>
         <p>
-          MELE 會使用必要的本機儲存與服務資料維持登入、每日儀式、偏好設定與安全稽核。
+          MELE 會使用必要的本機儲存與服務資料來維持登入、每日儀式、偏好設定與安全稽核。
           若未來加入分析或行銷追蹤，會在隱私權政策中更新並提供選擇。
         </p>
       </div>
