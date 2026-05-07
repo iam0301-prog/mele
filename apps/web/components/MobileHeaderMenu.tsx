@@ -38,8 +38,13 @@ export function MobileHeaderMenu({
   const pathname = usePathname();
   const rootRef = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(false);
+  const [hydrated, setHydrated] = useState(false);
 
   const close = () => setOpen(false);
+
+  useEffect(() => {
+    setHydrated(true);
+  }, []);
 
   useEffect(() => {
     close();
@@ -79,9 +84,10 @@ export function MobileHeaderMenu({
     <div ref={rootRef} className="relative ml-auto">
       <button
         type="button"
-        className="rounded-full border border-accent-dim bg-black/55 px-4 py-1.5 text-xs tracking-widest text-accent backdrop-blur transition hover:border-accent"
+        className={`rounded-full border border-accent-dim bg-black/55 px-4 py-1.5 text-xs tracking-widest text-accent backdrop-blur transition hover:border-accent disabled:cursor-wait disabled:opacity-60 ${hydrated ? '' : 'pointer-events-none'}`}
         aria-expanded={open}
         aria-controls="mobile-header-menu"
+        disabled={!hydrated}
         onClick={() => setOpen((value) => !value)}
       >
         {labels?.menu ?? '選單'}

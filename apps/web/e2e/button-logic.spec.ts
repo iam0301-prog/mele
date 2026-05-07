@@ -1,6 +1,23 @@
 import { expect, test } from '@playwright/test';
 
+const locales = ['zh-TW', 'en', 'vi', 'id', 'ja', 'ko'] as const;
+const toolSlugs = ['numerology', 'maya', 'bazi', 'tarot', 'runes', 'astro', 'ziwei', 'humandesign'] as const;
+const localizedPublicRoutes = locales.flatMap((locale) => [
+  `/${locale}`,
+  `/${locale}/beta`,
+  `/${locale}/spiritual`,
+  `/${locale}/tools`,
+  ...toolSlugs.map((tool) => `/${locale}/tools/${tool}`),
+  `/${locale}/teachers`,
+  `/${locale}/teachers/apply`,
+  `/${locale}/account/login`,
+  `/${locale}/legal/privacy`,
+  `/${locale}/legal/tos`,
+  `/${locale}/legal/disclaimer`,
+]);
+
 const publicRoutes = [
+  ...localizedPublicRoutes,
   '/zh-TW',
   '/en',
   '/vi',
@@ -27,6 +44,10 @@ const publicRoutes = [
   '/legal/disclaimer',
 ];
 
+function unique<T>(items: T[]) {
+  return [...new Set(items)];
+}
+
 function sameOriginPath(href: string) {
   if (!href || href.startsWith('#') || href.startsWith('mailto:') || href.startsWith('tel:')) return null;
   const url = new URL(href, 'http://127.0.0.1');
@@ -41,12 +62,26 @@ test.describe('Button and link logic', () => {
     });
   });
 
-  test('core public pages expose named buttons and non-broken same-origin links', async ({ page, request }) => {
+  test('all localized release routes respond before any button sends users there', async ({ request }) => {
     test.setTimeout(120_000);
+    const failures: string[] = [];
+
+    await Promise.all(
+      unique(publicRoutes).map(async (route) => {
+        const response = await request.get(route, { failOnStatusCode: false });
+        if (response.status() >= 400) failures.push(`${route} -> ${response.status()}`);
+      }),
+    );
+
+    expect(failures).toEqual([]);
+  });
+
+  test('core public pages expose named buttons and non-broken same-origin links', async ({ page, request }) => {
+    test.setTimeout(240_000);
     const brokenLinks = new Set<string>();
     const linkSources = new Map<string, string>();
 
-    for (const route of publicRoutes) {
+    for (const route of unique(publicRoutes)) {
       const response = await page.goto(route, { waitUntil: 'domcontentloaded' });
       expect(response?.status(), route).toBeLessThan(400);
 
@@ -66,6 +101,18 @@ test.describe('Button and link logic', () => {
           .filter((button) => !button.text && !button.ariaLabel && !button.title),
       );
       expect(unnamedButtons, `${route} has unnamed visible buttons`).toEqual([]);
+
+      const malformedControls = await page.locator('a,button').evaluateAll((controls) =>
+        controls
+          .filter((control) => {
+            const rect = control.getBoundingClientRect();
+            const style = window.getComputedStyle(control);
+            return rect.width > 0 && rect.height > 0 && style.visibility !== 'hidden' && style.display !== 'none';
+          })
+          .map((control) => control.textContent?.replace(/\s+/g, ' ').trim() ?? '')
+          .filter((text) => /\?{3,}/.test(text) || /EnglishEnglish|繁體中文繁體中文|日本語日本語|한국어한국어/.test(text)),
+      );
+      expect(malformedControls, `${route} has malformed visible button/link labels`).toEqual([]);
 
       const hrefs = await page.locator('a[href]').evaluateAll((links) =>
         Array.from(new Set(links.map((link) => link.getAttribute('href') ?? ''))),
@@ -97,6 +144,47 @@ test.describe('Button and link logic', () => {
     }
 
     expect([...brokenLinks]).toEqual([]);
+  });
+
+  test('localized home CTA and menu links keep users in the selected market', async ({ page }) => {
+    test.setTimeout(120_000);
+
+    for (const locale of locales) {
+      await page.goto(`/${locale}`, { waitUntil: 'domcontentloaded' });
+
+      for (const href of [
+        `/${locale}/beta`,
+        `/${locale}/daily`,
+        `/${locale}/tools/tarot`,
+        `/${locale}/teachers`,
+      ]) {
+        await expect(page.locator(`.home-hero__actions a[href="${href}"]`), `${locale} hero ${href}`).toBeVisible();
+      }
+
+      const menuButton = page.locator('button[aria-controls="mobile-header-menu"]');
+      await expect(menuButton, `${locale} menu button`).toBeVisible();
+      await menuButton.click();
+      const menu = page.locator('#mobile-header-menu');
+      await expect(menu).toBeVisible();
+
+      for (const href of [
+        `/${locale}/beta`,
+        `/${locale}/tools`,
+        `/${locale}/daily`,
+        `/${locale}/mobile`,
+        `/${locale}/ar`,
+        `/${locale}/teachers`,
+        `/${locale}/legal/disclaimer`,
+        `/${locale}/account/login`,
+        `/${locale}/teachers/apply`,
+      ]) {
+        await expect(menu.locator(`a[href="${href}"]`), `${locale} menu ${href}`).toBeVisible();
+      }
+
+      for (const nextLocale of locales) {
+        await expect(menu.locator(`a[href="/${nextLocale}"]`), `${locale} language ${nextLocale}`).toBeVisible();
+      }
+    }
   });
 
   test('right-side header menu routes and language switching preserve the current page', async ({ page }) => {

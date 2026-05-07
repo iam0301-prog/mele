@@ -641,6 +641,7 @@ log(
 
 const mobileHeaderMenu = readFileSync('apps/web/components/MobileHeaderMenu.tsx', 'utf8');
 log('header uses controlled mobile drawer navigation', header.includes('MobileHeaderMenu') && mobileHeaderMenu.includes('usePathname') && mobileHeaderMenu.includes('setOpen(false)') && mobileHeaderMenu.includes('pointerdown') && mobileHeaderMenu.includes('Escape'));
+log('header menu waits for hydration before accepting clicks', mobileHeaderMenu.includes('setHydrated(true)') && mobileHeaderMenu.includes('disabled={!hydrated}'));
 log(
   'header has localized right-side navigation and language switcher',
   ['getDictionary', 'LOCALE_HEADER', 'primaryLinks', 'guestLinks', 'MobileHeaderMenu'].every((token) => header.includes(token)) &&
