@@ -1,0 +1,218 @@
+import { existsSync, readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+
+const ENV_FILES = [
+  resolve('.env.auth.local'),
+  resolve('apps/web/.env.local'),
+  resolve('.env.local'),
+  resolve('.env'),
+];
+
+function parseEnvFile(file) {
+  if (!existsSync(file)) return {};
+  const result = {};
+
+  for (const rawLine of readFileSync(file, 'utf8').split(/\r?\n/)) {
+    const line = rawLine.trim();
+    if (!line || line.startsWith('#')) continue;
+    const match = line.match(/^([^=]+)=(.*)$/);
+    if (!match) continue;
+    result[match[1].trim()] = match[2].trim().replace(/^['"]|['"]$/g, '');
+  }
+
+  return result;
+}
+
+const env = Object.assign({}, ...ENV_FILES.map(parseEnvFile), process.env);
+const args = new Set(process.argv.slice(2));
+const apply = args.has('--apply');
+const statusOnly = args.has('--status');
+const help = args.has('--help') || args.has('-h');
+
+function usage() {
+  console.log(`Usage:
+  npm run ops:configure-auth -- --dry-run
+  npm run ops:configure-auth -- --apply
+  npm run ops:configure-auth -- --status
+
+Required secrets are read from .env.auth.local or process env.
+.env.auth.local is ignored by git.
+
+Required:
+  SUPABASE_ACCESS_TOKEN=<Supabase personal access token>
+  MELE_SMTP_PASS=<Resend API key or SMTP password>
+  MELE_SMTP_ADMIN_EMAIL=<verified sender email>
+
+Recommended:
+  MELE_AUTH_SITE_URL=https://mele-chi.vercel.app
+  MELE_EXTRA_REDIRECT_URLS=https://mele-chi.vercel.app/**,http://localhost:3000/**,http://127.0.0.1:3006/**
+  MELE_SMTP_HOST=smtp.resend.com
+  MELE_SMTP_PORT=465
+  MELE_SMTP_USER=resend
+  MELE_SMTP_SENDER_NAME=MELE`);
+}
+
+if (help) {
+  usage();
+  process.exit(0);
+}
+
+function info(message) {
+  console.log(`INFO ${message}`);
+}
+
+function ok(message) {
+  console.log(`OK   ${message}`);
+}
+
+function fail(message) {
+  console.error(`FAIL ${message}`);
+  process.exitCode = 1;
+}
+
+function required(name, value) {
+  if (!value) {
+    fail(`${name} is required.`);
+    return '';
+  }
+  return value;
+}
+
+function deriveProjectRef() {
+  if (env.SUPABASE_PROJECT_REF) return env.SUPABASE_PROJECT_REF;
+  const url = env.NEXT_PUBLIC_SUPABASE_URL;
+  const match = url?.match(/^https:\/\/([a-z0-9]{20})\.supabase\.co\/?$/i);
+  return match?.[1] ?? '';
+}
+
+function normalizeUrl(value) {
+  return value.replace(/\/+$/, '');
+}
+
+function isLocalUrl(value) {
+  return /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?/i.test(value);
+}
+
+function mask(value) {
+  if (!value) return '<missing>';
+  if (value.length <= 8) return '<set>';
+  return `${value.slice(0, 4)}...${value.slice(-4)}`;
+}
+
+function redactConfig(config) {
+  const clone = { ...config };
+  if (clone.smtp_pass) clone.smtp_pass = mask(clone.smtp_pass);
+  return clone;
+}
+
+const projectRef = required('SUPABASE_PROJECT_REF or NEXT_PUBLIC_SUPABASE_URL', deriveProjectRef());
+const accessToken = required('SUPABASE_ACCESS_TOKEN', env.SUPABASE_ACCESS_TOKEN);
+const siteUrl = normalizeUrl(
+  env.MELE_AUTH_SITE_URL
+    || (env.NEXT_PUBLIC_SITE_URL && !isLocalUrl(env.NEXT_PUBLIC_SITE_URL) ? env.NEXT_PUBLIC_SITE_URL : '')
+    || 'https://mele-chi.vercel.app',
+);
+
+const defaultRedirects = [
+  `${siteUrl}/**`,
+  'http://localhost:3000/**',
+  'http://127.0.0.1:3006/**',
+];
+const redirectUrls = (env.MELE_EXTRA_REDIRECT_URLS || defaultRedirects.join(','))
+  .split(',')
+  .map((value) => value.trim())
+  .filter(Boolean);
+
+const smtpAdminEmail = statusOnly ? env.MELE_SMTP_ADMIN_EMAIL : required('MELE_SMTP_ADMIN_EMAIL', env.MELE_SMTP_ADMIN_EMAIL);
+const smtpPass = statusOnly ? '' : required('MELE_SMTP_PASS', env.MELE_SMTP_PASS);
+
+if (process.exitCode) {
+  usage();
+  process.exit();
+}
+
+const authConfig = {
+  site_url: siteUrl,
+  uri_allow_list: redirectUrls.join(','),
+  disable_signup: false,
+  external_email_enabled: true,
+  mailer_autoconfirm: false,
+  smtp_admin_email: smtpAdminEmail,
+  smtp_host: env.MELE_SMTP_HOST || 'smtp.resend.com',
+  smtp_port: String(env.MELE_SMTP_PORT || '465'),
+  smtp_user: env.MELE_SMTP_USER || 'resend',
+  smtp_pass: smtpPass,
+  smtp_sender_name: env.MELE_SMTP_SENDER_NAME || 'MELE',
+  smtp_max_frequency: Number(env.MELE_SMTP_MAX_FREQUENCY || 60),
+  mailer_subjects_confirmation: env.MELE_MAIL_SUBJECT_CONFIRMATION || '確認你的 MELE 帳號',
+  mailer_subjects_recovery: env.MELE_MAIL_SUBJECT_RECOVERY || '重設你的 MELE 密碼',
+  mailer_subjects_magic_link: env.MELE_MAIL_SUBJECT_MAGIC_LINK || '登入 MELE',
+};
+
+const managementUrl = `https://api.supabase.com/v1/projects/${projectRef}/config/auth`;
+
+async function managementRequest(method, body) {
+  const response = await fetch(managementUrl, {
+    method,
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      'Content-Type': 'application/json',
+    },
+    body: body ? JSON.stringify(body) : undefined,
+  });
+
+  const text = await response.text();
+  let data = null;
+  try {
+    data = text ? JSON.parse(text) : null;
+  } catch {
+    data = text;
+  }
+
+  if (!response.ok) {
+    throw new Error(`Supabase Management API ${method} failed: HTTP ${response.status} ${JSON.stringify(data)}`);
+  }
+
+  return data;
+}
+
+function printSafeStatus(data) {
+  const picked = {
+    site_url: data?.site_url,
+    uri_allow_list: data?.uri_allow_list,
+    disable_signup: data?.disable_signup,
+    external_email_enabled: data?.external_email_enabled,
+    mailer_autoconfirm: data?.mailer_autoconfirm,
+    smtp_admin_email: data?.smtp_admin_email,
+    smtp_host: data?.smtp_host,
+    smtp_port: data?.smtp_port,
+    smtp_user: data?.smtp_user ? mask(data.smtp_user) : data?.smtp_user,
+    smtp_sender_name: data?.smtp_sender_name,
+    smtp_max_frequency: data?.smtp_max_frequency,
+  };
+  console.log(JSON.stringify(picked, null, 2));
+}
+
+info(`Project ref: ${projectRef}`);
+info(`Auth site URL: ${siteUrl}`);
+info(`Redirect allow list: ${redirectUrls.join(', ')}`);
+info(`SMTP host: ${authConfig.smtp_host}:${authConfig.smtp_port}`);
+info(`SMTP sender: ${smtpAdminEmail} (${authConfig.smtp_sender_name})`);
+
+if (statusOnly) {
+  const status = await managementRequest('GET');
+  printSafeStatus(status);
+  process.exit(0);
+}
+
+if (!apply) {
+  info('Dry run only. No remote settings were changed. Add --apply to update Supabase Auth.');
+  console.log(JSON.stringify(redactConfig(authConfig), null, 2));
+  process.exit(0);
+}
+
+await managementRequest('PATCH', authConfig);
+ok('Supabase Auth config updated.');
+
+const updated = await managementRequest('GET');
+printSafeStatus(updated);

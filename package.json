@@ -28,6 +28,7 @@
     "ops:build:web": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build-and-restart-web.ps1",
     "ops:verify": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify-local.ps1",
     "ops:check-auth": "node scripts/check-supabase-auth.mjs",
+    "ops:configure-auth": "node scripts/configure-supabase-auth.mjs",
     "test:watch": "vitest",
     "test:report": "node tests/verify-python-api.mjs",
     "tarot:forest-status": "node scripts/tarot-art-phase.mjs --style forest_athena --limit 10",
