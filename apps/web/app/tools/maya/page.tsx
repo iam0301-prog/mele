@@ -19,7 +19,7 @@ export default function MayaPage() {
   const [result, setResult] = useState<CalcResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const onSubmit = async (event: React.FormEvent) => {
+  const onSubmit = async (event: React.FormEvent | React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
     if (!date) {
       toast(copy.validation.dateRequired ?? 'Please choose your birth date first.', 'error');
@@ -48,7 +48,7 @@ export default function MayaPage() {
       <form onSubmit={onSubmit} className="mele-card" noValidate>
         <DateOnlyField locale={locale} date={date} onDateChange={setDate} label={copy.birth?.dateLabel} hint={copy.dateHint} />
 
-        <button type="submit" disabled={loading} className="mele-btn-primary w-full md:w-auto">
+        <button type="button" onClick={onSubmit} disabled={loading} className="mele-btn-primary w-full md:w-auto">
           {loading ? copy.submit.loading : copy.submit.idle}
         </button>
       </form>

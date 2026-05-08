@@ -74,6 +74,9 @@ function localeFromRequest(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
   if (isLocalizedPath(pathname)) return getLocaleFromPathname(pathname);
 
+  const headerLocale = request.headers.get(LOCALE_HEADER);
+  if (isLocale(headerLocale)) return headerLocale;
+
   const cookieLocale = request.cookies.get(LOCALE_COOKIE)?.value;
   if (isLocale(cookieLocale)) return cookieLocale;
 
@@ -112,7 +115,7 @@ function localeFromAcceptLanguage(header: string | null): Locale | null {
 function requestHeadersWithLocale(request: NextRequest, locale = localeFromRequest(request)) {
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set(LOCALE_HEADER, locale);
-  requestHeaders.set(PATH_HEADER, request.nextUrl.pathname);
+  requestHeaders.set(PATH_HEADER, request.headers.get(PATH_HEADER) || request.nextUrl.pathname);
   return requestHeaders;
 }
 

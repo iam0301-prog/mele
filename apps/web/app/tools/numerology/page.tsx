@@ -32,7 +32,7 @@ export default function NumerologyPage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [profile.loaded]);
 
-  const onSubmit = async (event: React.FormEvent) => {
+  const onSubmit = async (event: React.FormEvent | React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
     if (!date) {
       toast(copy.validation.dateRequired ?? 'Please choose your birth date first.', 'error');
@@ -63,7 +63,7 @@ export default function NumerologyPage() {
 
         <DateOnlyField locale={locale} date={date} onDateChange={setDate} label={copy.birth?.dateLabel} hint={copy.dateHint} />
 
-        <button type="submit" disabled={loading} className="mele-btn-primary w-full md:w-auto">
+        <button type="button" onClick={onSubmit} disabled={loading} className="mele-btn-primary w-full md:w-auto">
           {loading ? copy.submit.loading : copy.submit.idle}
         </button>
       </form>

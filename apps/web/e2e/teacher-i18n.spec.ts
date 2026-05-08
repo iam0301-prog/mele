@@ -9,6 +9,8 @@ const teacherHeadings = [
 ] as const;
 
 test.describe('Teacher multilingual surfaces', () => {
+  test.describe.configure({ mode: 'serial', timeout: 90_000 });
+
   test('teacher directory uses the active market language', async ({ page }) => {
     for (const [locale, heading] of teacherHeadings) {
       await page.goto(`/${locale}/teachers`, { waitUntil: 'domcontentloaded' });

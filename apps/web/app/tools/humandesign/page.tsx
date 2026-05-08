@@ -47,7 +47,7 @@ export default function HumanDesignPage() {
     toast(copy.submit.demo ?? 'Demo data filled.');
   };
 
-  const onSubmit = async (event: React.FormEvent) => {
+  const onSubmit = async (event: React.FormEvent | React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
 
     if (!date || !time) {
@@ -101,7 +101,7 @@ export default function HumanDesignPage() {
         />
 
         <div className="flex flex-col gap-3 sm:flex-row">
-          <button type="submit" disabled={loading} className="mele-btn-primary w-full sm:w-auto">
+          <button type="button" onClick={onSubmit} disabled={loading} className="mele-btn-primary w-full sm:w-auto">
             {loading ? copy.submit.loading : copy.submit.idle}
           </button>
           <button type="button" onClick={fillDemo} disabled={loading} className="mele-btn-secondary w-full sm:w-auto">

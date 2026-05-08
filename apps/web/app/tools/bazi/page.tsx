@@ -35,7 +35,7 @@ export default function BaziPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [profile.loaded]);
 
-  const onSubmit = async (event: React.FormEvent) => {
+  const onSubmit = async (event: React.FormEvent | React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
     if (!date || !time) {
       toast(copy.validation.dateTimeRequired ?? 'Please enter both birth date and time.', 'error');
@@ -91,7 +91,7 @@ export default function BaziPage() {
 
         {useTrueSolar && <LongitudeField locale={locale} longitude={longitude} onLongitudeChange={setLongitude} />}
 
-        <button type="submit" disabled={loading} className="mele-btn-primary w-full md:w-auto">
+        <button type="button" onClick={onSubmit} disabled={loading} className="mele-btn-primary w-full md:w-auto">
           {loading ? copy.submit.loading : copy.submit.idle}
         </button>
       </form>

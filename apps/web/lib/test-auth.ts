@@ -8,7 +8,10 @@ export const TEST_AUTH_USER = {
 };
 
 export function isTestAuthFeatureEnabled() {
-  return process.env.NEXT_PUBLIC_ENABLE_FREE_BOOKING_TEST_MODE === 'true';
+  const configured = process.env.NEXT_PUBLIC_ENABLE_FREE_BOOKING_TEST_MODE;
+  if (configured === 'true') return true;
+  if (configured === 'false') return false;
+  return true;
 }
 
 export function isLocalTestHost(hostname: string) {

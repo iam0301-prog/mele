@@ -21,7 +21,7 @@ export default function TarotPage() {
   const [result, setResult] = useState<CalcResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const onSubmit = async (event: React.FormEvent) => {
+  const onSubmit = async (event: React.FormEvent | React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
     if (!question.trim()) {
       toast(copy.validation.questionRequired ?? 'Please enter a question first.', 'error');
@@ -101,7 +101,7 @@ export default function TarotPage() {
           {copy.reversedLabel}
         </label>
 
-        <button type="submit" disabled={loading} className="mele-btn-primary w-full md:w-auto">
+        <button type="button" onClick={onSubmit} disabled={loading} className="mele-btn-primary w-full md:w-auto">
           {loading ? copy.submit.loading : copy.submit.idle}
         </button>
       </form>

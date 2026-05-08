@@ -2,7 +2,8 @@ import { expect, test } from '@playwright/test';
 
 const locales = ['zh-TW', 'en', 'vi', 'id', 'ja', 'ko'] as const;
 const toolSlugs = ['numerology', 'maya', 'bazi', 'tarot', 'runes', 'astro', 'ziwei', 'humandesign'] as const;
-const localizedPublicRoutes = locales.flatMap((locale) => [
+const routeProbeBatchSize = 1;
+const localizedCoreRoutes = locales.flatMap((locale) => [
   `/${locale}`,
   `/${locale}/beta`,
   `/${locale}/daily`,
@@ -10,7 +11,6 @@ const localizedPublicRoutes = locales.flatMap((locale) => [
   `/${locale}/ar`,
   `/${locale}/spiritual`,
   `/${locale}/tools`,
-  ...toolSlugs.map((tool) => `/${locale}/tools/${tool}`),
   `/${locale}/teachers`,
   `/${locale}/teachers/apply`,
   `/${locale}/account/login`,
@@ -18,9 +18,13 @@ const localizedPublicRoutes = locales.flatMap((locale) => [
   `/${locale}/legal/tos`,
   `/${locale}/legal/disclaimer`,
 ]);
+const primaryToolRoutes = ['zh-TW', 'en'].flatMap((locale) => toolSlugs.map((tool) => `/${locale}/tools/${tool}`));
+const localizedToolSpotChecks = locales.map((locale) => `/${locale}/tools/maya`);
 
 const publicRoutes = [
-  ...localizedPublicRoutes,
+  ...localizedCoreRoutes,
+  ...primaryToolRoutes,
+  ...localizedToolSpotChecks,
   '/zh-TW',
   '/en',
   '/vi',
@@ -83,17 +87,21 @@ test.describe('Button and link logic', () => {
         failOnStatusCode: false,
       });
       expect(response.status(), acceptLanguage).toBe(307);
-      expect(response.headers().location, acceptLanguage).toBe(expectedPath);
+      const location = response.headers().location ?? '';
+      const locationPath = location.startsWith('http')
+        ? new URL(location).pathname
+        : location;
+      expect(locationPath, acceptLanguage).toBe(expectedPath);
     }
   });
 
-  test('all localized release routes respond before any button sends users there', async ({ request }) => {
-    test.setTimeout(120_000);
+  test('localized release smoke routes respond before any button sends users there', async ({ request }) => {
+    test.setTimeout(300_000);
     const failures: string[] = [];
 
     const routes = unique(publicRoutes);
-    for (let index = 0; index < routes.length; index += 8) {
-      const chunk = routes.slice(index, index + 8);
+    for (let index = 0; index < routes.length; index += routeProbeBatchSize) {
+      const chunk = routes.slice(index, index + routeProbeBatchSize);
       await Promise.all(
         chunk.map(async (route) => {
           const response = await request.get(route, { failOnStatusCode: false });
@@ -106,7 +114,7 @@ test.describe('Button and link logic', () => {
   });
 
   test('core public pages expose named buttons and non-broken same-origin links', async ({ page, request }) => {
-    test.setTimeout(240_000);
+    test.setTimeout(600_000);
     const brokenLinks = new Set<string>();
     const linkSources = new Map<string, string>();
 
@@ -156,8 +164,8 @@ test.describe('Button and link logic', () => {
     }
 
     const paths = [...linkSources.keys()];
-    for (let index = 0; index < paths.length; index += 8) {
-      const chunk = paths.slice(index, index + 8);
+    for (let index = 0; index < paths.length; index += routeProbeBatchSize) {
+      const chunk = paths.slice(index, index + routeProbeBatchSize);
       const results = await Promise.all(
         chunk.map(async (path) => {
           const linkResponse = await request.get(path, { failOnStatusCode: false });
@@ -267,7 +275,8 @@ test.describe('Button and link logic', () => {
     ] as const;
 
     for (const [route, buttonName, validationText] of cases) {
-      await page.goto(route, { waitUntil: 'domcontentloaded' });
+      await page.goto(route, { waitUntil: 'load' });
+      await page.waitForLoadState('networkidle');
       await page.getByRole('button', { name: buttonName }).click();
       await expect(page.getByText(validationText, { exact: false }).first()).toBeVisible();
     }

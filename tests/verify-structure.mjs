@@ -328,6 +328,11 @@ log('locale labels are stable and not duplicated', ['\\u7e41\\u9ad4\\u4e2d\\u658
 log('language switcher preserves the current path', languageSwitcher.includes('switchLocaleInPathname') && languageSwitcher.includes('usePathname') && languageSwitcher.includes('useSearchParams'));
 log('language switcher renders panel locale names once', !languageSwitcher.includes("className={variant === 'panel' ? '' : 'sr-only'}"));
 log('middleware redirects root and rewrites localized legacy routes', i18nMiddleware.includes('pathname === \'/\'') && i18nMiddleware.includes('NextResponse.redirect') && i18nMiddleware.includes('NextResponse.rewrite') && i18nMiddleware.includes('LOCALE_HEADER'));
+log(
+  'middleware preserves locale through internal rewrites',
+  i18nMiddleware.includes('request.headers.get(LOCALE_HEADER)') &&
+    i18nMiddleware.includes('request.headers.get(PATH_HEADER) || request.nextUrl.pathname'),
+);
 log('middleware detects browser language before defaulting to Traditional Chinese', i18nMiddleware.includes('localeFromAcceptLanguage') && i18nMiddleware.includes("tag.startsWith('en')") && i18nMiddleware.includes("tag.startsWith('vi')") && i18nMiddleware.includes("tag.startsWith('id')") && i18nMiddleware.includes("tag.startsWith('ja')") && i18nMiddleware.includes("tag.startsWith('ko')"));
 log('middleware lets localized beta, market, and tools lobbies render natively', i18nMiddleware.includes("'/beta'") && i18nMiddleware.includes("'/spiritual'") && i18nMiddleware.includes("'/tools'"));
 log('middleware lets localized release utility pages render natively', ["'/daily'", "'/mobile'", "'/ar'", "'/account/login'", "'/legal/privacy'", "'/legal/tos'", "'/legal/disclaimer'"].every((token) => i18nMiddleware.includes(token)));
@@ -519,7 +524,7 @@ log(
     localizedLoginClient.includes('existingAccount'),
 );
 log('login supports beta invite signup metadata', ["search.get('invite')", "search.get('mode') === 'signup'", 'beta_invite_code', 'beta_segment'].every((token) => login.includes(token)));
-log('local test auth is gated to localhost free test mode', testAuth.includes('NEXT_PUBLIC_ENABLE_FREE_BOOKING_TEST_MODE') && testAuth.includes('isLocalTestHost') && testAuth.includes('localhost'));
+log('local test auth is gated to localhost and explicit disable', testAuth.includes('NEXT_PUBLIC_ENABLE_FREE_BOOKING_TEST_MODE') && testAuth.includes("configured === 'false'") && testAuth.includes('isLocalTestHost') && testAuth.includes('localhost'));
 log('login offers local test auth fallback', login.includes('使用本機測試帳號') && login.includes('setClientTestAuth') && login.includes('canUseClientTestAuth'));
 log('server header recognizes local test auth cookie', header.includes('getServerTestUser') && header.includes('testUser'));
 log(
