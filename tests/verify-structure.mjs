@@ -662,7 +662,7 @@ log(
   [
     'home-hero',
     'home-oracle-console',
-    'home-tool-grid',
+    'home-market-grid',
     "from 'next/image'",
     '/tarot/cards/ocean_poseidon/19.webp',
     '/maya/totems/yellow-human.png',
@@ -671,8 +671,8 @@ log(
       '.home-hero',
       '.home-oracle-console',
       '.home-proof-strip',
-      '.home-tool-grid',
-      '.home-tool-card',
+      '.home-market-grid',
+      '.home-market-card',
       '.home-role-lanes',
     ].every((token) => homeGlobalCss.includes(token)),
 );

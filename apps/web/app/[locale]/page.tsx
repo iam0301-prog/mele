@@ -105,18 +105,20 @@ export default async function LocalizedHomePage({ params }: PageProps) {
         ))}
       </section>
 
-      <section className="home-section home-section--tools">
+      <section className="home-section home-section--markets">
         <div className="home-section__header">
           <span>{home.marketsKicker}</span>
           <h2>{home.marketsTitle}</h2>
           <p>{home.marketsBody}</p>
         </div>
-        <div className="home-tool-grid">
+        <div className="home-market-grid">
           {markets.items.map((market) => (
-            <Link href={market.href} key={market.locale} className="home-tool-card" hrefLang={market.locale}>
+            <Link href={market.href} key={market.locale} className="home-market-card" hrefLang={market.locale}>
               <em>{market.status}</em>
-              <h3>{market.name}</h3>
-              <p>{market.body}</p>
+              <span>
+                <strong>{market.name}</strong>
+                <small>{market.body}</small>
+              </span>
             </Link>
           ))}
         </div>
