@@ -26,11 +26,13 @@ const authEmailRunbook = read('docs/SUPABASE_AUTH_EMAIL_RUNBOOK.md');
 const oauthRunbook = read('docs/OAUTH_LOGIN_RUNBOOK.md');
 const backendBlueprint = read('docs/BACKEND_BLUEPRINT.md');
 const deployRunbook = read('docs/DEPLOYMENT_RUNBOOK.md');
+const publicTestingRunbook = read('docs/PUBLIC_TESTING_RUNBOOK.md');
 const goLiveExternalSettings = read('docs/GO_LIVE_EXTERNAL_SETTINGS.md');
 const setupReadme = read('scripts/setup-supabase/README.md');
 const setupAllMigrations = read('scripts/setup-supabase/all_migrations.sql');
 const authCheckScript = read('scripts/check-supabase-auth.mjs');
 const configureAuthScript = read('scripts/configure-supabase-auth.mjs');
+const publicSmokeScript = read('scripts/smoke-public.mjs');
 const pythonDockerfile = read('python_api/Dockerfile');
 const pythonRequirementsDev = read('python_api/requirements-dev.txt');
 const pythonPackage = read('python_api/package.json');
@@ -38,6 +40,7 @@ const pythonReadme = read('python_api/README.md');
 const pythonPytestRunner = read('scripts/run-python-pytest.mjs');
 const renderYaml = read('render.yaml');
 const railwayJson = read('railway.json');
+const vercelJson = read('apps/web/vercel.json');
 const ciWorkflow = read('.github/workflows/ci.yml');
 const e2eSpec = read('apps/web/e2e/golden-path.spec.ts');
 const playwrightConfig = read('apps/web/playwright.config.ts');
@@ -57,10 +60,12 @@ for (const file of [
   'docs/OAUTH_LOGIN_RUNBOOK.md',
   'docs/BACKEND_BLUEPRINT.md',
   'docs/DEPLOYMENT_RUNBOOK.md',
+  'docs/PUBLIC_TESTING_RUNBOOK.md',
   'docs/GO_LIVE_EXTERNAL_SETTINGS.md',
   'scripts/setup-supabase/README.md',
   'scripts/check-supabase-auth.mjs',
   'scripts/configure-supabase-auth.mjs',
+  'scripts/smoke-public.mjs',
   'python_api/Dockerfile',
   'python_api/.dockerignore',
   'python_api/package.json',
@@ -69,6 +74,7 @@ for (const file of [
   'scripts/run-web-e2e.mjs',
   'render.yaml',
   'railway.json',
+  'apps/web/vercel.json',
   '.github/workflows/ci.yml',
 ]) {
   ok(`${file} exists`, existsSync(file));
@@ -195,6 +201,19 @@ for (const token of [
 }
 
 for (const token of [
+  '公開測試',
+  'Root Directory: apps/web',
+  'NEXT_PUBLIC_ENABLE_FREE_BOOKING_TEST_MODE=true',
+  'npm.cmd run ops:smoke:public',
+  'MELE_ALLOWED_ORIGINS',
+  'Supabase',
+  'No-Go',
+  '/api/calc/numerology',
+]) {
+  ok(`public testing runbook covers ${token}`, publicTestingRunbook.includes(token));
+}
+
+for (const token of [
   'Supabase Auth',
   'Google Login',
   'LINE Login / LIFF',
@@ -290,6 +309,9 @@ ok('Render blueprint auto-deploys API updates from main', renderYaml.includes('a
 ok('Render blueprint allows production Vercel origin', renderYaml.includes('MELE_ALLOWED_ORIGINS') && renderYaml.includes('https://mele-chi.vercel.app'));
 ok('Railway config points at API Dockerfile', railwayJson.includes('"dockerfilePath": "python_api/Dockerfile"'));
 ok('Railway config has /ready health check', railwayJson.includes('"healthcheckPath": "/ready"'));
+ok('Vercel app config uses Next.js framework', vercelJson.includes('"framework": "nextjs"'));
+ok('Vercel app config builds from apps/web package', vercelJson.includes('"buildCommand": "npm run build"'));
+ok('Vercel app config installs with npm ci', vercelJson.includes('"installCommand": "npm ci"'));
 
 console.log('\n=== CI workflow ===\n');
 
@@ -319,6 +341,7 @@ ok('package exposes test:deployment', pkg.scripts?.['test:deployment'] === 'node
 ok('package exposes test:secrets', pkg.scripts?.['test:secrets'] === 'node tests/verify-secrets.mjs');
 ok('package exposes test:python', pkg.scripts?.['test:python'] === 'node scripts/run-python-pytest.mjs');
 ok('package exposes release-grade test:e2e runner', pkg.scripts?.['test:e2e'] === 'node scripts/run-web-e2e.mjs');
+ok('package exposes public smoke test runner', pkg.scripts?.['ops:smoke:public'] === 'node scripts/smoke-public.mjs');
 ok('package exposes ops:check-auth', pkg.scripts?.['ops:check-auth'] === 'node scripts/check-supabase-auth.mjs');
 ok('package exposes release:check', typeof pkg.scripts?.['release:check'] === 'string');
 ok('release:check includes type-check', pkg.scripts?.['release:check']?.includes('type-check'));
@@ -356,6 +379,18 @@ ok('layout avoids build-time Google font network fetches', !webLayout.includes('
 ok('Next config sets outputFileTracingRoot for multiple lockfiles', nextConfig.includes('outputFileTracingRoot'));
 ok('localized beta entry exists for tester invite flow', localizedBetaPage.includes('dictionary.beta') && localizedBetaPage.includes("mode: 'signup'"));
 ok('sitemap includes localized beta entry', sitemapRoute.includes("'/beta'") && sitemapRoute.includes('buildAlternateLanguages'));
+
+for (const token of [
+  'MELE_PUBLIC_SITE_URL',
+  'MELE_PUBLIC_API_URL',
+  '/zh-TW/account/login',
+  '/zh-TW/tools/humandesign',
+  '/api/calc/numerology',
+  'access-control-allow-origin',
+  'Public smoke test:',
+]) {
+  ok(`public smoke script covers ${token}`, publicSmokeScript.includes(token));
+}
 
 console.log('\n=== Browser e2e coverage ===\n');
 

@@ -27,6 +27,7 @@
     "ops:restart": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/restart-local.ps1",
     "ops:build:web": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build-and-restart-web.ps1",
     "ops:verify": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify-local.ps1",
+    "ops:smoke:public": "node scripts/smoke-public.mjs",
     "ops:check-auth": "node scripts/check-supabase-auth.mjs",
     "ops:configure-auth": "node scripts/configure-supabase-auth.mjs",
     "test:watch": "vitest",
