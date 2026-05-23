@@ -637,6 +637,15 @@ export function BirthDateTimeFields({
   );
 }
 
+function formatUtcOffset(offset: number): string {
+  if (!Number.isFinite(offset)) return '';
+  const sign = offset >= 0 ? '+' : '-';
+  const absOffset = Math.abs(offset);
+  const hours = Math.floor(absOffset);
+  const minutes = Math.round((absOffset - hours) * 60);
+  return minutes ? `UTC${sign}${hours}:${String(minutes).padStart(2, '0')}` : `UTC${sign}${hours}`;
+}
+
 export function LocationFields({
   latitude,
   longitude,
@@ -658,6 +667,20 @@ export function LocationFields({
 }) {
   const copy = copyFor(locale);
 
+  // Locale-aware label for the advanced/manual coords toggle
+  const advancedSummary =
+    locale === 'zh-TW'
+      ? '進階：手動調整經緯度'
+      : locale === 'ja'
+        ? '上級：緯度・経度を手動調整'
+        : locale === 'ko'
+          ? '고급: 위도/경도 수동 조정'
+          : locale === 'vi'
+            ? 'Nâng cao: chỉnh tay vĩ độ/kinh độ'
+            : locale === 'id'
+              ? 'Lanjutan: atur manual lat/lon'
+              : 'Advanced: manual lat / lon';
+
   return (
     <div className="birth-inputs birth-inputs--oracle">
       <div className="birth-inputs__panel">
@@ -670,30 +693,69 @@ export function LocationFields({
           <span>{copy.selectedLocation}</span>
           <strong>{latitude.toFixed(4)}, {longitude.toFixed(4)}</strong>
         </div>
-        <div className="birth-inputs__grid birth-inputs__grid--three">
-          <label className="birth-inputs__field">
-            <span>{copy.latitude}</span>
-            <input type="number" step="0.0001" value={latitude} onChange={(event) => onLatitudeChange(Number.parseFloat(event.target.value))} className="birth-inputs__control" />
-          </label>
-          <label className="birth-inputs__field">
-            <span>{copy.longitude}</span>
-            <input type="number" step="0.0001" value={longitude} onChange={(event) => onLongitudeChange(Number.parseFloat(event.target.value))} className="birth-inputs__control" />
-          </label>
-        </div>
+
+        {/* Preset chips first — most users only need this */}
         <div className="birth-inputs__caption">{copy.presetLocation}</div>
         <div className="birth-inputs__chips">
-          {copy.locationPresets.map((item) => (
-            <button key={item.label} type="button" onClick={() => {
-              onLatitudeChange(item.lat);
-              onLongitudeChange(item.lon);
-              if (item.timezone && onTimezoneChange) {
-                onTimezoneChange(timezoneOffsetAt(item.timezone, timezoneDate, timezoneTime));
-              }
-            }}>
-              {item.label}
-            </button>
-          ))}
+          {copy.locationPresets.map((item) => {
+            const offset = item.timezone
+              ? typeof item.timezone === 'number'
+                ? item.timezone
+                : timezoneOffsetAt(item.timezone, timezoneDate, timezoneTime)
+              : null;
+            const offsetLabel = offset !== null ? formatUtcOffset(offset) : '';
+            return (
+              <button
+                key={item.label}
+                type="button"
+                onClick={() => {
+                  onLatitudeChange(item.lat);
+                  onLongitudeChange(item.lon);
+                  if (item.timezone && onTimezoneChange) {
+                    onTimezoneChange(timezoneOffsetAt(item.timezone, timezoneDate, timezoneTime));
+                  }
+                }}
+                title={offsetLabel ? `${item.label} · ${offsetLabel}` : item.label}
+              >
+                <span>{item.label}</span>
+                {offsetLabel && (
+                  <small className="block text-[10px] opacity-60 leading-tight mt-0.5">
+                    {offsetLabel}
+                  </small>
+                )}
+              </button>
+            );
+          })}
         </div>
+
+        {/* Advanced manual coords — collapsed by default */}
+        <details className="birth-inputs__advanced mt-4">
+          <summary className="cursor-pointer text-xs tracking-widest text-accent/80 hover:text-accent transition-colors">
+            {advancedSummary}
+          </summary>
+          <div className="birth-inputs__grid birth-inputs__grid--three mt-3">
+            <label className="birth-inputs__field">
+              <span>{copy.latitude}</span>
+              <input
+                type="number"
+                step="0.0001"
+                value={latitude}
+                onChange={(event) => onLatitudeChange(Number.parseFloat(event.target.value))}
+                className="birth-inputs__control"
+              />
+            </label>
+            <label className="birth-inputs__field">
+              <span>{copy.longitude}</span>
+              <input
+                type="number"
+                step="0.0001"
+                value={longitude}
+                onChange={(event) => onLongitudeChange(Number.parseFloat(event.target.value))}
+                className="birth-inputs__control"
+              />
+            </label>
+          </div>
+        </details>
       </div>
     </div>
   );

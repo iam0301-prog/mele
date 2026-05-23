@@ -87,6 +87,7 @@ type ToolLocaleCopy = {
     loadingBody: string;
     errorTitle: string;
     errorHint: string;
+    errorRetry: string;
   };
   tools: Record<ToolPageSlug, ToolPageCopy>;
 };
@@ -95,7 +96,7 @@ const zhTools: Record<ToolPageSlug, ToolPageCopy> = {
   numerology: {
     title: '生命靈數',
     subtitle: 'LIFE PATH NUMBER',
-    description: '用出生日期計算生命靈數、生日數與主數 11 / 22 / 33，快速看見你的天賦傾向、人生課題與行動風格。',
+    description: '用出生日期計算生命靈數、生日數與主數 11 / 22 / 33；若出現大師數，會同時標示 11/2、22/4、33/6，避免不同派別看法造成混淆。',
     spec: '生命靈數',
     dateHint: '生命靈數只需要出生日期，不需要出生時間。',
     validation: { dateRequired: '請先選擇出生日期。' },
@@ -378,6 +379,7 @@ const localeCopies: Record<Locale, ToolLocaleCopy> = {
       loadingBody: '系統正在整理盤面與解讀素材，請稍候片刻。',
       errorTitle: '計算失敗',
       errorHint: '請稍後再試，或確認 API 服務是否正在運行。',
+      errorRetry: '重新嘗試',
     },
     tools: zhTools,
   },
@@ -399,6 +401,7 @@ const localeCopies: Record<Locale, ToolLocaleCopy> = {
       loadingBody: 'The system is preparing your chart and reading material. Please wait a moment.',
       errorTitle: 'Reading failed',
       errorHint: 'Try again later, or confirm that the API service is running.',
+      errorRetry: 'Try again',
     },
     tools: enTools,
   },
@@ -420,6 +423,7 @@ const localeCopies: Record<Locale, ToolLocaleCopy> = {
       loadingBody: 'Hệ thống đang chuẩn bị lá số và nội dung giải thích. Vui lòng chờ một chút.',
       errorTitle: 'Không thể giải đọc',
       errorHint: 'Hãy thử lại sau hoặc kiểm tra dịch vụ API.',
+      errorRetry: 'Thử lại',
     },
     tools: {
       ...enTools,
@@ -451,6 +455,7 @@ const localeCopies: Record<Locale, ToolLocaleCopy> = {
       loadingBody: 'Sistem sedang menyiapkan chart dan bahan pembacaan. Mohon tunggu sebentar.',
       errorTitle: 'Pembacaan gagal',
       errorHint: 'Coba lagi nanti, atau pastikan layanan API berjalan.',
+      errorRetry: 'Coba lagi',
     },
     tools: {
       ...enTools,
@@ -482,6 +487,7 @@ const localeCopies: Record<Locale, ToolLocaleCopy> = {
       loadingBody: 'チャートと解説素材を準備しています。少しお待ちください。',
       errorTitle: '鑑定に失敗しました',
       errorHint: '後ほど再試行するか、API サービスを確認してください。',
+      errorRetry: 'もう一度試す',
     },
     tools: {
       ...enTools,
@@ -513,6 +519,7 @@ const localeCopies: Record<Locale, ToolLocaleCopy> = {
       loadingBody: '차트와 리딩 자료를 준비하고 있습니다. 잠시만 기다려 주세요.',
       errorTitle: '리딩 실패',
       errorHint: '잠시 후 다시 시도하거나 API 서비스 상태를 확인해 주세요.',
+      errorRetry: '다시 시도',
     },
     tools: {
       ...enTools,

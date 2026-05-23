@@ -74,7 +74,7 @@ def render(data: dict) -> dict:
     svg = f"""
 <svg viewBox="0 0 600 620" xmlns="http://www.w3.org/2000/svg">
 {COMMON_KEYFRAMES}
-{oracle_backdrop(600, 620, "占星星盤", "NATAL CHART ORACLE")}
+{oracle_backdrop(600, 620, "占星星盤", "本命星盤神諭")}
 <defs>
   <radialGradient id="centerGrad" cx="50%" cy="50%">
     <stop offset="0%" stop-color="rgba(201,162,39,0.15)"/>
@@ -91,11 +91,11 @@ def render(data: dict) -> dict:
 {house_ring}
 {planets_svg}
 
-<text x="{cx}" y="{cy-40}" text-anchor="middle" font-size="11" fill="rgba(255,255,255,0.55)" letter-spacing="2">YOUR NATAL CHART</text>
+<text x="{cx}" y="{cy-40}" text-anchor="middle" font-size="11" fill="rgba(255,255,255,0.55)" letter-spacing="2">你的本命星盤</text>
 <text x="{cx}" y="{cy-15}" text-anchor="middle" font-size="14" fill="{PALETTE['accent']}" letter-spacing="3">本命星盤</text>
 <text x="{cx}" y="{cy+10}" text-anchor="middle" font-size="11" fill="rgba(255,255,255,0.78)">☉ {sun_label}　☽ {moon_label}</text>
-<text x="{cx}" y="{cy+30}" text-anchor="middle" font-size="11" fill="rgba(255,255,255,0.7)">↑ Asc {asc_label}</text>
-<text x="{cx}" y="{cy+48}" text-anchor="middle" font-size="11" fill="rgba(255,255,255,0.6)">⊕ MC {mc_label}</text>
+<text x="{cx}" y="{cy+30}" text-anchor="middle" font-size="11" fill="rgba(255,255,255,0.7)">↑ 上升 {asc_label}</text>
+<text x="{cx}" y="{cy+48}" text-anchor="middle" font-size="11" fill="rgba(255,255,255,0.6)">⊕ 天頂 {mc_label}</text>
 </svg>"""
 
     speech = (

@@ -15,10 +15,19 @@ const inlineLinkClass =
   'rounded-full border border-accent-dim bg-black/45 px-3 py-1.5 text-[11px] tracking-widest text-accent backdrop-blur transition hover:border-accent';
 
 const panelLinkClass =
-  'rounded-md border border-accent-dim bg-white/[0.05] px-3 py-2 text-center text-xs tracking-widest text-accent transition hover:border-accent';
+  'flex min-h-12 flex-col items-center justify-center rounded-md border border-accent-dim bg-white/[0.05] px-2 py-2 text-center text-[11px] tracking-[0.16em] text-accent transition hover:border-accent';
+
+const ENGLISH_LOCALE_NAMES: Record<Locale, string> = {
+  'zh-TW': 'Traditional Chinese',
+  en: 'English',
+  vi: 'Vietnamese',
+  id: 'Indonesian',
+  ja: 'Japanese',
+  ko: 'Korean',
+};
 
 export function LanguageSwitcher({
-  label = '切換語言',
+  label = 'Language',
   variant = 'inline',
   onNavigate,
 }: {
@@ -36,11 +45,11 @@ export function LanguageSwitcher({
 
   return (
     <div
-      className={variant === 'panel' ? 'grid gap-2' : 'flex items-center gap-1'}
+      className={variant === 'panel' ? 'mt-1 grid grid-cols-2 gap-2 border-t border-accent-dim/60 pt-3' : 'flex items-center gap-1'}
       aria-label={label}
     >
       {variant === 'panel' && (
-        <div className="text-center text-[10px] uppercase tracking-[0.28em] text-white/45">
+        <div className="col-span-2 text-center text-[10px] uppercase tracking-[0.28em] text-white/45">
           {label}
         </div>
       )}
@@ -53,9 +62,10 @@ export function LanguageSwitcher({
             hrefLang={locale}
             aria-current={isActive ? 'page' : undefined}
             className={`${linkClass} ${isActive ? 'border-accent bg-accent/[0.14] text-accent-light' : ''}`}
+            onClick={onNavigate}
           >
             {variant === 'panel' ? (
-              <span>{LOCALE_LABELS[locale].nativeName}</span>
+              <span className="font-bold">{ENGLISH_LOCALE_NAMES[locale]}</span>
             ) : (
               <>
                 <span className="sr-only">{LOCALE_LABELS[locale].nativeName}</span>

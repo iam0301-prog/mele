@@ -69,7 +69,13 @@ export default function ProfilePage() {
 
   return (
     <div className="container mx-auto max-w-2xl px-5 py-12">
-      <header className="pb-8 text-center">
+      <Link
+        href="/"
+        className="inline-flex items-center gap-1 text-xs tracking-widest text-accent hover:opacity-80 transition-opacity"
+      >
+        ← 返回首頁
+      </Link>
+      <header className="pb-8 pt-6 text-center">
         <h1 className="mb-2 font-serif text-3xl tracking-widest">個人資料</h1>
         <div className="mele-subtitle">PROFILE</div>
         <p className="mt-3 text-sm leading-relaxed text-white/60">

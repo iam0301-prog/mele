@@ -62,10 +62,16 @@ export default function PrivacyPage() {
         <p className="mt-3 text-xs text-white/50">最後更新：2026 年 4 月 30 日</p>
       </header>
 
+      <div className="mb-6 rounded-lg border border-amber-400/40 bg-amber-500/[0.08] p-4 text-sm leading-relaxed text-amber-100">
+        <strong className="text-amber-300">⚠ 律師審核中（v0 草案）</strong>
+        <p className="mt-1.5 text-amber-100/82">
+          本頁為產品上線前草案。正式公開收費前，仍應由熟悉台灣個資法、GDPR 與跨境資料處理之律師審閱。
+        </p>
+      </div>
+
       <div className="mele-card prose prose-invert max-w-none">
         <p className="leading-loose text-white/72">
-          本頁是產品上線前的隱私權政策草案，用於清楚告知使用者 MELE 如何處理資料。
-          正式公開收費前，仍應由熟悉台灣個資法與跨境資料處理的律師審閱。
+          MELE 重視你的資料隱私。本政策說明我們蒐集什麼資料、為什麼蒐集、保存多久，以及你擁有哪些權利。
         </p>
 
         {sections.map((section) => (
@@ -80,11 +86,40 @@ export default function PrivacyPage() {
         ))}
 
         <section className="mt-7">
-          <h2 className="text-accent">你的權利與聯絡方式</h2>
+          <h2 className="text-accent">Cookies 與本機儲存</h2>
           <p className="leading-loose">
-            你可以聯絡 MELE 要求查詢、更正、下載、停止使用或刪除個人資料。
-            正式上線時，請將下列信箱替換為實際客服與隱私聯絡信箱：
+            MELE 使用 cookies 與 localStorage 維持登入狀態、記住偏好設定（如語系、解讀風格）、儲存每日抽牌結果。我們不使用第三方廣告追蹤 cookies。
+            首次造訪時會詢問你的 cookie 同意（mele_cookie_consent_v1），你可以隨時於瀏覽器清除本機資料。
+          </p>
+        </section>
+
+        <section className="mt-7">
+          <h2 className="text-accent">資料保存期限</h2>
+          <ul className="list-disc space-y-2 pl-5 leading-loose">
+            <li>帳號與排盤紀錄：保留至帳號刪除為止。</li>
+            <li>預約與付款紀錄：依稅務法令最少保留 5 年。</li>
+            <li>老師申請文件（KYC）：申請被拒絕後 90 天內自動清除（系統自動執行）。</li>
+            <li>客服與爭議紀錄：依個案爭議性，保留 1-7 年。</li>
+            <li>觀測 / 錯誤紀錄：30-90 天，僅供除錯用途。</li>
+          </ul>
+        </section>
+
+        <section className="mt-7">
+          <h2 className="text-accent">你的權利</h2>
+          <p className="leading-loose">
+            依個人資料保護法第 3 條，你有以下權利：
+          </p>
+          <ul className="list-disc space-y-2 pl-5 leading-loose">
+            <li><strong>查詢權</strong>：知道我們有你哪些資料、如何使用。</li>
+            <li><strong>更正權</strong>：要求更正不完整或錯誤的資料。</li>
+            <li><strong>停止處理</strong>：要求停止使用你的個人資料（可能會影響服務）。</li>
+            <li><strong>刪除權</strong>：要求刪除你的個人資料（部分法定保留紀錄除外）。</li>
+            <li><strong>資料可攜權</strong>：要求以可機器讀取格式提供你的資料。</li>
+          </ul>
+          <p className="mt-3 leading-loose">
+            行使任何權利請聯絡：
             <a href="mailto:privacy@mele.example" className="ml-1 text-accent-light">privacy@mele.example</a>
+            （正式上線將替換為實際聯絡信箱）。我們會在 30 天內回應你的請求。
           </p>
         </section>
 

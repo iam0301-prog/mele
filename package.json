@@ -19,6 +19,7 @@
     "lint:python": "ruff check python_api && ruff format --check python_api",
     "typecheck:python": "mypy python_api",
     "test:sql": "node tests/verify-sql.mjs && node tests/verify-free-booking-sql.mjs && node tests/verify-auth-signup-sql.mjs",
+    "test:reference": "node scripts/reference-crosscheck.mjs",
     "test:deployment": "node tests/verify-deployment-readiness.mjs",
     "test:secrets": "node tests/verify-secrets.mjs",
     "release:check": "npm run type-check && npm test && npm run test:web && npm run test:e2e && npm run test:python && npm run test:sql && npm run test:deployment && npm run test:secrets && npm run build",

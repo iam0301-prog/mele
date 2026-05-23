@@ -50,7 +50,7 @@ describe('<DateOnlyField />', () => {
       />,
     );
 
-    fireEvent.click(screen.getByRole('button', { name: 'Los Angeles' }));
+    fireEvent.click(screen.getByRole('button', { name: /Los Angeles/i }));
 
     expect(onLatitudeChange).toHaveBeenCalledWith(34.0522);
     expect(onLongitudeChange).toHaveBeenCalledWith(-118.2437);

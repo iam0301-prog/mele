@@ -15,7 +15,42 @@ import {
   stripLocaleFromPathname,
 } from '@/lib/i18n';
 import { LocaleProvider } from '@/lib/i18n/LocaleProvider';
+import { SITE_URL } from '@/lib/i18n/seo';
 import './globals.css';
+
+/**
+ * JSON-LD structured data for SEO + rich Google results.
+ * - Organization: brand identity, surface "Mele 命理媒介中心" knowledge panel
+ * - WebSite: lets Google show a sitelinks search box
+ */
+function buildStructuredData(siteName: string, description: string) {
+  return [
+    {
+      '@context': 'https://schema.org',
+      '@type': 'Organization',
+      name: siteName,
+      alternateName: 'Mele',
+      url: SITE_URL,
+      logo: new URL('/icon.svg', SITE_URL).toString(),
+      description,
+      sameAs: [],
+    },
+    {
+      '@context': 'https://schema.org',
+      '@type': 'WebSite',
+      name: siteName,
+      url: SITE_URL,
+      potentialAction: {
+        '@type': 'SearchAction',
+        target: {
+          '@type': 'EntryPoint',
+          urlTemplate: `${SITE_URL}/teachers?spec={search_term_string}`,
+        },
+        'query-input': 'required name=search_term_string',
+      },
+    },
+  ];
+}
 
 const localPreviewCacheResetScript = `
 (function () {
@@ -88,9 +123,20 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const requestHeaders = await headers();
   const headerLocale = requestHeaders.get(LOCALE_HEADER);
   const locale = isLocale(headerLocale) ? headerLocale : DEFAULT_LOCALE;
+  const dictionary = await getDictionary(locale);
+  const structuredData = buildStructuredData(dictionary.meta.siteName, dictionary.meta.description);
 
   return (
     <html lang={locale}>
+      <head>
+        {structuredData.map((data, index) => (
+          <script
+            key={index}
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}
+          />
+        ))}
+      </head>
       <body className="font-sans">
         <script dangerouslySetInnerHTML={{ __html: localPreviewCacheResetScript }} />
         <ToastProvider>

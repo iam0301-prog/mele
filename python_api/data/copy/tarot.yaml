@@ -1,0 +1,7 @@
+# Mele 塔羅大牌解讀 v1
+# 22 大牌 × (teaser_friend + full_master 6 區塊)
+# YAML key = name_zh（對應 tarot.json）
+
+schema_version: 1
+
+cards: {}

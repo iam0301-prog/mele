@@ -37,12 +37,14 @@ const migrations = [
   'supabase/migrations/0010_kyc_auto_purge_cron.sql',
   'supabase/migrations/0011_admin_member_ops.sql',
   'supabase/migrations/0012_beta_tester_ops.sql',
+  'supabase/migrations/0013_teacher_consultation_briefs.sql',
 ];
 
 const pointMigrationFile = 'supabase/migrations/0009_member_points_unlocks.sql';
 const kycPurgeMigrationFile = 'supabase/migrations/0010_kyc_auto_purge_cron.sql';
 const adminMemberOpsMigrationFile = 'supabase/migrations/0011_admin_member_ops.sql';
 const betaTesterOpsMigrationFile = 'supabase/migrations/0012_beta_tester_ops.sql';
+const teacherConsultationBriefsMigrationFile = 'supabase/migrations/0013_teacher_consultation_briefs.sql';
 const SQL = migrations
   .map((file) => readFileSync(file, 'utf8'))
   .join('\n');
@@ -75,6 +77,7 @@ for (const table of [
   'daily_point_claims',
   'content_unlocks',
   'beta_testers',
+  'teacher_consultation_briefs',
 ]) {
   const re = new RegExp(`create\\s+table\\s+(if\\s+not\\s+exists\\s+)?public\\.${table}`, 'i');
   log(`table public.${table}`, re.test(SQL));
@@ -149,6 +152,8 @@ for (const index of [
   'idx_match_sessions_user_created',
   'idx_point_transactions_user_created',
   'idx_content_unlocks_user_scope',
+  'idx_teacher_consultation_briefs_booking',
+  'idx_teacher_consultation_briefs_teacher',
   'uniq_daily_draws_user_date_choice',
 ]) {
   log(`index ${index}`, SQL.includes(index));
@@ -188,9 +193,26 @@ for (const policy of [
   'match_sessions_self_insert',
   'match_sessions_self_update',
   'match_sessions_admin_select',
+  'teacher_consultation_briefs_teacher_select',
+  'teacher_consultation_briefs_teacher_insert',
+  'teacher_consultation_briefs_teacher_update',
+  'teacher_consultation_briefs_admin_all',
 ]) {
   log(`RLS policy ${policy}`, SQL.includes(`"${policy}"`));
 }
+
+const teacherConsultationBriefsSql = existsSync(teacherConsultationBriefsMigrationFile)
+  ? readFileSync(teacherConsultationBriefsMigrationFile, 'utf8')
+  : '';
+log(
+  'teacher consultation briefs store editable teacher drafts without exposing them to customers',
+  teacherConsultationBriefsSql.includes('create table if not exists public.teacher_consultation_briefs') &&
+    teacherConsultationBriefsSql.includes('generated_brief jsonb') &&
+    teacherConsultationBriefsSql.includes('teacher_overrides jsonb') &&
+    teacherConsultationBriefsSql.includes('save_teacher_consultation_brief') &&
+    teacherConsultationBriefsSql.includes('grant select, insert, update on public.teacher_consultation_briefs to authenticated') &&
+    !teacherConsultationBriefsSql.includes('customer_select'),
+);
 
 log(
   'bookings direct updates are restricted to admin policy/RPC workflows',
@@ -500,6 +522,8 @@ const accountPrivacyPage = readFileSync('apps/web/app/account/privacy/page.tsx',
 const profilePage = readFileSync('apps/web/app/account/profile/page.tsx', 'utf8');
 const chartsPage = readFileSync('apps/web/app/account/charts/page.tsx', 'utf8');
 const teacherPortalPage = readFileSync('apps/web/app/teacher-portal/page.tsx', 'utf8');
+const teacherBriefWorkbench = readFileSync('apps/web/components/TeacherBriefWorkbench.tsx', 'utf8');
+const teacherConsultationBriefs = readFileSync('apps/web/lib/teacher-consultation-briefs.ts', 'utf8');
 const teacherCopy = readFileSync('apps/web/lib/i18n/teacher-copy.ts', 'utf8');
 const testAuth = readFileSync('apps/web/lib/test-auth.ts', 'utf8');
 const testAuthServer = readFileSync('apps/web/lib/test-auth-server.ts', 'utf8');
@@ -733,6 +757,13 @@ log(
 );
 log('booking flow explains payment and refund expectations', ['付款後可在「我的諮詢」查看狀態', '取消政策', 'question.length'].some((token) => bookingExperiencePage.includes(token)) && bookingExperiencePage.includes('系統仍會以資料庫狀態再次確認'));
 log(
+  'booking flow captures structured client issue context before payment',
+  ['BOOK_COPY', 'questionTopics', 'painPoints', 'sessionGoals', 'QuestionOptionGrid', '想問主題：', 'Topic: ', 'Chủ đề muốn hỏi: ', '相談テーマ：', '질문 주제: ', 'issueContext'].every((token) => bookingExperiencePage.includes(token)) &&
+    bookingExperiencePage.includes('questionTitle') &&
+    bookingExperiencePage.includes('copy.prefixes.topic') &&
+    bookingExperiencePage.includes('p_customer_question: structuredQuestion'),
+);
+log(
   'booking flow supports free test mode through RPC',
   bookingExperiencePage.includes('NEXT_PUBLIC_ENABLE_FREE_BOOKING_TEST_MODE') &&
     bookingExperiencePage.includes("rpc('create_booking_request'") &&
@@ -942,7 +973,7 @@ log(
 log(
   'member unlock library provides real closed-beta content',
   existsSync('apps/web/lib/member-unlocks.ts') &&
-    ['MEMBER_UNLOCK_OPTIONS', 'buildUnlockedReadingContent', 'buildTeacherReadingBrief', 'unlockScopeKey', 'DAILY_POINT_AMOUNT', 'POINT_UNLOCK_COST', 'deep_reading', 'transit_day', 'transit_month', 'transit_year', '此象', '宜', '忌'].every((token) => memberUnlocks.includes(token)) &&
+    ['MEMBER_UNLOCK_OPTIONS', 'buildUnlockedReadingContent', 'buildTeacherReadingBrief', 'unlockScopeKey', 'DAILY_POINT_AMOUNT', 'POINT_UNLOCK_COST', 'deep_reading', 'transit_day', 'transit_month', 'transit_year', '白話解讀', '核心', '優勢', '宜', '忌'].every((token) => memberUnlocks.includes(token)) &&
     !['預留', '之後可把', '正式內容上線', '槽位'].some((token) => memberUnlocks.includes(token)),
 );
 log(
@@ -976,6 +1007,17 @@ log(
   ['chart_records', 'buildTeacherReadingBrief', 'customer_question', 'chart_data', 'teacher-member-brief', 'TeacherMemberBriefPanel', 'TeacherReadingAssistPanel'].every((token) => teacherPortal.includes(token)) &&
     ['會員詳解備忘', '輔助解盤工作台', '流日 / 流月 / 流年延伸'].every((token) => teacherCopy.includes(token)) &&
     ['.teacher-member-brief', '.teacher-member-brief__grid', '.teacher-member-brief__item'].every((token) => globalCss.includes(token)),
+);
+log(
+  'teacher portal includes all-tool editable consultation workbench',
+  ['TeacherBriefWorkbench', 'makeDemoWorkbenchCards', 'buildTeacherConsultationBrief', 'buildDailyConsultationBrief', 'teacher_consultation_briefs'].every((token) => teacherPortal.includes(token)) &&
+    ['save_teacher_consultation_brief', 'mergeTeacherBriefDraft', '複製備課文字', '儲存草稿', '五段式諮詢 SOP'].every((token) => teacherBriefWorkbench.includes(token)) &&
+    ['buildBazi', 'buildZiwei', 'buildAstro', 'buildHumanDesign', 'buildMaya', 'buildNumerology', 'buildTarot', 'buildRunes', 'buildDailyConsultationBrief'].every((token) => teacherConsultationBriefs.includes(token)) &&
+    ['.teacher-workbench', '.teacher-workbench__rail', '.teacher-workbench__stage', '@media (max-width: 860px)'].every((token) => globalCss.includes(token)),
+);
+log(
+  'teacher workbench briefs prioritize client issue and plain Human Design gates',
+  ['parseClientIssueContext', 'clientIssueSummary', '先了解客人', '針對客人問題', '先翻成人話', '不是少了這個能力'].every((token) => teacherConsultationBriefs.includes(token)),
 );
 const explanations = readFileSync('python_api/engines/explanations.py', 'utf8');
 log('backend explanations include non-repetitive Maya oracle roles', explanations.includes('MAYA_ORACLE_ROLES') && explanations.includes('這股力量不是敵人') && !explanations.includes('提醒你從不同角度理解本命 Kin'));

@@ -46,6 +46,7 @@ const migrations = [
   'supabase/migrations/0010_kyc_auto_purge_cron.sql',
   'supabase/migrations/0011_admin_member_ops.sql',
   'supabase/migrations/0012_beta_tester_ops.sql',
+  'supabase/migrations/0013_teacher_consultation_briefs.sql',
 ];
 
 function pgliteCompat(sql) {
@@ -109,6 +110,40 @@ console.log('\n[Test 1] 預約建立 → 自動分潤計算');
   const r = await db.query(`select platform_fee_ntd, teacher_amount_ntd from public.bookings where id='66666666-6666-6666-6666-666666666666'`);
   log('platform_fee_ntd = 400 (20%)', r.rows[0].platform_fee_ntd === 400, `got ${r.rows[0].platform_fee_ntd}`);
   log('teacher_amount_ntd = 1600', r.rows[0].teacher_amount_ntd === 1600, `got ${r.rows[0].teacher_amount_ntd}`);
+}
+
+// === 測試 1b: 老師解盤草稿保存 ===
+console.log('\n[Test 1b] teacher_consultation_briefs RPC');
+{
+  await db.exec(`select set_config('request.jwt.claim.sub', '${teacherUser}', false);`);
+  const saved = await db.query(`
+    select booking_id, teacher_id, customer_id, generated_brief, teacher_overrides, status
+    from public.save_teacher_consultation_brief(
+      '66666666-6666-6666-6666-666666666666',
+      '{"sourceLabel":"八字","coreSummary":"生成摘要"}'::jsonb,
+      '{"coreSummary":"老師改寫摘要"}'::jsonb,
+      'draft'
+    );
+  `);
+  log('teacher can save consultation brief', saved.rows[0].booking_id === '66666666-6666-6666-6666-666666666666');
+  log('generated brief is stored separately', saved.rows[0].generated_brief.coreSummary === '生成摘要');
+  log('teacher overrides are stored separately', saved.rows[0].teacher_overrides.coreSummary === '老師改寫摘要');
+  log('brief remains in draft status', saved.rows[0].status === 'draft');
+
+  await db.exec(`select set_config('request.jwt.claim.sub', '${cust}', false);`);
+  try {
+    await db.query(`
+      select public.save_teacher_consultation_brief(
+        '66666666-6666-6666-6666-666666666666',
+        '{}'::jsonb,
+        '{}'::jsonb,
+        'draft'
+      );
+    `);
+    log('customer cannot save teacher consultation brief', false, 'unexpectedly allowed');
+  } catch (e) {
+    log('customer cannot save teacher consultation brief', true, e.message.split('\n')[0]);
+  }
 }
 
 // === 測試 2: 雙重預約防護 ===

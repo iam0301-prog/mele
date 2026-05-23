@@ -6,3 +6,6 @@
 pyswisseph==2.10.3.2
 sxtwl==2.0.7
 lunar-python==1.4.8
+
+# Optional observability — only needed when SENTRY_DSN is set in production
+sentry-sdk[fastapi]==2.18.0

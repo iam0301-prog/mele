@@ -132,7 +132,14 @@ export default function ChartsPage() {
 
   return (
     <main className="container mx-auto max-w-5xl px-5 py-12">
-      <header className="text-center pb-8">
+      <Link
+        href="/"
+        className="inline-flex items-center gap-1 text-xs tracking-widest text-accent hover:opacity-80 transition-opacity"
+      >
+        ← 返回首頁
+      </Link>
+
+      <header className="text-center pb-8 pt-6">
         <h1 className="font-serif text-3xl tracking-widest mb-2">會員解讀庫</h1>
         <div className="mele-subtitle">MEMBER ORACLE ARCHIVE</div>
         <p className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-white/68">
@@ -182,8 +189,12 @@ export default function ChartsPage() {
         {loading && <div className="member-empty-state">載入解鎖紀錄中...</div>}
         {!loading && unlocks.length === 0 && (
           <div className="member-empty-state">
-            目前尚未解鎖內容。你可以先到任一工具取得簡易解釋，再用點數開啟文言感深度解讀。
-            <div><Link href="/" className="member-inline-link">前往工具首頁</Link></div>
+            目前尚未解鎖內容。你可以先到任一工具取得簡易解釋，再用 {POINT_UNLOCK_COST} 點開啟「深入解釋 / 流日 / 流月 / 流年」。
+            <div className="mt-3 flex flex-wrap justify-center gap-3">
+              <Link href="/tools/numerology" className="member-inline-link">先試生命靈數</Link>
+              <Link href="/tools/tarot" className="member-inline-link">抽今日塔羅</Link>
+              <Link href="/daily" className="member-inline-link">領今日點數</Link>
+            </div>
           </div>
         )}
         {!loading && unlocks.length > 0 && (
@@ -208,8 +219,13 @@ export default function ChartsPage() {
         {loading && <div className="member-empty-state">載入排盤紀錄中...</div>}
         {!loading && records.length === 0 && (
           <div className="member-empty-state">
-            尚未保存任何排盤。先做一份免費簡易解釋，之後再視需要付點數看深度內容。
-            <div><Link href="/" className="member-inline-link">開始第一份解讀</Link></div>
+            尚未保存任何排盤。先挑一個工具做一份免費簡易解釋，之後再視需要付點數看深度內容。
+            <div className="mt-3 flex flex-wrap justify-center gap-3">
+              <Link href="/tools/numerology" className="member-inline-link">生命靈數</Link>
+              <Link href="/tools/bazi" className="member-inline-link">八字</Link>
+              <Link href="/tools/astro" className="member-inline-link">占星</Link>
+              <Link href="/tools" className="member-inline-link">看所有工具 →</Link>
+            </div>
           </div>
         )}
         {!loading && records.length > 0 && (

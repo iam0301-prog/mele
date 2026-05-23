@@ -16,17 +16,71 @@ const GOOGLE_LOGIN_FLAG = process.env.NEXT_PUBLIC_ENABLE_GOOGLE_LOGIN;
 const LINE_LOGIN_FLAG = process.env.NEXT_PUBLIC_ENABLE_LINE_LOGIN;
 const LINE_OAUTH_PROVIDER = (process.env.NEXT_PUBLIC_LINE_OAUTH_PROVIDER || 'custom:line') as Provider;
 
-const SOCIAL_PROVIDERS: Array<{ key: SocialProviderKey; provider: Provider; label: string; setupHint: string }> = [
+type SupportedLocale = 'zh-TW' | 'en' | 'vi' | 'id' | 'ja' | 'ko';
+
+const SOCIAL_LABELS: Record<SupportedLocale, { line: string; google: string; tagline: string; notEnabled: string; helpText: string }> = {
+  'zh-TW': {
+    line: '使用 LINE 登入',
+    google: '使用 Google 登入',
+    tagline: '也可以使用社群帳號登入',
+    notEnabled: '尚未啟用',
+    helpText: '若要使用 Google 或 LINE 登入，需先在 Supabase Auth Providers 啟用對應供應商。',
+  },
+  en: {
+    line: 'Sign in with LINE',
+    google: 'Sign in with Google',
+    tagline: 'Or continue with social',
+    notEnabled: 'Not enabled',
+    helpText: 'Google / LINE login requires the corresponding provider to be enabled in Supabase Auth.',
+  },
+  vi: {
+    line: 'Đăng nhập bằng LINE',
+    google: 'Đăng nhập bằng Google',
+    tagline: 'Hoặc dùng tài khoản mạng xã hội',
+    notEnabled: 'Chưa bật',
+    helpText: 'Đăng nhập Google / LINE cần bật provider tương ứng trong Supabase Auth.',
+  },
+  id: {
+    line: 'Masuk dengan LINE',
+    google: 'Masuk dengan Google',
+    tagline: 'Atau pakai akun sosial',
+    notEnabled: 'Belum aktif',
+    helpText: 'Login Google / LINE perlu provider terkait diaktifkan di Supabase Auth.',
+  },
+  ja: {
+    line: 'LINE でログイン',
+    google: 'Google でログイン',
+    tagline: 'ソーシャルアカウントでも続行できます',
+    notEnabled: '未有効化',
+    helpText: 'Google / LINE ログインを使うには Supabase Auth で対応プロバイダーを有効化してください。',
+  },
+  ko: {
+    line: 'LINE 로 로그인',
+    google: 'Google 로 로그인',
+    tagline: '소셜 계정으로도 로그인할 수 있어요',
+    notEnabled: '비활성',
+    helpText: 'Google / LINE 로그인을 사용하려면 Supabase Auth 에서 해당 provider 를 활성화하세요.',
+  },
+};
+
+function detectLocaleFromReturn(returnUrl: string): SupportedLocale {
+  const match = returnUrl.match(/^\/([a-z]{2}(?:-[A-Z]{2})?)\//);
+  const candidate = match?.[1];
+  if (candidate && candidate in SOCIAL_LABELS) {
+    return candidate as SupportedLocale;
+  }
+  return 'zh-TW';
+}
+
+const SOCIAL_PROVIDERS: Array<{ key: SocialProviderKey; provider: Provider; setupHint: string }> = [
   {
     key: 'line',
     provider: LINE_OAUTH_PROVIDER,
-    label: '使用 LINE 登入',
     setupHint: 'LINE 登入需先在 Supabase 建立 custom:line provider，並在 LINE Developers 設定 callback URL。',
   },
   {
     key: 'google',
     provider: 'google',
-    label: '使用 Google 登入',
     setupHint: 'Google 登入需先在 Supabase Auth Providers 開啟 Google 並填入 Google OAuth client。',
   },
 ];
@@ -60,6 +114,8 @@ function LoginInner() {
   const search = useSearchParams();
   const toast = useToast();
   const returnUrl = search.get('return') || '/';
+  const socialLocale = detectLocaleFromReturn(returnUrl);
+  const socialLabels = SOCIAL_LABELS[socialLocale];
   const inviteCode = search.get('invite')?.trim() || '';
   const betaSegment = search.get('segment')?.trim() || 'invite';
   const authError = search.get('error');
@@ -501,7 +557,7 @@ function LoginInner() {
           </div>
         )}
 
-        <div className="mb-3 mt-6 text-center text-xs text-white/50">也可以使用社群帳號登入</div>
+        <div className="mb-3 mt-6 text-center text-xs text-white/50">{socialLabels.tagline}</div>
         <div className="mb-3 rounded-lg border border-accent-dim bg-white/[0.035] p-3 text-xs leading-relaxed text-white/58">
           {providerStatus.loading && '正在檢查 Supabase 登入設定...'}
           {!providerStatus.loading && providerStatus.error && `Auth 設定讀取失敗：${providerStatus.error}`}
@@ -520,13 +576,15 @@ function LoginInner() {
               className={`mele-btn-secondary w-full ${isSocialProviderEnabled(item.key) ? '' : 'opacity-60'}`}
               aria-disabled={!isSocialProviderEnabled(item.key)}
             >
-              {item.label}
-              {!isSocialProviderEnabled(item.key) && <span className="ml-2 text-[10px] opacity-60">尚未啟用</span>}
+              {socialLabels[item.key]}
+              {!isSocialProviderEnabled(item.key) && (
+                <span className="ml-2 text-[10px] opacity-60">{socialLabels.notEnabled}</span>
+              )}
             </button>
           ))}
         </div>
         <p className="mt-3 text-center text-[11px] leading-relaxed text-white/45">
-          若要使用 Google 或 LINE 登入，需先在 Supabase Auth Providers 啟用對應供應商。
+          {socialLabels.helpText}
         </p>
       </div>
 

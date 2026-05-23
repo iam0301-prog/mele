@@ -41,17 +41,34 @@ export function ToolLoading({
 export function ToolError({
   message,
   locale = DEFAULT_LOCALE,
+  onRetry,
 }: {
   message: string;
   locale?: Locale;
+  /** Optional callback — when provided, renders a retry button below the error message. */
+  onRetry?: () => void;
 }) {
   const copy = getToolLocaleCopy(locale).feedback;
 
   return (
-    <div className="rounded-2xl border border-reverse bg-reverse/[0.05] p-8 mt-6 text-center text-rose-300">
+    <div
+      className="rounded-2xl border border-reverse bg-reverse/[0.05] p-8 mt-6 text-center text-rose-300"
+      role="alert"
+      aria-live="assertive"
+    >
       <div className="text-2xl mb-2">{copy.errorTitle}</div>
       <div className="text-sm">{message}</div>
       <div className="text-xs mt-3 text-white/50">{copy.errorHint}</div>
+      {onRetry && (
+        <button
+          type="button"
+          onClick={onRetry}
+          className="mele-btn-primary mt-5 inline-flex items-center gap-2"
+        >
+          <span aria-hidden="true">↻</span>
+          {copy.errorRetry}
+        </button>
+      )}
     </div>
   );
 }

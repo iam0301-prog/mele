@@ -1,18 +1,28 @@
 import { spawn } from 'node:child_process';
 import { existsSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { delimiter, resolve } from 'node:path';
 import { setTimeout as delay } from 'node:timers/promises';
 
 const PORT = Number(process.env.MELE_TEST_PORT || 8125);
 let baseUrl = `http://127.0.0.1:${PORT}`;
-const PYTHON =
-  process.env.MELE_PYTHON ||
+const PYTHON_CANDIDATES = [
+  process.env.MELE_PYTHON,
+  process.platform === 'win32'
+    ? 'C:/Users/iam03/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe'
+    : undefined,
   resolve(process.platform === 'win32'
     ? 'python_api/venv/Scripts/python.exe'
-    : 'python_api/venv/bin/python');
+    : 'python_api/venv/bin/python'),
+].filter(Boolean);
+const PYTHON = PYTHON_CANDIDATES.find((candidate) => existsSync(candidate));
+const PYTHONPATH_ENTRIES = [
+  resolve('.py312-packages'),
+  resolve('python_api'),
+  process.env.PYTHONPATH,
+].filter(Boolean);
 
-if (!existsSync(PYTHON)) {
-  console.error(`Python executable not found: ${PYTHON}`);
+if (!PYTHON) {
+  console.error(`Python executable not found. Checked: ${PYTHON_CANDIDATES.join(', ')}`);
   process.exit(1);
 }
 
@@ -58,19 +68,44 @@ async function waitForHealth() {
   return false;
 }
 
+async function waitForHealthOrFallback() {
+  const spawnedHealthReady = await waitForHealth();
+  if (spawnedHealthReady) return true;
+
+  if (server) {
+    server.kill();
+    server = null;
+  }
+
+  const fallbackUrl = process.env.MELE_API_URL || 'http://127.0.0.1:8015';
+  if (baseUrl === fallbackUrl) return false;
+
+  console.warn(`Local API did not become healthy on ${baseUrl}; using existing API at ${fallbackUrl}.`);
+  if (stderr.trim()) console.warn(stderr.trim());
+  baseUrl = fallbackUrl;
+  return waitForHealth();
+}
+
 let server = null;
 let stderr = '';
 
 try {
   server = spawn(PYTHON, ['-m', 'uvicorn', 'main:app', '--host', '127.0.0.1', '--port', String(PORT)], {
     cwd: 'python_api',
-    env: { ...process.env, PYTHONIOENCODING: 'utf-8' },
+    env: {
+      ...process.env,
+      PYTHONIOENCODING: 'utf-8',
+      PYTHONPATH: PYTHONPATH_ENTRIES.join(delimiter),
+    },
     stdio: ['ignore', 'pipe', 'pipe'],
     windowsHide: true,
   });
 
   server.stderr.on('data', (chunk) => {
     stderr += chunk.toString();
+  });
+  server.on('error', (error) => {
+    stderr += `\nAPI spawn error: ${error.code || error.message}`;
   });
 } catch (error) {
   baseUrl = process.env.MELE_API_URL || 'http://127.0.0.1:8015';
@@ -80,7 +115,7 @@ try {
 
 try {
   console.log('\n=== Python FastAPI endpoint verification ===\n');
-  const healthReady = await waitForHealth();
+  const healthReady = await waitForHealthOrFallback();
   check('/health is reachable', healthReady);
   if (!healthReady) {
     console.error(stderr);

@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import type { Metadata } from 'next';
+import { DailyPointsClaim } from '@/components/DailyPointsClaim';
 import {
   LOCALES,
   buildLocalizedMetadata,
@@ -44,20 +45,38 @@ export default async function LocalizedHomePage({ params }: PageProps) {
       <section className="home-hero">
         <div className="home-hero__content">
           <div className="home-beta-badge">{home.badge}</div>
-          <h1>{home.title}</h1>
-          <p>{home.description}</p>
+          <div>
+            <h1>{home.title}</h1>
+            <p className="home-hero__subtitle">{home.subtitle}</p>
+          </div>
+          <p className="home-hero__description">{home.description}</p>
+          {/* Primary CTA — Daily ritual is the engagement loop, get it big & alone first. */}
+          <div className="home-hero__primary-cta">
+            <Link
+              href={localizePath('/daily', locale)}
+              className="mele-btn-primary !text-base !px-7 !py-3.5 shadow-[0_0_24px_rgba(212,175,55,0.25)] hover:shadow-[0_0_32px_rgba(212,175,55,0.4)] transition-shadow"
+            >
+              ✨ {home.actions.daily}
+            </Link>
+            {locale === 'zh-TW' && (
+              <p className="mt-2 text-xs tracking-wide text-white/55">
+                新訪客建議從每日儀式開始：免費抽今日塔羅或盧恩，登入後再領 200 點。
+              </p>
+            )}
+          </div>
+          {/* Secondary actions — give space to choose path without competing with primary */}
           <div className="home-hero__actions">
-            <Link href={localizePath('/beta', locale)} className="mele-btn-primary">
-              {dict.nav.beta}
-            </Link>
-            <Link href={localizePath('/daily', locale)} className="mele-btn-primary">
-              {home.actions.daily}
-            </Link>
             <Link href={localizePath('/tools/tarot', locale)} className="mele-btn-secondary">
               {home.actions.tarot}
             </Link>
             <Link href={localizePath('/teachers', locale)} className="home-ghost-link">
               {home.actions.teachers}
+            </Link>
+            <Link
+              href={localizePath('/beta', locale)}
+              className="home-ghost-link text-xs opacity-75 hover:opacity-100"
+            >
+              {dict.nav.beta} →
             </Link>
           </div>
         </div>
@@ -94,6 +113,14 @@ export default async function LocalizedHomePage({ params }: PageProps) {
           </ol>
         </div>
       </section>
+
+      {locale === 'zh-TW' && (
+        <section className="home-section" aria-label="會員每日點數">
+          <div className="mx-auto max-w-2xl">
+            <DailyPointsClaim returnPath={localizePath('/', locale)} />
+          </div>
+        </section>
+      )}
 
       <section className="home-proof-strip" aria-label={home.subtitle}>
         {home.stats.map((stat) => (

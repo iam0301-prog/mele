@@ -34,10 +34,16 @@ export default function DisclaimerPage() {
         <p className="mt-3 text-xs text-white/50">最後更新：2026 年 4 月 30 日</p>
       </header>
 
+      <div className="mb-6 rounded-lg border border-amber-400/40 bg-amber-500/[0.08] p-4 text-sm leading-relaxed text-amber-100">
+        <strong className="text-amber-300">⚠ 律師審核中（v0 草案）</strong>
+        <p className="mt-1.5 text-amber-100/82">
+          正式上線前建議交由律師審閱本文責任限制與消費者保護條款。
+        </p>
+      </div>
+
       <div className="mele-card prose prose-invert max-w-none">
         <p className="leading-loose text-white/72">
-          這份聲明用來明確界定 MELE 的服務邊界，降低使用者誤解與平台營運風險。
-          正式上線前仍建議交由律師審閱。
+          這份聲明明確界定 MELE 的服務邊界，避免使用者誤解。使用本平台即表示你已閱讀並理解以下說明。
         </p>
 
         {disclaimers.map((item) => (
@@ -46,6 +52,20 @@ export default function DisclaimerPage() {
             <p className="leading-loose">{item.body}</p>
           </section>
         ))}
+
+        <section className="mt-7">
+          <h2 className="text-accent">緊急情況請尋求專業協助</h2>
+          <p className="leading-loose">
+            若你正面臨以下情況，請<strong className="text-accent-light">立即</strong>向專業資源求助，不要僅依賴本平台內容：
+          </p>
+          <ul className="list-disc space-y-2 pl-5 leading-loose">
+            <li>有自傷或自殺念頭：撥打 <strong>1995</strong>（生命線）或 <strong>1925</strong>（安心專線）。</li>
+            <li>身體急症或意外：撥打 <strong>119</strong>。</li>
+            <li>遭遇詐騙或人身安全威脅：撥打 <strong>110</strong> 或 <strong>165</strong>（反詐騙專線）。</li>
+            <li>家庭暴力或性別暴力：撥打 <strong>113</strong>（婦幼保護專線）。</li>
+            <li>嚴重情緒困擾：請尋求合格心理師、精神科醫師之專業協助。</li>
+          </ul>
+        </section>
 
         <div className="mt-8 rounded-lg border border-accent-dim bg-black/25 p-4 text-sm leading-loose text-white/68">
           使用 MELE 即表示你理解命理內容的限制，並同意搭配

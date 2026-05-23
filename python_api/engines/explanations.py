@@ -3,9 +3,59 @@
 from __future__ import annotations
 
 from html import escape
-from typing import Iterable, Literal
+from pathlib import Path
+from typing import Any, Iterable, Literal
 
 DetailLevel = Literal["teaser", "full"]
+Voice = Literal["friend", "scholar", "master"]
+VALID_VOICES: tuple[Voice, ...] = ("friend", "scholar", "master")
+DEFAULT_VOICE: Voice = "friend"
+
+# YAML copy data — content is separated from code so non-engineers can edit文案
+_DATA_DIR = Path(__file__).resolve().parent.parent / "data" / "copy"
+_NUMEROLOGY_CACHE: dict[str, Any] | None = None
+_MAYA_CACHE: dict[str, Any] | None = None
+
+
+def _load_yaml(path: Path) -> dict[str, Any]:
+    try:
+        import yaml  # local import — keeps PyYAML optional during partial deploys
+    except ImportError:
+        return {}
+    try:
+        with path.open("r", encoding="utf-8") as handle:
+            loaded = yaml.safe_load(handle) or {}
+            return loaded if isinstance(loaded, dict) else {}
+    except FileNotFoundError:
+        return {}
+
+
+def _numerology_copy() -> dict[str, Any]:
+    """Lazy-load numerology.yaml once; gracefully degrade if YAML missing."""
+    global _NUMEROLOGY_CACHE
+    if _NUMEROLOGY_CACHE is None:
+        _NUMEROLOGY_CACHE = _load_yaml(_DATA_DIR / "numerology.yaml")
+    return _NUMEROLOGY_CACHE
+
+
+def _maya_copy() -> dict[str, Any]:
+    """Lazy-load maya.yaml once; gracefully degrade if YAML missing."""
+    global _MAYA_CACHE
+    if _MAYA_CACHE is None:
+        _MAYA_CACHE = _load_yaml(_DATA_DIR / "maya.yaml")
+    return _MAYA_CACHE
+
+
+# Maya seals come from the engine prefixed with their tribal color
+# (紅 / 白 / 藍 / 黃). The YAML keeps keys un-prefixed so a single
+# entry maps to e.g. "黃星星" or "黃太陽" without duplication.
+_MAYA_SEAL_COLORS = ("紅", "白", "藍", "黃")
+
+
+def _strip_seal_color(seal_name: str) -> str:
+    if seal_name and seal_name[0] in _MAYA_SEAL_COLORS:
+        return seal_name[1:]
+    return seal_name
 
 
 def _text(value: object, fallback: str = "") -> str:
@@ -20,6 +70,17 @@ def _join(items: Iterable[object], sep: str = "、") -> str:
 
 def _line(body: str) -> str:
     return f"<div class='exp-line'>{body}</div>"
+
+
+def _paragraph(body: str) -> str:
+    """Render a YAML literal-block paragraph: preserve line breaks via <br>."""
+    safe = escape(body.strip()).replace("\n", "<br>")
+    return f"<div class='exp-line exp-line--paragraph'>{safe}</div>"
+
+
+def _bullets(items: list[str]) -> str:
+    inner = "".join(f"<li>{escape(item)}</li>" for item in items if item)
+    return f"<ul class='exp-list'>{inner}</ul>"
 
 
 def _section(title: str) -> str:
@@ -39,6 +100,9 @@ def _wrap(parts: list[str], detail: DetailLevel) -> str:
     return f"<div class='explanation explanation-full'>{inner}</div>"
 
 
+# Legacy guide kept as a last-resort fallback if the YAML file is missing
+# entirely (e.g. partial deploys). The canonical copy lives in
+# python_api/data/copy/numerology.yaml — edit that file, not this dict.
 NUMEROLOGY_GUIDE = {
     1: "主題是開創與自我領導。你適合先把方向立起來，再邀請他人一起完成。",
     2: "主題是合作與感受力。你能讀懂關係中的細節，也需要練習清楚表達界線。",
@@ -49,9 +113,9 @@ NUMEROLOGY_GUIDE = {
     7: "主題是探索與洞察。你需要獨處、研究與精神深度，答案常在安靜中浮現。",
     8: "主題是資源與影響力。你適合管理、整合與放大價值，也要讓權力服務於願景。",
     9: "主題是慈悲與完成。你容易看見更大的圖像，人生功課是放下與成全。",
-    11: "主題是靈感與感召。你的直覺強，適合把看見的光轉成可被理解的訊息。",
-    22: "主題是大師級建造。你能把理想落地成結構，但需要耐心與長期節奏。",
-    33: "主題是療癒與服務。你適合用溫柔、教導與陪伴，讓他人重新相信自己。",
+    11: "主題是 11/2：11 代表靈感與感召，2 是關係與感受力的底色。你的直覺強，但也需要清楚界線。",
+    22: "主題是 22/4：22 代表大型建造力，4 是秩序與落地的底色。你適合把理想做成可執行的結構。",
+    33: "主題是 33/6：33 代表療癒與服務，6 是照顧與責任的底色。你適合陪伴他人，也要先照顧自己。",
 }
 
 
@@ -119,47 +183,205 @@ def _tone_theme(name: object) -> str:
     return "這個調性說明能量如何被啟動、組織與表達。"
 
 
-def explain_numerology(data: dict, detail: DetailLevel = "teaser") -> str:
+def _numerology_lookup_key(life_path: object, life_path_reduced: object) -> str:
+    """Map raw lifePath → YAML key (1-9).
+
+    Master numbers 11/22/33 fall back to their reduced base; the platform now
+    publishes a single set of 1-9 entries.
+    """
+    try:
+        lp_int = int(life_path) if life_path is not None else 0
+    except (TypeError, ValueError):
+        lp_int = 0
+    if 1 <= lp_int <= 9:
+        return str(lp_int)
+    try:
+        reduced = int(life_path_reduced) if life_path_reduced is not None else 0
+    except (TypeError, ValueError):
+        reduced = 0
+    if 1 <= reduced <= 9:
+        return str(reduced)
+    return ""
+
+
+def _render_full_block(block: dict[str, Any]) -> list[str]:
+    """Render a 6-block YAML structure into HTML parts."""
+    parts: list[str] = []
+    sections: list[tuple[str, str, bool]] = [
+        ("core", "核心", False),
+        ("shadow", "暗面", False),
+        ("milestones", "關鍵時刻", True),
+        ("inquiries", "諮詢探問", True),
+        ("crosses", "盤面交叉", True),
+        ("focus", "本次諮詢可聚焦", False),
+    ]
+    for key, label, is_list in sections:
+        value = block.get(key)
+        if not value:
+            continue
+        parts.append(_section(label))
+        if is_list and isinstance(value, list):
+            parts.append(_bullets([str(item) for item in value]))
+        else:
+            parts.append(_paragraph(str(value)))
+    return parts
+
+
+def explain_numerology(
+    data: dict,
+    detail: DetailLevel = "teaser",
+    voice: Voice = DEFAULT_VOICE,
+) -> str:
+    """Numerology explanation backed by python_api/data/copy/numerology.yaml.
+
+    - Teaser (客戶端): always friendly short blurb regardless of `voice`.
+    - Full (老師後台): structured 6-block reading in the requested `voice`
+      (`friend` / `scholar` / `master`). Falls back to friend voice if the
+      requested voice is missing.
+    """
+    voice_key: Voice = voice if voice in VALID_VOICES else DEFAULT_VOICE
+
     lp = data.get("lifePath")
+    lp_display = data.get("lifePathDisplay") or lp
+    lp_reduced = data.get("lifePathReduced")
     bd = data.get("birthDay")
+    bd_display = data.get("birthDayDisplay") or bd
     arche = data.get("lifePathArchetype") or {}
     bd_arche = data.get("birthDayArchetype") or {}
     is_master = data.get("isMaster")
 
-    parts = [
-        _line(
-            f"你的生命靈數是 <strong>{_text(lp)}</strong>"
-            f"{'（大師數）' if is_master else ''}，核心原型是 <strong>{_text(arche.get('name'))}</strong>。"
-        ),
-        _line(NUMEROLOGY_GUIDE.get(lp, _text(arche.get("desc"), "此數字代表你一生反覆練習的核心節奏。"))),
-    ]
+    copy = _numerology_copy()
+    paths: dict[str, Any] = copy.get("life_paths", {}) if isinstance(copy, dict) else {}
+    key = _numerology_lookup_key(lp, lp_reduced)
+    entry: dict[str, Any] = paths.get(key, {}) if isinstance(paths.get(key), dict) else {}
 
-    if bd and bd != lp:
-        parts.append(_line(f"生日數 <strong>{_text(bd)}</strong> 顯示你日常表現出的氣質：{_text(bd_arche.get('name'), '個人特質')}。"))
+    header = _line(
+        f"你的生命靈數是 <strong>{_text(lp_display)}</strong>"
+        f"{'（保留大師數，也看底色數）' if is_master else ''}"
+        f"，核心原型是 <strong>{_text(arche.get('name'))}</strong>。"
+    )
 
-    if detail == "full":
-        parts.extend([
+    if detail == "teaser":
+        parts: list[str] = [header]
+        teaser_text = (entry.get("teaser") or {}).get("friend") if entry else None
+        if teaser_text:
+            parts.append(_paragraph(str(teaser_text)))
+        else:
+            # YAML missing → legacy guide → archetype desc → generic
+            fallback = NUMEROLOGY_GUIDE.get(
+                lp,
+                _text(arche.get("desc"), "此數字代表你一生反覆練習的核心節奏。"),
+            )
+            parts.append(_line(fallback))
+
+        if is_master and lp_reduced:
+            parts.append(_line(
+                f"如果別的網站把你算成 <strong>{_text(lp_reduced)}</strong>，不是誰錯誰對；"
+                f"那是把大師數繼續化簡。本平台會顯示 <strong>{_text(lp_display)}</strong>，讓兩種派別都看得到。"
+            ))
+
+        if bd and bd != lp:
+            parts.append(_line(
+                f"生日數 <strong>{_text(bd_display)}</strong> 顯示你日常表現出的氣質："
+                f"{_text(bd_arche.get('name'), '個人特質')}。"
+            ))
+
+        return _wrap(parts, "teaser")
+
+    # Full mode — teacher portal, voice-aware
+    full_block = (entry.get("full") or {}).get(voice_key) if entry else None
+    if not full_block:
+        full_block = (entry.get("full") or {}).get(DEFAULT_VOICE) if entry else None
+
+    full_parts: list[str] = [header]
+    if isinstance(full_block, dict) and full_block:
+        full_parts.extend(_render_full_block(full_block))
+    else:
+        # No YAML entry → legacy minimal full breakdown
+        full_parts.append(_line(
+            NUMEROLOGY_GUIDE.get(lp, _text(arche.get("desc"), "此數字代表你一生反覆練習的核心節奏。"))
+        ))
+        full_parts.extend([
             _section("深度解讀方向"),
             _line("觀察你在壓力下會如何做決定，能看見生命靈數的陰影面。"),
             _line("適合把此數字延伸到職涯角色、親密關係、財務模式與年度節奏。"),
         ])
-    return _wrap(parts, detail)
+
+    if is_master and lp_reduced:
+        full_parts.append(_line(
+            f"註：大師數 <strong>{_text(lp_display)}</strong> 在解讀時以底色數 "
+            f"<strong>{_text(lp_reduced)}</strong> 為主軸；老師可視諮詢深度補充大師數面向。"
+        ))
+
+    if bd and bd != lp:
+        full_parts.append(_line(
+            f"生日數 <strong>{_text(bd_display)}</strong>："
+            f"{_text(bd_arche.get('name'), '個人特質')}；可與主數對讀，找出表裡反差。"
+        ))
+
+    return _wrap(full_parts, "full")
 
 
-def explain_maya(data: dict, detail: DetailLevel = "teaser") -> str:
+def explain_maya(
+    data: dict,
+    detail: DetailLevel = "teaser",
+    voice: Voice = DEFAULT_VOICE,
+) -> str:
+    """Maya explanation backed by python_api/data/copy/maya.yaml.
+
+    - Teaser: friendly short blurb sourced from YAML; falls back to original
+      MAYA_SEAL_THEMES + ORACLE block when YAML missing.
+    - Full: 6-block structured teacher reading in requested `voice`
+      (currently only `master` voice has YAML entries; other voices fall
+      back to friend / themes).
+    """
+    voice_key: Voice = voice if voice in VALID_VOICES else DEFAULT_VOICE
     seal = data.get("seal") or {}
     tone = data.get("tone") or {}
     oracle = data.get("oracle") or {}
     seal_name = seal.get("zh") or seal.get("name") or seal.get("label")
     tone_name = tone.get("zh") or tone.get("name") or tone.get("label")
 
-    parts = [
-        _line(f"你是 <strong>Kin {_text(data.get('kin'))}</strong>，能量名稱為 <strong>{_text(tone_name)}{_text(seal_name)}</strong>。"),
-        _line(f"太陽圖騰 <strong>{_text(seal_name)}</strong>：{_maya_theme(seal_name)}"),
-        _line(f"銀河調性 <strong>{_text(tone_name)}</strong>：{_tone_theme(tone_name)}"),
-    ]
+    header = _line(
+        f"你是 <strong>Kin {_text(data.get('kin'))}</strong>，"
+        f"能量名稱為 <strong>{_text(tone_name)}{_text(seal_name)}</strong>。"
+    )
 
-    parts.append(_section("馬雅神諭關係"))
+    copy = _maya_copy()
+    seals: dict[str, Any] = copy.get("seals", {}) if isinstance(copy, dict) else {}
+    # Seal.zh from engine includes color prefix (e.g. 黃星星 / 紅龍).
+    # YAML keys are stored without prefix for brevity (e.g. 星星 / 龍).
+    seal_lookup = _strip_seal_color(str(seal_name)) if seal_name else ""
+    entry_raw = seals.get(seal_lookup) if seal_lookup else None
+    entry: dict[str, Any] = entry_raw if isinstance(entry_raw, dict) else {}
+
+    if detail == "teaser":
+        parts: list[str] = [header]
+        teaser_text = (entry.get("teaser") or {}).get("friend") if entry else None
+        if teaser_text:
+            parts.append(_paragraph(str(teaser_text)))
+        else:
+            # Fallback to legacy themes when YAML missing for this seal
+            parts.append(_line(f"太陽圖騰 <strong>{_text(seal_name)}</strong>：{_maya_theme(seal_name)}"))
+            parts.append(_line(f"銀河調性 <strong>{_text(tone_name)}</strong>：{_tone_theme(tone_name)}"))
+        return _wrap(parts, "teaser")
+
+    # Full mode — teacher portal, voice-aware
+    full_block = (entry.get("full") or {}).get(voice_key) if entry else None
+    if not full_block:
+        # Master is the only YAML-backed voice today; fall back to it for any voice
+        full_block = (entry.get("full") or {}).get("master") if entry else None
+
+    full_parts: list[str] = [header]
+    if isinstance(full_block, dict) and full_block:
+        full_parts.extend(_render_full_block(full_block))
+    else:
+        # Legacy path: keep original behaviour for unmapped seals
+        full_parts.append(_line(f"太陽圖騰 <strong>{_text(seal_name)}</strong>：{_maya_theme(seal_name)}"))
+        full_parts.append(_line(f"銀河調性 <strong>{_text(tone_name)}</strong>：{_tone_theme(tone_name)}"))
+
+    # Always append oracle relationships — this is structural to Maya
+    full_parts.append(_section("馬雅神諭關係"))
     for key in ("guide", "analog", "antipode", "occult"):
         label, role_copy = MAYA_ORACLE_ROLES[key]
         item = oracle.get(key) or {}
@@ -170,19 +392,20 @@ def explain_maya(data: dict, detail: DetailLevel = "teaser") -> str:
         if item_seal:
             kin_text = f"Kin {_text(item.get('kin'))}，" if item.get("kin") else ""
             tone_text = f"{_text(item_tone)}" if item_tone else ""
-            parts.append(_line(
+            full_parts.append(_line(
                 f"<strong>{label}</strong>：{kin_text}{tone_text}{_text(item_seal)}。"
                 f"{role_copy}{_maya_theme(item_seal)}"
             ))
 
-    if detail == "full":
-        starroot = data.get("starroot") or {}
-        parts.extend([
-            _section("跨曆法對照"),
-            _line(f"Dreamspell / 13 Moon / 傳統卓爾金等對照可用來確認同一天在不同系統中的定位：{_text(starroot.get('dreamspell', {}).get('label'))}。"),
-            _line("若要作為正式諮詢，建議同時說明所採用的曆法系統，避免使用者把不同流派混為一談。"),
-        ])
-    return _wrap(parts, detail)
+    starroot = data.get("starroot") or {}
+    full_parts.extend([
+        _section("跨曆法對照"),
+        _line(
+            f"Dreamspell / 13 Moon / 傳統卓爾金等對照可用來確認同一天在不同系統中的定位："
+            f"{_text(starroot.get('dreamspell', {}).get('label'))}。"
+        ),
+    ])
+    return _wrap(full_parts, "full")
 
 
 WUXING_GUIDE = {

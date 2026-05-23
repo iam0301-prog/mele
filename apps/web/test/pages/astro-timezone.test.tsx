@@ -55,7 +55,9 @@ describe('<AstroPage /> timezone handling', () => {
     const { container } = renderPage();
 
     await waitFor(() => {
-      expect(screen.getByText('UTC-7')).toBeInTheDocument();
+      // The timezone summary <strong>UTC-7</strong> + the new city chip <small>UTC-7</small>
+      // both contain "UTC-7" — assert at least one is rendered.
+      expect(screen.getAllByText('UTC-7').length).toBeGreaterThan(0);
     });
 
     const form = container.querySelector('form');

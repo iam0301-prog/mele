@@ -1,12 +1,21 @@
+"""Numerology engine.
+
+This calculator keeps the common master numbers 11 / 22 / 33, but also returns
+their single-digit base numbers so the UI can show both schools clearly.
 """
-靈數 Numerology — Pythagorean / Hans Decoz 派
-保留大師數 11/22/33
-"""
+
 MASTER_NUMBERS = {11, 22, 33}
 
 
 def sum_digits(n: int) -> int:
     return sum(int(c) for c in str(abs(n)))
+
+
+def reduce_to_single(n: int) -> int:
+    cur = n
+    while cur > 9:
+        cur = sum_digits(cur)
+    return cur
 
 
 def reduce_with_master(n: int) -> int:
@@ -16,42 +25,64 @@ def reduce_with_master(n: int) -> int:
     return cur
 
 
+def display_number(value: int) -> str:
+    base = reduce_to_single(value)
+    return f"{value}/{base}" if value in MASTER_NUMBERS else str(value)
+
+
 MEANINGS = {
-    1: ("領導者", "獨立、開創、自我主導。挑戰：易自我中心、過度逞強。"),
-    2: ("協調者", "敏感、合作、和諧。挑戰：猶豫、易受他人情緒影響。"),
-    3: ("表達者", "創意、溝通、樂觀。挑戰：分散、缺乏專注。"),
-    4: ("建造者", "務實、穩定、紀律。挑戰：固執、抗拒改變。"),
-    5: ("探險者", "自由、變化、體驗。挑戰：難以承諾、躁動。"),
-    6: ("照護者", "責任、家庭、付出。挑戰：過度承擔、犧牲自我。"),
-    7: ("思考者", "靈性、洞察、獨處。挑戰：疏離、過度分析。"),
-    8: ("實踐者", "權力、財富、成就。挑戰：物質執著、控制慾。"),
-    9: ("完成者", "博愛、智慧、收尾。挑戰：理想化、放手困難。"),
-    11: ("直覺大師", "高敏、靈感、啟發他人。挑戰：高壓、神經緊張。"),
-    22: ("建造大師", "宏觀、實踐、改變世界格局。挑戰：壓力極大、自我懷疑。"),
-    33: ("療癒大師", "無私、犧牲、教導療癒。挑戰：耗竭、邊界模糊。"),
+    1: ("開創者", "重視自主、方向與主導權，遇到事情時常先想：我要怎麼開始。"),
+    2: ("協調者", "敏感、重視關係與氣氛，擅長讀懂別人的感受，也容易被關係牽動。"),
+    3: ("表達者", "透過語言、創意與分享整理自己，越能說清楚，越能找回力量。"),
+    4: ("建造者", "需要結構、秩序與可落地的方法，適合把想法一步步做成成果。"),
+    5: ("探索者", "需要變化、自由與新鮮感，卡住時通常不是不努力，而是空間太窄。"),
+    6: ("守護者", "重視責任、關係與照顧，容易把別人的需求放到自己前面。"),
+    7: ("研究者", "需要理解事情背後的原因，適合深度學習、觀察與建立自己的答案。"),
+    8: ("管理者", "關心成就、資源與現實結果，適合練習權力、金錢與責任的平衡。"),
+    9: ("整合者", "看重意義、包容與完成，人生常在學習放下、整理與服務更大的方向。"),
+    11: ("靈感型協調者", "11 是 2 的高敏感版本：直覺強、感受細，容易接收到很多靈感，也更需要穩定情緒與界線。"),
+    22: ("實踐型建造者", "22 是 4 的放大版本：有把願景落地的能力，但要避免把所有責任都扛在自己身上。"),
+    33: ("療癒型守護者", "33 是 6 的放大版本：很適合陪伴、教學與照顧，但要先學會不犧牲自己。"),
 }
 
 
 def calculate(year: int, month: int, day: int) -> dict:
-    yr = reduce_with_master(year)
-    mr = reduce_with_master(month)
-    dr = reduce_with_master(day)
-    total = yr + mr + dr
+    year_reduced = reduce_with_master(year)
+    month_reduced = reduce_with_master(month)
+    day_reduced = reduce_with_master(day)
+    total = year_reduced + month_reduced + day_reduced
     life_path = reduce_with_master(total)
+    life_path_reduced = reduce_to_single(life_path)
     birth_day = reduce_with_master(day)
-    name_lp, desc_lp = MEANINGS.get(life_path, ("", ""))
-    name_bd, desc_bd = MEANINGS.get(birth_day, ("", ""))
+    birth_day_reduced = reduce_to_single(birth_day)
+    name_lp, desc_lp = MEANINGS.get(life_path, ("生命節奏", "這個數字代表你一生反覆練習的核心節奏。"))
+    name_bd, desc_bd = MEANINGS.get(birth_day, ("生日天賦", "生日數代表你自然帶出的能力與表達方式。"))
+    is_master = life_path in MASTER_NUMBERS
+    is_birth_day_master = birth_day in MASTER_NUMBERS
 
     return {
         "lifePath": life_path,
+        "lifePathReduced": life_path_reduced,
+        "lifePathDisplay": display_number(life_path),
         "birthDay": birth_day,
-        "isMaster": life_path in MASTER_NUMBERS,
-        "isBirthDayMaster": birth_day in MASTER_NUMBERS,
+        "birthDayReduced": birth_day_reduced,
+        "birthDayDisplay": display_number(birth_day),
+        "isMaster": is_master,
+        "isBirthDayMaster": is_birth_day_master,
+        "masterNumber": life_path if is_master else None,
+        "baseNumber": life_path_reduced,
+        "calculationMethod": "保留大師數派：11 / 22 / 33 會保留，同時標示最後化簡的底色。",
+        "calculationNote": (
+            f"你的主數以 {display_number(life_path)} 呈現。"
+            if is_master
+            else f"你的主數是 {life_path}。"
+        ),
         "breakdown": {
-            "yearReduced": yr,
-            "monthReduced": mr,
-            "dayReduced": dr,
+            "yearReduced": year_reduced,
+            "monthReduced": month_reduced,
+            "dayReduced": day_reduced,
             "total": total,
+            "formula": f"{year_reduced} + {month_reduced} + {day_reduced} = {total} -> {display_number(life_path)}",
         },
         "lifePathArchetype": {"name": name_lp, "desc": desc_lp},
         "birthDayArchetype": {"name": name_bd, "desc": desc_bd},

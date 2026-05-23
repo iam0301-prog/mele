@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useMemo, useState } from 'react';
 import { ToolError, ToolLoading } from '@/components/ToolFeedback';
 import { ToolResultSection } from '@/components/ToolResultSection';
+import { DailyPointsClaim } from '@/components/DailyPointsClaim';
 import { calc, type CalcResponse } from '@/lib/api';
 import { hashToSeed, localDrawKey, taipeiDateKey, type DailyDrawTool } from '@/lib/daily-ritual';
 import { localizePath, type Locale } from '@/lib/i18n/config';
@@ -86,6 +87,7 @@ export function LocalizedDailyClient({ locale }: { locale: Locale }) {
   return (
     <main className="min-h-screen bg-[radial-gradient(circle_at_top,#1a2438_0%,#070b12_46%,#030406_100%)]">
       <section className="mx-auto flex max-w-6xl flex-col gap-6 px-4 pb-16 pt-20 md:px-8">
+        <DailyPointsClaim returnPath={localizePath('/daily', locale)} />
         <div className="grid gap-6 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
           <div className="ritual-hero">
             <div className="ritual-kicker">{copy.kicker}</div>

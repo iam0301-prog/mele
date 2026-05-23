@@ -93,7 +93,13 @@ export default function MyBookingsPage() {
 
   return (
     <div className="container mx-auto max-w-3xl px-5 py-12">
-      <header className="text-center pb-8">
+      <Link
+        href="/"
+        className="inline-flex items-center gap-1 text-xs tracking-widest text-accent hover:opacity-80 transition-opacity"
+      >
+        ← 返回首頁
+      </Link>
+      <header className="text-center pb-8 pt-6">
         <h1 className="font-serif text-3xl tracking-widest mb-2">我的諮詢</h1>
         <div className="mele-subtitle">MY BOOKINGS</div>
       </header>
@@ -114,9 +120,21 @@ export default function MyBookingsPage() {
 
         {loading && <div className="text-center text-white/60 py-8">載入中…</div>}
         {!loading && bookings.length === 0 && (
-          <div className="text-center py-12 text-white/60">
+          <div className="text-center py-12 text-white/72">
             <div className="text-4xl text-accent opacity-50 mb-3">○</div>
-            沒有紀錄
+            <div className="mb-4 text-sm">
+              {tab === 'upcoming'
+                ? '目前沒有即將諮詢的預約。'
+                : tab === 'past'
+                  ? '尚未有完成的諮詢紀錄。'
+                  : '沒有已取消的紀錄。'}
+            </div>
+            {tab === 'upcoming' && (
+              <div className="flex flex-wrap justify-center gap-3">
+                <Link href="/teachers" className="mele-btn-primary !px-4 !py-2 !text-xs">尋找老師</Link>
+                <Link href="/tools" className="mele-btn-secondary !px-4 !py-2 !text-xs">先試免費工具</Link>
+              </div>
+            )}
           </div>
         )}
         {!loading && bookings.map((b) => (

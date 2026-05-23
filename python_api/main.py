@@ -21,6 +21,24 @@ from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse, JSONResponse
 
+# Optional Sentry integration — no-op when SENTRY_DSN missing.
+# To activate in production: `pip install sentry-sdk[fastapi]` and set SENTRY_DSN env.
+_SENTRY_DSN = os.environ.get("SENTRY_DSN", "").strip()
+if _SENTRY_DSN:
+    try:
+        import sentry_sdk  # type: ignore[import-not-found]
+
+        sentry_sdk.init(
+            dsn=_SENTRY_DSN,
+            environment=os.environ.get("SENTRY_ENVIRONMENT", "production"),
+            traces_sample_rate=float(os.environ.get("SENTRY_TRACES_SAMPLE_RATE", "0.1")),
+            send_default_pii=False,
+        )
+    except ImportError:
+        # sentry-sdk not installed; observability disabled silently.
+        # CI / local dev typically skip the optional dep.
+        pass
+
 from engines import astro, bazi, explanations, humandesign, maya, numerology, runes, tarot, ziwei
 from models import (
     AstroRequest,
@@ -148,15 +166,30 @@ EXPLAINER = {
 }
 
 
-def wrap(tool: str, request_input: dict, data: dict, render_bundle: dict, detail: str = "teaser") -> CalcResponse:
-    """Normalize every calculator result into the public API response shell."""
+def wrap(
+    tool: str,
+    request_input: dict,
+    data: dict,
+    render_bundle: dict,
+    detail: str = "teaser",
+    voice: str = "friend",
+) -> CalcResponse:
+    """Normalize every calculator result into the public API response shell.
+
+    `voice` is currently honored only by the numerology explainer (teacher
+    backend can switch between friend / scholar / master narration styles).
+    Other explainers ignore the kwarg via the TypeError fallback below.
+    """
 
     if tool in EXPLAINER and not render_bundle.get("html"):
         try:
             try:
-                render_bundle["html"] = EXPLAINER[tool](data, detail=detail)
+                render_bundle["html"] = EXPLAINER[tool](data, detail=detail, voice=voice)
             except TypeError:
-                render_bundle["html"] = EXPLAINER[tool](data)
+                try:
+                    render_bundle["html"] = EXPLAINER[tool](data, detail=detail)
+                except TypeError:
+                    render_bundle["html"] = EXPLAINER[tool](data)
         except Exception:
             traceback.print_exc()
             render_bundle["html"] = ""
@@ -269,22 +302,52 @@ async def global_exception_handler(request: Request, exc: Exception):
 
 
 DetailQuery = Literal["teaser", "full"]
+VoiceQuery = Literal["friend", "scholar", "master"]
 
 
 @app.post("/api/v1/calc/numerology", response_model=CalcResponse, tags=["Calc"])
-async def calc_numerology(req: NumerologyRequest, detail: DetailQuery = Query("teaser")):
-    """靈數：生命靈數、生日數與核心傾向。"""
+async def calc_numerology(
+    req: NumerologyRequest,
+    detail: DetailQuery = Query("teaser"),
+    voice: VoiceQuery = Query(
+        "friend",
+        description=(
+            "解讀語氣（僅 full 模式有意義）。"
+            "friend=朋友式（預設）；scholar=學院派；master=老師口吻。"
+            "teaser 模式永遠使用 friend。"
+        ),
+    ),
+):
+    """靈數：生命靈數、生日數與核心傾向。
+
+    - `detail=teaser`：客戶端公開版，朋友式短初盤。
+    - `detail=full`：老師後台完整解盤，可透過 `voice` 切換三種敘述語氣。
+    """
 
     data = await run_calc("numerology", _cached_numerology, req.year, req.month, req.day)
-    return wrap("numerology", req.model_dump(), data, numerology_render.render(data), detail=detail)
+    return wrap(
+        "numerology",
+        req.model_dump(),
+        data,
+        numerology_render.render(data),
+        detail=detail,
+        voice=voice,
+    )
 
 
 @app.post("/api/v1/calc/maya", response_model=CalcResponse, tags=["Calc"])
-async def calc_maya(req: MayaRequest, detail: DetailQuery = Query("teaser")):
-    """馬雅曆：Kin、Seal、Tone 與 oracle 關係。"""
+async def calc_maya(
+    req: MayaRequest,
+    detail: DetailQuery = Query("teaser"),
+    voice: VoiceQuery = Query("friend"),
+):
+    """馬雅曆：Kin、Seal、Tone 與 oracle 關係。
+
+    `voice` 在 full 模式下切換敘述語氣（目前 master 為主，其他 voice 退回 master fallback）。
+    """
 
     data = await run_calc("maya", _cached_maya, req.year, req.month, req.day, req.include_leap_day)
-    return wrap("maya", req.model_dump(), data, maya_render.render(data), detail=detail)
+    return wrap("maya", req.model_dump(), data, maya_render.render(data), detail=detail, voice=voice)
 
 
 @app.post("/api/v1/calc/bazi", response_model=CalcResponse, tags=["Calc"])
