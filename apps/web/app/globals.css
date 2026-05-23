@@ -9294,6 +9294,22 @@ footer {
   margin-top: 28px;
 }
 
+.home-route-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 18px;
+  margin-top: 18px;
+  color: rgba(248, 234, 208, 0.72);
+  font-size: 14px;
+  font-weight: 750;
+}
+
+.home-route-links a {
+  color: rgba(159, 232, 239, 0.9);
+  text-underline-offset: 5px;
+  text-decoration-thickness: 1px;
+}
+
 .beta2-trust span {
   border: 1px solid rgba(232, 197, 71, 0.22);
   border-radius: 999px;
@@ -9302,6 +9318,13 @@ footer {
   background: rgba(232, 197, 71, 0.075);
   font-size: 13px;
   font-weight: 800;
+}
+
+.home-trust-list span {
+  border: 0;
+  border-radius: 14px;
+  color: rgba(248, 234, 208, 0.7);
+  background: rgba(255, 255, 255, 0.032);
 }
 
 .beta2-visual {
@@ -9392,12 +9415,12 @@ footer {
 }
 
 .beta2-phone li {
-  border: 1px solid rgba(255,255,255,0.11);
-  border-radius: 18px;
-  padding: 13px 14px;
-  color: #fff;
-  background: rgba(255,255,255,0.055);
-  font-weight: 850;
+  border-left: 3px solid rgba(232, 197, 71, 0.52);
+  border-radius: 10px;
+  padding: 10px 0 10px 12px;
+  color: rgba(248, 234, 208, 0.86);
+  background: transparent;
+  font-weight: 820;
 }
 
 .beta2-path {

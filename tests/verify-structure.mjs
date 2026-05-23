@@ -457,6 +457,29 @@ for (const [file, rpc] of rpcChecks) {
   log(`${file} calls ${rpc}`, source.includes(`rpc('${rpc}'`) || source.includes(`rpc("${rpc}"`));
 }
 
+const localizedHome = readFileSync('apps/web/app/[locale]/page.tsx', 'utf8');
+log(
+  'home page distinguishes primary CTA from secondary route links',
+  localizedHome.includes('home-route-links') &&
+    localizedHome.includes('home-trust-list') &&
+    localizedHome.includes('aria-label={copy.secondaryRoutesLabel}'),
+);
+const adminApplications = readFileSync('apps/web/app/admin/applications/page.tsx', 'utf8');
+log(
+  'admin teacher applications include review SOP and explicit contracted copy',
+  adminApplications.includes('審核檢查清單') &&
+    adminApplications.includes('通過，進入待簽約/待上架') &&
+    adminApplications.includes('補件、面談、拒絕都建議留下明確備註'),
+);
+const teacherPortalSourceForModes = readFileSync('apps/web/app/teacher-portal/page.tsx', 'utf8');
+log(
+  'teacher portal labels demo teacher and admin viewing modes',
+  teacherPortalSourceForModes.includes('teacher-portal-mode-banner') &&
+    teacherPortalSourceForModes.includes('示範模式') &&
+    teacherPortalSourceForModes.includes('老師本人模式') &&
+    teacherPortalSourceForModes.includes('管理員代看模式'),
+);
+
 console.log('\n=== Auth, API, and edge integration ===\n');
 
 const nextConfig = readFileSync('apps/web/next.config.mjs', 'utf8');

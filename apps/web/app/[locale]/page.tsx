@@ -42,6 +42,7 @@ const homeCopy = {
     tarot: '試抽塔羅',
     beta: '測試任務清單',
     teacher: '需要時找老師',
+    secondaryRoutesLabel: '其他測試入口',
     points: '每日可領 200 測試點',
     unlock: '100 點解鎖深度解讀',
     teacherNote: '老師諮詢仍是選項，不是強迫購買',
@@ -83,6 +84,7 @@ const homeCopy = {
     tarot: 'Try tarot',
     beta: 'Testing checklist',
     teacher: 'Find a guide if needed',
+    secondaryRoutesLabel: 'Other beta routes',
     points: 'Claim 200 test points daily',
     unlock: 'Unlock depth with 100 points',
     teacherNote: 'Guides are optional, never forced',
@@ -137,18 +139,21 @@ export default async function LocalizedHomePage({ params }: PageProps) {
             <Link href={localizePath('/tools', locale)} className="beta2-secondary">
               {copy.secondary}
             </Link>
-            <Link href={localizePath('/tools/tarot', locale)} className="beta2-secondary">
-              {copy.tarot}
-            </Link>
-            <Link href={localizePath('/beta', locale)} className="beta2-ghost">
-              {copy.beta}
-            </Link>
-            <Link href={localizePath('/teachers', locale)} className="beta2-ghost">
-              {copy.teacher}
-            </Link>
           </div>
 
-          <div className="beta2-trust" aria-label="公開測試規則">
+          <nav className="home-route-links" aria-label={copy.secondaryRoutesLabel}>
+            <Link href={localizePath('/tools/tarot', locale)}>
+              {copy.tarot}
+            </Link>
+            <Link href={localizePath('/beta', locale)}>
+              {copy.beta}
+            </Link>
+            <Link href={localizePath('/teachers', locale)}>
+              {copy.teacher}
+            </Link>
+          </nav>
+
+          <div className="beta2-trust home-trust-list" aria-label="公開測試規則">
             <span>{copy.points}</span>
             <span>{copy.unlock}</span>
             <span>{copy.teacherNote}</span>

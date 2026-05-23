@@ -30,6 +30,14 @@ const STATUS_COLOR: Record<TeacherStatus, string> = {
   suspended: 'bg-reverse/30 text-reverse border-reverse',
 };
 
+const REVIEW_CHECKLIST = [
+  '身份與聯絡資料完整，附件連結可以打開',
+  '專長與服務方式具體，沒有誇大療效或保證結果',
+  '公開介紹適合一般會員閱讀，不會造成誤導',
+  '社群、自介影片或作品可驗證老師真實性',
+  '佣金、服務價格與公開測試責任已確認',
+];
+
 export default function AdminApplications() {
   const toast = useToast();
   const [filter, setFilter] = useState<TeacherStatus | ''>('pending');
@@ -137,12 +145,16 @@ function ApplicationModal({ app, onClose, onUpdated }: {
 
   const act = async (action: string) => {
     if (busy) return;
+    const trimmedNotes = notes.trim();
+    if (['request_revision', 'reject', 'interview'].includes(action) && !trimmedNotes) {
+      return toast('補件、面談、拒絕都建議留下明確備註，請先寫清楚原因或下一步。', 'error');
+    }
     setBusy(true);
     const supabase = createClient();
     const { error } = await supabase.rpc('review_teacher_application', {
       p_application_id: app.id,
       p_action: action,
-      p_notes: notes || null,
+      p_notes: trimmedNotes || null,
       p_commission_rate: rate / 100,
     });
     setBusy(false);
@@ -179,6 +191,15 @@ function ApplicationModal({ app, onClose, onUpdated }: {
         </div>
 
         <div className="space-y-4 text-sm">
+          <InfoBlock title="審核檢查清單">
+            <ol className="list-decimal space-y-1 pl-5 text-white/72">
+              {REVIEW_CHECKLIST.map((item) => <li key={item}>{item}</li>)}
+            </ol>
+            <p className="mt-3 rounded-lg border border-warning/30 bg-warning/10 p-3 text-xs leading-relaxed text-white/70">
+              補件、面談、拒絕都建議留下明確備註；「通過」只代表進入待簽約/待上架，確認服務項目與測試預約後才正式上架。
+            </p>
+          </InfoBlock>
+
           <InfoBlock title="專長">
             <div className="flex flex-wrap gap-1">
               {(app.specialties || []).map((item) => (
@@ -230,7 +251,7 @@ function ApplicationModal({ app, onClose, onUpdated }: {
           <button type="button" onClick={() => act('review')} disabled={busy} aria-disabled={busy} className="mele-btn-success !px-4 !py-2 !text-xs">進入審核</button>
           <button type="button" onClick={() => act('interview')} disabled={busy} aria-disabled={busy} className="mele-btn-secondary !px-4 !py-2 !text-xs">安排面談</button>
           <button type="button" onClick={() => act('request_revision')} disabled={busy} aria-disabled={busy} className="mele-btn-secondary !px-4 !py-2 !text-xs">要求補件</button>
-          <button type="button" onClick={() => act('approve')} disabled={busy} aria-disabled={busy} className="mele-btn-success !px-4 !py-2 !text-xs">審核通過</button>
+          <button type="button" onClick={() => act('approve')} disabled={busy} aria-disabled={busy} className="mele-btn-success !px-4 !py-2 !text-xs">通過，進入待簽約/待上架</button>
           <button type="button" onClick={() => act('reject')} disabled={busy} aria-disabled={busy} className="mele-btn-danger !px-4 !py-2 !text-xs">拒絕</button>
           {app.status === 'contracted' && (
             <button type="button" onClick={activate} disabled={busy} aria-disabled={busy} className="mele-btn-success !px-4 !py-2 !text-xs">正式上架</button>

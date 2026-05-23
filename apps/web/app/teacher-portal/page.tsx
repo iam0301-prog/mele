@@ -691,8 +691,8 @@ export default async function TeacherPortalPage({ searchParams }: TeacherPortalP
           <p className="mt-3 text-white/70 text-sm">{localizedDemoTeacher.display_name} · {copy.portal.demoMode}</p>
         </header>
 
-        <div className="mb-5 rounded-lg border border-accent-dim bg-accent/[0.08] p-4 text-sm leading-relaxed text-white/72">
-          {copy.portal.demoNotice}
+        <div className="teacher-portal-mode-banner mb-5 rounded-lg border border-accent-dim bg-accent/[0.08] p-4 text-sm leading-relaxed text-white/72">
+          <strong className="text-accent">示範模式</strong>：{copy.portal.demoNotice}
         </div>
 
         <TeacherBriefWorkbench cards={demoWorkbenchCards} demoMode locale={locale} />
@@ -898,9 +898,13 @@ export default async function TeacherPortalPage({ searchParams }: TeacherPortalP
         <p className="mt-3 text-white/70 text-sm">{t.display_name} · {t.title ?? ''}</p>
       </header>
 
-      {isAdminViewingTeacher && (
-        <div className="mb-5 rounded-lg border border-accent bg-accent/[0.08] p-4 text-sm leading-relaxed text-white/76">
-          你正在用管理員身分代看「{t.display_name}」的老師後台。這裡會顯示該老師的預約、會員問題、解盤脈絡與服務前準備內容。
+      {isAdminViewingTeacher ? (
+        <div className="teacher-portal-mode-banner mb-5 rounded-lg border border-accent bg-accent/[0.08] p-4 text-sm leading-relaxed text-white/76">
+          <strong className="text-accent">管理員代看模式</strong>：你正在代看「{t.display_name}」的老師後台。這裡會顯示該老師的預約、會員問題、解盤脈絡與服務前準備內容。
+        </div>
+      ) : (
+        <div className="teacher-portal-mode-banner mb-5 rounded-lg border border-success/40 bg-success/[0.08] p-4 text-sm leading-relaxed text-white/76">
+          <strong className="text-success">老師本人模式</strong>：你正在查看自己的預約、會員問題、解盤脈絡與服務前準備內容。
         </div>
       )}
 
