@@ -49,9 +49,9 @@ NUMEROLOGY_GUIDE = {
     7: "主題是探索與洞察。你需要獨處、研究與精神深度，答案常在安靜中浮現。",
     8: "主題是資源與影響力。你適合管理、整合與放大價值，也要讓權力服務於願景。",
     9: "主題是慈悲與完成。你容易看見更大的圖像，人生功課是放下與成全。",
-    11: "主題是靈感與感召。你的直覺強，適合把看見的光轉成可被理解的訊息。",
-    22: "主題是大師級建造。你能把理想落地成結構，但需要耐心與長期節奏。",
-    33: "主題是療癒與服務。你適合用溫柔、教導與陪伴，讓他人重新相信自己。",
+    11: "主題是 11/2：11 代表靈感與感召，2 是關係與感受力的底色。你的直覺強，但也需要清楚界線。",
+    22: "主題是 22/4：22 代表大型建造力，4 是秩序與落地的底色。你適合把理想做成可執行的結構。",
+    33: "主題是 33/6：33 代表療癒與服務，6 是照顧與責任的底色。你適合陪伴他人，也要先照顧自己。",
 }
 
 
@@ -111,6 +111,41 @@ def _maya_theme(name: object) -> str:
     return "這個圖騰代表你與世界互動的一種能量語言，重點是把象徵放回真實生活裡觀察。"
 
 
+MAYA_MEMBER_READING = {
+    "龍": ("你很容易成為把事情重新養起來的人，適合從建立基礎、照顧資源、讓一件事恢復生命力開始。", "要留意自己是不是又把所有人的需要都放在前面，忘了先問：我自己的根基穩不穩。"),
+    "風": ("你需要把感受說清楚，越願意把話講明白，關係與選擇就越容易流動。", "卡住時不是因為你不會說，而是你可能說了很多外圍，真正重要的需求還沒有出口。"),
+    "夜": ("你的內在世界很豐富，直覺、夢境與想像力常會比理性更早感覺到答案。", "要留意自己是不是把不安藏回心裡，讓別人看不見你真正需要什麼。"),
+    "種子": ("你適合專注培養一件事，只要環境對了，成長會很紮實。", "卡住時容易一直等更好的時機，結果真正想發芽的事停太久。"),
+    "蛇": ("你的身體感很強，喜歡、不喜歡、靠近或遠離，身體常比頭腦更早知道。", "要留意自己是不是壓住本能，直到最後用過度反應保護自己。"),
+    "世界橋": ("你有讓舊階段結束、轉換關係位置、重新連接的能力。", "卡住時常是捨不得放下不適合的角色，停在中間地帶。"),
+    "手": ("你適合親手處理問題，把理解落到修補、整理與完成。", "要留意自己是不是一直替別人完成本該由對方完成的事。"),
+    "星星": ("你對美感、和諧與秩序敏感，能把混亂整理成讓人舒服的形式。", "卡住時可能為了維持好看或和平，忽略真正不舒服的地方。"),
+    "月": ("你很會感覺情緒流動，能透過感受辨認什麼需要被清理或更新。", "要留意一時情緒浪潮，不要把它直接當成全部真相。"),
+    "狗": ("你的核心在信任、忠誠與心的連結，關係品質會深深影響你的狀態。", "卡住時容易因為在乎而過度忍耐，或把忠誠變成不能離開。"),
+    "猴": ("你有幽默、創意與打破僵局的能力，越放鬆越能找到新解法。", "要留意自己是不是用玩笑或轉移注意力避開真正脆弱的問題。"),
+    "人": ("你的課題在選擇與自由意志，你需要感覺這個決定真的屬於自己。", "卡住時容易聽太多意見，最後失去自己的判斷。"),
+    "天行者": ("你需要空間、經驗與探索，走出去會讓你更認識自己。", "要分辨自己想離開，是因為要拓展，還是因為不想面對眼前問題。"),
+    "巫師": ("你有很強的臨在感，不急著控制時，反而更能感覺到時機。", "卡住時可能停在等待，少了把感覺落地的下一步。"),
+    "鷹": ("你能看見大局與未來藍圖，適合把複雜狀況拉高一層重新設計。", "要留意自己是不是看得太遠，反而忽略眼前最需要處理的一步。"),
+    "戰士": ("你適合透過提問找到真相，越能誠實面對問題，越能長出勇氣。", "卡住時容易用質疑保護自己，一直追問到不敢行動。"),
+    "地球": ("你適合聽環境訊號與生活節奏，答案常透過身邊事件同步出現。", "要留意自己是不是太想找外在徵兆，反而忽略已經知道的感受。"),
+    "鏡": ("你容易看見真相與界線，能把事情照得很清楚。", "卡住時容易太快切割或太銳利，讓清楚變成防衛。"),
+    "風暴": ("你有更新與重啟的力量，混亂有時是在逼你離開不適合的舊模式。", "要留意自己是不是在變動中急著抓回控制，反而更累。"),
+    "太陽": ("你有照亮事情、帶來清楚與溫暖的能力，適合把模糊處說明白。", "卡住時可能一直扮演明亮的人，卻沒有讓自己的需要被看見。"),
+}
+
+
+def _maya_member_reading(name: object) -> tuple[str, str]:
+    text = str(name or "")
+    for key, value in MAYA_MEMBER_READING.items():
+        if key in text:
+            return value
+    return (
+        "這個圖騰像你面對世界時常用的語氣，請先把它放回日常選擇、關係與壓力反應裡觀察。",
+        "卡住時通常不是圖騰不好，而是這股力量被用得太急、太滿，或用在不適合的地方。",
+    )
+
+
 def _tone_theme(name: object) -> str:
     text = str(name or "")
     for key, value in MAYA_TONE_THEMES.items():
@@ -121,21 +156,30 @@ def _tone_theme(name: object) -> str:
 
 def explain_numerology(data: dict, detail: DetailLevel = "teaser") -> str:
     lp = data.get("lifePath")
+    lp_display = data.get("lifePathDisplay") or lp
+    lp_reduced = data.get("lifePathReduced")
     bd = data.get("birthDay")
+    bd_display = data.get("birthDayDisplay") or bd
     arche = data.get("lifePathArchetype") or {}
     bd_arche = data.get("birthDayArchetype") or {}
     is_master = data.get("isMaster")
 
     parts = [
         _line(
-            f"你的生命靈數是 <strong>{_text(lp)}</strong>"
-            f"{'（大師數）' if is_master else ''}，核心原型是 <strong>{_text(arche.get('name'))}</strong>。"
+            f"你的生命靈數是 <strong>{_text(lp_display)}</strong>"
+            f"{'（保留大師數，也看底色數）' if is_master else ''}，核心原型是 <strong>{_text(arche.get('name'))}</strong>。"
         ),
         _line(NUMEROLOGY_GUIDE.get(lp, _text(arche.get("desc"), "此數字代表你一生反覆練習的核心節奏。"))),
     ]
 
+    if is_master and lp_reduced:
+        parts.append(_line(
+            f"所以如果別的網站把你算成 <strong>{_text(lp_reduced)}</strong>，不是誰錯誰對；"
+            f"那是把大師數繼續化簡。本平台會顯示 <strong>{_text(lp_display)}</strong>，讓兩種派別都看得到。"
+        ))
+
     if bd and bd != lp:
-        parts.append(_line(f"生日數 <strong>{_text(bd)}</strong> 顯示你日常表現出的氣質：{_text(bd_arche.get('name'), '個人特質')}。"))
+        parts.append(_line(f"生日數 <strong>{_text(bd_display)}</strong> 顯示你日常表現出的氣質：{_text(bd_arche.get('name'), '個人特質')}。"))
 
     if detail == "full":
         parts.extend([
@@ -152,11 +196,13 @@ def explain_maya(data: dict, detail: DetailLevel = "teaser") -> str:
     oracle = data.get("oracle") or {}
     seal_name = seal.get("zh") or seal.get("name") or seal.get("label")
     tone_name = tone.get("zh") or tone.get("name") or tone.get("label")
+    gift, shadow = _maya_member_reading(seal_name)
 
     parts = [
         _line(f"你是 <strong>Kin {_text(data.get('kin'))}</strong>，能量名稱為 <strong>{_text(tone_name)}{_text(seal_name)}</strong>。"),
-        _line(f"太陽圖騰 <strong>{_text(seal_name)}</strong>：{_maya_theme(seal_name)}"),
-        _line(f"銀河調性 <strong>{_text(tone_name)}</strong>：{_tone_theme(tone_name)}"),
+        _line(f"白話先看你本人：<strong>{_text(seal_name)}</strong> 不是稱號，而是在說你的慣用節奏。{_text(gift)}"),
+        _line(f"如果這段有中，通常會中在卡點：{_text(shadow)}"),
+        _line(f"銀河調性 <strong>{_text(tone_name)}</strong> 補充的是這股力量如何被啟動：{_tone_theme(tone_name)}"),
     ]
 
     parts.append(_section("馬雅神諭關係"))
@@ -172,7 +218,7 @@ def explain_maya(data: dict, detail: DetailLevel = "teaser") -> str:
             tone_text = f"{_text(item_tone)}" if item_tone else ""
             parts.append(_line(
                 f"<strong>{label}</strong>：{kin_text}{tone_text}{_text(item_seal)}。"
-                f"{role_copy}{_maya_theme(item_seal)}"
+                f"{role_copy}{_maya_member_reading(item_seal)[0]}"
             ))
 
     if detail == "full":
@@ -315,9 +361,27 @@ def explain_ziwei(data: dict, detail: DetailLevel = "teaser") -> str:
     if ming_stars:
         parts.append(_line(f"命宮主要星曜：<strong>{_join(_star_name(star) for star in ming_stars)}</strong>。"))
 
-    parts.append(_section("十二宮閱讀方式"))
-    parts.append(_line("紫微斗數不是只看單一主星，而是同時看宮位、星曜、四化、三方四正與大限流年。"))
-    parts.append(_line("本頁先呈現命宮與十二宮架構，適合用來建立人生主題、關係模式與事業方向的第一層理解。"))
+    def palace_line(target: str, topic: str) -> str | None:
+        if not isinstance(palaces, list):
+            return None
+        for palace in palaces:
+            if palace.get("name") == target:
+                stars = palace.get("majorStarNames") or palace.get("majorStars") or []
+                star_text = _join(_star_name(star) for star in stars) or "暫無主星，需看對宮與三方四正"
+                branch = _text(palace.get("earthlyBranch"))
+                return f"{target}（{branch}）：{star_text}。這裡先看「{topic}」，如果這題最近很有感，就比泛泛看整張盤更值得先問。"
+        return None
+
+    parts.append(_section("先挑一個真的想問的題目"))
+    for line in [
+        palace_line("官祿", "工作定位、職涯方向與投入方式"),
+        palace_line("夫妻", "關係模式、親密安全感與伴侶互動"),
+        palace_line("財帛", "賺錢方式、資源流動與金錢壓力"),
+    ]:
+        if line:
+            parts.append(_line(line))
+
+    parts.append(_line("紫微不是一次把全部宮位背起來，而是先抓命宮主軸，再挑一個最有感的生活問題深看。老師解盤的價值，就在於把對宮、三方四正與流年一起合參。"))
 
     if detail == "full":
         for palace in palaces[:12]:
@@ -337,18 +401,49 @@ def _sign_text(value: object) -> str:
     return _text(sign or value.get("zh") or value.get("label"))
 
 
+ASTRO_MEMBER_READING = {
+    "牡羊": ("需要直接感、行動感與能自己開路的空間", "容易還沒聽完就先衝出去"),
+    "金牛": ("需要穩定、身體感與能慢慢累積的安全感", "容易明知道不適合也不想改變"),
+    "雙子": ("需要理解、交流與資訊流動，說出來會幫你釐清自己", "容易想太多、分心太多，真正的感受反而被跳過"),
+    "巨蟹": ("需要情感安全、歸屬感與能照顧自己的空間", "容易把過去感受帶進現在，用保護殼防衛"),
+    "獅子": ("需要被看見、創造與真心投入，越真誠越有光", "容易太在意表現，怕不被肯定就不敢自然發揮"),
+    "處女": ("需要把事情整理清楚，透過細節、修正與服務建立價值", "容易過度挑剔自己，一直修到不敢開始"),
+    "天秤": ("需要關係中的平衡、互相理解與好好協調的空間", "容易為了和諧先放掉自己的立場"),
+    "天蠍": ("需要深度、真相與真正可信任的連結，不適合只停在表面", "容易太警戒或太想掌控，反而更難放鬆"),
+    "射手": ("需要意義、遠方與能讓視野打開的方向", "容易只想離開，卻沒有整理真正要追求的是什麼"),
+    "摩羯": ("需要長期目標、責任感與能一步步建立成果的路線", "容易把自己逼太緊，用表現證明價值"),
+    "水瓶": ("需要獨立思考、系統視角與跟一般規則保持距離的空間", "容易太抽離，知道很多卻不一定讓人靠近"),
+    "雙魚": ("需要想像力、感受力與能讓心柔軟下來的空間", "容易界線模糊，把別人的情緒也當成自己的責任"),
+}
+
+
+def _astro_member_reading(point: object) -> tuple[str, str]:
+    text = str(point or "")
+    for key, value in ASTRO_MEMBER_READING.items():
+        if key in text:
+            return value
+    return ("代表一種需要放回生活場景理解的慣用模式", "卡住時可能會過度補償或失去彈性")
+
+
 def explain_astro(data: dict, detail: DetailLevel = "teaser") -> str:
     planets = data.get("planets") or {}
     sun = data.get("sun") or planets.get("sun") or {}
     moon = data.get("moon") or planets.get("moon") or {}
     asc = data.get("ascendant") or {}
     mc = data.get("midheaven") or {}
+    sun_text = _sign_text(sun)
+    moon_text = _sign_text(moon)
+    asc_text = _sign_text(asc)
+    sun_gift, sun_shadow = _astro_member_reading(sun_text)
+    moon_gift, moon_shadow = _astro_member_reading(moon_text)
+    asc_gift, asc_shadow = _astro_member_reading(asc_text)
 
     parts = [
-        _line(f"太陽：<strong>{_sign_text(sun)}</strong>，代表你的意志、生命力與想成為的樣子。"),
-        _line(f"月亮：<strong>{_sign_text(moon)}</strong>，代表情緒需求、直覺反應與安全感來源。"),
-        _line(f"上升：<strong>{_sign_text(asc)}</strong>，代表你進入世界的方式與他人第一眼感受到的氣質。"),
+        _line(f"太陽 <strong>{sun_text}</strong>：你想活出的方向通常{_text(sun_gift)}；卡住時{_text(sun_shadow)}。"),
+        _line(f"月亮 <strong>{moon_text}</strong>：你真正需要的安全感通常{_text(moon_gift)}；壓力下{_text(moon_shadow)}。"),
+        _line(f"上升 <strong>{asc_text}</strong>：別人第一眼接收到的你，常帶著「{_text(asc_gift)}」的氣質；但也可能{_text(asc_shadow)}。"),
         _line(f"天頂：<strong>{_sign_text(mc)}</strong>，代表事業形象、成就方向與社會角色。"),
+        _line("如果你覺得自己內在需要、外在表現與人生方向不一致，這就很適合帶著星盤問老師，因為答案通常在宮位與相位的交叉處。"),
     ]
     if detail == "full":
         parts.extend([
@@ -564,7 +659,7 @@ def explain_runes(data: dict, detail: DetailLevel = "teaser") -> str:
     material = (data.get("meta") or {}).get("material")
     parts = [
         _section("盧恩訊息"),
-        _line(f"本次抽出 {len(runes)} 顆符文{f'，材質為 {_text(material)}' if material else ''}。盧恩適合讀成提醒、阻力與下一步。"),
+        _line(f"你本次抽出 {len(runes)} 顆符文{f'，材質為 {_text(material)}' if material else ''}。盧恩適合讀成提醒、阻力與下一步。"),
     ]
 
     for index, draw in enumerate(runes, start=1):

@@ -53,6 +53,7 @@ type LoginCopy = {
     emailDelivery: string;
     existingAccount: string;
     authCallback: string;
+    emailConfirmedLoginRequired: string;
     authProviderSetup: string;
   };
   successSignIn: string;
@@ -155,6 +156,7 @@ const en: ReleaseCopy = {
       emailDelivery: 'The confirmation email could not be sent. Please try signing in, resend confirmation, or contact support while we check SMTP settings.',
       existingAccount: 'This email may already be registered. Try signing in or resend the confirmation email.',
       authCallback: 'Login callback failed. Please check the provider setup or try email login.',
+      emailConfirmedLoginRequired: 'Your email may already be confirmed. Please log in with the email and password you used to sign up.',
       authProviderSetup: 'This login method is not ready yet. Please use email login for now.',
     },
     successSignIn: 'Logged in.',
@@ -274,6 +276,7 @@ const zh: ReleaseCopy = {
       emailDelivery: '驗證信目前寄送失敗。請先確認是否已註冊，或稍後重寄驗證信；我們正在檢查 SMTP 寄信設定。',
       existingAccount: '這個 Email 可能已經註冊過。請改用登入，或按「重寄認證信」。',
       authCallback: '登入回跳失敗，請確認 Google / LINE 或 Supabase Redirect URL 設定。',
+      emailConfirmedLoginRequired: 'Email 可能已完成驗證，但這個瀏覽器沒有原本的註冊登入狀態。請直接用剛才註冊的 Email 與密碼登入。',
       authProviderSetup: '這個登入方式尚未完整啟用，請先使用 Email 登入。',
     },
     successSignIn: '已登入。',

@@ -1,0 +1,30 @@
+{
+  "maya": [
+    { "name": "Steve Jobs", "date": "1955-02-24" },
+    { "name": "Taylor Swift", "date": "1989-12-13" },
+    { "name": "Elon Musk", "date": "1971-06-28" },
+    { "name": "Barack Obama", "date": "1961-08-04" },
+    { "name": "Beyonce", "date": "1981-09-04" },
+    { "name": "Audrey Hepburn", "date": "1929-05-04" },
+    { "name": "Princess Diana", "date": "1961-07-01" },
+    { "name": "Albert Einstein", "date": "1879-03-14" },
+    { "name": "Marilyn Monroe", "date": "1926-06-01" },
+    { "name": "John Lennon", "date": "1940-10-09" }
+  ],
+  "ziwei": [
+    { "name": "Steve Jobs", "date": "1955-02-24", "hour": 20, "minute": 0, "gender": "male" },
+    { "name": "Albert Einstein", "date": "1879-03-14", "hour": 12, "minute": 0, "gender": "male" },
+    { "name": "Marilyn Monroe", "date": "1926-06-01", "hour": 10, "minute": 0, "gender": "female" },
+    { "name": "John Lennon", "date": "1940-10-09", "hour": 18, "minute": 0, "gender": "male" },
+    { "name": "Princess Diana", "date": "1961-07-01", "hour": 20, "minute": 0, "gender": "female" }
+  ],
+  "humandesign": [
+    {
+      "name": "Steve Jobs",
+      "date": "1955-02-24",
+      "time": "19:15",
+      "timezone": -8,
+      "cityNote": "San Francisco / Los Altos public biographical references vary; keep as manual fixture candidate."
+    }
+  ]
+}

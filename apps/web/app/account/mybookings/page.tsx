@@ -103,6 +103,7 @@ export default function MyBookingsPage() {
           {(['upcoming', 'past', 'cancelled'] as BookingTab[]).map((t) => (
             <button
               key={t}
+              type="button"
               onClick={() => setTab(t)}
               className={`flex-1 py-3 text-sm tracking-widest transition-colors
                 ${tab === t ? 'text-accent border-b-2 border-accent' : 'text-white/60 hover:text-white'}`}
@@ -150,14 +151,14 @@ export default function MyBookingsPage() {
                 {(b.status === 'paid' || b.status === 'confirmed') && (
                   <>
                     {b.teachers?.line_url && <a href={b.teachers.line_url} target="_blank" rel="noreferrer" className="mele-btn-secondary !px-4 !py-2 !text-xs">LINE</a>}
-                    <button onClick={() => cancel(b)} className="mele-btn-secondary !px-4 !py-2 !text-xs">取消</button>
+                    <button type="button" onClick={() => cancel(b)} className="mele-btn-secondary !px-4 !py-2 !text-xs">取消</button>
                   </>
                 )}
                 {b.status === 'completed' && !reviewedSet.has(b.id) && (
-                  <button onClick={() => setReviewModal(b)} className="mele-btn-primary !px-4 !py-2 !text-xs">評價</button>
+                  <button type="button" onClick={() => setReviewModal(b)} className="mele-btn-primary !px-4 !py-2 !text-xs">評價</button>
                 )}
                 {b.status === 'completed' && !b.followup_question && (
-                  <button onClick={() => askFollowup(b)} className="mele-btn-secondary !px-4 !py-2 !text-xs">免費追問</button>
+                  <button type="button" onClick={() => askFollowup(b)} className="mele-btn-secondary !px-4 !py-2 !text-xs">免費追問</button>
                 )}
               </div>
             </div>
@@ -186,6 +187,7 @@ function ReviewModal({ booking, onClose, onDone }: { booking: Booking; onClose: 
   const [submitting, setSubmitting] = useState(false);
 
   const submit = async () => {
+    if (submitting) return;
     setSubmitting(true);
     const supabase = createClient();
     const { data: { user } } = await supabase.auth.getUser();
@@ -211,7 +213,16 @@ function ReviewModal({ booking, onClose, onDone }: { booking: Booking; onClose: 
           <div className="mele-label">評分</div>
           <div className="flex gap-1 text-3xl">
             {[1, 2, 3, 4, 5].map((n) => (
-              <button key={n} onClick={() => setRating(n)} className={n <= rating ? 'text-yellow-400' : 'text-white/30'}>★</button>
+              <button
+                key={n}
+                type="button"
+                onClick={() => setRating(n)}
+                aria-pressed={n === rating}
+                aria-label={`${n} 星`}
+                className={n <= rating ? 'text-yellow-400' : 'text-white/30'}
+              >
+                ★
+              </button>
             ))}
           </div>
         </div>
@@ -224,10 +235,10 @@ function ReviewModal({ booking, onClose, onDone }: { booking: Booking; onClose: 
           匿名評價（你的名字不會公開）
         </label>
         <div className="flex gap-3">
-          <button onClick={submit} disabled={submitting} className="mele-btn-primary flex-1">
+          <button type="button" onClick={submit} disabled={submitting} aria-disabled={submitting} className="mele-btn-primary flex-1">
             {submitting ? '送出中…' : '送出'}
           </button>
-          <button onClick={onClose} className="mele-btn-secondary">取消</button>
+          <button type="button" onClick={onClose} disabled={submitting} className="mele-btn-secondary">取消</button>
         </div>
       </div>
     </div>

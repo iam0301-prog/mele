@@ -8,8 +8,9 @@ import {
   DAILY_POINT_AMOUNT,
   MEMBER_UNLOCK_OPTIONS,
   POINT_UNLOCK_COST,
-  buildUnlockedReadingContent,
+  buildUnlockContentMetadata,
   unlockScopeKey as getUnlockScopeKey,
+  type MemberUnlockedReading,
   type MemberUnlockOption,
   type MemberUnlockType,
 } from '@/lib/member-unlocks';
@@ -61,6 +62,7 @@ type PointRpcResult = {
   amount?: number;
   balance?: number;
   already_unlocked?: boolean;
+  content?: MemberUnlockedReading;
 };
 
 type BeginnerGuideItem = {
@@ -74,6 +76,21 @@ type BeginnerGuide = {
   intro: string;
   items: BeginnerGuideItem[];
   note: string;
+};
+
+type MemberResonancePoint = {
+  label: string;
+  title: string;
+  body: string;
+};
+
+type MemberResonance = {
+  eyebrow: string;
+  title: string;
+  lead: string;
+  mirror: string;
+  points: MemberResonancePoint[];
+  nextQuestion: string;
 };
 
 type GameStat = {
@@ -170,7 +187,7 @@ const BEGINNER_GUIDES: Record<CalcTool, BeginnerGuide> = {
   },
   maya: {
     title: '瑪雅曆初步認識自己',
-    intro: '瑪雅曆把生日換成 Kin、調性與圖騰，像是在看你的靈魂節奏：你如何啟動事情、如何與世界互動，以及什麼能量最能支持你。',
+    intro: '瑪雅曆把生日換成 Kin、調性與圖騰，像是在看你的內在節奏：你如何啟動事情、如何與世界互動，以及什麼力量最能支持你。',
     items: [
       { label: 'Kin', title: 'Kin 是你的瑪雅曆身份編號', body: '它像一個總索引，整理你的調性、圖騰與當天能量，讓你知道這份解讀在看哪一組生命節奏。' },
       { label: 'Tone', title: '調性像是你的做事節奏', body: '調性會描述你啟動、整理、合作或完成事情的方式；初階可以把它看成「我怎麼推動人生」。' },
@@ -382,6 +399,30 @@ const PILLAR_LABELS: Record<string, string> = {
   hour: '時柱',
 };
 
+const NUMEROLOGY_FACT_LABELS: Record<string, string> = {
+  lifePath: '生命靈數',
+  lifePathReduced: '底色數',
+  lifePathDisplay: '生命靈數',
+  birthDay: '生日數',
+  birthDayReduced: '生日底色',
+  birthDayDisplay: '生日數',
+  calculationMethod: '算法說明',
+  calculationNote: '數字說明',
+};
+
+const HIDDEN_FACT_KEYS = new Set([
+  'jd',
+  'meta',
+  'input',
+  'location',
+  'planets',
+  'houses',
+  'render',
+  'svg',
+  'html',
+  'animations',
+]);
+
 const HD_VALUE_LABELS: Record<string, string> = {
   Manifestor: '顯示者',
   Generator: '生產者',
@@ -511,6 +552,20 @@ function firstValue(data: Dict, keys: string[], fallback = '尚未取得'): stri
   return fallback;
 }
 
+function formatDegree(value: unknown): string {
+  const numeric = Number(value);
+  if (Number.isFinite(numeric)) return `${numeric.toFixed(1)}度`;
+  const raw = cleanText(value);
+  return raw ? `${raw}度` : '';
+}
+
+function formatZodiacPoint(value: unknown): string {
+  const obj = asDict(value);
+  const sign = asDict(obj.sign);
+  if (Object.keys(sign).length === 0) return '';
+  return compact([cleanText(sign.symbol), cleanText(sign.zh), formatDegree(sign.degInSign)], ' ');
+}
+
 function formatPrimitive(value: unknown): string {
   if (value === null || value === undefined || value === '') return '';
   if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
@@ -526,13 +581,11 @@ function formatPrimitive(value: unknown): string {
   }
 
   const obj = asDict(value);
+  const zodiacPoint = formatZodiacPoint(obj);
+  if (zodiacPoint) return zodiacPoint;
+
   const direct = cleanText(obj.name_zh) || cleanText(obj.zh) || cleanText(obj.label) || cleanText(obj.name) || cleanText(obj.text);
   if (direct) return direct;
-
-  const sign = asDict(obj.sign);
-  if (Object.keys(sign).length > 0) {
-    return compact([cleanText(sign.symbol), cleanText(sign.zh), cleanText(sign.degInSign) && `${cleanText(sign.degInSign)}度`], ' ');
-  }
 
   const counts = asDict(obj.counts);
   if (Object.keys(counts).length > 0) {
@@ -567,7 +620,7 @@ function formatFact(data: Dict, key: string): InsightFact | null {
   }
 
   if (!value) return null;
-  return { label: KEY_LABELS[key] ?? key, value };
+  return { label: NUMEROLOGY_FACT_LABELS[key] ?? KEY_LABELS[key] ?? key, value };
 }
 
 function collectFacts(data: Dict, keys: string[], limit = 6): InsightFact[] {
@@ -581,6 +634,7 @@ function collectFacts(data: Dict, keys: string[], limit = 6): InsightFact[] {
 
   for (const key of Object.keys(data)) {
     if (keys.includes(key)) continue;
+    if (HIDDEN_FACT_KEYS.has(key)) continue;
     const fact = formatFact(data, key);
     if (fact) facts.push(fact);
     if (facts.length >= limit) break;
@@ -657,13 +711,15 @@ function mayaCards(data: Dict): InsightCard[] {
       const seal = asDict(item.seal);
       const tone = asDict(item.tone);
       const kin = cleanText(item.kin);
+      const sealText = formatPrimitive(seal);
+      const memberCopy = mayaMemberCopy(sealText);
       if (!kin && !formatPrimitive(item)) return null;
       return {
         title: label,
         subtitle: kin ? `Kin ${kin}` : undefined,
         body: compact([
           compact([formatPrimitive(tone), formatPrimitive(seal)], ''),
-          MAYA_ORACLE_COPY[key],
+          key === 'antipode' ? memberCopy.shadow : key === 'self' ? memberCopy.gift : MAYA_ORACLE_COPY[key],
         ], '：') || '這個位置說明今日能量如何與你的核心 Kin 互動。',
         tags: compact([formatPrimitive(seal), formatPrimitive(tone)], ' / ').split(' / ').filter(Boolean).slice(0, 3),
         mayaSeal: seal,
@@ -688,6 +744,532 @@ function gateCards(data: Dict): InsightCard[] {
       tags: asArray(item.keywords).map((entry) => cleanText(entry)).filter(Boolean).slice(0, 4),
     };
   });
+}
+
+function firstQuestion(result: CalcResponse): string {
+  return cleanText(result.input.question)
+    || cleanText(result.input.topic)
+    || cleanText(result.input.intent)
+    || '這次想理解的問題';
+}
+
+function symbolCopy(source: string, copyMap: Record<string, SymbolMemberCopy>, fallback: SymbolMemberCopy): SymbolMemberCopy {
+  const text = source || '';
+  const entry = Object.entries(copyMap).find(([key]) => text.includes(key));
+  return entry?.[1] ?? fallback;
+}
+
+function mayaMemberCopy(seal: string): SymbolMemberCopy {
+  return symbolCopy(seal, MAYA_SEAL_MEMBER_COPY, {
+    gift: '你的圖騰像一種面對世界的慣用語氣；先觀察它在日常選擇、關係與壓力反應裡怎麼出現。',
+    shadow: '卡住時通常不是圖騰不好，而是你把這股力量用得太急、太滿，或用在不適合的地方。',
+    teacherQuestion: '我的圖騰力量現在最該用在哪個生活問題上？',
+  });
+}
+
+function astroMemberCopy(point: string): SymbolMemberCopy {
+  return symbolCopy(point, ASTRO_SIGN_MEMBER_COPY, {
+    gift: '這個星座位置代表你的一種慣用模式，需要放回生活場景才會真正有感。',
+    shadow: '卡住時，這股能量可能會過度補償或失去彈性。',
+    teacherQuestion: '這個星盤位置在我的關係、工作或情緒裡，最明顯表現在哪裡？',
+  });
+}
+
+function palaceName(palace: Dict): string {
+  return cleanText(palace.name) || cleanText(palace.earthlyBranch) || '宮位';
+}
+
+function palaceStarText(palace: Dict): string {
+  const stars = asArray(palace.majorStarNames).length ? asArray(palace.majorStarNames) : asArray(palace.majorStars);
+  return stars.map((star) => formatPrimitive(star) || cleanText(star)).filter(Boolean).join(' / ');
+}
+
+function palaceByName(data: Dict, name: string): Dict {
+  const palaces = asArray(data.palaces).map((item) => asDict(item));
+  return palaces.find((palace) => palaceName(palace).includes(name)) ?? {};
+}
+
+function describeZiweiPalace(data: Dict, name: string, fallback: string) {
+  const palace = palaceByName(data, name);
+  const branch = cleanText(palace.earthlyBranch);
+  const stars = palaceStarText(palace);
+  if (branch || stars) {
+    return {
+      title: compact([branch ? `${branch}${name}` : name, stars || '無主星'], '｜'),
+      body: stars
+        ? `${name}落在${branch || '此宮'}，主星是 ${stars}。這不是單一答案，而是你在「${fallback}」這個生活題目裡常用的反應方式。`
+        : `${name}是空宮時，更需要看對宮與三方四正；會員會有感的重點不是「沒有」，而是這個題目容易透過環境、對象或外部事件被觸發。`,
+    };
+  }
+  return { title: name, body: fallback };
+}
+
+type NumerologyProfileCopy = {
+  headline: string;
+  lead: string;
+  mirror: string;
+  advantage: string;
+  shadow: string;
+  action: string;
+};
+
+type SymbolMemberCopy = {
+  gift: string;
+  shadow: string;
+  teacherQuestion: string;
+};
+
+const MAYA_SEAL_MEMBER_COPY: Record<string, SymbolMemberCopy> = {
+  龍: {
+    gift: '你有把事情重新養起來的能力，適合從建立基礎、照顧資源、讓一件事重新有生命力開始。',
+    shadow: '你容易把所有人都放在前面，最後分不清什麼是照顧、什麼是過度承擔。',
+    teacherQuestion: '我在哪些關係或工作裡一直扮演照顧者，卻忘了先照顧自己的根基？',
+  },
+  風: {
+    gift: '你的力量在溝通、連結與把感受說成話；當你願意說清楚，混亂會開始流動。',
+    shadow: '你容易想很多、說很多，但真正重要的需求反而沒有講出口。',
+    teacherQuestion: '我最近哪一句話一直沒有說清楚，導致關係或選擇卡住？',
+  },
+  夜: {
+    gift: '你的內在世界很豐富，直覺、夢境與想像力常能先感覺到答案。',
+    shadow: '你容易退回自己的世界，把不安藏起來，讓別人不知道怎麼靠近你。',
+    teacherQuestion: '我現在的不安全感，是真的來自現實，還是來自過去累積的想像與擔心？',
+  },
+  種子: {
+    gift: '你適合專注培養一件事，只要環境與時間對了，成長會很紮實。',
+    shadow: '你容易一直等更好的時機，結果讓真正想發芽的事停太久。',
+    teacherQuestion: '我現在該繼續等待、調整環境，還是已經可以開始行動？',
+  },
+  蛇: {
+    gift: '你的身體感很強，對喜歡、不喜歡、靠近或遠離，常比頭腦更早知道。',
+    shadow: '你容易壓住本能，或在壓力下用過度反應保護自己。',
+    teacherQuestion: '我最近的身體反應在提醒我什麼界線或真實需求？',
+  },
+  世界橋: {
+    gift: '你有結束舊階段、轉換關係位置、讓事情重新連接的能力。',
+    shadow: '你容易捨不得放下已經不適合的角色，卡在中間地帶。',
+    teacherQuestion: '我現在真正需要結束的是一段關係、一種責任，還是一個舊身份？',
+  },
+  手: {
+    gift: '你適合親手把問題處理掉，理解不只停在想法，而是要落到修補、整理與完成。',
+    shadow: '你容易一直幫忙、一直處理，卻沒有問自己是否真的有餘裕。',
+    teacherQuestion: '我正在替誰完成本該由對方完成的事？我可以怎麼把責任交回去？',
+  },
+  星星: {
+    gift: '你對美感、和諧與秩序敏感，能把混亂整理成讓人舒服的形式。',
+    shadow: '你容易為了維持好看或和諧，忽略真正不舒服的地方。',
+    teacherQuestion: '我現在追求的和諧，是出於真心，還是害怕衝突？',
+  },
+  月: {
+    gift: '你對情緒流動很敏感，適合透過感受辨認什麼需要被清理或更新。',
+    shadow: '你容易被情緒浪潮帶走，把一時的感覺當成全部真相。',
+    teacherQuestion: '我這次的情緒是在提醒真需求，還是在重播舊模式？',
+  },
+  狗: {
+    gift: '你的核心在愛、信任與忠誠，關係品質會深深影響你的狀態。',
+    shadow: '你容易因為愛而過度忍耐，或把忠誠變成不能離開。',
+    teacherQuestion: '我在關係裡的付出，是出於愛，還是出於害怕失去？',
+  },
+  猴: {
+    gift: '你有幽默、創意與打破僵局的能力，越放鬆越能找到新解法。',
+    shadow: '你容易用玩笑或轉移注意力避開真正脆弱的問題。',
+    teacherQuestion: '我最近是不是用輕鬆帶過，避開了一件其實很重要的事？',
+  },
+  人: {
+    gift: '你的課題在自由意志與選擇，你需要感覺這個決定真的屬於自己。',
+    shadow: '你容易聽太多意見，最後反而失去自己的判斷。',
+    teacherQuestion: '這個選擇如果不考慮別人的期待，我真正想怎麼走？',
+  },
+  天行者: {
+    gift: '你需要空間、經驗與探索，透過走出去才會更認識自己。',
+    shadow: '你容易一直想換環境，卻沒有看清自己真正想逃離什麼。',
+    teacherQuestion: '我想離開現況，是因為要拓展，還是因為不想面對眼前問題？',
+  },
+  巫師: {
+    gift: '你有很強的臨在感，當你不急著控制，反而能感覺到時機。',
+    shadow: '你容易停在等待或相信感覺，卻少了把感覺落地的步驟。',
+    teacherQuestion: '我現在該信任時機，還是該把直覺轉成具體安排？',
+  },
+  鷹: {
+    gift: '你能看見大局與未來藍圖，適合把複雜狀況拉高一層重新設計。',
+    shadow: '你容易看得太遠，反而忽略眼前最需要被處理的一步。',
+    teacherQuestion: '我的遠景很清楚，但第一個可執行的小步驟是什麼？',
+  },
+  戰士: {
+    gift: '你適合透過提問找到真相，越能誠實面對問題，越能長出勇氣。',
+    shadow: '你容易用質疑保護自己，或一直追問到不敢行動。',
+    teacherQuestion: '我現在的懷疑是在幫我確認方向，還是在阻止我前進？',
+  },
+  地球: {
+    gift: '你適合聽環境訊號與生活節奏，很多答案會透過身邊事件同步出現。',
+    shadow: '你容易太想找外在徵兆，卻忽略自己已經知道的感受。',
+    teacherQuestion: '最近反覆出現的事件，正在把我帶回哪個現實問題？',
+  },
+  鏡: {
+    gift: '你容易看見真相與界線，能把事情照得很清楚。',
+    shadow: '你容易太快切割或太銳利，讓清楚變成防衛。',
+    teacherQuestion: '我現在需要更清楚的界線，還是需要更柔軟的表達方式？',
+  },
+  風暴: {
+    gift: '你有更新與重啟的力量，混亂有時是在逼你離開不適合的舊模式。',
+    shadow: '你容易在變動中慌張，急著抓回控制感，反而更累。',
+    teacherQuestion: '這場變動想帶我更新哪個舊習慣？我該放掉什麼？',
+  },
+  太陽: {
+    gift: '你有照亮事情、帶來清楚與溫暖的能力，適合把模糊處說明白。',
+    shadow: '你容易一直扮演明亮的人，卻不讓別人看見你也需要支持。',
+    teacherQuestion: '我在哪裡一直照亮別人，卻沒有讓自己的需要被看見？',
+  },
+};
+
+const ASTRO_SIGN_MEMBER_COPY: Record<string, SymbolMemberCopy> = {
+  牡羊: {
+    gift: '你需要直接感、行動感與可以自己開路的空間。',
+    shadow: '卡住時容易太快反應，還沒聽完就先衝出去。',
+    teacherQuestion: '我最近是需要勇敢開始，還是需要先慢下來看清楚？',
+  },
+  金牛: {
+    gift: '你需要穩定、身體感與能慢慢累積的安全感。',
+    shadow: '卡住時容易太怕改變，明知道不適合也不想動。',
+    teacherQuestion: '我現在守住的是價值，還是只是習慣性的安全感？',
+  },
+  雙子: {
+    gift: '你需要理解、交流與讓資訊流動，說出來會幫你釐清自己。',
+    shadow: '卡住時容易想太多、分心太多，真正的感受反而被跳過。',
+    teacherQuestion: '我現在需要更多資訊，還是需要把已知的事整理成決定？',
+  },
+  巨蟹: {
+    gift: '你需要情感安全、歸屬感與能照顧自己也照顧他人的空間。',
+    shadow: '卡住時容易用保護殼防衛，或把過去感受帶進現在。',
+    teacherQuestion: '我現在的防衛是在保護我，還是讓我無法靠近真正想要的人事物？',
+  },
+  獅子: {
+    gift: '你需要被看見、創造與真心投入，越真誠越有光。',
+    shadow: '卡住時容易太在意表現，怕不被肯定就不敢自然發揮。',
+    teacherQuestion: '我現在想被看見的是成就，還是真正的自己？',
+  },
+  處女: {
+    gift: '你需要把事情整理清楚，能透過細節、修正與服務建立價值。',
+    shadow: '卡住時容易過度挑剔自己，一直修到不敢開始。',
+    teacherQuestion: '我現在的修正是讓事情更好，還是在拖延真正開始？',
+  },
+  天秤: {
+    gift: '你需要關係中的平衡、互相理解與好好協調的空間。',
+    shadow: '卡住時容易太怕衝突，為了和諧先放掉自己的立場。',
+    teacherQuestion: '我現在維持的和平，有沒有包含我自己的真實需求？',
+  },
+  天蠍: {
+    gift: '你需要深度、真相與真正可信任的連結，不適合只停在表面。',
+    shadow: '卡住時容易太警戒或太想掌控，反而更難放鬆。',
+    teacherQuestion: '我現在想控制的是局面，還是害怕再次受傷的自己？',
+  },
+  射手: {
+    gift: '你需要意義、遠方與能讓你擴展視野的方向。',
+    shadow: '卡住時容易只想離開，卻沒有整理真正要追求的是什麼。',
+    teacherQuestion: '我現在想追的是自由，還是一個更有意義的方向？',
+  },
+  摩羯: {
+    gift: '你需要長期目標、責任感與能一步步建立成果的路線。',
+    shadow: '卡住時容易把自己逼太緊，用表現證明價值。',
+    teacherQuestion: '我現在承擔的責任，哪些是真的必要，哪些只是我不敢放下？',
+  },
+  水瓶: {
+    gift: '你需要獨立思考、系統視角與跟一般規則保持距離的空間。',
+    shadow: '卡住時容易太抽離，知道很多卻不一定讓人靠近。',
+    teacherQuestion: '我現在需要保持距離看清楚，還是需要讓真實感受進來？',
+  },
+  雙魚: {
+    gift: '你需要想像力、感受力與能讓心柔軟下來的空間。',
+    shadow: '卡住時容易界線模糊，把別人的情緒也當成自己的責任。',
+    teacherQuestion: '我現在感受到的是自己的需要，還是我吸收了別人的狀態？',
+  },
+};
+
+const NUMEROLOGY_PROFILE_COPY: Record<string, NumerologyProfileCopy> = {
+  '1': {
+    headline: '1：你需要感覺自己有主導權，才會真的動起來',
+    lead: '你通常不是沒有能力，而是需要一個清楚的起點。當方向模糊時，你會比別人更容易急、悶或想自己扛。',
+    mirror: '如果最近覺得卡，可能不是你不夠努力，而是你把所有責任都攬到自己身上，忘了先定義真正要解決的問題。',
+    advantage: '你的優勢是開路、決定、把事情從零推到一。',
+    shadow: '你的卡點是太急著證明自己，或不容易開口求助。',
+    action: '今天先選一件你能主導的小事，把它完成，不需要一次扛完整局。',
+  },
+  '2': {
+    headline: '2：你很會感受關係氣氛，但要學會不把所有情緒都收進自己身上',
+    lead: '你常能讀到別人的需要，也擅長協調氣氛。問題是，你有時會太快配合，最後反而不知道自己真正想要什麼。',
+    mirror: '如果你之前被算成 2，那是在看你最後落地的底色：關係、合作、界線與安全感。',
+    advantage: '你的優勢是敏感、同理、連結與讓人安心。',
+    shadow: '你的卡點是怕衝突、怕讓人失望，或把別人的狀態誤以為是自己的責任。',
+    action: '今天先練習一句話：「我需要想一下再回覆你。」這會幫你把界線放回來。',
+  },
+  '3': {
+    headline: '3：你需要把感受說出來，才會重新找回流動感',
+    lead: '你不是只適合開心或外向，而是很需要表達。當你長期壓住情緒，靈感與行動力都會變鈍。',
+    mirror: '如果最近覺得散，可能是你腦中有太多未說出口的感受，需要先整理成話。',
+    advantage: '你的優勢是表達、創作、帶動氣氛與把複雜感受變得可理解。',
+    shadow: '你的卡點是逃避沉重議題，或用忙碌、玩笑蓋過真正的需要。',
+    action: '今天寫下三句真心話：我在意什麼、我害怕什麼、我下一步要做什麼。',
+  },
+  '4': {
+    headline: '4：你需要穩定架構，混亂會讓你比別人更耗能',
+    lead: '你通常很重視實際、可靠與可執行。當事情太飄、規則一直變，你會很難安心。',
+    mirror: '如果最近很累，可能是生活裡有太多未整理的責任，讓你一直在補洞。',
+    advantage: '你的優勢是規劃、落地、負責與建立秩序。',
+    shadow: '你的卡點是太硬撐、太怕失控，或把安全感綁在完美表現上。',
+    action: '今天只整理一個範圍：桌面、行程、帳務或一段關係的界線。',
+  },
+  '5': {
+    headline: '5：你需要空間與變化，但自由也需要方向感',
+    lead: '你很容易被新鮮感、可能性與移動吸引。你不是不穩，而是需要知道自己為什麼要前進。',
+    mirror: '如果最近覺得卡，可能不是你不想承諾，而是眼前的選擇沒有讓你感覺到生命力。',
+    advantage: '你的優勢是彈性、探索、溝通與快速適應。',
+    shadow: '你的卡點是容易分心、逃避限制，或用新的刺激避開真正要面對的事。',
+    action: '今天選一個方向實驗 24 小時，不急著承諾一輩子。',
+  },
+  '6': {
+    headline: '6：你很在乎愛與責任，但要小心把照顧變成壓力',
+    lead: '你容易看見誰需要被照顧，也很在乎關係是否和諧。你的課題是：愛人時不要把自己消耗掉。',
+    mirror: '如果最近覺得委屈，可能是你給太多、說太少，讓別人以為你一直都可以。',
+    advantage: '你的優勢是照顧、美感、責任感與讓關係變得更溫暖。',
+    shadow: '你的卡點是過度負責、想修好所有人，或用付出換安全感。',
+    action: '今天把一個責任分出去，或清楚說出你也需要被支持。',
+  },
+  '7': {
+    headline: '7：你需要理解事情背後的原因，不能只被表面答案打發',
+    lead: '你常會想得很深，也需要獨處整理。你不是冷淡，而是需要時間把資訊消化成自己的答案。',
+    mirror: '如果最近想躲起來，可能是外界太吵，讓你無法聽見真正的判斷。',
+    advantage: '你的優勢是洞察、研究、直覺與看見深層脈絡。',
+    shadow: '你的卡點是想太多、過度懷疑，或因為怕不準備好而遲遲不行動。',
+    action: '今天留 20 分鐘不被打擾，只問自己：我真正知道的是什麼？還沒證實的是什麼？',
+  },
+  '8': {
+    headline: '8：你需要把能力變成成果，也要學會不只用成敗評價自己',
+    lead: '你對結果、資源與影響力很敏銳。當你把力量用對地方，會很能整合人事物。',
+    mirror: '如果最近壓力大，可能是你把價值感綁在表現上，忘了成果也需要節奏。',
+    advantage: '你的優勢是管理、判斷、整合資源與承擔大局。',
+    shadow: '你的卡點是控制感太重、太怕失敗，或容易把自己逼到過勞。',
+    action: '今天先定義一個真正重要的成果，刪掉一件只是看起來很忙的事。',
+  },
+  '9': {
+    headline: '9：你看事情很有大局感，但要學會把理想落到眼前一步',
+    lead: '你容易感受到更大的意義，也常想幫助別人。你的課題是不要因為想照顧全部，反而忽略自己現在的位置。',
+    mirror: '如果最近感到失望，可能是理想與現實落差太大，需要先回到可執行的範圍。',
+    advantage: '你的優勢是包容、整合、同理與看見長遠意義。',
+    shadow: '你的卡點是過度犧牲、難以放下，或對自己與世界都太嚴格。',
+    action: '今天只做一件能讓世界或自己好一點的小事，不需要一次拯救全部。',
+  },
+  '11/2': {
+    headline: '11/2：你直覺很強，但真正的課題常在關係、界線與安全感',
+    lead: '11 代表放大的感受力與靈感，2 代表最後要回到合作、關係與界線。你可能很快讀到氣氛，但也容易被氣氛影響。',
+    mirror: '你之前被算成 2，是因為有些算法會把 11 繼續化簡。MELE 顯示 11/2，是同時保留「敏銳天線」與「關係底色」。',
+    advantage: '你的優勢是靈感、同理、感受細節與把人連結起來。',
+    shadow: '你的卡點是過度敏感、怕衝突、或把別人的期待誤認成自己的責任。',
+    action: '今天先不要急著替別人感受。先問自己：這是我的感覺，還是我接收到別人的情緒？',
+  },
+  '22/4': {
+    headline: '22/4：你有把大想法落地的能力，但需要穩定步驟',
+    lead: '22 代表大型建構力，4 代表制度、步驟與耐心。你的力量不在一時爆發，而在把願景變成可以真的完成的路線。',
+    mirror: '你若被算成 4，是因為算法只看最後底色。22/4 則提醒你：你的 4 不是普通穩定，而是帶著更大的建構課題。',
+    advantage: '你的優勢是規劃、整合、承擔與把理想落地。',
+    shadow: '你的卡點是壓力過大、怕失控，或因為標準太高而不敢開始。',
+    action: '今天把一個大目標拆成第一個可驗證的小步驟。',
+  },
+  '33/6': {
+    headline: '33/6：你很容易承接他人的需要，但愛人之前要先照顧自己',
+    lead: '33 放大了照顧、支持與陪伴能力，6 則提醒你回到責任、家庭、關係與美感。',
+    mirror: '你若被算成 6，是因為算法只看最後底色。33/6 會多看見你對他人痛苦的敏感度與承接力。',
+    advantage: '你的優勢是陪伴、包容、支持與讓人感覺被接住。',
+    shadow: '你的卡點是過度付出、想拯救所有人，或把被需要當成被愛。',
+    action: '今天先問自己：我願意幫忙到哪裡？哪一段需要交還給對方？',
+  },
+};
+
+function numerologyProfile(data: Dict) {
+  const lifePath = firstValue(data, ['lifePathDisplay', 'lifePath'], '生命靈數');
+  const reduced = firstValue(data, ['lifePathReduced', 'baseNumber'], '');
+  const birthday = firstValue(data, ['birthDayDisplay', 'birthDay'], '生日數');
+  const archetype = firstValue(data, ['lifePathArchetype', 'birthDayArchetype'], '生命原型');
+  const profileKey = lifePath.startsWith('11') ? '11/2'
+    : lifePath.startsWith('22') ? '22/4'
+      : lifePath.startsWith('33') ? '33/6'
+        : reduced || lifePath;
+  const copy = NUMEROLOGY_PROFILE_COPY[profileKey] ?? NUMEROLOGY_PROFILE_COPY[reduced] ?? NUMEROLOGY_PROFILE_COPY['2'];
+
+  return { lifePath, reduced, birthday, archetype, copy };
+}
+
+function buildMemberResonance(result: CalcResponse): MemberResonance {
+  const data = result.data ?? {};
+  const question = firstQuestion(result);
+
+  if (result.tool === 'tarot') {
+    const draw = asDict(asArray(data.cards)[0]);
+    const card = asDict(draw.card);
+    const name = firstValue(card, ['name_zh', 'name_en'], '這張牌');
+    const position = positionLabel(draw.position);
+    const keywords = compact(keywordsFrom(draw, card).slice(0, 3), '、') || '當下訊息';
+
+    return {
+      eyebrow: '先給會員的命中感',
+      title: `${name}（${position}）`,
+      lead: `它不是在判斷好壞，而是在回應你現在最明顯的拉扯：「${question}」。`,
+      mirror: `核心感覺：${keywords}。先看這幾個字有沒有刺中你，不用一次讀完整份。`,
+      points: [
+        { label: '感覺', title: '你想面對，但還有壓力', body: '先承認這件事對你有重量。' },
+        { label: '卡點', title: '不要急著求結論', body: '先分清楚：你怕的是對方反應，還是自己的答案。' },
+        { label: '行動', title: '今天只做一件事', body: '把問題縮成一句：「我下一步可以先確認什麼？」' },
+      ],
+      nextQuestion: '這張牌比較像你、你爸，還是你們之間的氣氛？',
+    };
+  }
+
+  if (result.tool === 'runes') {
+    const draw = asDict(asArray(data.runes)[0]);
+    const rune = asDict(draw.rune);
+    const name = firstValue(rune, ['zh', 'name'], '這枚符文');
+    const position = positionLabel(draw.position);
+    const keywords = compact(keywordsFrom(draw, rune).slice(0, 3), '、') || '當下提醒';
+
+    return {
+      eyebrow: '先給會員的命中感',
+      title: `${name}（${position}）在提醒：「${question}」`,
+      lead: '盧恩不適合講太長，它像一句古老的短訊息：把注意力拉回你今天真正能處理的那一步。',
+      mirror: `你可能已經知道該做什麼，只是需要一個更清楚的界線。這次訊息聚焦在「${keywords}」。`,
+      points: [
+        { label: '感覺', title: '先看第一直覺', body: '如果符文一出現你就有某個人、事件或選擇浮上來，那通常就是今天要先看的地方。' },
+        { label: '卡點', title: '不要把簡單變複雜', body: '盧恩的提醒通常很直接；越想一次解完全部，越容易錯過最重要的一句。' },
+        { label: '行動', title: '留下一句行動咒語', body: '把今天的結果濃縮成一句話，例如「我先守住界線」或「我先走出一步」。' },
+      ],
+      nextQuestion: '這枚符文比較像在叫你前進、停下，還是先保護自己？',
+    };
+  }
+
+  if (result.tool === 'humandesign') {
+    const type = firstValue(data, ['type'], '你的類型');
+    const authority = firstValue(data, ['authority'], '內在權威');
+    const strategy = firstValue(data, ['strategy'], '你的策略');
+    const gates = gateCards(data).slice(0, 3).map((card) => card.title.replace('閘門 ', '')).join('、') || '目前啟動的閘門';
+
+    return {
+      eyebrow: '先給會員的命中感',
+      title: `${type} 的重點不是更用力，而是用對節奏`,
+      lead: `這張圖先看三件事：你怎麼跟世界互動、怎麼做決定，以及哪些閘門正在形成你的行為習慣。`,
+      mirror: `你可能常在「要不要現在決定」上用頭腦搶答；但這張圖提醒你先回到「${strategy}」與「${authority}」。`,
+      points: [
+        { label: '類型', title: type, body: '這不是人格標籤，而是你比較省力的互動方式；照錯節奏時，容易覺得一直在硬撐。' },
+        { label: '權威', title: authority, body: '權威是做決定的內在訊號。越重要的選擇，越不適合只靠焦慮或道理立刻判斷。' },
+        { label: '閘門', title: gates, body: '啟動閘門像你身上比較常亮的開關；先看最有感的三個，比一次讀完 64 個更容易吸收。' },
+      ],
+      nextQuestion: '最近一個重要決定，你是用身體、情緒、直覺，還是頭腦先回答？',
+    };
+  }
+
+  if (result.tool === 'bazi') {
+    const dayMaster = firstValue(data, ['dayMaster'], '日主');
+    const wuxing = firstValue(data, ['dayMasterWuxing', 'wuxing'], '五行');
+
+    return {
+      eyebrow: '先給會員的命中感',
+      title: `你的入口是日主 ${dayMaster}，先看你怎麼消耗與補充能量`,
+      lead: '八字初階不要先講吉凶，先讓會員聽懂：自己遇到事情時，通常會用哪種方式反應。',
+      mirror: `你可能會在某些情境很能撐，但一累就變成固定反應。這張盤先把「${wuxing}」拿出來看平衡。`,
+      points: [
+        { label: '自己', title: `日主 ${dayMaster}`, body: '日主像你的內在質地，先看你自然的反應方式，再看什麼會讓你更穩。' },
+        { label: '卡點', title: '五行不是好壞分數', body: '某個元素多，不代表一定好；少，也不代表一定差。重點是能量流動是否卡住。' },
+        { label: '行動', title: '補一個平衡動作', body: '今天先做一件能讓生活回穩的事：整理、溝通、休息、規劃或把需求說清楚。' },
+      ],
+      nextQuestion: '你最近最常是太急、太撐、太亂，還是太不想動？',
+    };
+  }
+
+  if (result.tool === 'maya') {
+    const kin = firstValue(data, ['kin'], 'Kin');
+    const label = firstValue(data, ['label', 'seal'], '本命 Kin');
+    const tone = firstValue(data, ['tone'], '調性');
+    const copy = mayaMemberCopy(label);
+    const oracle = asDict(data.oracle);
+    const guideSeal = formatPrimitive(asDict(asDict(oracle.guide).seal));
+    const analogSeal = formatPrimitive(asDict(asDict(oracle.analog).seal));
+    const antipodeSeal = formatPrimitive(asDict(asDict(oracle.antipode).seal));
+    const guideCopy = mayaMemberCopy(guideSeal);
+    const analogCopy = mayaMemberCopy(analogSeal);
+    const antipodeCopy = mayaMemberCopy(antipodeSeal);
+
+    return {
+      eyebrow: '先給會員的命中感',
+      title: `${label} 不是稱號，而是在說你怎麼做選擇、怎麼卡住`,
+      lead: `你的入口是 ${kin}、${tone}、${label}。白話來看，${copy.gift}`,
+      mirror: `如果這段有中，通常會中在這裡：${copy.shadow}`,
+      points: [
+        { label: '主軸', title: label, body: copy.gift },
+        { label: '借力', title: compact([guideSeal, analogSeal], ' / ') || '引導與支持', body: compact([guideCopy.gift, analogCopy.gift], ' ') || '引導力量像指南針，支持力量像補給，這兩個位置最適合轉成下一步行動。' },
+        { label: '卡點', title: antipodeSeal || '挑戰力量', body: antipodeCopy.shadow },
+      ],
+      nextQuestion: copy.teacherQuestion,
+    };
+  }
+
+  if (result.tool === 'ziwei') {
+    const mingPalace = palaceByName(data, '命宮');
+    const shenPalace = palaceByName(data, '身宮');
+    const career = describeZiweiPalace(data, '官祿', '工作風格、職涯方向與適合投入的位置');
+    const relationship = describeZiweiPalace(data, '夫妻', '關係模式、親密安全感與伴侶互動');
+    const fortune = describeZiweiPalace(data, '財帛', '賺錢方式、資源流動與金錢壓力');
+    const ming = compact([cleanText(mingPalace.earthlyBranch), palaceStarText(mingPalace) || firstValue(data, ['mingGong', 'lifePalace'], '命宮')], '｜');
+    const shen = compact([cleanText(shenPalace.earthlyBranch), palaceStarText(shenPalace) || firstValue(data, ['shenGong', 'bodyPalace'], '身宮')], '｜') || '身宮';
+
+    return {
+      eyebrow: '先給會員的命中感',
+      title: `你的命盤不是要背十二宮，而是先看哪個生活題目最刺中你`,
+      lead: `你的命宮入口是 ${ming || '命宮'}。如果這張盤有命中，通常會命中在「我到底要用哪種方式面對世界、工作與關係」。`,
+      mirror: `這張盤已經露出三個很適合問老師的題目：${career.title}、${relationship.title}、${fortune.title}。你不需要一次看完，只要先挑最有感的一個。`,
+      points: [
+        { label: '主軸', title: `命宮 ${ming || '命宮'}`, body: `命宮不是只代表位置，而是你的第一層人生反應：遇到壓力、選擇與人際時，你習慣怎麼站上舞台。${ming.includes('無主星') ? '命宮無主星時，更要看對宮與三方四正，這很適合交給老師深看。' : ''}` },
+        { label: '現實', title: `身宮 ${shen}`, body: '身宮看你長大後更常用的落地方式。它會回答：你不是怎麼想，而是最後會怎麼承擔、怎麼做選擇。' },
+        { label: '最想問', title: career.title, body: `${career.body} 如果你最近剛好卡在職涯或定位，這一宮會比泛泛看整張盤更有用。` },
+        { label: '關係線', title: relationship.title, body: `${relationship.body} 如果你一邊想靠近、一邊又不安，這裡很值得帶去問老師。` },
+      ],
+      nextQuestion: '這張紫微盤裡，你最想先問老師：感情、事業、財務，還是命宮主軸？',
+    };
+  }
+
+  if (result.tool === 'astro') {
+    const sun = firstValue(data, ['sun'], '太陽');
+    const moon = firstValue(data, ['moon'], '月亮');
+    const asc = firstValue(data, ['ascendant'], '上升');
+    const sunCopy = astroMemberCopy(sun);
+    const moonCopy = astroMemberCopy(moon);
+    const ascCopy = astroMemberCopy(asc);
+
+    return {
+      eyebrow: '先給會員的命中感',
+      title: `你的星盤不是只有星座，而是三個自己在拉扯`,
+      lead: `太陽 ${sun} 說的是你想活出的方向：${sunCopy.gift}`,
+      mirror: `月亮 ${moon} 會透露你真正需要的安全感：${moonCopy.gift} 但卡住時，${moonCopy.shadow}`,
+      points: [
+        { label: '想成為', title: `太陽 ${sun}`, body: sunCopy.gift },
+        { label: '真正需要', title: `月亮 ${moon}`, body: moonCopy.shadow },
+        { label: '別人先看到', title: `上升 ${asc}`, body: `${ascCopy.gift} 如果你覺得別人誤會你，通常要從上升和月亮的落差開始看。` },
+      ],
+      nextQuestion: moonCopy.teacherQuestion,
+    };
+  }
+
+  const profile = numerologyProfile(data);
+
+  return {
+    eyebrow: '先給會員的命中感',
+    title: profile.copy.headline,
+    lead: profile.copy.lead,
+    mirror: profile.copy.mirror,
+    points: [
+      { label: '主軸', title: `生命靈數 ${profile.lifePath}`, body: `你的入口是 ${profile.lifePath}，底色是 ${profile.reduced || '核心數字'}。先把它當成一種反覆出現的反應節奏，而不是固定命運。` },
+      { label: '優勢', title: profile.archetype, body: profile.copy.advantage },
+      { label: '卡點', title: `生日數 ${profile.birthday}`, body: profile.copy.shadow },
+      { label: '行動', title: '今天先做一個小選擇', body: profile.copy.action },
+    ],
+    nextQuestion: '這段比較像你的優勢、你的壓力反應，還是你在關係裡常遇到的狀況？',
+  };
 }
 
 function buildPersonalReading(result: CalcResponse): PersonalReading {
@@ -768,31 +1350,37 @@ function buildPersonalReading(result: CalcResponse): PersonalReading {
   if (result.tool === 'maya') {
     const kin = firstValue(data, ['kin'], 'Kin');
     const label = firstValue(data, ['label', 'seal'], '本命 Kin');
+    const tone = firstValue(data, ['tone'], '調性');
+    const copy = mayaMemberCopy(label);
     return {
       eyebrow: 'PERSONAL READING',
       title: `${title}：${label}`,
-      subtitle: `馬雅曆先看 ${kin} 與 ${label}，再看引導、支持、挑戰與隱藏力量如何互相牽動。`,
+      subtitle: `你的入口是 ${kin}、${tone}、${label}。這不是稱號，而是在說你怎麼推進事情、怎麼卡住、怎麼找回節奏。`,
       points: [
-        { label: '我在看什麼', title: 'Kin 與圖騰', body: 'Kin 是你的能量座標，圖騰像主要語氣，調性則描述這股能量如何運作。' },
-        { label: '我的優勢', title: '支持力量', body: '支持力量不是額外能力，而是你比較容易借力的位置，適合拿來穩住日常節奏。' },
-        { label: '可能卡點', title: '挑戰力量', body: '挑戰力量不代表壞事，而是提醒你在哪些情境容易過度防衛、猶豫或逃避。' },
-        { label: '今日行動', title: '用一個角度驗證', body: '今天挑一件正在發生的事，分別用引導、支持、挑戰三個角度看一次。' },
+        { label: '我在看什麼', title: `${label} 的本人感`, body: copy.gift },
+        { label: '我的優勢', title: '可借力的位置', body: '支持與引導不是裝飾資訊，而是當你卡住時，最適合拿來當下一步方法的力量。' },
+        { label: '可能卡點', title: '挑戰力量', body: copy.shadow },
+        { label: '想問老師', title: '把感覺變成問題', body: copy.teacherQuestion },
       ],
     };
   }
 
   if (result.tool === 'ziwei') {
-    const ming = firstValue(data, ['mingGong'], '命宮');
-    const shen = firstValue(data, ['shenGong'], '身宮');
+    const mingPalace = palaceByName(data, '命宮');
+    const shenPalace = palaceByName(data, '身宮');
+    const career = describeZiweiPalace(data, '官祿', '工作風格、職涯方向與適合投入的位置');
+    const relationship = describeZiweiPalace(data, '夫妻', '關係模式、親密安全感與伴侶互動');
+    const ming = compact([cleanText(mingPalace.earthlyBranch), palaceStarText(mingPalace) || firstValue(data, ['mingGong'], '命宮')], '｜') || '命宮';
+    const shen = compact([cleanText(shenPalace.earthlyBranch), palaceStarText(shenPalace) || firstValue(data, ['shenGong'], '身宮')], '｜') || '身宮';
     return {
       eyebrow: 'PERSONAL READING',
-      title: `${title}：${ming}`,
-      subtitle: `紫微先看命宮與身宮。命宮像人生主軸，身宮像你實際把人生走出來的方式。`,
+      title: `${title}：先挑一個真正想問的宮位`,
+      subtitle: `你的命宮入口是 ${ming}。紫微不是背十二宮，而是把人生主軸、工作、關係與財務分題看清楚。`,
       points: [
-        { label: '我在看什麼', title: '命宮身宮', body: `這張盤的入口是 ${ming} 與 ${shen}，先抓主軸，再看其他宮位會更清楚。` },
-        { label: '我的優勢', title: '主星資源', body: '主星代表你容易展現的性格資源，適合用來判斷工作模式、關係互動與決策風格。' },
-        { label: '可能卡點', title: '宮位壓力', body: '不要一次解讀全部十二宮。當資訊太多時，反而容易失去真正想問的問題。' },
-        { label: '今日行動', title: '選一個宮位', body: '今天只選事業、感情、財務或家庭其中一個主題，讓解讀聚焦。' },
+        { label: '我在看什麼', title: `命宮 ${ming}`, body: '命宮不是名詞解釋，而是你遇到人生選擇時，最常站出來的那一種反應方式。' },
+        { label: '我的落地', title: `身宮 ${shen}`, body: '身宮看你長大後更常用的實際做法，常常比「我以為我是怎樣的人」更接近現實。' },
+        { label: '可能卡點', title: relationship.title, body: relationship.body },
+        { label: '想問老師', title: career.title, body: `${career.body} 這裡很適合延伸成一場老師諮詢，因為它需要合參三方四正，不適合只看單一宮位。` },
       ],
     };
   }
@@ -801,30 +1389,32 @@ function buildPersonalReading(result: CalcResponse): PersonalReading {
     const sun = firstValue(data, ['sun'], '太陽');
     const moon = firstValue(data, ['moon'], '月亮');
     const asc = firstValue(data, ['ascendant'], '上升');
+    const sunCopy = astroMemberCopy(sun);
+    const moonCopy = astroMemberCopy(moon);
+    const ascCopy = astroMemberCopy(asc);
     return {
       eyebrow: 'PERSONAL READING',
-      title: `${title}：${sun}`,
-      subtitle: `占星入門先看太陽、月亮與上升。這三個點能快速整理你的意志、需求與外在應對。`,
+      title: `${title}：三個自己同時在說話`,
+      subtitle: `太陽 ${sun}、月亮 ${moon}、上升 ${asc} 不是三個名詞，而是你想成為的樣子、真正需要的安全感、以及別人先看到的你。`,
       points: [
-        { label: '我在看什麼', title: '太陽月亮上升', body: `太陽是 ${sun}，月亮是 ${moon}，上升是 ${asc}。先用這三點建立整體感。` },
-        { label: '我的優勢', title: '可發展的性格資源', body: '太陽給方向，月亮給安全感，上升給行動方式。三者能互相補位。' },
-        { label: '可能卡點', title: '只看單一星座', body: '如果只看太陽星座，容易把自己看得太扁。要把情緒需求與外在反應一起看。' },
-        { label: '今日行動', title: '記錄一個反應', body: '今天觀察一次你面對壓力時的第一反應，它通常很接近上升與月亮的運作。' },
+        { label: '我想成為', title: `太陽 ${sun}`, body: sunCopy.gift },
+        { label: '我真正需要', title: `月亮 ${moon}`, body: moonCopy.shadow },
+        { label: '別人先看到', title: `上升 ${asc}`, body: ascCopy.gift },
+        { label: '想問老師', title: '三者落差', body: '如果你覺得自己明明想往前，情緒卻一直拉住，或外在表現和內在需求不一致，這就很適合帶去問老師。' },
       ],
     };
   }
 
-  const lifePath = firstValue(data, ['lifePath'], '生命靈數');
-  const archetype = firstValue(data, ['lifePathArchetype', 'birthDayArchetype'], '生命原型');
+  const profile = numerologyProfile(data);
   return {
     eyebrow: 'PERSONAL READING',
-    title: `${title}：${lifePath}`,
-    subtitle: `生命靈數先看核心數字，再看原型如何落在你的生活選擇中。`,
+    title: `${title}：${profile.lifePath}`,
+    subtitle: `先看 ${profile.lifePath} 的核心節奏，再看它怎麼落在關係、壓力與日常選擇裡。若顯示 11/2，代表同時保留大師數 11 與底色數 2。`,
     points: [
-      { label: '我在看什麼', title: '生命數與生日數', body: `你的入口是 ${lifePath}，可搭配 ${archetype} 理解你反覆出現的行動模式。` },
-      { label: '我的優勢', title: '穩定特質', body: '生命數通常代表你自然會走回去的能力，也是你遇到壓力時最熟悉的處理方式。' },
-      { label: '可能卡點', title: '慣性模式', body: '每個數字都有慣性。當你太依賴熟悉方式，原本的優勢也可能變成限制。' },
-      { label: '今日行動', title: '把數字變成選擇', body: '今天挑一件小事，用你的核心特質主動做一個更清楚的選擇。' },
+      { label: '我在看什麼', title: '生命數與生日數', body: `你的入口是 ${profile.lifePath}，生日數是 ${profile.birthday}。前者像人生主軸，後者像你很自然會拿出來使用的能力。` },
+      { label: '我的優勢', title: profile.archetype, body: profile.copy.advantage },
+      { label: '可能卡點', title: '優勢過度使用時', body: profile.copy.shadow },
+      { label: '今日行動', title: '把數字變成選擇', body: profile.copy.action },
     ],
   };
 }
@@ -833,7 +1423,7 @@ function buildInsight(result: CalcResponse): ResultInsight {
   const data = result.data ?? {};
   const base = TOOL_COPY[result.tool];
   const keyMap: Record<CalcTool, string[]> = {
-    numerology: ['lifePath', 'birthDay', 'lifePathArchetype', 'birthDayArchetype'],
+    numerology: ['lifePathDisplay', 'lifePathReduced', 'birthDayDisplay', 'calculationNote', 'lifePathArchetype', 'birthDayArchetype'],
     maya: ['kin', 'label', 'tone', 'seal', 'classicTzolkin', 'starroot'],
     bazi: ['pillars', 'dayMaster', 'dayMasterYinYang', 'dayMasterWuxing', 'wuxing', 'nayin'],
     ziwei: ['mingGong', 'shenGong', 'fiveElementsClass', 'palaces', 'majorStars'],
@@ -872,7 +1462,7 @@ function countResultSignals(result: CalcResponse): number {
   }
   if (result.tool === 'maya') return ['kin', 'tone', 'seal', 'guide', 'analog', 'antipode', 'occult'].filter((key) => data[key]).length;
   if (result.tool === 'astro') return ['sun', 'moon', 'ascendant', 'midheaven'].filter((key) => data[key]).length;
-  return ['lifePath', 'birthDay', 'lifePathArchetype', 'birthDayArchetype'].filter((key) => data[key]).length;
+  return ['lifePathDisplay', 'lifePathReduced', 'birthDayDisplay', 'calculationNote', 'lifePathArchetype', 'birthDayArchetype'].filter((key) => data[key]).length;
 }
 
 function buildGameProfile(result: CalcResponse, insight: ResultInsight, reading: PersonalReading): GameProfile {
@@ -1030,6 +1620,35 @@ function ZiweiPlainGuide({ result }: { result: CalcResponse }) {
   );
 }
 
+function MemberResonancePanel({ resonance }: { resonance: MemberResonance }) {
+  return (
+    <section className="member-resonance" aria-label="會員初步命中感">
+      <div className="member-resonance__header">
+        <span>{resonance.eyebrow}</span>
+        <h2>{resonance.title}</h2>
+        <p>{resonance.lead}</p>
+      </div>
+
+      <div className="member-resonance__mirror">
+        <strong>你可以先這樣理解</strong>
+        <p>{resonance.mirror}</p>
+      </div>
+
+      <div className="member-resonance__grid">
+        {resonance.points.map((point) => (
+          <article key={`${point.label}-${point.title}`}>
+            <span>{point.label}</span>
+            <h3>{point.title}</h3>
+            <p>{point.body}</p>
+          </article>
+        ))}
+      </div>
+
+      <p className="member-resonance__question">帶去問老師：{resonance.nextQuestion}</p>
+    </section>
+  );
+}
+
 function BeginnerGuidePanel({ guide }: { guide: BeginnerGuide }) {
   return (
     <section className="beginner-guide" aria-label="會員初階導讀">
@@ -1107,7 +1726,7 @@ function ResultGamePanel({ profile }: { profile: GameProfile }) {
 
 function ResultInsightPanel({ insight, speech }: { insight: ResultInsight; speech?: string }) {
   const [expanded, setExpanded] = useState(false);
-  const [activeCardIndex, setActiveCardIndex] = useState<number | null>(insight.cards.length > 0 ? 0 : null);
+  const [activeCardIndex, setActiveCardIndex] = useState<number | null>(null);
   const [resonantCards, setResonantCards] = useState<number[]>([]);
   const hasManyCards = insight.cards.length > 4;
   const visibleCards = hasManyCards && !expanded ? insight.cards.slice(0, 3) : insight.cards;
@@ -1116,7 +1735,7 @@ function ResultInsightPanel({ insight, speech }: { insight: ResultInsight; speec
 
   useEffect(() => {
     setExpanded(false);
-    setActiveCardIndex(insight.cards.length > 0 ? 0 : null);
+    setActiveCardIndex(null);
     setResonantCards([]);
   }, [insight.title, cardSignature, insight.cards.length]);
 
@@ -1376,6 +1995,7 @@ function PointUnlockPanel({ result }: { result: CalcResponse }) {
   const [balance, setBalance] = useState<number | null>(null);
   const [claimedToday, setClaimedToday] = useState(false);
   const [unlocked, setUnlocked] = useState<Partial<Record<MemberUnlockType, boolean>>>({});
+  const [unlockedContent, setUnlockedContent] = useState<Partial<Record<MemberUnlockType, MemberUnlockedReading>>>({});
   const [busy, setBusy] = useState<'claim' | MemberUnlockType | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [ready, setReady] = useState(false);
@@ -1396,6 +2016,7 @@ function PointUnlockPanel({ result }: { result: CalcResponse }) {
         setBalance(null);
         setClaimedToday(false);
         setUnlocked({});
+        setUnlockedContent({});
         setReady(true);
         return;
       }
@@ -1417,7 +2038,7 @@ function PointUnlockPanel({ result }: { result: CalcResponse }) {
           .maybeSingle(),
         supabase
           .from('content_unlocks')
-          .select('unlock_type,scope_key')
+          .select('unlock_type,scope_key,metadata')
           .eq('user_id', user.id)
           .eq('tool', result.tool)
           .in('scope_key', MEMBER_UNLOCK_OPTIONS.map((option) => getUnlockScopeKey(result, option.type))),
@@ -1434,12 +2055,20 @@ function PointUnlockPanel({ result }: { result: CalcResponse }) {
       setClaimedToday(Boolean(claimResult.data));
 
       const nextUnlocked: Partial<Record<MemberUnlockType, boolean>> = {};
-      const rows = (unlockResult.data || []) as Array<{ unlock_type?: MemberUnlockType; scope_key?: string }>;
+      const nextUnlockedContent: Partial<Record<MemberUnlockType, MemberUnlockedReading>> = {};
+      const rows = (unlockResult.data || []) as Array<{
+        unlock_type?: MemberUnlockType;
+        scope_key?: string;
+        metadata?: { unlocked_content?: MemberUnlockedReading } | null;
+      }>;
       MEMBER_UNLOCK_OPTIONS.forEach((option) => {
         const scopeKey = getUnlockScopeKey(result, option.type);
-        nextUnlocked[option.type] = rows.some((row) => row.unlock_type === option.type && row.scope_key === scopeKey);
+        const row = rows.find((item) => item.unlock_type === option.type && item.scope_key === scopeKey);
+        nextUnlocked[option.type] = Boolean(row);
+        if (row?.metadata?.unlocked_content) nextUnlockedContent[option.type] = row.metadata.unlocked_content;
       });
       setUnlocked(nextUnlocked);
+      setUnlockedContent(nextUnlockedContent);
       setReady(true);
     }
 
@@ -1491,10 +2120,7 @@ function PointUnlockPanel({ result }: { result: CalcResponse }) {
       p_tool: result.tool,
       p_scope_key: getUnlockScopeKey(result, option.type),
       p_cost: POINT_UNLOCK_COST,
-      p_metadata: {
-        computed_at: result.computed_at,
-        version: result.version,
-      },
+      p_metadata: buildUnlockContentMetadata(result),
     });
 
     if (error) {
@@ -1506,6 +2132,9 @@ function PointUnlockPanel({ result }: { result: CalcResponse }) {
     const payload = (data || {}) as PointRpcResult;
     setBalance(typeof payload.balance === 'number' ? payload.balance : Math.max(0, (balance ?? 0) - POINT_UNLOCK_COST));
     setUnlocked((prev) => ({ ...prev, [option.type]: true }));
+    if (payload.content) {
+      setUnlockedContent((prev) => ({ ...prev, [option.type]: payload.content }));
+    }
     setNotice(payload.already_unlocked ? `${option.label}已經解鎖，可以直接查看。` : `已用 100 點解鎖 ${option.label}。`);
     setBusy(null);
   };
@@ -1544,7 +2173,8 @@ function PointUnlockPanel({ result }: { result: CalcResponse }) {
       <div className="point-unlock__grid">
         {MEMBER_UNLOCK_OPTIONS.map((option) => {
           const isUnlocked = Boolean(unlocked[option.type]);
-          const reading = buildUnlockedReadingContent(result, option.type);
+          const reading = unlockedContent[option.type];
+          const hasRevealedContent = Boolean(reading);
           return (
             <article key={option.type} className={`point-unlock__option${isUnlocked ? ' is-unlocked' : ''}`}>
               <span>{option.eyebrow}</span>
@@ -1555,12 +2185,12 @@ function PointUnlockPanel({ result }: { result: CalcResponse }) {
                 <button
                   type="button"
                   onClick={() => unlockContent(option)}
-                  disabled={!userId || busy !== null || isUnlocked}
+                  disabled={!userId || busy !== null || (isUnlocked && hasRevealedContent)}
                 >
-                  {isUnlocked ? '已解鎖' : busy === option.type ? '解鎖中...' : `解鎖 ${option.label}`}
+                  {isUnlocked && hasRevealedContent ? '已解鎖' : busy === option.type ? '解鎖中...' : isUnlocked ? '載入內容' : `解鎖 ${option.label}`}
                 </button>
               </div>
-              {isUnlocked && (
+              {isUnlocked && reading && (
                 <div className="point-unlock__revealed">
                   <strong>{reading.title}</strong>
                   <p>{reading.summary}</p>
@@ -1641,6 +2271,7 @@ export function ToolResult({ result }: { result: CalcResponse | null }) {
   const insight = buildInsight(result);
   const personalReading = buildPersonalReading(result);
   const gameProfile = buildGameProfile(result, insight, personalReading);
+  const memberResonance = buildMemberResonance(result);
   const beginnerGuide = BEGINNER_GUIDES[result.tool];
 
   return (
@@ -1654,15 +2285,16 @@ export function ToolResult({ result }: { result: CalcResponse | null }) {
         />
       )}
 
-      <BeginnerGuidePanel guide={beginnerGuide} />
+      <MemberResonancePanel resonance={memberResonance} />
+      {result.tool !== 'tarot' && <BeginnerGuidePanel guide={beginnerGuide} />}
       {result.tool === 'maya' && <MayaTotemGallery activeSeal={result.data.seal} />}
-      <ResultGamePanel profile={gameProfile} />
-      <ResultInsightPanel insight={insight} speech={speech} />
+      {result.tool !== 'tarot' && <ResultGamePanel profile={gameProfile} />}
+      <ResultInsightPanel insight={insight} speech={result.tool === 'tarot' ? undefined : speech} />
       <ZiweiPlainGuide result={result} />
-      <PersonalReadingPanel reading={personalReading} />
+      {result.tool !== 'tarot' && <PersonalReadingPanel reading={personalReading} />}
       <PointUnlockPanel result={result} />
-      <ResultNextSteps tool={result.tool} />
-      <MemberActionPath tool={result.tool} />
+      {result.tool !== 'tarot' && <ResultNextSteps tool={result.tool} />}
+      {result.tool !== 'tarot' && <MemberActionPath tool={result.tool} />}
 
       {html && (
         <details className="result-backend-details">

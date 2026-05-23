@@ -71,7 +71,7 @@ NEXT_PUBLIC_LINE_OAUTH_PROVIDER=custom:line
 
 ## 4. 診斷
 
-執行：
+執行一般診斷：
 
 ```powershell
 npm run ops:check-auth
@@ -83,8 +83,22 @@ npm run ops:check-auth
 - Google provider public status。
 - LINE 前端開關與 provider 名稱。
 - 目前預期的 `/auth/callback`。
+- Google / LINE 外部平台要填的 Supabase callback：
+  - `https://<project-ref>.supabase.co/auth/v1/callback`
 
-它不能讀取第三方 client secret，也不能驗證 custom OAuth provider 是否真的存在；這部分要看 Supabase Dashboard。
+正式站檢查請明確帶網域：
+
+```powershell
+npm run ops:check-auth -- https://mele-chi.vercel.app
+```
+
+封測或上線前，若 Google / LINE 必須都可用，請使用硬性 gate：
+
+```powershell
+npm run ops:check-auth -- https://mele-chi.vercel.app --require-oauth
+```
+
+它不能讀取第三方 client secret、LINE channel 狀態、Google OAuth consent screen 審核狀態，或 Supabase Redirect allow list 的私有值；這些仍要看 Supabase / Google / LINE Dashboard。但 `--require-oauth` 會在 public Auth settings 顯示 provider 尚未啟用時直接失敗，避免把「尚未開通」誤判成可上線。
 
 ## 5. 驗收
 
@@ -98,11 +112,12 @@ npm run ops:check-auth
 
 正式站驗收：
 
-1. 使用正式網域跑 Google。
-2. 使用 LINE App 內建瀏覽器跑 LINE。
-3. 使用 Safari / Chrome 各跑一次。
-4. Supabase Auth Logs 中能看到 provider login success。
-5. Header 顯示使用者已登入，會員頁不再導回 `/account/login`。
+1. `npm run ops:check-auth -- https://mele-chi.vercel.app --require-oauth` 通過。
+2. 使用正式網域跑 Google。
+3. 使用 LINE App 內建瀏覽器跑 LINE。
+4. 使用 Safari / Chrome 各跑一次。
+5. Supabase Auth Logs 中能看到 provider login success。
+6. Header 顯示使用者已登入，會員頁不再導回 `/account/login`。
 
 ## 6. 常見錯誤
 

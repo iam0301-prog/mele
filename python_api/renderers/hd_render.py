@@ -277,6 +277,24 @@ def _render_gate_cards(active_gates: list[int], records: dict[int, list[dict]]) 
     return template.replace("__CARDS__", "".join(cards))
 
 
+def _render_member_prompt(type_label: str, authority_label: str, strategy: str) -> str:
+    return """
+<section class="hd-detail-panel">
+  <div class="hd-detail-title">會員白話導讀</div>
+  <div class="hd-detail-copy">
+    你先不用一次讀完所有閘門。先看類型、策略與權威：{type_label} 的重點，是用「{strategy}」減少硬撐，再用「{authority_label}」判斷重要選擇是否真的適合你。
+  </div>
+  <div class="hd-detail-copy">
+    如果你最近卡在工作、關係或要不要做某個決定，可以把這張圖帶去問老師：我現在是在照自己的節奏走，還是在用頭腦替焦慮搶答？
+  </div>
+</section>
+""".format(
+        type_label=escape(str(type_label)),
+        strategy=escape(str(strategy or "你的策略")),
+        authority_label=escape(str(authority_label)),
+    )
+
+
 def render(data: dict) -> dict:
     defined = set(data.get("definedCenters") or [])
     active_gates = sorted(int(g) for g in (data.get("activatedGates") or []))
@@ -378,7 +396,7 @@ def render(data: dict) -> dict:
 </g>
 </svg>"""
 
-    html = _render_gate_cards(active_gates, records)
+    html = _render_member_prompt(type_label, authority_label, strategy) + _render_gate_cards(active_gates, records)
     speech = (
         f"你的人類圖類型是 {type_label}，人生角色是 {profile}，內在權威是 {authority_label}。"
         f"這張圖目前點亮 {len(active_gates)} 個閘門、{len(defined_channels)} 條完整通道；"

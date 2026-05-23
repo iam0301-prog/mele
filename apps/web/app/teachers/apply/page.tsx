@@ -164,6 +164,7 @@ export default function ApplyPage() {
   };
 
   const submit = async () => {
+    if (submitting) return;
     if (!user) return;
     if (!specs.length) return toast(copy.apply.requiredSpecialty, 'error');
     if (!legalName || !displayName || !emailField || !phone || !introShort) return toast(copy.apply.requiredFields, 'error');
@@ -230,7 +231,9 @@ export default function ApplyPage() {
             {(['signin', 'signup'] as const).map((m) => (
               <button
                 key={m}
+                type="button"
                 onClick={() => setAuthMode(m)}
+                aria-pressed={authMode === m}
                 className={`flex-1 py-3 text-sm tracking-widest ${authMode === m ? 'text-accent border-b-2 border-accent' : 'text-white/60'}`}
               >
                 {m === 'signin' ? copy.apply.signIn : copy.apply.signUp}
@@ -239,7 +242,7 @@ export default function ApplyPage() {
           </div>
           <input type="email" placeholder={copy.apply.email} value={authEmail} onChange={(e) => setAuthEmail(e.target.value)} className="mele-input" />
           <input type="password" placeholder={copy.apply.password} minLength={6} value={authPwd} onChange={(e) => setAuthPwd(e.target.value)} className="mele-input" />
-          <button onClick={() => auth(authMode!)} disabled={authing} className="mele-btn-primary w-full">
+          <button type="button" onClick={() => auth(authMode!)} disabled={authing} aria-disabled={authing} className="mele-btn-primary w-full">
             {authing ? copy.apply.authing : authMode === 'signin' ? copy.apply.signIn : copy.apply.signUp}
           </button>
         </div>
@@ -371,7 +374,7 @@ export default function ApplyPage() {
           ))}
         </div>
 
-        <button onClick={submit} disabled={submitting} className="mele-btn-primary w-full">
+        <button type="button" onClick={submit} disabled={submitting} aria-disabled={submitting} className="mele-btn-primary w-full">
           {submitting ? copy.apply.submitting : copy.apply.submit}
         </button>
       </div>

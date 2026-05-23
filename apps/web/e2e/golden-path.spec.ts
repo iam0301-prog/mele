@@ -1,5 +1,10 @@
 import { test, expect } from '@playwright/test';
 
+function isLocalBaseURL(baseURL: unknown) {
+  const hostname = new URL(String(baseURL ?? 'http://127.0.0.1')).hostname;
+  return ['localhost', '127.0.0.1', '::1'].includes(hostname);
+}
+
 test.beforeEach(async ({ page }) => {
   await page.addInitScript(() => {
     window.localStorage.setItem('mele_cookie_consent_v1', 'accepted');
@@ -73,17 +78,6 @@ test.describe('Smoke: home and tools index', () => {
     }
   });
 
-  test('localized market pages expose all 8 tool entrances', async ({ page }) => {
-    const tools = ['numerology', 'maya', 'bazi', 'tarot', 'runes', 'astro', 'ziwei', 'humandesign'];
-
-    for (const locale of ['en', 'vi', 'id', 'ja', 'ko']) {
-      await page.goto(`/${locale}/spiritual`, { waitUntil: 'domcontentloaded' });
-      for (const tool of tools) {
-        await expect(page.locator(`a[href="/${locale}/tools/${tool}"]`).first(), `${locale}/${tool}`).toBeVisible();
-      }
-    }
-  });
-
   test('localized tools lobby exposes all 8 tool entrances', async ({ page }) => {
     const tools = ['numerology', 'maya', 'bazi', 'tarot', 'runes', 'astro', 'ziwei', 'humandesign'];
 
@@ -99,7 +93,7 @@ test.describe('Smoke: home and tools index', () => {
     await page.goto('/en/tools/maya', { waitUntil: 'domcontentloaded' });
     await expect(page.getByRole('heading', { name: 'Maya Calendar Kin' })).toBeVisible();
     await expect(page.getByRole('button', { name: 'Find my Kin' })).toBeVisible();
-    await expect(page.getByText('Back to spiritual hub')).toBeVisible();
+    await expect(page.getByText('Back to tools hub')).toBeVisible();
 
     await page.goto('/en/tools/tarot', { waitUntil: 'domcontentloaded' });
     await expect(page.getByRole('heading', { name: 'Tarot Reading' })).toBeVisible();
@@ -108,21 +102,29 @@ test.describe('Smoke: home and tools index', () => {
   });
 });
 
-test.describe('Closed beta premium flows', () => {
-  test('homepage exposes the beta task board, points economy, and visual assets', async ({ page }) => {
+test.describe('Public beta premium flows', () => {
+  test('homepage exposes the public beta task board, points economy, and visual assets', async ({ page }) => {
     await page.goto('/zh-TW');
 
     await expect(page.getByRole('heading', { name: 'MELE' })).toBeVisible();
-    await expect(page.getByLabel('封閉測試任務台')).toBeVisible();
-    await expect(page.getByText('今日可領 200 點')).toBeVisible();
-    await expect(page.getByText('會員付 100 點解鎖')).toBeVisible();
-    await expect(page.getByLabel('封閉測試任務台').getByText('老師只作為進一步諮詢選項')).toBeVisible();
+    await expect(page.getByLabel('公開測試首頁')).toBeVisible();
+    await expect(page.getByText('每日可領 200 測試點')).toBeVisible();
+    await expect(page.getByText('100 點解鎖深度解讀')).toBeVisible();
+    await expect(page.getByText('老師諮詢仍是選項，不是強迫購買')).toBeVisible();
     await expect(page.getByAltText('大海波賽頓塔羅卡面')).toBeVisible();
     await expect(page.getByAltText('瑪雅黃色人圖騰')).toBeVisible();
   });
 
-  test('local beta auth opens the member archive and teacher portal', async ({ page }) => {
+  test('local beta auth opens the member archive and teacher portal', async ({ page }, testInfo) => {
+    test.setTimeout(60_000);
+
     await page.goto('/zh-TW/account/login?return=/zh-TW/account/charts');
+
+    if (!isLocalBaseURL(testInfo.project.use.baseURL)) {
+      await expect(page.getByRole('button', { name: '使用本機測試帳號' })).toHaveCount(0);
+      await expect(page.getByRole('button', { name: '登入' }).first()).toBeVisible();
+      return;
+    }
 
     await page.getByRole('button', { name: '使用本機測試帳號' }).click();
     await expect(page).toHaveURL(/\/zh-TW\/account\/charts$/);

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ToolShell, ConsultCTA } from '@/components/ToolShell';
 import { ToolLoading, ToolError } from '@/components/ToolFeedback';
 import { ToolResultSection } from '@/components/ToolResultSection';
@@ -25,6 +25,7 @@ export default function AstroPage() {
   const [lon, setLon] = useState(121.5654);
   const [autofilled, setAutofilled] = useState(false);
   const [loading, setLoading] = useState(false);
+  const submittingRef = useRef(false);
   const [result, setResult] = useState<CalcResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -32,8 +33,8 @@ export default function AstroPage() {
     if (!profile.loaded || !profile.hasData) return;
     if (date === '' && profile.birth_date) setDate(profile.birth_date);
     if (time === '' && profile.birth_time) setTime(normalizeTime(profile.birth_time));
-    if (profile.birth_lat) setLat(profile.birth_lat);
-    if (profile.birth_lon) setLon(profile.birth_lon);
+    if (profile.birth_lat !== null && profile.birth_lat !== undefined) setLat(profile.birth_lat);
+    if (profile.birth_lon !== null && profile.birth_lon !== undefined) setLon(profile.birth_lon);
     if (profile.birth_timezone) {
       setTimezone(timezoneOffsetAt(profile.birth_timezone, profile.birth_date ?? date, profile.birth_time ? normalizeTime(profile.birth_time) : time));
     }
@@ -41,13 +42,15 @@ export default function AstroPage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [profile.loaded]);
 
-  const onSubmit = async (event: React.FormEvent | React.MouseEvent<HTMLButtonElement>) => {
+  const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (loading || submittingRef.current) return;
     if (!date || !time) {
       toast(copy.validation.dateTimeRequired ?? 'Please enter both birth date and time.', 'error');
       return;
     }
 
+    submittingRef.current = true;
     setLoading(true);
     setError(null);
     setResult(null);
@@ -71,6 +74,7 @@ export default function AstroPage() {
       setError(message);
       toast(message, 'error');
     } finally {
+      submittingRef.current = false;
       setLoading(false);
     }
   };
@@ -105,7 +109,7 @@ export default function AstroPage() {
         />
 
         {copy.birth?.locationNote && <p className="text-xs text-white/50 mb-5">{copy.birth.locationNote}</p>}
-        <button type="button" onClick={onSubmit} disabled={loading} className="mele-btn-primary w-full md:w-auto">
+        <button type="submit" disabled={loading} aria-disabled={loading} className="mele-btn-primary w-full md:w-auto">
           {loading ? copy.submit.loading : copy.submit.idle}
         </button>
       </form>

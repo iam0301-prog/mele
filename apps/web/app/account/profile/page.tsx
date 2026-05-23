@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import { useToast } from '@/components/ToastProvider';
+import { findBirthLocationPreset, getBirthLocationPresets, presetTimezoneName, type BirthLocationPreset } from '@/components/BirthInputs';
 
 interface Profile {
   display_name: string | null;
@@ -50,6 +51,7 @@ export default function ProfilePage() {
   }, [router]);
 
   const save = async () => {
+    if (saving) return;
     setSaving(true);
     const supabase = createClient();
     const { data: { user } } = await supabase.auth.getUser();
@@ -61,6 +63,27 @@ export default function ProfilePage() {
     setSaving(false);
     if (error) return toast(error.message, 'error');
     toast('個人資料已儲存。', 'success');
+  };
+
+  const applyBirthPreset = (preset: BirthLocationPreset) => {
+    setProfile((current) => ({
+      ...current,
+      birth_location: preset.label,
+      birth_lat: preset.lat,
+      birth_lon: preset.lon,
+      birth_timezone: presetTimezoneName(preset) ?? current.birth_timezone ?? 'Asia/Taipei',
+    }));
+  };
+
+  const updateBirthLocation = (value: string) => {
+    const preset = findBirthLocationPreset(value);
+    setProfile((current) => ({
+      ...current,
+      birth_location: value,
+      birth_lat: preset ? preset.lat : current.birth_lat,
+      birth_lon: preset ? preset.lon : current.birth_lon,
+      birth_timezone: preset ? presetTimezoneName(preset) ?? current.birth_timezone : current.birth_timezone,
+    }));
   };
 
   if (loading) {
@@ -126,10 +149,29 @@ export default function ProfilePage() {
           <label className="mele-label">出生地</label>
           <input
             value={profile.birth_location ?? ''}
-            onChange={(event) => setProfile({ ...profile, birth_location: event.target.value })}
+            onChange={(event) => updateBirthLocation(event.target.value)}
+            onBlur={(event) => {
+              const preset = findBirthLocationPreset(event.target.value);
+              if (preset) applyBirthPreset(preset);
+            }}
             placeholder="例如：台北市"
             className="mele-input"
           />
+          <div className="mt-2 flex flex-wrap gap-2">
+            {getBirthLocationPresets().slice(0, 10).map((preset) => (
+              <button
+                key={preset.label}
+                type="button"
+                onClick={() => applyBirthPreset(preset)}
+                className="rounded-full border border-accent-dim px-3 py-1 text-xs text-white/70 transition hover:border-accent hover:text-accent"
+              >
+                {preset.label}
+              </button>
+            ))}
+          </div>
+          <p className="mt-2 text-xs leading-relaxed text-white/48">
+            點選常用城市或輸入相同城市名，系統會自動帶入經緯度與出生地時區；需要更精準時仍可手動修正。
+          </p>
         </div>
 
         <div className="grid gap-4 md:grid-cols-2">
@@ -156,6 +198,16 @@ export default function ProfilePage() {
         </div>
 
         <div>
+          <label className="mele-label">出生地時區</label>
+          <input
+            value={profile.birth_timezone ?? 'Asia/Taipei'}
+            onChange={(event) => setProfile({ ...profile, birth_timezone: event.target.value || null })}
+            className="mele-input"
+            placeholder="例如：Asia/Taipei"
+          />
+        </div>
+
+        <div>
           <label className="mele-label">性別</label>
           <select
             value={profile.gender ?? '未填'}
@@ -170,7 +222,7 @@ export default function ProfilePage() {
         </div>
 
         <div className="flex flex-wrap gap-3 pt-4">
-          <button onClick={save} disabled={saving} className="mele-btn-primary">
+          <button type="button" onClick={save} disabled={saving} aria-disabled={saving} className="mele-btn-primary">
             {saving ? '儲存中...' : '儲存資料'}
           </button>
           <Link href="/account/privacy" className="mele-btn-secondary">資料權利</Link>

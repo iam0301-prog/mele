@@ -19,12 +19,16 @@ function parseEnvFile(file) {
 }
 
 const env = Object.assign({}, ...envFiles.map(parseEnvFile), process.env);
+const args = new Set(process.argv.slice(2));
+const explicitSiteUrl = process.argv.slice(2).find((arg) => /^https?:\/\//i.test(arg));
 const supabaseUrl = env.NEXT_PUBLIC_SUPABASE_URL;
 const anonKey = env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-const siteUrl = env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+const siteUrl = explicitSiteUrl || env.MELE_AUTH_SITE_URL || env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
 const expectedCallback = `${siteUrl.replace(/\/$/, '')}/auth/callback`;
+const supabaseProviderCallback = `${supabaseUrl?.replace(/\/$/, '')}/auth/v1/callback`;
 const wantsGoogle = env.NEXT_PUBLIC_ENABLE_GOOGLE_LOGIN === 'true';
 const wantsLine = env.NEXT_PUBLIC_ENABLE_LINE_LOGIN === 'true';
+const requireOAuth = args.has('--require-oauth') || env.MELE_REQUIRE_OAUTH === 'true';
 const lineProvider = env.NEXT_PUBLIC_LINE_OAUTH_PROVIDER || 'custom:line';
 const lineProviderName = lineProvider.replace(/^custom:/, '');
 
@@ -83,7 +87,8 @@ try {
 }
 
 note(`Project URL: ${supabaseUrl}`);
-note(`Expected local/site callback: ${expectedCallback}`);
+note(`Expected app callback: ${expectedCallback}`);
+note(`Google/LINE provider callback for external dashboards: ${supabaseProviderCallback}`);
 note('Dashboard must allow this callback under Authentication -> URL Configuration -> Redirect URLs.');
 
 if (settings.disable_signup === false) {
@@ -102,6 +107,8 @@ if (settings.external?.google === true) {
   pass('Google provider is enabled in Supabase.');
 } else if (wantsGoogle) {
   fail('Google login is allowed by frontend config, but Supabase Google provider is not enabled.');
+} else if (requireOAuth) {
+  fail('Google provider is required for this check, but it is not enabled in Supabase.');
 } else {
   note('Google provider is not enabled; frontend should keep Google login disabled.');
 }
@@ -111,6 +118,8 @@ if (wantsLine && lineEnabled) {
   pass(`LINE provider appears enabled in public Auth settings as "${lineProvider}".`);
 } else if (wantsLine) {
   fail(`LINE login is allowed by frontend config, but public Auth settings do not expose "${lineProvider}". Confirm custom OAuth provider in Supabase Dashboard.`);
+} else if (requireOAuth) {
+  fail(`LINE provider is required for this check, but "${lineProvider}" is not enabled and the frontend switch is off.`);
 } else if (lineEnabled) {
   note(`LINE provider appears enabled in Supabase, but frontend switch is disabled. Set NEXT_PUBLIC_ENABLE_LINE_LOGIN=true when ready.`);
 } else {
@@ -124,4 +133,5 @@ if (settings.mailer_autoconfirm === false) {
 }
 
 note('This public check cannot read SMTP, bounce suppression, email rate-limit logs, or redirect allowlist values.');
+note('Use --require-oauth or MELE_REQUIRE_OAUTH=true before launch to fail when Google/LINE are still disabled.');
 note('If the UI says the email was sent but no mail arrives, check Supabase Auth Logs and SMTP delivery next.');

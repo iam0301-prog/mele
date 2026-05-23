@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ToolShell, ConsultCTA } from '@/components/ToolShell';
 import { ToolLoading, ToolError } from '@/components/ToolFeedback';
 import { ToolResultSection } from '@/components/ToolResultSection';
@@ -32,6 +32,7 @@ export default function ZiweiPage() {
   const [gender, setGender] = useState<Gender>('女');
   const [autofilled, setAutofilled] = useState(false);
   const [loading, setLoading] = useState(false);
+  const submittingRef = useRef(false);
   const [result, setResult] = useState<CalcResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -45,13 +46,15 @@ export default function ZiweiPage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [profile.loaded]);
 
-  const onSubmit = async (event: React.FormEvent | React.MouseEvent<HTMLButtonElement>) => {
+  const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (loading || submittingRef.current) return;
     if (!date || !time) {
       toast(copy.validation.dateTimeRequired ?? 'Please enter both birth date and time.', 'error');
       return;
     }
 
+    submittingRef.current = true;
     setLoading(true);
     setError(null);
     setResult(null);
@@ -66,6 +69,7 @@ export default function ZiweiPage() {
       setError(message);
       toast(message, 'error');
     } finally {
+      submittingRef.current = false;
       setLoading(false);
     }
   };
@@ -94,7 +98,7 @@ export default function ZiweiPage() {
           </select>
         </div>
 
-        <button type="button" onClick={onSubmit} disabled={loading} className="mele-btn-primary w-full md:w-auto">
+        <button type="submit" disabled={loading} aria-disabled={loading} className="mele-btn-primary w-full md:w-auto">
           {loading ? copy.submit.loading : copy.submit.idle}
         </button>
       </form>

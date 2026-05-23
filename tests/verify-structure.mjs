@@ -37,12 +37,20 @@ const migrations = [
   'supabase/migrations/0010_kyc_auto_purge_cron.sql',
   'supabase/migrations/0011_admin_member_ops.sql',
   'supabase/migrations/0012_beta_tester_ops.sql',
+  'supabase/migrations/0013_teacher_consultation_briefs.sql',
+  'supabase/migrations/0014_admin_teacher_ops.sql',
+  'supabase/migrations/0015_lock_member_point_economy.sql',
+  'supabase/migrations/0016_teacher_portal_admin_chart_access.sql',
 ];
 
 const pointMigrationFile = 'supabase/migrations/0009_member_points_unlocks.sql';
+const pointEconomyLockMigrationFile = 'supabase/migrations/0015_lock_member_point_economy.sql';
+const teacherPortalAdminChartAccessMigrationFile = 'supabase/migrations/0016_teacher_portal_admin_chart_access.sql';
 const kycPurgeMigrationFile = 'supabase/migrations/0010_kyc_auto_purge_cron.sql';
 const adminMemberOpsMigrationFile = 'supabase/migrations/0011_admin_member_ops.sql';
 const betaTesterOpsMigrationFile = 'supabase/migrations/0012_beta_tester_ops.sql';
+const teacherConsultationBriefsMigrationFile = 'supabase/migrations/0013_teacher_consultation_briefs.sql';
+const adminTeacherOpsMigrationFile = 'supabase/migrations/0014_admin_teacher_ops.sql';
 const SQL = migrations
   .map((file) => readFileSync(file, 'utf8'))
   .join('\n');
@@ -75,6 +83,7 @@ for (const table of [
   'daily_point_claims',
   'content_unlocks',
   'beta_testers',
+  'teacher_consultation_briefs',
 ]) {
   const re = new RegExp(`create\\s+table\\s+(if\\s+not\\s+exists\\s+)?public\\.${table}`, 'i');
   log(`table public.${table}`, re.test(SQL));
@@ -149,6 +158,8 @@ for (const index of [
   'idx_match_sessions_user_created',
   'idx_point_transactions_user_created',
   'idx_content_unlocks_user_scope',
+  'idx_teacher_consultation_briefs_booking',
+  'idx_teacher_consultation_briefs_teacher',
   'uniq_daily_draws_user_date_choice',
 ]) {
   log(`index ${index}`, SQL.includes(index));
@@ -169,6 +180,7 @@ for (const policy of [
   'reviews_public_select_visible',
   'chart_records_self_select',
   'chart_records_teacher_select',
+  'chart_records_admin_select',
   'settlements_admin_all',
   'settlements_teacher_self_select',
   'support_self_select',
@@ -188,9 +200,26 @@ for (const policy of [
   'match_sessions_self_insert',
   'match_sessions_self_update',
   'match_sessions_admin_select',
+  'teacher_consultation_briefs_teacher_select',
+  'teacher_consultation_briefs_teacher_insert',
+  'teacher_consultation_briefs_teacher_update',
+  'teacher_consultation_briefs_admin_all',
 ]) {
   log(`RLS policy ${policy}`, SQL.includes(`"${policy}"`));
 }
+
+const teacherConsultationBriefsSql = existsSync(teacherConsultationBriefsMigrationFile)
+  ? readFileSync(teacherConsultationBriefsMigrationFile, 'utf8')
+  : '';
+log(
+  'teacher consultation briefs store editable teacher drafts without exposing them to customers',
+  teacherConsultationBriefsSql.includes('create table if not exists public.teacher_consultation_briefs') &&
+    teacherConsultationBriefsSql.includes('generated_brief jsonb') &&
+    teacherConsultationBriefsSql.includes('teacher_overrides jsonb') &&
+    teacherConsultationBriefsSql.includes('save_teacher_consultation_brief') &&
+    teacherConsultationBriefsSql.includes('grant select, insert, update on public.teacher_consultation_briefs to authenticated') &&
+    !teacherConsultationBriefsSql.includes('customer_select'),
+);
 
 log(
   'bookings direct updates are restricted to admin policy/RPC workflows',
@@ -203,17 +232,34 @@ log(
 );
 
 log('member points migration exists', existsSync(pointMigrationFile));
+log('member point economy lock migration exists', existsSync(pointEconomyLockMigrationFile));
+log('teacher portal admin chart access migration exists', existsSync(teacherPortalAdminChartAccessMigrationFile));
 log('KYC purge cron migration exists', existsSync(kycPurgeMigrationFile));
 log('admin member operations migration exists', existsSync(adminMemberOpsMigrationFile));
 log('beta tester operations migration exists', existsSync(betaTesterOpsMigrationFile));
+log('admin teacher operations migration exists', existsSync(adminTeacherOpsMigrationFile));
+log(
+  'admin teacher operations use RPCs for profile and status changes',
+  SQL.includes('admin_update_teacher_status') &&
+    SQL.includes('admin_update_teacher_profile') &&
+    SQL.includes('teacher_review_log') &&
+    SQL.includes('reason_required'),
+);
 log(
   'member point economy uses 200 daily claim and 100 point unlocks',
   SQL.includes('p_daily_amount int default 200') &&
     SQL.includes('p_cost int default 100') &&
+    SQL.includes('daily_amount_must_be_200') &&
+    SQL.includes('unlock_cost_must_be_100') &&
+    SQL.includes('v_daily_amount constant int := 200') &&
+    SQL.includes('v_unlock_cost constant int := 100') &&
     SQL.includes('member_wallets') &&
     SQL.includes('point_transactions') &&
     SQL.includes('daily_point_claims') &&
-    SQL.includes('content_unlocks'),
+    SQL.includes('content_unlocks') &&
+    SQL.includes('build_member_unlock_content') &&
+    SQL.includes('unlocked_content') &&
+    SQL.includes("'content', v_content"),
 );
 log(
   'daily draws are one tarot-or-rune choice per member per day',
@@ -273,7 +319,6 @@ for (const file of [
   'apps/web/app/[locale]/daily/page.tsx',
   'apps/web/app/[locale]/mobile/page.tsx',
   'apps/web/app/[locale]/ar/page.tsx',
-  'apps/web/app/[locale]/spiritual/page.tsx',
   'apps/web/app/[locale]/tools/page.tsx',
   'apps/web/app/[locale]/account/login/page.tsx',
   'apps/web/app/[locale]/legal/privacy/page.tsx',
@@ -323,7 +368,7 @@ const i18nConfig = readFileSync('apps/web/lib/i18n/config.ts', 'utf8');
 const i18nMiddleware = readFileSync('apps/web/middleware.ts', 'utf8');
 const languageSwitcher = readFileSync('apps/web/components/LanguageSwitcher.tsx', 'utf8');
 const sitemapRoute = readFileSync('apps/web/app/sitemap.ts', 'utf8');
-log('i18n supports six market locales and default zh-TW', ['zh-TW', 'en', 'vi', 'id', 'ja', 'ko'].every((token) => i18nConfig.includes(token)) && i18nConfig.includes("DEFAULT_LOCALE: Locale = 'zh-TW'"));
+log('i18n supports six route locales and default zh-TW', ['zh-TW', 'en', 'vi', 'id', 'ja', 'ko'].every((token) => i18nConfig.includes(token)) && i18nConfig.includes("DEFAULT_LOCALE: Locale = 'zh-TW'"));
 log('locale labels are stable and not duplicated', ['\\u7e41\\u9ad4\\u4e2d\\u6587', 'English', 'Ti\\u1ebfng Vi\\u1ec7t', 'Bahasa Indonesia', '\\u65e5\\u672c\\u8a9e', '\\ud55c\\uad6d\\uc5b4'].every((token) => i18nConfig.includes(token)) && !/EnglishEnglish|\?{3,}/.test(i18nConfig));
 log('language switcher preserves the current path', languageSwitcher.includes('switchLocaleInPathname') && languageSwitcher.includes('usePathname') && languageSwitcher.includes('useSearchParams'));
 log('language switcher renders panel locale names once', !languageSwitcher.includes("className={variant === 'panel' ? '' : 'sr-only'}"));
@@ -334,11 +379,10 @@ log(
     i18nMiddleware.includes('request.headers.get(PATH_HEADER) || request.nextUrl.pathname'),
 );
 log('middleware detects browser language before defaulting to Traditional Chinese', i18nMiddleware.includes('localeFromAcceptLanguage') && i18nMiddleware.includes("tag.startsWith('en')") && i18nMiddleware.includes("tag.startsWith('vi')") && i18nMiddleware.includes("tag.startsWith('id')") && i18nMiddleware.includes("tag.startsWith('ja')") && i18nMiddleware.includes("tag.startsWith('ko')"));
-log('middleware lets localized beta, market, and tools lobbies render natively', i18nMiddleware.includes("'/beta'") && i18nMiddleware.includes("'/spiritual'") && i18nMiddleware.includes("'/tools'"));
+log('middleware lets localized beta and tools lobbies render natively', i18nMiddleware.includes("'/beta'") && i18nMiddleware.includes("'/tools'") && !i18nMiddleware.includes("'/spiritual'"));
 log('middleware lets localized release utility pages render natively', ["'/daily'", "'/mobile'", "'/ar'", "'/account/login'", "'/legal/privacy'", "'/legal/tos'", "'/legal/disclaimer'"].every((token) => i18nMiddleware.includes(token)));
 log('sitemap emits localized hreflang alternates', sitemapRoute.includes('buildAlternateLanguages') && sitemapRoute.includes('alternates') && sitemapRoute.includes('languages'));
 log('sitemap includes localized utility pages', ["'/daily'", "'/mobile'", "'/ar'", "'/legal/privacy'", "'/legal/tos'", "'/legal/disclaimer'"].every((token) => sitemapRoute.includes(token)));
-const localizedMarketPage = readFileSync('apps/web/app/[locale]/spiritual/page.tsx', 'utf8');
 const localizedToolsPage = readFileSync('apps/web/app/[locale]/tools/page.tsx', 'utf8');
 const localizedBetaPage = readFileSync('apps/web/app/[locale]/beta/page.tsx', 'utf8');
 log(
@@ -353,11 +397,10 @@ log(
     'home-beta-roadmap',
   ].every((token) => localizedBetaPage.includes(token)),
 );
-log('market page links numerology and human design quick paths', localizedMarketPage.includes("toolLabel('numerology')") && localizedMarketPage.includes("toolLabel('humandesign')"));
-log('market page exposes all localized tool entrances', localizedMarketPage.includes('dict.home.tools.map') && localizedMarketPage.includes('`/tools/${tool.slug}`') && localizedMarketPage.includes('home-quick-grid'));
 log('localized tools lobby exposes all calculator entrances', localizedToolsPage.includes('dict.home.tools.map') && localizedToolsPage.includes('dict.nav.tools') && localizedToolsPage.includes('`/tools/${tool.slug}`'));
 log('sitemap includes the localized tools lobby', sitemapRoute.includes("'/tools'"));
 log('sitemap includes the localized beta entry', sitemapRoute.includes("'/beta'"));
+log('public sitemap no longer publishes the retired spiritual market route', !sitemapRoute.includes("'/spiritual'"));
 
 for (const tool of ['numerology', 'maya', 'bazi', 'tarot', 'runes', 'astro', 'ziwei', 'humandesign']) {
   const file = `apps/web/app/tools/${tool}/page.tsx`;
@@ -404,7 +447,8 @@ const rpcChecks = [
   ['apps/web/app/admin/members/page.tsx', 'admin_update_member_profile'],
   ['apps/web/app/admin/testers/page.tsx', 'admin_adjust_member_points'],
   ['apps/web/app/admin/testers/page.tsx', 'admin_upsert_beta_tester'],
-  ['apps/web/app/admin/teachers/page.tsx', 'suspend_teacher'],
+  ['apps/web/app/admin/teachers/page.tsx', 'admin_update_teacher_status'],
+  ['apps/web/app/admin/teachers/page.tsx', 'admin_update_teacher_profile'],
   ['apps/web/app/account/mybookings/page.tsx', 'cancel_booking'],
 ];
 
@@ -470,12 +514,17 @@ const architectureDoc = readFileSync('docs/ARCHITECTURE.md', 'utf8');
 const backendBlueprint = readFileSync('docs/BACKEND_BLUEPRINT.md', 'utf8');
 const authEmailRunbook = readFileSync('docs/SUPABASE_AUTH_EMAIL_RUNBOOK.md', 'utf8');
 const oauthRunbook = readFileSync('docs/OAUTH_LOGIN_RUNBOOK.md', 'utf8');
+const authCheckScript = readFileSync('scripts/check-supabase-auth.mjs', 'utf8');
 const verificationDoc = readFileSync('docs/VERIFICATION.md', 'utf8');
 const readinessDoc = readFileSync('docs/RELEASE_READINESS.md', 'utf8');
 log('architecture doc matches current FastAPI deployment', ['Python FastAPI', 'Node subprocess', '不要把整個產品假設成「只要 Vercel + Supabase 就能上線」', 'Backend Blueprint'].every((token) => architectureDoc.includes(token)));
 log('backend blueprint defines service boundaries and rollout', ['Supabase Auth', 'Supabase Postgres', 'Supabase Edge Functions', 'Python FastAPI', 'Phase 1', 'Phase 3'].every((token) => backendBlueprint.includes(token)));
 log('auth email runbook covers confirmation diagnostics', ['supabase.auth.resend', 'Redirect URLs', 'SMTP', 'Authentication -> Logs', '重新寄送驗證信'].every((token) => authEmailRunbook.includes(token)));
 log('oauth runbook covers Google and LINE provider setup', ['Google Cloud Console', 'LINE Developers', 'custom:line', 'NEXT_PUBLIC_ENABLE_GOOGLE_LOGIN', 'NEXT_PUBLIC_ENABLE_LINE_LOGIN'].every((token) => oauthRunbook.includes(token)));
+log(
+  'oauth runbook documents strict launch gate',
+  ['--require-oauth', 'https://<project-ref>.supabase.co/auth/v1/callback', 'https://mele-chi.vercel.app'].every((token) => oauthRunbook.includes(token)),
+);
 log('verification doc records algorithm gray areas', ['Human Design', 'Maya Guide', '真太陽時', '不可宣稱事項'].every((token) => verificationDoc.includes(token)));
 log('release readiness doc includes no-go and evidence gates', ['No-Go 條件', '發布證據', '正式收費前 P0', 'ops:check-auth'].every((token) => readinessDoc.includes(token)));
 const legalSop = readFileSync('docs/LEGAL_COMPLIANCE_SOP.md', 'utf8');
@@ -496,10 +545,13 @@ log('operational SOP docs cover legal payment deployment assets algorithms and Q
 const login = readFileSync('apps/web/app/account/login/page.tsx', 'utf8');
 const localizedLoginClient = readFileSync('apps/web/components/LocalizedLoginClient.tsx', 'utf8');
 const authCallback = readFileSync('apps/web/app/auth/callback/route.ts', 'utf8');
+const authCallbackRedirects = readFileSync('apps/web/lib/auth-callback-redirects.ts', 'utf8');
 const accountPrivacyPage = readFileSync('apps/web/app/account/privacy/page.tsx', 'utf8');
 const profilePage = readFileSync('apps/web/app/account/profile/page.tsx', 'utf8');
 const chartsPage = readFileSync('apps/web/app/account/charts/page.tsx', 'utf8');
 const teacherPortalPage = readFileSync('apps/web/app/teacher-portal/page.tsx', 'utf8');
+const teacherBriefWorkbench = readFileSync('apps/web/components/TeacherBriefWorkbench.tsx', 'utf8');
+const teacherConsultationBriefs = readFileSync('apps/web/lib/teacher-consultation-briefs.ts', 'utf8');
 const teacherCopy = readFileSync('apps/web/lib/i18n/teacher-copy.ts', 'utf8');
 const testAuth = readFileSync('apps/web/lib/test-auth.ts', 'utf8');
 const testAuthServer = readFileSync('apps/web/lib/test-auth-server.ts', 'utf8');
@@ -563,11 +615,27 @@ log(
 log('server test auth is restricted to local host cookie', testAuthServer.includes('cookies()') && testAuthServer.includes('headers()') && testAuthServer.includes('isLocalTestHost'));
 log('social login providers use Supabase settings and env gates', ['NEXT_PUBLIC_ENABLE_GOOGLE_LOGIN', 'NEXT_PUBLIC_ENABLE_LINE_LOGIN', 'NEXT_PUBLIC_LINE_OAUTH_PROVIDER', '/auth/v1/settings', 'custom:line'].every((token) => login.includes(token)));
 log(
+  'auth diagnostic script supports explicit site URL and strict OAuth gate',
+  ['explicitSiteUrl', 'MELE_AUTH_SITE_URL', 'supabaseProviderCallback', '--require-oauth', 'MELE_REQUIRE_OAUTH'].every((token) => authCheckScript.includes(token)),
+);
+log(
   'localized login providers use Supabase settings and env gates',
   ['NEXT_PUBLIC_ENABLE_GOOGLE_LOGIN', 'NEXT_PUBLIC_ENABLE_LINE_LOGIN', 'NEXT_PUBLIC_LINE_OAUTH_PROVIDER', '/auth/v1/settings', 'custom:line', 'signInWithOAuth'].every((token) => localizedLoginClient.includes(token)),
 );
-log('auth callback rejects provider errors and unsafe next URLs', authCallback.includes('auth_callback_failed') && authCallback.includes('error_description') && authCallback.includes('startsWith(\'/\')') && authCallback.includes('!nextParam.startsWith(\'//\')'));
-log('auth callback returns errors to the localized login page', authCallback.includes('localizedLoginUrl') && authCallback.includes("localizePath('/account/login'"));
+log(
+  'auth callback rejects provider errors and unsafe next URLs',
+  authCallback.includes('auth_callback_failed') &&
+    authCallback.includes('error_description') &&
+    authCallback.includes('sanitizeAuthNextPath') &&
+    authCallbackRedirects.includes("next.startsWith('/')") &&
+    authCallbackRedirects.includes("next.startsWith('//')"),
+);
+log(
+  'auth callback returns errors to the localized login page',
+  authCallback.includes('buildLocalizedAuthFailureUrl') &&
+    authCallbackRedirects.includes("localizePath('/account/login'") &&
+    authCallbackRedirects.includes("url.searchParams.set('return', safeNext)"),
+);
 log('account privacy page lets users request data rights', ['資料權利中心', 'create_support_thread', '匯出我的資料', '刪除帳號與資料', '停止特定使用'].every((token) => accountPrivacyPage.includes(token)));
 log('profile and account menu expose data rights', profilePage.includes('/account/privacy') && headerUserMenu.includes('/account/privacy') && headerUserMenu.includes('labels?.dataRights'));
 log('cookie consent explains local storage and links privacy policy', ['Cookie 與資料使用提示', 'localStorage', '/legal/privacy', 'mele_cookie_consent_v1'].every((token) => cookieConsent.includes(token)));
@@ -649,31 +717,27 @@ log(
     !zhCommon.includes('老師' + '媒合'),
 );
 log(
-  'localized home presents premium closed-beta command center',
+  'localized home presents public-beta command center',
   [
-    'getDictionary',
-    'markets.items',
-    'home.roles',
-    '封閉測試任務台',
-    '今日可領 200 點',
-    '會員付 100 點解鎖',
-    '老師只作為進一步諮詢選項',
+    'PUBLIC BETA · 公開測試中',
+    '每日可領 200 測試點',
+    '100 點解鎖深度解讀',
+    '老師諮詢仍是選項，不是強迫購買',
+    '公開測試流程',
+    '今天請你幫忙測這 4 件事',
   ].every((token) => homePage.includes(token) || zhCommon.includes(token)) &&
   [
-    'home-hero',
-    'home-oracle-console',
-    'home-market-grid',
+    'beta2-hero',
+    'beta2-phone',
     "from 'next/image'",
     '/tarot/cards/ocean_poseidon/19.webp',
     '/maya/totems/yellow-human.png',
   ].every((token) => homePage.includes(token)) &&
     [
-      '.home-hero',
-      '.home-oracle-console',
-      '.home-proof-strip',
-      '.home-market-grid',
-      '.home-market-card',
-      '.home-role-lanes',
+      '.beta2-hero',
+      '.beta2-phone',
+      '.beta2-public-panel',
+      '.beta2-final-cta',
     ].every((token) => homeGlobalCss.includes(token)),
 );
 
@@ -732,6 +796,13 @@ log(
   ),
 );
 log('booking flow explains payment and refund expectations', ['付款後可在「我的諮詢」查看狀態', '取消政策', 'question.length'].some((token) => bookingExperiencePage.includes(token)) && bookingExperiencePage.includes('系統仍會以資料庫狀態再次確認'));
+log(
+  'booking flow captures structured client issue context before payment',
+  ['BOOK_COPY', 'questionTopics', 'painPoints', 'sessionGoals', 'QuestionOptionGrid', '想問主題：', 'Topic: ', 'Chủ đề muốn hỏi: ', '相談テーマ：', '질문 주제: ', 'issueContext'].every((token) => bookingExperiencePage.includes(token)) &&
+    bookingExperiencePage.includes('questionTitle') &&
+    bookingExperiencePage.includes('copy.prefixes.topic') &&
+    bookingExperiencePage.includes('p_customer_question: structuredQuestion'),
+);
 log(
   'booking flow supports free test mode through RPC',
   bookingExperiencePage.includes('NEXT_PUBLIC_ENABLE_FREE_BOOKING_TEST_MODE') &&
@@ -926,6 +997,18 @@ log(
 log('result CSS includes beginner member guide cards', ['.beginner-guide', '.beginner-guide__header', '.beginner-guide__grid', '.beginner-guide__item', '.beginner-guide__note'].every((token) => globalCss.includes(token)));
 log('tool result reading cards support member interactions', ['result-insights__member-prompt', 'result-insights__card-button', 'result-insights__card-body', 'result-insights__resonate', 'aria-pressed', 'personal-reading__focus', 'personal-reading__point-action'].every((token) => toolResult.includes(token)));
 log('tool result adds personal reading summary for all tools', ['buildPersonalReading', 'PersonalReadingPanel', 'PERSONAL READING', '我的優勢', '可能卡點', '今日行動'].every((token) => toolResult.includes(token)));
+log(
+  'tool result turns Maya, Ziwei, and Astro into member-readable consultation hooks',
+  [
+    'MAYA_SEAL_MEMBER_COPY',
+    'ASTRO_SIGN_MEMBER_COPY',
+    'teacherQuestion',
+    '這不是稱號，而是在說你怎麼推進事情、怎麼卡住、怎麼找回節奏',
+    '先挑一個真正想問的宮位',
+    '三個自己同時在說話',
+    '這裡很適合延伸成一場老師諮詢',
+  ].every((token) => toolResult.includes(token)),
+);
 log('tool result gives clear post-reading next steps', ['RESULT_NEXT_STEPS', 'ResultNextSteps', '\u63a5\u4e0b\u4f86\u53ef\u4ee5\u9019\u6a23\u770b', '\u9810\u7d04\u8001\u5e2b\u89e3\u8b80', '2D'].every((token) => toolResult.includes(token)));
 log('tool result covers every calculator explanation type', ['numerology', 'maya', 'bazi', 'ziwei', 'tarot', 'runes', 'astro', 'humandesign'].every((tool) => toolResult.includes(`${tool}:`)));
 log('tool result has clean Chinese result states', ['結果重點解讀', '生命靈數解讀', '塔羅牌解讀', '正在整理解讀', '解讀失敗'].every((token) => toolResult.includes(token)));
@@ -940,16 +1023,19 @@ log(
     .every((token) => toolResult.includes(token)),
 );
 log(
-  'member unlock library provides real closed-beta content',
+  'member unlock library provides scope keys and backend content metadata only',
   existsSync('apps/web/lib/member-unlocks.ts') &&
-    ['MEMBER_UNLOCK_OPTIONS', 'buildUnlockedReadingContent', 'buildTeacherReadingBrief', 'unlockScopeKey', 'DAILY_POINT_AMOUNT', 'POINT_UNLOCK_COST', 'deep_reading', 'transit_day', 'transit_month', 'transit_year', '此象', '宜', '忌'].every((token) => memberUnlocks.includes(token)) &&
-    !['預留', '之後可把', '正式內容上線', '槽位'].some((token) => memberUnlocks.includes(token)),
+    ['MEMBER_UNLOCK_OPTIONS', 'buildUnlockContentMetadata', 'buildTeacherReadingBrief', 'unlockScopeKey', 'DAILY_POINT_AMOUNT', 'POINT_UNLOCK_COST', 'deep_reading', 'transit_day', 'transit_month', 'transit_year', 'result_anchor', 'result_signals'].every((token) => memberUnlocks.includes(token)) &&
+    !['buildUnlockedReadingContent', '完整深入解釋', '今日流日解讀'].some((token) => memberUnlocks.includes(token)),
 );
 log(
-  'tool result uses generated unlock content instead of inline placeholders',
-  toolResult.includes('buildUnlockedReadingContent') &&
-    toolResult.includes('getUnlockScopeKey') &&
+  'tool result renders paid unlock content only from RPC or stored metadata',
+  toolResult.includes('buildUnlockContentMetadata') &&
+    toolResult.includes('metadata?.unlocked_content') &&
+    toolResult.includes('payload.content') &&
+    toolResult.includes('setUnlockedContent') &&
     toolResult.includes('reading.sections.map') &&
+    !toolResult.includes('buildUnlockedReadingContent') &&
     !toolResult.includes('unlockedBody'),
 );
 log(
@@ -977,10 +1063,38 @@ log(
     ['會員詳解備忘', '輔助解盤工作台', '流日 / 流月 / 流年延伸'].every((token) => teacherCopy.includes(token)) &&
     ['.teacher-member-brief', '.teacher-member-brief__grid', '.teacher-member-brief__item'].every((token) => globalCss.includes(token)),
 );
+log(
+  'teacher portal workbench only prepares active upcoming paid or confirmed bookings',
+  ['activeBookings', "in('status', ['paid', 'confirmed'])", ".gte('scheduled_at', nowIso)", 'briefSourceRows', 'activeBookingRows.length'].every((token) => teacherPortal.includes(token)),
+);
+log(
+  'teacher portal includes all-tool editable consultation workbench',
+  ['TeacherBriefWorkbench', 'makeDemoWorkbenchCards', 'buildTeacherConsultationBrief', 'buildDailyConsultationBrief', 'teacher_consultation_briefs'].every((token) => teacherPortal.includes(token)) &&
+    ['save_teacher_consultation_brief', 'mergeTeacherBriefDraft', '複製備課文字', '儲存草稿', '五段式諮詢 SOP'].every((token) => teacherBriefWorkbench.includes(token)) &&
+    ['buildBazi', 'buildZiwei', 'buildAstro', 'buildHumanDesign', 'buildMaya', 'buildNumerology', 'buildTarot', 'buildRunes', 'buildDailyConsultationBrief'].every((token) => teacherConsultationBriefs.includes(token)) &&
+    ['.teacher-workbench', '.teacher-workbench__rail', '.teacher-workbench__stage', '@media (max-width: 860px)'].every((token) => globalCss.includes(token)),
+);
+log(
+  'teacher workbench briefs prioritize client issue and plain Human Design gates',
+  ['parseClientIssueContext', 'clientIssueSummary', '先了解客人', '針對客人問題', '先翻成人話', '不是少了這個能力'].every((token) => teacherConsultationBriefs.includes(token)),
+);
 const explanations = readFileSync('python_api/engines/explanations.py', 'utf8');
 log('backend explanations include non-repetitive Maya oracle roles', explanations.includes('MAYA_ORACLE_ROLES') && explanations.includes('這股力量不是敵人') && !explanations.includes('提醒你從不同角度理解本命 Kin'));
 log('backend explanations include richer Bazi day-master guidance', explanations.includes('DAY_MASTER_GUIDE') && explanations.includes('PILLAR_ROLES') && explanations.includes('月令、十神、格局'));
 log('backend explanations include Human Design gate meanings', explanations.includes('GATE_MEANINGS') && explanations.includes('第 {gate} 閘門｜') && explanations.includes('家庭與承諾'));
+log(
+  'backend explanations keep member-first hooks for Maya, Ziwei, and Astro',
+  [
+    'MAYA_MEMBER_READING',
+    'ASTRO_MEMBER_READING',
+    '白話先看你本人',
+    '如果這段有中，通常會中在卡點',
+    '先挑一個真的想問的題目',
+    '三方四正',
+    '你真正需要的安全感',
+    '帶著星盤問老師',
+  ].every((token) => explanations.includes(token)),
+);
 const rendererCommon = readFileSync('python_api/renderers/common.py', 'utf8');
 const mayaRenderer = readFileSync('python_api/renderers/maya_render.py', 'utf8');
 const tarotRenderer = readFileSync('python_api/renderers/tarot_render.py', 'utf8');
@@ -1044,7 +1158,7 @@ log(
 const launchPage = readFileSync('apps/web/app/admin/launch/page.tsx', 'utf8');
 log('admin launch checklist checks production env', launchPage.includes('NEXT_PUBLIC_LIFF_ID') && launchPage.includes('MELE_API_URL') && launchPage.includes('iPhone AR fallback'));
 log('admin launch checklist separates cloud manual checks', ['SQL migrations 檔案完整', 'ECPay checkout secrets', '封閉公測名單', 'Auth 驗證信與 Redirect URLs', 'ops:check-auth'].every((token) => launchPage.includes(token)));
-log('admin launch checklist covers current migrations', ['0009_member_points_unlocks.sql', '0010_kyc_auto_purge_cron.sql', '0011_admin_member_ops.sql', '0012_beta_tester_ops.sql', '0001-0012', 'member_wallets', 'content_unlocks', 'daily_point_claims', 'beta_testers'].every((token) => launchPage.includes(token)));
+log('admin launch checklist covers current migrations', ['0009_member_points_unlocks.sql', '0010_kyc_auto_purge_cron.sql', '0011_admin_member_ops.sql', '0012_beta_tester_ops.sql', '0013_teacher_consultation_briefs.sql', '0014_admin_teacher_ops.sql', '0001-0014', 'member_wallets', 'content_unlocks', 'daily_point_claims', 'admin_update_teacher_status', 'admin_update_teacher_profile', 'beta_testers'].every((token) => launchPage.includes(token)));
 const retiredNumerologyFunction = existsSync('supabase/functions/calc-numerology/index.ts');
 log('retired calc-numerology edge function is removed', !retiredNumerologyFunction);
 

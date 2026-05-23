@@ -1,5 +1,6 @@
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { withSentryConfig } from '@sentry/nextjs';
 
 /** @type {import('next').NextConfig} */
 const webRoot = dirname(fileURLToPath(import.meta.url));
@@ -87,6 +88,20 @@ const nextConfig = {
   },
 };
 
-export default process.env.ANALYZE === 'true'
+const configWithAnalyzer = process.env.ANALYZE === 'true'
   ? (await import('@next/bundle-analyzer')).default({ enabled: true })(nextConfig)
   : nextConfig;
+
+export default withSentryConfig(configWithAnalyzer, {
+  org: process.env.SENTRY_ORG,
+  project: process.env.SENTRY_PROJECT,
+  authToken: process.env.SENTRY_AUTH_TOKEN,
+  silent: !process.env.CI,
+  widenClientFileUpload: true,
+  webpack: {
+    treeshake: {
+      removeDebugLogging: true,
+    },
+    automaticVercelMonitors: true,
+  },
+});

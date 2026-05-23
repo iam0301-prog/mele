@@ -74,6 +74,8 @@ type BirthCopy = {
   locationPresets: Array<{ label: string; lat: number; lon: number; timezone?: string | number }>;
 };
 
+export type BirthLocationPreset = BirthCopy['locationPresets'][number];
+
 const BIRTH_COPY: Record<Locale, BirthCopy> = {
   'zh-TW': {
     birthData: '出生資料',
@@ -333,6 +335,24 @@ applyLocationPresetTimezones();
 
 function copyFor(locale: Locale) {
   return BIRTH_COPY[locale] ?? BIRTH_COPY[DEFAULT_LOCALE];
+}
+
+export function getBirthLocationPresets(locale: Locale = DEFAULT_LOCALE): BirthLocationPreset[] {
+  return copyFor(locale).locationPresets;
+}
+
+export function findBirthLocationPreset(value: string, locale: Locale = DEFAULT_LOCALE): BirthLocationPreset | undefined {
+  const normalized = value.trim().toLocaleLowerCase();
+  if (!normalized) return undefined;
+
+  return getBirthLocationPresets(locale).find((item) => {
+    const label = item.label.toLocaleLowerCase();
+    return label === normalized || `${label}市` === normalized || label.replace(/市$/, '') === normalized.replace(/市$/, '');
+  });
+}
+
+export function presetTimezoneName(preset: BirthLocationPreset): string | undefined {
+  return typeof preset.timezone === 'string' ? preset.timezone : undefined;
 }
 
 function pad2(value: number) {

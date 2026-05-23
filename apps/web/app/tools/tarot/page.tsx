@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { ConsultCTA, ToolShell } from '@/components/ToolShell';
 import { ToolError, ToolLoading } from '@/components/ToolFeedback';
 import { ToolResultSection } from '@/components/ToolResultSection';
@@ -18,16 +18,19 @@ export default function TarotPage() {
   const [tarotStyle, setTarotStyle] = useState(copy.tarotStyles?.[1]?.value ?? 'ocean_poseidon');
   const [reversed, setReversed] = useState(true);
   const [loading, setLoading] = useState(false);
+  const submittingRef = useRef(false);
   const [result, setResult] = useState<CalcResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const onSubmit = async (event: React.FormEvent | React.MouseEvent<HTMLButtonElement>) => {
+  const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (loading || submittingRef.current) return;
     if (!question.trim()) {
       toast(copy.validation.questionRequired ?? 'Please enter a question first.', 'error');
       return;
     }
 
+    submittingRef.current = true;
     setLoading(true);
     setError(null);
     setResult(null);
@@ -47,6 +50,7 @@ export default function TarotPage() {
       setError(message);
       toast(message, 'error');
     } finally {
+      submittingRef.current = false;
       setLoading(false);
     }
   };
@@ -75,6 +79,7 @@ export default function TarotPage() {
                 key={item.value}
                 type="button"
                 onClick={() => setTarotStyle(item.value)}
+                aria-pressed={tarotStyle === item.value}
                 className={tarotStyle === item.value ? 'is-active' : ''}
               >
                 <span className={`tarot-style-preview tarot-style-preview--${item.value}`} aria-hidden="true">
@@ -101,7 +106,7 @@ export default function TarotPage() {
           {copy.reversedLabel}
         </label>
 
-        <button type="button" onClick={onSubmit} disabled={loading} className="mele-btn-primary w-full md:w-auto">
+        <button type="submit" disabled={loading} aria-disabled={loading} className="mele-btn-primary w-full md:w-auto">
           {loading ? copy.submit.loading : copy.submit.idle}
         </button>
       </form>

@@ -80,8 +80,14 @@ const RUNE_MATERIAL_META: Record<RuneMaterial, { label: string; short: string }>
 
 const SUMMARY_LABELS: Record<string, string> = {
   lifePath: '生命靈數',
+  lifePathDisplay: '生命靈數',
+  lifePathReduced: '底色數',
   birthDay: '生日數',
+  birthDayDisplay: '生日數',
+  birthDayReduced: '生日底色',
   lifePathArchetype: '生命原型',
+  birthDayArchetype: '生日原型',
+  calculationNote: '數字說明',
   kin: 'Kin',
   label: '本命印記',
   tone: '調性',
@@ -195,6 +201,21 @@ function text(value: unknown, fallback = '') {
   return fallback;
 }
 
+function formatSummaryDegree(value: unknown): string {
+  const numeric = Number(value);
+  if (Number.isFinite(numeric)) return `${numeric.toFixed(1)}度`;
+  const raw = text(value);
+  return raw ? `${raw}度` : '';
+}
+
+function formatZodiacSummary(value: unknown): string | null {
+  const obj = asRecord(value);
+  const sign = asRecord(obj.sign);
+  if (Object.keys(sign).length === 0) return null;
+  const joined = [text(sign.symbol), text(sign.zh), formatSummaryDegree(sign.degInSign)].filter(Boolean).join(' ');
+  return joined || null;
+}
+
 function formatSummaryValue(value: unknown): string | null {
   if (value === null || value === undefined || value === '') return null;
   if (['string', 'number', 'boolean'].includes(typeof value)) {
@@ -206,6 +227,8 @@ function formatSummaryValue(value: unknown): string | null {
     return joined || null;
   }
   const obj = asRecord(value);
+  const zodiac = formatZodiacSummary(obj);
+  if (zodiac) return zodiac;
   return text(obj.label) || text(obj.zh) || text(obj.name) || text(obj.name_zh) || null;
 }
 
@@ -312,7 +335,7 @@ function tarotIllustrationPath(style: TarotStyle, card?: TarotCardData): string 
 function getGenericSummary(kind: ReadingArKind, result?: CalcResponse | null) {
   const data = result?.data ?? {};
   const keysByKind: Record<ReadingArKind, string[]> = {
-    numerology: ['lifePath', 'birthDay', 'lifePathArchetype'],
+    numerology: ['lifePathDisplay', 'lifePathReduced', 'birthDayDisplay', 'lifePathArchetype'],
     maya: ['kin', 'label', 'tone', 'seal'],
     bazi: ['dayMaster', 'dayMasterWuxing', 'dayMasterYinYang'],
     ziwei: ['mingGong', 'shenGong', 'fiveElementsClass'],
@@ -349,12 +372,12 @@ function getVisualDiagramGuide(kind: ReadingArKind, result?: CalcResponse | null
       ],
     },
     numerology: {
-      intro: '靈數盤把生命路徑、生日數與原型整理成一張地圖。先看哪個數字最像你，再看今天可以練習什麼。',
-      note: '數字不是限制，而是幫你命名一種常見的思考與行動方式。',
+      intro: '靈數盤先把「生命靈數、底色數、生日數」翻成白話。不要先背公式，先看它有沒有說中你做決定、面對關係與處理壓力的習慣。',
+      note: '像 11/2 這種寫法，意思是：11 是放大的直覺與感受力，2 是最後落地的關係、協調與界線。別的網站算成 2 並不是一定錯，而是它選擇把大師數繼續化簡。',
       items: [
-        { title: '中間主題', body: `${firstSummary}。中間放最主要的生命數字，先用它抓你的基本節奏。` },
-        { title: '外圈結構', body: '外圈整理其他輔助數字與原型，幫你看見不同面向如何支援主軸。' },
-        { title: '線條代表', body: '線條代表數字之間的連動，提醒你哪些特質容易一起出現。' },
+        { title: '先看主數', body: `${firstSummary}。主數像你的第一反應：遇到事情時，你通常會怎麼感覺、怎麼想、怎麼想把事情推進。` },
+        { title: '再看底色', body: '底色數是這個人最後會落回去的生活課題。例如 11/2 不是「比 2 高級」，而是 11 的敏銳最後要學會用 2 的合作、界線與關係感落地。' },
+        { title: '最後看行動', body: '把數字變成今天能做的一件事：如果你太敏感，就先確認事實；如果你太配合，就練習說清楚自己的界線。' },
       ],
     },
     ziwei: {

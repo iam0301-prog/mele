@@ -46,6 +46,10 @@ const migrations = [
   'supabase/migrations/0010_kyc_auto_purge_cron.sql',
   'supabase/migrations/0011_admin_member_ops.sql',
   'supabase/migrations/0012_beta_tester_ops.sql',
+  'supabase/migrations/0013_teacher_consultation_briefs.sql',
+  'supabase/migrations/0014_admin_teacher_ops.sql',
+  'supabase/migrations/0015_lock_member_point_economy.sql',
+  'supabase/migrations/0016_teacher_portal_admin_chart_access.sql',
 ];
 
 function pgliteCompat(sql) {
@@ -73,22 +77,29 @@ for (const m of migrations) {
 const cust = '11111111-1111-1111-1111-111111111111';
 const teacherUser = '22222222-2222-2222-2222-222222222222';
 const adminUser = '33333333-3333-3333-3333-333333333333';
+const otherTeacherUser = '23232323-2323-2323-2323-232323232323';
+const memberUser = '24242424-2424-2424-2424-242424242424';
 
 await db.exec(`
   insert into auth.users (id, email, aud, role) values
     ('${cust}', 'cust@test', 'authenticated', 'authenticated'),
     ('${teacherUser}', 'teacher@test', 'authenticated', 'authenticated'),
-    ('${adminUser}', 'admin@test', 'authenticated', 'authenticated');
+    ('${adminUser}', 'admin@test', 'authenticated', 'authenticated'),
+    ('${otherTeacherUser}', 'teacher2@test', 'authenticated', 'authenticated'),
+    ('${memberUser}', 'member@test', 'authenticated', 'authenticated');
 
   insert into public.admins (user_id, role) values ('${adminUser}', 'super');
 
   insert into public.profiles (id, display_name) values
-    ('${cust}', '客戶 A'), ('${teacherUser}', '老師 B')
+    ('${cust}', '客戶 A'), ('${teacherUser}', '老師 B'),
+    ('${otherTeacherUser}', '老師 C'), ('${memberUser}', '會員 D')
   on conflict (id) do update set display_name = excluded.display_name;
 
   insert into public.teachers (id, user_id, status, display_name, specialties, commission_rate, approved_at)
   values ('44444444-4444-4444-4444-444444444444', '${teacherUser}', 'active', '林老師',
-    array['八字'], 0.20, now());
+    array['八字'], 0.20, now()),
+    ('45454545-4545-4545-4545-454545454545', '${otherTeacherUser}', 'active', '陳老師',
+    array['塔羅'], 0.20, now());
 
   insert into public.teacher_services (id, teacher_id, name, duration_minutes, price_ntd)
   values ('55555555-5555-5555-5555-555555555555',
@@ -109,6 +120,150 @@ console.log('\n[Test 1] 預約建立 → 自動分潤計算');
   const r = await db.query(`select platform_fee_ntd, teacher_amount_ntd from public.bookings where id='66666666-6666-6666-6666-666666666666'`);
   log('platform_fee_ntd = 400 (20%)', r.rows[0].platform_fee_ntd === 400, `got ${r.rows[0].platform_fee_ntd}`);
   log('teacher_amount_ntd = 1600', r.rows[0].teacher_amount_ntd === 1600, `got ${r.rows[0].teacher_amount_ntd}`);
+}
+
+// === 測試 1b: 老師解盤草稿保存 ===
+console.log('\n[Test 1b] teacher_consultation_briefs RPC');
+{
+  await db.exec(`select set_config('request.jwt.claim.sub', '${teacherUser}', false);`);
+  const saved = await db.query(`
+    select booking_id, teacher_id, customer_id, generated_brief, teacher_overrides, status
+    from public.save_teacher_consultation_brief(
+      '66666666-6666-6666-6666-666666666666',
+      '{"sourceLabel":"八字","coreSummary":"生成摘要"}'::jsonb,
+      '{"coreSummary":"老師改寫摘要"}'::jsonb,
+      'draft'
+    );
+  `);
+  log('teacher can save consultation brief', saved.rows[0].booking_id === '66666666-6666-6666-6666-666666666666');
+  log('generated brief is stored separately', saved.rows[0].generated_brief.coreSummary === '生成摘要');
+  log('teacher overrides are stored separately', saved.rows[0].teacher_overrides.coreSummary === '老師改寫摘要');
+  log('brief remains in draft status', saved.rows[0].status === 'draft');
+
+  await db.exec(`select set_config('request.jwt.claim.sub', '${cust}', false);`);
+  try {
+    await db.query(`
+      select public.save_teacher_consultation_brief(
+        '66666666-6666-6666-6666-666666666666',
+        '{}'::jsonb,
+        '{}'::jsonb,
+        'draft'
+      );
+    `);
+    log('customer cannot save teacher consultation brief', false, 'unexpectedly allowed');
+  } catch (e) {
+    log('customer cannot save teacher consultation brief', true, e.message.split('\n')[0]);
+  }
+
+  await db.exec(`select set_config('request.jwt.claim.sub', '${otherTeacherUser}', false);`);
+  try {
+    await db.query(`
+      select public.save_teacher_consultation_brief(
+        '66666666-6666-6666-6666-666666666666',
+        '{}'::jsonb,
+        '{}'::jsonb,
+        'draft'
+      );
+    `);
+    log('non-booked teacher cannot save another teacher brief', false, 'unexpectedly allowed');
+  } catch (e) {
+    log('non-booked teacher cannot save another teacher brief', true, e.message.split('\n')[0]);
+  }
+}
+
+// === Test 1c: member point wallet RPC ===
+console.log('\n[Test 1c] member point wallet RPC');
+{
+  await db.exec(`select set_config('request.jwt.claim.sub', '${memberUser}', false);`);
+
+  let r = await db.query(`select public.claim_daily_points('2026-05-10'::date, 200) as result`);
+  log('member can claim 200 daily points', r.rows[0].result.claimed === true && r.rows[0].result.amount === 200, `got ${JSON.stringify(r.rows[0].result)}`);
+  log('daily claim balance is 200', r.rows[0].result.balance === 200, `got ${r.rows[0].result.balance}`);
+
+  r = await db.query(`select public.claim_daily_points('2026-05-10'::date, 200) as result`);
+  log('same-day claim is idempotent', r.rows[0].result.claimed === false && r.rows[0].result.amount === 0, `got ${JSON.stringify(r.rows[0].result)}`);
+  log('same-day duplicate claim does not add points', r.rows[0].result.balance === 200, `got ${r.rows[0].result.balance}`);
+
+  try {
+    await db.query(`select public.claim_daily_points('2026-05-11'::date, 999) as result`);
+    log('daily claim rejects caller-controlled amount', false, 'unexpectedly allowed 999 points');
+  } catch (e) {
+    log('daily claim rejects caller-controlled amount', e.message.includes('daily_amount_must_be_200'), e.message.substring(0, 80));
+  }
+
+  r = await db.query(`select balance, lifetime_earned from public.member_wallets where user_id='${memberUser}'`);
+  log('rejected daily amount override does not change wallet', r.rows[0].balance === 200 && r.rows[0].lifetime_earned === 200, `got ${JSON.stringify(r.rows[0])}`);
+
+  r = await db.query(`
+    select public.unlock_content(
+      'deep_reading',
+      'numerology',
+      'chart:demo-1',
+      100,
+      '{"source":"sql-test"}'::jsonb
+    ) as result
+  `);
+  log('member can unlock deep reading for 100 points', r.rows[0].result.unlocked === true && r.rows[0].result.already_unlocked === false, `got ${JSON.stringify(r.rows[0].result)}`);
+  log('unlock subtracts 100 points', r.rows[0].result.balance === 100, `got ${r.rows[0].result.balance}`);
+  log('unlock RPC returns backend-generated paid content', Boolean(r.rows[0].result.content?.title && r.rows[0].result.content?.summary && Array.isArray(r.rows[0].result.content?.sections)), `got ${JSON.stringify(r.rows[0].result.content)}`);
+
+  let unlockRow = await db.query(`select metadata from public.content_unlocks where user_id='${memberUser}' and scope_key='chart:demo-1'`);
+  log('unlock stores generated content in server metadata', Boolean(unlockRow.rows[0].metadata?.unlocked_content?.title), `got ${JSON.stringify(unlockRow.rows[0].metadata)}`);
+
+  try {
+    await db.query(`
+      select public.unlock_content(
+        'transit_day',
+        'numerology',
+        'chart:demo-1:day',
+        1,
+        '{}'::jsonb
+      )
+    `);
+    log('unlock rejects caller-controlled cost', false, 'unexpectedly allowed 1 point unlock');
+  } catch (e) {
+    log('unlock rejects caller-controlled cost', e.message.includes('unlock_cost_must_be_100'), e.message.substring(0, 80));
+  }
+
+  r = await db.query(`select balance, lifetime_spent from public.member_wallets where user_id='${memberUser}'`);
+  log('rejected unlock cost override does not change wallet', r.rows[0].balance === 100 && r.rows[0].lifetime_spent === 100, `got ${JSON.stringify(r.rows[0])}`);
+
+  r = await db.query(`
+    select public.unlock_content(
+      'deep_reading',
+      'numerology',
+      'chart:demo-1',
+      100,
+      '{"source":"sql-test"}'::jsonb
+    ) as result
+  `);
+  log('re-unlocking same scope is idempotent', r.rows[0].result.already_unlocked === true, `got ${JSON.stringify(r.rows[0].result)}`);
+  log('re-unlocking same scope does not charge again', r.rows[0].result.balance === 100, `got ${r.rows[0].result.balance}`);
+  log('re-unlocking same scope returns stored paid content', r.rows[0].result.content?.title === unlockRow.rows[0].metadata.unlocked_content.title, `got ${JSON.stringify(r.rows[0].result.content)}`);
+
+  r = await db.query(`
+    select count(*)::int as c
+      from public.point_transactions
+     where user_id='${memberUser}'
+  `);
+  log('daily claim plus one unlock writes two point transactions', r.rows[0].c === 2, `got ${r.rows[0].c}`);
+
+  await db.exec(`update public.member_wallets set balance = 50 where user_id='${memberUser}'`);
+
+  try {
+    await db.query(`
+      select public.unlock_content(
+        'transit_year',
+        'astro',
+        'year:2026',
+        100,
+        '{}'::jsonb
+      )
+    `);
+    log('insufficient points blocks paid unlock', false, 'unexpectedly allowed');
+  } catch (e) {
+    log('insufficient points blocks paid unlock', e.message.includes('insufficient_points'), e.message.substring(0, 80));
+  }
 }
 
 // === 測試 2: 雙重預約防護 ===

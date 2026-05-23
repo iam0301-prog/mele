@@ -5,7 +5,7 @@
     "description": "MELE is a multilingual self-discovery platform for free tests, tarot, runes, Maya calendar, Bazi, Human Design, astrology, numerology, daily rituals, and member points.",
     "keywords": [
       "self-discovery",
-      "spiritual tools",
+      "self-discovery tools",
       "tarot",
       "Maya calendar",
       "Bazi",
@@ -88,7 +88,7 @@
     "marketsBody": "Taiwan, Vietnam, Indonesia, English, and future Japanese and Korean audiences can enter the same tool system in their own language.",
     "toolsKicker": "FREE TESTS",
     "toolsTitle": "Understand yourself before going deeper",
-    "toolsBody": "Each market page reserves sections for free tests, persona analysis, articles, short-form video, social channels, and optional guidance.",
+    "toolsBody": "The public entry now focuses on tools, daily rituals, member points, and optional guidance.",
     "roleKicker": "ROLE FLOW",
     "roleTitle": "Clear journeys for members and guides",
     "roleBody": "Members start with simple interactive tools; guides only step in when someone wants a deeper conversation.",
@@ -183,46 +183,46 @@
         "name": "Cổng Đài Loan",
         "status": "Thị trường chính",
         "body": "Nội dung tiếng Hoa phồn thể, LINE, lối vào tư vấn và nghi thức ngày.",
-        "href": "/zh-TW/spiritual"
+        "href": "/tools"
       },
       {
         "locale": "vi",
         "name": "Cổng Việt Nam",
         "status": "Thị trường chính",
         "body": "Bài test tiếng Việt, video ngắn và kênh xã hội.",
-        "href": "/vi/spiritual"
+        "href": "/tools"
       },
       {
         "locale": "id",
         "name": "Cổng Indonesia",
         "status": "Thị trường chính",
         "body": "Nội dung Indonesia và hợp tác cùng guide.",
-        "href": "/id/spiritual"
+        "href": "/tools"
       },
       {
         "locale": "en",
         "name": "Cổng tiếng Anh",
         "status": "Quốc tế",
         "body": "Onboarding tiếng Anh cho công cụ và tư vấn.",
-        "href": "/en/spiritual"
+        "href": "/tools"
       },
       {
         "locale": "ja",
         "name": "Cổng Nhật Bản",
         "status": "Chuẩn bị",
         "body": "Khung SEO và nội dung sẽ bổ sung sau.",
-        "href": "/ja/spiritual"
+        "href": "/tools"
       },
       {
         "locale": "ko",
         "name": "Cổng Hàn Quốc",
         "status": "Chuẩn bị",
         "body": "Khung SEO và nội dung sẽ bổ sung sau.",
-        "href": "/ko/spiritual"
+        "href": "/tools"
       }
     ],
     "page": {
-      "kicker": "SPIRITUAL MARKET",
+      "kicker": "SELF DISCOVERY",
       "heroTitle": "Cổng thị trường tâm linh",
       "heroBody": "Trang landing bản địa cho test miễn phí, phân tích vai trò, bài viết, video ngắn, kênh chính thức và lối vào tư vấn khi cần.",
       "freeTests": "Bài test miễn phí",

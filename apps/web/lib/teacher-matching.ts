@@ -15,7 +15,7 @@ export const MATCH_TOPICS: Array<{ value: MatchTopic; label: string; hint: strin
   { value: 'family', label: '家庭', hint: '親子、原生家庭、家人互動', keywords: ['家庭', '家人', '親子', '父母', '小孩', '原生家庭'] },
   { value: 'self', label: '自我', hint: '天賦、卡關、內在整理', keywords: ['自我', '天賦', '卡關', '內在', '方向', '迷惘'] },
   { value: 'year', label: '年度方向', hint: '流年、未來一年、重大選擇', keywords: ['年度', '流年', '未來', '選擇', '規劃', '運勢'] },
-  { value: 'spiritual', label: '靈性探索', hint: '能量、夢境、直覺、靈魂課題', keywords: ['靈性', '能量', '夢境', '直覺', '靈魂', '課題'] },
+  { value: 'spiritual', label: '直覺與內在整理', hint: '夢境、直覺、反覆出現的內在訊息', keywords: ['直覺', '夢境', '內在', '訊息', '課題'] },
 ];
 
 export const MATCH_TOOLS: Array<{ value: MatchTool; label: string; specialties: string[] }> = [
@@ -31,7 +31,7 @@ export const MATCH_TOOLS: Array<{ value: MatchTool; label: string; specialties: 
 ];
 
 export const MATCH_STYLES: Array<{ value: MatchStyle; label: string; keywords: string[] }> = [
-  { value: 'gentle', label: '溫柔陪伴', keywords: ['溫柔', '陪伴', '傾聽', '療癒', '支持'] },
+  { value: 'gentle', label: '溫柔陪伴', keywords: ['溫柔', '陪伴', '傾聽', '修復', '支持'] },
   { value: 'direct', label: '直接點破', keywords: ['直接', '點破', '犀利', '清楚', '直白'] },
   { value: 'structured', label: '結構分析', keywords: ['結構', '分析', '理性', '邏輯', '系統'] },
   { value: 'ritual', label: '神秘儀式感', keywords: ['儀式', '神秘', '直覺', '能量', '牌卡'] },

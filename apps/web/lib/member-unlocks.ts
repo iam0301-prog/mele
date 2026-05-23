@@ -36,41 +36,30 @@ export const MEMBER_UNLOCK_OPTIONS: MemberUnlockOption[] = [
     label: '深入解釋',
     eyebrow: 'DEEP READING',
     title: '解鎖本次完整解釋',
-    body: '付 100 點可開深解。此段以文言感書寫，先明其象，再立其行。',
+    body: '花 100 點看更完整的白話解讀：優勢、卡點、目前最該注意的地方，以及今天可以做的一個小行動。',
   },
   {
     type: 'transit_day',
     label: '流日',
     eyebrow: 'DAILY TRANSIT',
     title: '解鎖今天的流日視角',
-    body: '付 100 點觀今日之氣。宜知所進退，忌為雜念牽行。',
+    body: '花 100 點看今天適合怎麼使用這份結果：哪裡可以前進、哪裡先不要急，避免把情緒當成答案。',
   },
   {
     type: 'transit_month',
     label: '流月',
     eyebrow: 'MONTHLY TRANSIT',
     title: '解鎖本月流月解讀',
-    body: '付 100 點觀本月之勢。明其主題，辨其消長，安排行止。',
+    body: '花 100 點看本月主題：適合累積什麼、要避開什麼消耗，以及每週可以檢查的方向。',
   },
   {
     type: 'transit_year',
     label: '流年',
     eyebrow: 'YEARLY TRANSIT',
     title: '解鎖今年流年解讀',
-    body: '付 100 點觀今年之局。察其大勢，定其修習，分段而行。',
+    body: '花 100 點看今年大方向：哪些事值得長期投入、哪些慣性要調整，幫你把一年拆成可走的階段。',
   },
 ];
-
-const TOOL_LABEL: Record<CalcTool, string> = {
-  numerology: '生命靈數',
-  maya: '馬雅曆',
-  bazi: '八字',
-  ziwei: '紫微斗數',
-  tarot: '塔羅',
-  runes: '盧恩',
-  astro: '占星',
-  humandesign: '人類圖',
-};
 
 function taipeiDatePart(part: 'day' | 'month' | 'year') {
   const day = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Taipei' }).format(new Date());
@@ -88,9 +77,18 @@ function hashScopeText(value: string) {
   return (hash >>> 0).toString(36);
 }
 
+function canonicalJson(value: unknown): string {
+  if (value === null || typeof value !== 'object') return JSON.stringify(value);
+  if (Array.isArray(value)) return `[${value.map((item) => canonicalJson(item)).join(',')}]`;
+  return `{${Object.keys(value as Record<string, unknown>)
+    .sort()
+    .map((key) => `${JSON.stringify(key)}:${canonicalJson((value as Record<string, unknown>)[key])}`)
+    .join(',')}}`;
+}
+
 function stableJson(value: unknown) {
   try {
-    return JSON.stringify(value);
+    return canonicalJson(value);
   } catch {
     return String(value);
   }
@@ -144,13 +142,13 @@ function resultAnchor(result: CalcResponse) {
   if (result.tool === 'ziwei') return cleanText(data.mingGong, '命宮');
   if (result.tool === 'astro') return cleanText(data.sun, '太陽星座');
   if (result.tool === 'humandesign') return cleanText(data.type, '能量類型');
-  return cleanText(data.lifePath, '核心數字');
+  return cleanText(data.lifePathDisplay ?? data.lifePath, '核心數字');
 }
 
 function resultSignals(result: CalcResponse) {
   const data = result.data ?? {};
   const keys: Partial<Record<CalcTool, string[]>> = {
-    numerology: ['lifePath', 'birthDay', 'lifePathArchetype'],
+    numerology: ['lifePathDisplay', 'lifePathReduced', 'birthDayDisplay', 'lifePathArchetype'],
     maya: ['kin', 'tone', 'seal', 'guide', 'analog', 'antipode', 'occult'],
     bazi: ['dayMaster', 'dayMasterWuxing', 'dayMasterYinYang', 'nayin'],
     ziwei: ['mingGong', 'shenGong', 'fiveElementsClass'],
@@ -176,100 +174,13 @@ function resultSignals(result: CalcResponse) {
     .slice(0, 5);
 }
 
-function periodCopy(type: MemberUnlockType) {
-  if (type === 'transit_day') {
-    return {
-      period: '今日',
-      title: '今日流日解讀',
-      tempo: '今日宜收斂心神，先定一事，不貪多功。',
-      risk: '忌見一念而即動。身感、情緒、責任三者宜分辨，不宜混作一團。',
-      action: '取一件十五分鐘可成之事，成後再議下一步。',
-    };
-  }
-  if (type === 'transit_month') {
-    return {
-      period: '本月',
-      title: '本月流月解讀',
-      tempo: '本月宜立常課，使靈感、學習與人事各得其位。',
-      risk: '忌一時求盡解。凡反覆來者，正是本月當修之處。',
-      action: '列三件可久行之習，每七日自省一次。',
-    };
-  }
-  if (type === 'transit_year') {
-    return {
-      period: '今年',
-      title: '今年流年解讀',
-      tempo: '今年宜將天賦入於長策，不以一時情緒為舟楫。',
-      risk: '忌急迫決大事。歲運之象，貴在觀其漸成。',
-      action: '分今年為三段：定基、開展、收束；每段各立一可驗之果。',
-    };
-  }
-  return {
-    period: '本次',
-    title: '完整深入解釋',
-    tempo: '此解不以吉凶定論，重在辨其主軸，使心有所據。',
-    risk: '忌執一詞為全局。圖像、數據、位置與所問之事，宜合參而觀。',
-    action: '先錄最有感之一句，再化為今日可行之一事。',
-  };
-}
-
-export function buildUnlockedReadingContent(result: CalcResponse, type: MemberUnlockType): MemberUnlockedReading {
-  const toolName = TOOL_LABEL[result.tool];
-  const anchor = resultAnchor(result);
+export function buildUnlockContentMetadata(result: CalcResponse) {
   const signals = resultSignals(result);
-  const signalText = signals.length ? signals.join('、') : anchor;
-  const period = periodCopy(type);
-
-  if (type === 'deep_reading') {
-    return {
-      title: `${toolName}｜完整深入解釋`,
-      summary: `此象以「${anchor}」為眼。${signalText} 皆為旁證；先明其所指，再定今日所行。`,
-      sections: [
-        {
-          label: '其象',
-          title: '本象所指',
-          body: `${anchor} 為本次主象。此象不專言吉凶，乃示你當收回散逸之心，復見真正要處。`,
-        },
-        {
-          label: '其用',
-          title: '當如何承接',
-          body: `${signalText} 同現，宜先立序，再求變。凡眼前最具體、最可改善之事，便是入手處。`,
-        },
-        {
-          label: '其行',
-          title: '今日可行之法',
-          body: '宜少反應，多選擇；少自責，多整理。能行一小步，勝於徒得千言。',
-        },
-      ],
-      tasks: ['記一字為今日主題', '擇一事於今日完成', '入夜回看其應驗處'],
-    };
-  }
-
   return {
-    title: `${toolName}｜${period.title}`,
-    summary: `${period.period}以「${anchor}」為門。所重不在斷一事成敗，而在知其節候，使進退有據。`,
-    sections: [
-      {
-        label: '宜',
-        title: `${period.period}可順之勢`,
-        body: `${period.tempo} ${toolName} 所示 ${signalText}，可作定心之準。`,
-      },
-      {
-        label: '忌',
-        title: `${period.period}當避之耗`,
-        body: period.risk,
-      },
-      {
-        label: '行',
-        title: `${period.period}可行之事`,
-        body: period.action,
-      },
-    ],
-    tasks: [
-      `${period.period}只守一個主題`,
-      '以一句話記其心境',
-      '將提醒化為一件可成之事',
-    ],
+    result_anchor: resultAnchor(result),
+    result_signals: signals.length ? signals : [resultAnchor(result)],
+    computed_at: result.computed_at,
+    version: result.version,
   };
 }
 

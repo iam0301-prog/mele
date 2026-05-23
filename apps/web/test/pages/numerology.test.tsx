@@ -90,6 +90,49 @@ describe('<NumerologyPage />', () => {
     });
   });
 
+  it('guards against duplicate submit clicks while the reading is loading', async () => {
+    let resolveFetch: ((value: {
+      ok: boolean;
+      status: number;
+      json: () => Promise<unknown>;
+    }) => void) | undefined;
+    const fetchMock = vi.fn().mockImplementation(() => new Promise((resolve) => {
+      resolveFetch = resolve;
+    }));
+    vi.stubGlobal('fetch', fetchMock);
+
+    renderPage();
+    fireEvent.change(screen.getByRole('combobox', { name: /年/i }), { target: { value: '1990' } });
+    fireEvent.change(screen.getByRole('combobox', { name: /月/i }), { target: { value: '6' } });
+    fireEvent.change(screen.getByRole('combobox', { name: /日/i }), { target: { value: '15' } });
+
+    const submit = screen.getByRole('button', { name: /開始解讀/ });
+    fireEvent.click(submit);
+    fireEvent.click(submit);
+
+    await waitFor(() => {
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+      expect(submit).toBeDisabled();
+    });
+
+    resolveFetch?.({
+      ok: true,
+      status: 200,
+      json: () => Promise.resolve({
+        tool: 'numerology',
+        version: 'v1',
+        computed_at: '2026-05-04',
+        input: { year: 1990, month: 6, day: 15 },
+        data: { lifePath: 4 },
+        render: { svg: '<svg/>' },
+      }),
+    });
+
+    await waitFor(() => {
+      expect(screen.getByTestId('tool-result')).toBeInTheDocument();
+    });
+  });
+
   it('renders ToolError when API returns failure', async () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
       ok: false,

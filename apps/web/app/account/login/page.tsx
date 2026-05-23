@@ -3,10 +3,12 @@
 import Link from 'next/link';
 import type { Provider } from '@supabase/supabase-js';
 import { Suspense, useEffect, useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
+import { normalizeLoginReturnPath } from '@/lib/auth-callback-redirects';
 import { canUseClientTestAuth, setClientTestAuth } from '@/lib/test-auth';
 import { useToast } from '@/components/ToastProvider';
+import { findBirthLocationPreset, getBirthLocationPresets, presetTimezoneName, type BirthLocationPreset } from '@/components/BirthInputs';
 
 const CONSENT_VERSION = '2026-04-30';
 type SocialProviderKey = 'line' | 'google';
@@ -34,7 +36,17 @@ const SOCIAL_PROVIDERS: Array<{ key: SocialProviderKey; provider: Provider; labe
 const AUTH_ERROR_COPY: Record<string, string> = {
   auth_failed: '登入連結已失效或驗證沒有完成，請重新登入一次。',
   auth_callback_failed: '第三方登入回跳失敗，請確認 Supabase Redirect URLs 與 provider 設定。',
+  email_confirmed_login_required: 'Email 可能已完成驗證，但這個瀏覽器沒有原本的註冊登入狀態。請直接用剛才註冊的 Email 與密碼登入。',
+  not_admin: '這個瀏覽器目前登入的帳號不是後台管理員。請改用管理員 Email 登入。',
 };
+
+function friendlyError(error: unknown, fallback = '操作沒有完成，請再試一次。') {
+  if (error instanceof Error) return error.message || fallback;
+  if (typeof error === 'object' && error !== null && 'message' in error) {
+    return String((error as { message?: unknown }).message || fallback);
+  }
+  return fallback;
+}
 
 const detectLineProvider = (settings: { external?: Record<string, unknown> }) => {
   const external = settings.external ?? {};
@@ -56,14 +68,14 @@ const detectLineProvider = (settings: { external?: Record<string, unknown> }) =>
 };
 
 function LoginInner() {
-  const router = useRouter();
   const search = useSearchParams();
   const toast = useToast();
-  const returnUrl = search.get('return') || '/';
+  const returnUrl = normalizeLoginReturnPath(search.get('return'));
   const inviteCode = search.get('invite')?.trim() || '';
   const betaSegment = search.get('segment')?.trim() || 'invite';
   const authError = search.get('error');
   const authMessage = search.get('message');
+  const forceSignOut = search.get('force_signout') === '1';
   const authErrorMessage = authError ? (authMessage || AUTH_ERROR_COPY[authError] || '登入流程沒有完成，請再試一次。') : '';
 
   const [mode, setMode] = useState<'signin' | 'signup'>(() => (inviteCode || search.get('mode') === 'signup' ? 'signup' : 'signin'));
@@ -79,7 +91,7 @@ function LoginInner() {
   const [birthLocation, setBirthLocation] = useState('台北市');
   const [birthLat, setBirthLat] = useState('25.033');
   const [birthLon, setBirthLon] = useState('121.5654');
-  const [birthTz] = useState('Asia/Taipei');
+  const [birthTz, setBirthTz] = useState('Asia/Taipei');
 
   const [loading, setLoading] = useState(false);
   const [resetSending, setResetSending] = useState(false);
@@ -91,6 +103,23 @@ function LoginInner() {
   useEffect(() => {
     if (authErrorMessage) toast(authErrorMessage, 'error');
   }, [authErrorMessage, toast]);
+
+  useEffect(() => {
+    if (!forceSignOut) return;
+    const clearWrongSession = async () => {
+      try {
+        const supabase = createClient();
+        await supabase.auth.signOut();
+      } catch {
+        // 登入頁仍可手動輸入管理員帳號，不需要阻斷畫面。
+      } finally {
+        window.location.replace(`/account/login?return=${encodeURIComponent(returnUrl)}`);
+      }
+    };
+    void clearWrongSession().catch(() => {
+      window.location.replace(`/account/login?return=${encodeURIComponent(returnUrl)}`);
+    });
+  }, [forceSignOut, returnUrl]);
 
   useEffect(() => {
     if (inviteCode) setMode('signup');
@@ -141,6 +170,22 @@ function LoginInner() {
   const buildAuthCallbackUrl = (next: string) =>
     `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`;
 
+  const applyBirthPreset = (preset: BirthLocationPreset) => {
+    setBirthLocation(preset.label);
+    setBirthLat(String(preset.lat));
+    setBirthLon(String(preset.lon));
+    setBirthTz(presetTimezoneName(preset) ?? birthTz);
+  };
+
+  const updateBirthLocation = (value: string) => {
+    setBirthLocation(value);
+    const preset = findBirthLocationPreset(value);
+    if (!preset) return;
+    setBirthLat(String(preset.lat));
+    setBirthLon(String(preset.lon));
+    setBirthTz(presetTimezoneName(preset) ?? birthTz);
+  };
+
   const submit = async (event: React.FormEvent) => {
     event.preventDefault();
     setSignupNotice('');
@@ -150,25 +195,66 @@ function LoginInner() {
     if (mode === 'signup' && !ageConfirmed) return toast('請確認年齡與監護人同意狀態。', 'error');
 
     setLoading(true);
-    const supabase = createClient();
+    try {
+      const supabase = createClient();
 
-    if (mode === 'signin') {
-      const { error } = await supabase.auth.signInWithPassword({ email, password: pwd });
-      setLoading(false);
-      if (error) return toast(error.message, 'error');
-      toast('登入成功。', 'success');
-      router.push(returnUrl);
-      router.refresh();
-      return;
-    }
+      if (mode === 'signin') {
+        const { error } = await supabase.auth.signInWithPassword({ email, password: pwd });
+        if (error) {
+          toast(error.message, 'error');
+          return;
+        }
+        toast('登入成功。', 'success');
+        window.location.assign(returnUrl);
+        return;
+      }
 
-    const consentedAt = new Date().toISOString();
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password: pwd,
-      options: {
-        emailRedirectTo: buildAuthCallbackUrl(returnUrl),
-        data: {
+      const consentedAt = new Date().toISOString();
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password: pwd,
+        options: {
+          emailRedirectTo: buildAuthCallbackUrl(returnUrl),
+          data: {
+            display_name: displayName,
+            birth_date: birthDate || null,
+            birth_time: birthTime || null,
+            birth_location: birthLocation || null,
+            birth_lat: birthLat ? parseFloat(birthLat) : null,
+            birth_lon: birthLon ? parseFloat(birthLon) : null,
+            birth_timezone: birthTz,
+            gender,
+            privacy_consent_at: consentedAt,
+            tos_consent_at: consentedAt,
+            consent_version: CONSENT_VERSION,
+            marketing_opt_in: false,
+            beta_invite_code: inviteCode || null,
+            beta_segment: betaSegment,
+          },
+        },
+      });
+
+      if (error) {
+        toast(error.message, 'error');
+        return;
+      }
+
+      const likelyExistingSignup =
+        data.user &&
+        !data.session &&
+        Array.isArray(data.user.identities) &&
+        data.user.identities.length === 0;
+      if (likelyExistingSignup) {
+        setMode('signin');
+        setPwd('');
+        setSignupNotice('這個 Email 可能已經註冊或完成驗證，因此系統不一定會再寄新的註冊驗證信。請先嘗試直接登入；若忘記密碼，請使用「忘記密碼」寄送重設信。');
+        toast('這個 Email 可能已經註冊，請改用登入或忘記密碼。', 'error');
+        return;
+      }
+
+      if (data.user && data.session) {
+        const { error: profileError } = await supabase.from('profiles').upsert({
+          id: data.user.id,
           display_name: displayName,
           birth_date: birthDate || null,
           birth_time: birthTime || null,
@@ -179,108 +265,81 @@ function LoginInner() {
           gender,
           privacy_consent_at: consentedAt,
           tos_consent_at: consentedAt,
-          consent_version: CONSENT_VERSION,
-          marketing_opt_in: false,
-          beta_invite_code: inviteCode || null,
-          beta_segment: betaSegment,
-        },
-      },
-    });
+          privacy_consent_version: CONSENT_VERSION,
+        });
+        if (profileError) console.warn('profile upsert failed:', profileError);
 
-    if (error) {
-      setLoading(false);
-      return toast(error.message, 'error');
-    }
+        const { data: existingConsent } = await supabase
+          .from('consent_log')
+          .select('consent_type')
+          .eq('user_id', data.user.id)
+          .eq('consent_version', CONSENT_VERSION)
+          .in('consent_type', ['privacy', 'tos']);
+        const existingTypes = new Set((existingConsent ?? []).map((row) => row.consent_type));
+        const missingConsent = [
+          { user_id: data.user.id, consent_type: 'privacy', consent_version: CONSENT_VERSION, consented_at: consentedAt },
+          { user_id: data.user.id, consent_type: 'tos', consent_version: CONSENT_VERSION, consented_at: consentedAt },
+        ].filter((row) => !existingTypes.has(row.consent_type));
+        if (missingConsent.length > 0) {
+          const { error: consentError } = await supabase.from('consent_log').insert(missingConsent);
+          if (consentError) console.warn('consent log insert failed:', consentError);
+        }
+      }
 
-    const likelyExistingSignup =
-      data.user &&
-      !data.session &&
-      Array.isArray(data.user.identities) &&
-      data.user.identities.length === 0;
-    if (likelyExistingSignup) {
-      setLoading(false);
+      if (data.session) {
+        toast('註冊完成，已登入。', 'success');
+        window.location.assign(returnUrl);
+        return;
+      }
+
       setMode('signin');
       setPwd('');
-      setSignupNotice('這個 Email 可能已經註冊或完成驗證，因此系統不一定會再寄新的註冊驗證信。請先嘗試直接登入；若忘記密碼，請使用「忘記密碼」寄送重設信。');
-      toast('這個 Email 可能已經註冊，請改用登入或忘記密碼。', 'error');
-      return;
+      setSignupNotice('確認信已寄出，請到信箱完成驗證後再回來登入。若 1-2 分鐘內沒有收到，請先檢查垃圾信件與促銷分類，也可以按下重新寄送驗證信。');
+      toast('確認信已寄出，請先完成 Email 驗證。', 'success');
+    } catch (error) {
+      toast(friendlyError(error), 'error');
+    } finally {
+      setLoading(false);
     }
-
-    if (data.user && data.session) {
-      const { error: profileError } = await supabase.from('profiles').upsert({
-        id: data.user.id,
-        display_name: displayName,
-        birth_date: birthDate || null,
-        birth_time: birthTime || null,
-        birth_location: birthLocation || null,
-        birth_lat: birthLat ? parseFloat(birthLat) : null,
-        birth_lon: birthLon ? parseFloat(birthLon) : null,
-        birth_timezone: birthTz,
-        gender,
-        privacy_consent_at: consentedAt,
-        tos_consent_at: consentedAt,
-        privacy_consent_version: CONSENT_VERSION,
-      });
-      if (profileError) console.warn('profile upsert failed:', profileError);
-
-      const { data: existingConsent } = await supabase
-        .from('consent_log')
-        .select('consent_type')
-        .eq('user_id', data.user.id)
-        .eq('consent_version', CONSENT_VERSION)
-        .in('consent_type', ['privacy', 'tos']);
-      const existingTypes = new Set((existingConsent ?? []).map((row) => row.consent_type));
-      const missingConsent = [
-        { user_id: data.user.id, consent_type: 'privacy', consent_version: CONSENT_VERSION, consented_at: consentedAt },
-        { user_id: data.user.id, consent_type: 'tos', consent_version: CONSENT_VERSION, consented_at: consentedAt },
-      ].filter((row) => !existingTypes.has(row.consent_type));
-      if (missingConsent.length > 0) {
-        const { error: consentError } = await supabase.from('consent_log').insert(missingConsent);
-        if (consentError) console.warn('consent log insert failed:', consentError);
-      }
-    }
-
-    setLoading(false);
-    if (data.session) {
-      toast('註冊完成，已登入。', 'success');
-      router.push(returnUrl);
-      router.refresh();
-      return;
-    }
-
-    setMode('signin');
-    setPwd('');
-    setSignupNotice('確認信已寄出，請到信箱完成驗證後再回來登入。若 1-2 分鐘內沒有收到，請先檢查垃圾信件與促銷分類，也可以按下重新寄送驗證信。');
-    toast('確認信已寄出，請先完成 Email 驗證。', 'success');
   };
 
   const sendPasswordReset = async () => {
     if (!email) return toast('請先輸入要重設密碼的 Email。', 'error');
     setResetSending(true);
-    const supabase = createClient();
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent('/account/profile')}`,
-    });
-    setResetSending(false);
-    if (error) return toast(error.message, 'error');
-    toast('密碼重設信已寄出，請到信箱查看。', 'success');
+    try {
+      const supabase = createClient();
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent('/account/profile')}`,
+      });
+      if (error) return toast(error.message, 'error');
+      toast('密碼重設信已寄出，請到信箱查看。', 'success');
+    } catch (error) {
+      toast(friendlyError(error), 'error');
+    } finally {
+      setResetSending(false);
+    }
   };
 
   const resendSignupConfirmation = async () => {
     if (!email) return toast('請先輸入註冊時使用的 Email。', 'error');
     setConfirmationSending(true);
-    const supabase = createClient();
-    const { error } = await supabase.auth.resend({
-      type: 'signup',
-      email,
-      options: {
-        emailRedirectTo: buildAuthCallbackUrl(returnUrl),
-      },
-    });
-    setConfirmationSending(false);
-    if (error) return toast(error.message, 'error');
-    setSignupNotice('驗證信已重新寄出，請檢查收件匣、垃圾信件與促銷分類。若仍收不到，通常是 Supabase SMTP 或寄信限制需要在 Dashboard 調整。');
-    toast('驗證信已重新寄出。', 'success');
+    try {
+      const supabase = createClient();
+      const { error } = await supabase.auth.resend({
+        type: 'signup',
+        email,
+        options: {
+          emailRedirectTo: buildAuthCallbackUrl(returnUrl),
+        },
+      });
+      if (error) return toast(error.message, 'error');
+      setSignupNotice('驗證信已重新寄出，請檢查收件匣、垃圾信件與促銷分類。若仍收不到，通常是 Supabase SMTP 或寄信限制需要在 Dashboard 調整。');
+      toast('驗證信已重新寄出。', 'success');
+    } catch (error) {
+      toast(friendlyError(error), 'error');
+    } finally {
+      setConfirmationSending(false);
+    }
   };
 
   const isSocialProviderEnabled = (provider: SocialProviderKey) => {
@@ -300,23 +359,26 @@ function LoginInner() {
       return;
     }
 
-    const supabase = createClient();
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: meta.provider,
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(returnUrl)}`,
-        scopes: provider === 'line' ? 'openid profile email' : undefined,
-      },
-    });
-    if (error) toast(`${provider} 登入失敗：${error.message}`, 'error');
+    try {
+      const supabase = createClient();
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: meta.provider,
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(returnUrl)}`,
+          scopes: provider === 'line' ? 'openid profile email' : undefined,
+        },
+      });
+      if (error) toast(`${provider} 登入失敗：${error.message}`, 'error');
+    } catch (error) {
+      toast(friendlyError(error, `${provider} 登入失敗。`), 'error');
+    }
   };
 
   const useLocalTestAuth = () => {
     const enabled = setClientTestAuth();
     if (!enabled) return toast('本機測試登入只會在 localhost 與免費測試模式開啟。', 'error');
     toast('已使用本機測試帳號進入。正式上線仍需完成 Email 驗證信設定。', 'success');
-    router.push(returnUrl);
-    router.refresh();
+    window.location.assign(returnUrl);
   };
 
   return (
@@ -360,8 +422,10 @@ function LoginInner() {
 
         <form onSubmit={submit} className="space-y-4">
           <div>
-            <label className="mele-label">Email</label>
+            <label htmlFor="account-login-email" className="mele-label">Email</label>
             <input
+              id="account-login-email"
+              name="email"
               type="email"
               autoComplete="email"
               required
@@ -372,11 +436,14 @@ function LoginInner() {
           </div>
 
           <div>
-            <label className="mele-label">密碼</label>
+            <label htmlFor="account-login-password" className="mele-label">密碼</label>
             <input
+              id="account-login-password"
+              name="password"
               type="password"
               minLength={6}
               required
+              autoComplete={mode === 'signin' ? 'current-password' : 'new-password'}
               value={pwd}
               onChange={(event) => setPwd(event.target.value)}
               className="mele-input"
@@ -406,9 +473,12 @@ function LoginInner() {
           {mode === 'signup' && (
             <>
               <div>
-                <label className="mele-label">對外顯示名 *</label>
+                <label htmlFor="account-signup-display-name" className="mele-label">對外顯示名 *</label>
                 <input
+                  id="account-signup-display-name"
+                  name="displayName"
                   required
+                  autoComplete="name"
                   value={displayName}
                   onChange={(event) => setDisplayName(event.target.value)}
                   className="mele-input"
@@ -420,18 +490,18 @@ function LoginInner() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="mele-label">出生日期</label>
-                  <input type="date" value={birthDate} onChange={(event) => setBirthDate(event.target.value)} className="mele-input" />
+                  <label htmlFor="account-signup-birth-date" className="mele-label">出生日期</label>
+                  <input id="account-signup-birth-date" name="birthDate" type="date" value={birthDate} onChange={(event) => setBirthDate(event.target.value)} className="mele-input" />
                 </div>
                 <div>
-                  <label className="mele-label">出生時間</label>
-                  <input type="time" value={birthTime} onChange={(event) => setBirthTime(event.target.value)} className="mele-input" />
+                  <label htmlFor="account-signup-birth-time" className="mele-label">出生時間</label>
+                  <input id="account-signup-birth-time" name="birthTime" type="time" value={birthTime} onChange={(event) => setBirthTime(event.target.value)} className="mele-input" />
                 </div>
               </div>
 
               <div>
-                <label className="mele-label">性別</label>
-                <select value={gender} onChange={(event) => setGender(event.target.value)} className="mele-input">
+                <label htmlFor="account-signup-gender" className="mele-label">性別</label>
+                <select id="account-signup-gender" name="gender" value={gender} onChange={(event) => setGender(event.target.value)} className="mele-input">
                   <option value="女">女</option>
                   <option value="男">男</option>
                   <option value="其他">其他</option>
@@ -440,24 +510,47 @@ function LoginInner() {
               </div>
 
               <div>
-                <label className="mele-label">出生地</label>
+                <label htmlFor="account-signup-birth-location" className="mele-label">出生地</label>
                 <input
+                  id="account-signup-birth-location"
+                  name="birthLocation"
                   value={birthLocation}
-                  onChange={(event) => setBirthLocation(event.target.value)}
+                  onChange={(event) => updateBirthLocation(event.target.value)}
+                  onBlur={(event) => {
+                    const preset = findBirthLocationPreset(event.target.value);
+                    if (preset) applyBirthPreset(preset);
+                  }}
                   placeholder="例如：台北市"
                   className="mele-input"
                 />
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {getBirthLocationPresets().slice(0, 8).map((preset) => (
+                    <button
+                      key={preset.label}
+                      type="button"
+                      onClick={() => applyBirthPreset(preset)}
+                      className="rounded-full border border-accent-dim px-3 py-1 text-xs text-white/70 transition hover:border-accent hover:text-accent"
+                    >
+                      {preset.label}
+                    </button>
+                  ))}
+                </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="mele-label">緯度</label>
-                  <input type="number" step="0.0001" value={birthLat} onChange={(event) => setBirthLat(event.target.value)} className="mele-input" />
+                  <label htmlFor="account-signup-birth-latitude" className="mele-label">緯度</label>
+                  <input id="account-signup-birth-latitude" name="birthLatitude" type="number" step="0.0001" value={birthLat} onChange={(event) => setBirthLat(event.target.value)} className="mele-input" />
                 </div>
                 <div>
-                  <label className="mele-label">經度</label>
-                  <input type="number" step="0.0001" value={birthLon} onChange={(event) => setBirthLon(event.target.value)} className="mele-input" />
+                  <label htmlFor="account-signup-birth-longitude" className="mele-label">經度</label>
+                  <input id="account-signup-birth-longitude" name="birthLongitude" type="number" step="0.0001" value={birthLon} onChange={(event) => setBirthLon(event.target.value)} className="mele-input" />
                 </div>
+              </div>
+
+              <div>
+                <label htmlFor="account-signup-birth-timezone" className="mele-label">出生地時區</label>
+                <input id="account-signup-birth-timezone" name="birthTimezone" value={birthTz} onChange={(event) => setBirthTz(event.target.value)} className="mele-input" />
               </div>
 
               <p className="text-xs leading-relaxed text-white/50">
@@ -467,12 +560,12 @@ function LoginInner() {
               <hr className="border-accent-dim/50" />
 
               <label className="flex cursor-pointer items-start gap-2 text-xs leading-relaxed text-white/70">
-                <input type="checkbox" checked={ageConfirmed} onChange={(event) => setAgeConfirmed(event.target.checked)} className="mt-0.5" />
+                <input id="account-signup-age-confirmed" name="ageConfirmed" type="checkbox" checked={ageConfirmed} onChange={(event) => setAgeConfirmed(event.target.checked)} className="mt-0.5" />
                 <span>我確認自己已滿 18 歲，或已取得法定代理人同意；未滿 13 歲不得自行註冊使用本服務。</span>
               </label>
 
               <label className="flex cursor-pointer items-start gap-2 text-xs leading-relaxed text-white/70">
-                <input type="checkbox" checked={agreed} onChange={(event) => setAgreed(event.target.checked)} className="mt-0.5" />
+                <input id="account-signup-agreed" name="agreed" type="checkbox" checked={agreed} onChange={(event) => setAgreed(event.target.checked)} className="mt-0.5" />
                 <span>
                   我已閱讀並同意
                   <Link href="/legal/tos" className="mx-1 text-accent">服務條款</Link>

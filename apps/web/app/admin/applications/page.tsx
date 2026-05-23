@@ -69,7 +69,7 @@ export default function AdminApplications() {
             <option key={status} value={status}>{STATUS_LABEL[status]}</option>
           ))}
         </select>
-        <button onClick={load} className="mele-btn-secondary !px-4 !py-2 !text-xs">重新載入</button>
+        <button type="button" onClick={load} className="mele-btn-secondary !px-4 !py-2 !text-xs">重新載入</button>
       </div>
 
       {loading && <div className="text-center py-12 text-white/60">正在載入申請資料...</div>}
@@ -136,6 +136,7 @@ function ApplicationModal({ app, onClose, onUpdated }: {
   const [busy, setBusy] = useState(false);
 
   const act = async (action: string) => {
+    if (busy) return;
     setBusy(true);
     const supabase = createClient();
     const { error } = await supabase.rpc('review_teacher_application', {
@@ -151,6 +152,7 @@ function ApplicationModal({ app, onClose, onUpdated }: {
   };
 
   const activate = async () => {
+    if (busy) return;
     setBusy(true);
     const supabase = createClient();
     const { error } = await supabase.rpc('activate_teacher', { p_application_id: app.id });
@@ -225,17 +227,17 @@ function ApplicationModal({ app, onClose, onUpdated }: {
         )}
 
         <div className="flex flex-wrap gap-2 mt-6">
-          <button onClick={() => act('review')} disabled={busy} className="mele-btn-success !px-4 !py-2 !text-xs">進入審核</button>
-          <button onClick={() => act('interview')} disabled={busy} className="mele-btn-secondary !px-4 !py-2 !text-xs">安排面談</button>
-          <button onClick={() => act('request_revision')} disabled={busy} className="mele-btn-secondary !px-4 !py-2 !text-xs">要求補件</button>
-          <button onClick={() => act('approve')} disabled={busy} className="mele-btn-success !px-4 !py-2 !text-xs">審核通過</button>
-          <button onClick={() => act('reject')} disabled={busy} className="mele-btn-danger !px-4 !py-2 !text-xs">拒絕</button>
+          <button type="button" onClick={() => act('review')} disabled={busy} aria-disabled={busy} className="mele-btn-success !px-4 !py-2 !text-xs">進入審核</button>
+          <button type="button" onClick={() => act('interview')} disabled={busy} aria-disabled={busy} className="mele-btn-secondary !px-4 !py-2 !text-xs">安排面談</button>
+          <button type="button" onClick={() => act('request_revision')} disabled={busy} aria-disabled={busy} className="mele-btn-secondary !px-4 !py-2 !text-xs">要求補件</button>
+          <button type="button" onClick={() => act('approve')} disabled={busy} aria-disabled={busy} className="mele-btn-success !px-4 !py-2 !text-xs">審核通過</button>
+          <button type="button" onClick={() => act('reject')} disabled={busy} aria-disabled={busy} className="mele-btn-danger !px-4 !py-2 !text-xs">拒絕</button>
           {app.status === 'contracted' && (
-            <button onClick={activate} disabled={busy} className="mele-btn-success !px-4 !py-2 !text-xs">正式上架</button>
+            <button type="button" onClick={activate} disabled={busy} aria-disabled={busy} className="mele-btn-success !px-4 !py-2 !text-xs">正式上架</button>
           )}
         </div>
 
-        <button onClick={onClose} className="mele-btn-secondary mt-5 !text-xs">關閉</button>
+        <button type="button" onClick={onClose} disabled={busy} className="mele-btn-secondary mt-5 !text-xs">關閉</button>
       </div>
     </div>
   );

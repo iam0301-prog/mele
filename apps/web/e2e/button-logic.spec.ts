@@ -9,7 +9,6 @@ const localizedCoreRoutes = locales.flatMap((locale) => [
   `/${locale}/daily`,
   `/${locale}/mobile`,
   `/${locale}/ar`,
-  `/${locale}/spiritual`,
   `/${locale}/tools`,
   `/${locale}/teachers`,
   `/${locale}/teachers/apply`,
@@ -31,7 +30,6 @@ const publicRoutes = [
   '/id',
   '/ja',
   '/ko',
-  '/en/spiritual',
   '/en/tools',
   '/en/tools/numerology',
   '/en/tools/maya',
@@ -234,7 +232,7 @@ test.describe('Button and link logic', () => {
 
     await menu.locator('a[href="/en/tools"]').click();
     await expect(page).toHaveURL(/\/en\/tools$/);
-    await expect(page.getByRole('heading', { name: 'Understand yourself before going deeper' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Test these tool entrances first' })).toBeVisible();
 
     await page.getByRole('button', { name: 'Menu' }).click();
     await page.locator('#mobile-header-menu a[href="/vi/tools"]').click();
@@ -246,7 +244,7 @@ test.describe('Button and link logic', () => {
     test.setTimeout(60_000);
     await page.goto('/en', { waitUntil: 'domcontentloaded' });
 
-    await page.locator('a[href="/en/daily"]').click();
+    await page.locator('a[href="/en/daily"]').first().click();
     await expect(page).toHaveURL(/\/en\/daily$/);
     await expect(page.getByRole('heading', { name: 'Daily ritual center' })).toBeVisible();
 
@@ -256,7 +254,7 @@ test.describe('Button and link logic', () => {
     await expect(page.getByRole('heading', { name: 'Tarot Reading' })).toBeVisible();
 
     await page.goto('/en', { waitUntil: 'domcontentloaded' });
-    await page.locator('a[href="/en/teachers"]').click();
+    await page.locator('a[href="/en/teachers"]').first().click();
     await expect(page).toHaveURL(/\/en\/teachers$/);
     await expect(page.getByRole('heading', { name: 'Guidance Directory' })).toBeVisible();
   });

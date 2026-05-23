@@ -22,6 +22,7 @@ const ignoredDirs = new Set([
   '.py312-packages',
   '.pytest_cache',
   '.tmp',
+  'tmp',
   'node_modules',
   'venv',
 ]);

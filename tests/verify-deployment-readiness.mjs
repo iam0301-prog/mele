@@ -50,6 +50,10 @@ const webLayout = read('apps/web/app/layout.tsx');
 const localizedBetaPage = read('apps/web/app/[locale]/beta/page.tsx');
 const sitemapRoute = read('apps/web/app/sitemap.ts');
 const nextConfig = read('apps/web/next.config.mjs');
+const sentryClientConfig = read('apps/web/instrumentation-client.ts');
+const sentryServerConfig = read('apps/web/sentry.server.config.ts');
+const sentryEdgeConfig = read('apps/web/sentry.edge.config.ts');
+const sentryInstrumentation = read('apps/web/instrumentation.ts');
 const pkg = JSON.parse(read('package.json') || '{}');
 
 for (const file of [
@@ -75,6 +79,11 @@ for (const file of [
   'render.yaml',
   'railway.json',
   'apps/web/vercel.json',
+  'apps/web/instrumentation-client.ts',
+  'apps/web/sentry.server.config.ts',
+  'apps/web/sentry.edge.config.ts',
+  'apps/web/instrumentation.ts',
+  'apps/web/app/global-error.tsx',
   '.github/workflows/ci.yml',
 ]) {
   ok(`${file} exists`, existsSync(file));
@@ -102,6 +111,7 @@ for (const key of [
   'ECPAY_HASH_KEY',
   'ECPAY_HASH_IV',
   'LINE_CHANNEL_ACCESS_TOKEN',
+  'NEXT_PUBLIC_SENTRY_DSN',
 ]) {
   ok(`root .env.example documents ${key}`, rootEnv.includes(`${key}=`));
 }
@@ -116,6 +126,7 @@ for (const key of [
   'NEXT_PUBLIC_LINE_OAUTH_PROVIDER',
   'NEXT_PUBLIC_ENABLE_FREE_BOOKING_TEST_MODE',
   'MELE_API_URL',
+  'NEXT_PUBLIC_SENTRY_DSN',
 ]) {
   ok(`web env example documents ${key}`, webEnv.includes(`${key}=`));
 }
@@ -373,10 +384,18 @@ for (const token of [
 ok('web package includes sharp for production images', Boolean(webPackage.dependencies?.sharp));
 ok('web lint uses ESLint CLI instead of deprecated next lint', webPackage.scripts?.lint === 'eslint . --max-warnings=0');
 ok('web package pins safe PostCSS override', webPackage.overrides?.postcss === '8.5.12');
-ok('web package targets patched Next 15 line', /^\^15\.5\.15/.test(webPackage.dependencies?.next || ''));
+ok('web package targets patched Next 15 line', /^\^15\.5\.18/.test(webPackage.dependencies?.next || ''));
 ok('web package targets patched Playwright', /^\^1\.59\.1/.test(webPackage.devDependencies?.['@playwright/test'] || ''));
 ok('layout avoids build-time Google font network fetches', !webLayout.includes('next/font/google'));
 ok('Next config sets outputFileTracingRoot for multiple lockfiles', nextConfig.includes('outputFileTracingRoot'));
+ok('Next config wraps build with Sentry SDK', nextConfig.includes('withSentryConfig') && nextConfig.includes('@sentry/nextjs'));
+ok('web package includes @sentry/nextjs', Boolean(webPackage.dependencies?.['@sentry/nextjs']));
+ok('Sentry client config uses public DSN only', sentryClientConfig.includes('NEXT_PUBLIC_SENTRY_DSN') && sentryClientConfig.includes('Sentry.init'));
+ok('Sentry client config captures router transitions', sentryClientConfig.includes('onRouterTransitionStart') && sentryClientConfig.includes('captureRouterTransitionStart'));
+ok('Sentry server config uses public DSN only', sentryServerConfig.includes('NEXT_PUBLIC_SENTRY_DSN') && sentryServerConfig.includes('Sentry.init'));
+ok('Sentry edge config uses public DSN only', sentryEdgeConfig.includes('NEXT_PUBLIC_SENTRY_DSN') && sentryEdgeConfig.includes('Sentry.init'));
+ok('Sentry instrumentation registers node and edge runtimes', sentryInstrumentation.includes("process.env.NEXT_RUNTIME === 'nodejs'") && sentryInstrumentation.includes("process.env.NEXT_RUNTIME === 'edge'"));
+ok('Sentry config uses current webpack options', nextConfig.includes('removeDebugLogging') && nextConfig.includes('automaticVercelMonitors'));
 ok('localized beta entry exists for tester invite flow', localizedBetaPage.includes('dictionary.beta') && localizedBetaPage.includes("mode: 'signup'"));
 ok('sitemap includes localized beta entry', sitemapRoute.includes("'/beta'") && sitemapRoute.includes('buildAlternateLanguages'));
 
@@ -395,10 +414,10 @@ for (const token of [
 console.log('\n=== Browser e2e coverage ===\n');
 
 for (const token of [
-  '封閉測試任務台',
-  '今日可領 200 點',
-  '會員付 100 點解鎖',
-  '老師只作為進一步諮詢選項',
+  '公開測試首頁',
+  '每日可領 200 測試點',
+  '100 點解鎖深度解讀',
+  '老師諮詢仍是選項，不是強迫購買',
   '/account/charts',
   '/teacher-portal',
   '每日儀式中心',

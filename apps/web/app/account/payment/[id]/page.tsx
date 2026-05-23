@@ -52,6 +52,7 @@ export default function PaymentPage() {
   const [booking, setBooking] = useState<BookingSummary | null>(null);
   const [checkout, setCheckout] = useState<CheckoutResponse | null>(null);
   const [loading, setLoading] = useState(true);
+  const [submittingPayment, setSubmittingPayment] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -100,8 +101,11 @@ export default function PaymentPage() {
   }, [bookingId, router, toast]);
 
   const submitForm = () => {
+    if (submittingPayment) return;
     const form = document.getElementById('ecpay-form') as HTMLFormElement | null;
-    form?.submit();
+    if (!form) return;
+    setSubmittingPayment(true);
+    form.requestSubmit();
   };
 
   const service = pickOne(booking?.teacher_services ?? null);
@@ -157,8 +161,14 @@ export default function PaymentPage() {
                 <input key={key} type="hidden" name={key} value={value} />
               ))}
             </form>
-            <button type="button" onClick={submitForm} className="mele-btn-primary w-full mt-6">
-              前往綠界付款
+            <button
+              type="button"
+              onClick={submitForm}
+              disabled={submittingPayment}
+              aria-disabled={submittingPayment}
+              className="mele-btn-primary w-full mt-6"
+            >
+              {submittingPayment ? '正在前往綠界...' : '前往綠界付款'}
             </button>
             <p className="mt-4 text-xs leading-relaxed text-white/50">
               回到本站後若狀態仍顯示確認中，代表背景 webhook 尚未完成。通常幾分鐘內會更新，最終結果以「我的預約」顯示為準。

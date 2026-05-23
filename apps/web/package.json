@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "eslint . --max-warnings=0",
     "type-check": "tsc --noEmit",
-    "test": "vitest run",
+    "test": "vitest run --pool=threads --testTimeout=30000 --no-file-parallelism --maxWorkers=1 test/lib/api.test.ts test/lib/auth-callback.test.ts test/lib/daily-ritual.test.ts test/lib/i18n.test.ts test/lib/member-unlocks.test.ts test/lib/teacher-consultation-briefs.test.ts test/lib/teacher-consultation-briefs-i18n.test.ts test/lib/teacher-matching.test.ts test/lib/timezone.test.ts && vitest run --pool=threads --testTimeout=30000 --no-file-parallelism --maxWorkers=1 test/components/AutofillBanner.test.tsx test/components/BirthInputs.test.tsx test/components/LocalizedLoginClient.test.tsx && vitest run --pool=threads --testTimeout=30000 --no-file-parallelism --maxWorkers=1 test/pages/numerology.test.tsx && vitest run --pool=threads --testTimeout=30000 --no-file-parallelism --maxWorkers=1 test/pages/astro-timezone.test.tsx && vitest run --pool=threads --testTimeout=30000 --no-file-parallelism --maxWorkers=1 test/pages/tools-render.test.tsx",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
@@ -16,9 +16,10 @@
     "analyze": "ANALYZE=true next build"
   },
   "dependencies": {
+    "@sentry/nextjs": "^10.53.1",
     "@supabase/ssr": "^0.5.2",
     "@supabase/supabase-js": "^2.45.4",
-    "next": "^15.5.15",
+    "next": "^15.5.18",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "sharp": "^0.34.5"

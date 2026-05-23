@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { AutofillBanner } from '@/components/AutofillBanner';
 import { BirthDateTimeFields } from '@/components/BirthInputs';
@@ -25,6 +25,7 @@ export default function HumanDesignPage() {
   const [timezone, setTimezone] = useState(() => timezoneOffsetAt(getBrowserTimeZone()));
   const [autofilled, setAutofilled] = useState(false);
   const [loading, setLoading] = useState(false);
+  const submittingRef = useRef(false);
   const [result, setResult] = useState<CalcResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -47,8 +48,9 @@ export default function HumanDesignPage() {
     toast(copy.submit.demo ?? 'Demo data filled.');
   };
 
-  const onSubmit = async (event: React.FormEvent | React.MouseEvent<HTMLButtonElement>) => {
+  const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (loading || submittingRef.current) return;
 
     if (!date || !time) {
       const message = copy.validation.dateTimeRequired ?? 'Please enter birth date and time.';
@@ -57,6 +59,7 @@ export default function HumanDesignPage() {
       return;
     }
 
+    submittingRef.current = true;
     setLoading(true);
     setError(null);
     setResult(null);
@@ -78,6 +81,7 @@ export default function HumanDesignPage() {
       setError(message);
       toast(message, 'error');
     } finally {
+      submittingRef.current = false;
       setLoading(false);
     }
   };
@@ -101,7 +105,7 @@ export default function HumanDesignPage() {
         />
 
         <div className="flex flex-col gap-3 sm:flex-row">
-          <button type="button" onClick={onSubmit} disabled={loading} className="mele-btn-primary w-full sm:w-auto">
+          <button type="submit" disabled={loading} aria-disabled={loading} className="mele-btn-primary w-full sm:w-auto">
             {loading ? copy.submit.loading : copy.submit.idle}
           </button>
           <button type="button" onClick={fillDemo} disabled={loading} className="mele-btn-secondary w-full sm:w-auto">

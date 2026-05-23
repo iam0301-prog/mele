@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { AutofillBanner } from '@/components/AutofillBanner';
 import { BirthDateTimeFields, LongitudeField } from '@/components/BirthInputs';
 import { ConsultCTA, ToolShell } from '@/components/ToolShell';
@@ -23,6 +23,7 @@ export default function BaziPage() {
   const [useTrueSolar, setUseTrueSolar] = useState(true);
   const [autofilled, setAutofilled] = useState(false);
   const [loading, setLoading] = useState(false);
+  const submittingRef = useRef(false);
   const [result, setResult] = useState<CalcResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -30,18 +31,20 @@ export default function BaziPage() {
     if (!profile.loaded || !profile.hasData) return;
     if (date === '' && profile.birth_date) setDate(profile.birth_date);
     if (time === '' && profile.birth_time) setTime(normalizeTime(profile.birth_time));
-    if (profile.birth_lon) setLongitude(profile.birth_lon);
+    if (profile.birth_lon !== null && profile.birth_lon !== undefined) setLongitude(profile.birth_lon);
     setAutofilled(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [profile.loaded]);
 
-  const onSubmit = async (event: React.FormEvent | React.MouseEvent<HTMLButtonElement>) => {
+  const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (loading || submittingRef.current) return;
     if (!date || !time) {
       toast(copy.validation.dateTimeRequired ?? 'Please enter both birth date and time.', 'error');
       return;
     }
 
+    submittingRef.current = true;
     setLoading(true);
     setError(null);
     setResult(null);
@@ -64,6 +67,7 @@ export default function BaziPage() {
       setError(message);
       toast(message, 'error');
     } finally {
+      submittingRef.current = false;
       setLoading(false);
     }
   };
@@ -91,7 +95,7 @@ export default function BaziPage() {
 
         {useTrueSolar && <LongitudeField locale={locale} longitude={longitude} onLongitudeChange={setLongitude} />}
 
-        <button type="button" onClick={onSubmit} disabled={loading} className="mele-btn-primary w-full md:w-auto">
+        <button type="submit" disabled={loading} aria-disabled={loading} className="mele-btn-primary w-full md:w-auto">
           {loading ? copy.submit.loading : copy.submit.idle}
         </button>
       </form>

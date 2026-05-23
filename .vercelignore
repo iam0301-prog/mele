@@ -1,0 +1,12 @@
+node_modules/
+apps/web/node_modules/
+apps/web/.next/
+.py312-packages/
+python_api/venv/
+.tmp/
+tmp/
+test-results/
+coverage/
+apps/web/playwright-report/
+supabase/.temp/
+*.log

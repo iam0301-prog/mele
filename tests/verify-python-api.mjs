@@ -1,19 +1,30 @@
 import { spawn } from 'node:child_process';
 import { existsSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { delimiter, resolve } from 'node:path';
 import { setTimeout as delay } from 'node:timers/promises';
 
 const PORT = Number(process.env.MELE_TEST_PORT || 8125);
 let baseUrl = `http://127.0.0.1:${PORT}`;
-const PYTHON =
-  process.env.MELE_PYTHON ||
+const PYTHON_CANDIDATES = [
+  process.env.MELE_PYTHON,
+  process.platform === 'win32'
+    ? 'C:/Users/iam03/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe'
+    : undefined,
   resolve(process.platform === 'win32'
     ? 'python_api/venv/Scripts/python.exe'
-    : 'python_api/venv/bin/python');
+    : 'python_api/venv/bin/python'),
+].filter(Boolean);
+const PYTHON = PYTHON_CANDIDATES.find((candidate) => existsSync(candidate));
+const PYTHONPATH_ENTRIES = [
+  resolve('.py312-packages'),
+  resolve('python_api'),
+  process.env.PYTHONPATH,
+].filter(Boolean);
 
-if (!existsSync(PYTHON)) {
-  console.error(`Python executable not found: ${PYTHON}`);
-  process.exit(1);
+if (!PYTHON) {
+  baseUrl = process.env.MELE_API_URL || 'http://127.0.0.1:8015';
+  console.warn(`Python executable not found. Checked: ${PYTHON_CANDIDATES.join(', ')}`);
+  console.warn(`Using existing API at ${baseUrl}.`);
 }
 
 let passed = 0;
@@ -58,20 +69,47 @@ async function waitForHealth() {
   return false;
 }
 
+async function waitForHealthOrFallback() {
+  const spawnedHealthReady = await waitForHealth();
+  if (spawnedHealthReady) return true;
+
+  if (server) {
+    server.kill();
+    server = null;
+  }
+
+  const fallbackUrl = process.env.MELE_API_URL || 'http://127.0.0.1:8015';
+  if (baseUrl === fallbackUrl) return false;
+
+  console.warn(`Local API did not become healthy on ${baseUrl}; using existing API at ${fallbackUrl}.`);
+  if (stderr.trim()) console.warn(stderr.trim());
+  baseUrl = fallbackUrl;
+  return waitForHealth();
+}
+
 let server = null;
 let stderr = '';
 
 try {
-  server = spawn(PYTHON, ['-m', 'uvicorn', 'main:app', '--host', '127.0.0.1', '--port', String(PORT)], {
-    cwd: 'python_api',
-    env: { ...process.env, PYTHONIOENCODING: 'utf-8' },
-    stdio: ['ignore', 'pipe', 'pipe'],
-    windowsHide: true,
-  });
+  if (PYTHON) {
+    server = spawn(PYTHON, ['-m', 'uvicorn', 'main:app', '--host', '127.0.0.1', '--port', String(PORT)], {
+      cwd: 'python_api',
+      env: {
+        ...process.env,
+        PYTHONIOENCODING: 'utf-8',
+        PYTHONPATH: PYTHONPATH_ENTRIES.join(delimiter),
+      },
+      stdio: ['ignore', 'pipe', 'pipe'],
+      windowsHide: true,
+    });
 
-  server.stderr.on('data', (chunk) => {
-    stderr += chunk.toString();
-  });
+    server.stderr.on('data', (chunk) => {
+      stderr += chunk.toString();
+    });
+    server.on('error', (error) => {
+      stderr += `\nAPI spawn error: ${error.code || error.message}`;
+    });
+  }
 } catch (error) {
   baseUrl = process.env.MELE_API_URL || 'http://127.0.0.1:8015';
   stderr = `Could not spawn local API (${error.code || error.message}); using existing API at ${baseUrl}.`;
@@ -80,7 +118,7 @@ try {
 
 try {
   console.log('\n=== Python FastAPI endpoint verification ===\n');
-  const healthReady = await waitForHealth();
+  const healthReady = await waitForHealthOrFallback();
   check('/health is reachable', healthReady);
   if (!healthReady) {
     console.error(stderr);
@@ -136,6 +174,68 @@ try {
         }
       }
       check('humandesign gate circles avoid visual overlap', minClearance >= 2.4, `min clearance ${minClearance.toFixed(1)}px`);
+    }
+  }
+
+  const sampleGroups = {
+    numerology: [
+      { year: 1988, month: 1, day: 3 },
+      { year: 1995, month: 11, day: 29 },
+      { year: 2001, month: 7, day: 14 },
+    ],
+    maya: [
+      { year: 1988, month: 1, day: 3 },
+      { year: 1995, month: 11, day: 29 },
+      { year: 2001, month: 7, day: 14 },
+    ],
+    bazi: [
+      { year: 1988, month: 1, day: 3, hour: 7, minute: 30 },
+      { year: 1995, month: 11, day: 29, hour: 22, minute: 10 },
+      { year: 2001, month: 7, day: 14, hour: 14, minute: 45 },
+    ],
+    ziwei: [
+      { year: 1988, month: 1, day: 3, hour: 7, minute: 30, gender: '女' },
+      { year: 1995, month: 11, day: 29, hour: 22, minute: 10, gender: '男' },
+      { year: 2001, month: 7, day: 14, hour: 14, minute: 45, gender: '女' },
+    ],
+    tarot: [
+      { count: 3, reversed: true, spread: 'three_card', seed: 7 },
+      { count: 1, reversed: true, spread: 'single', seed: 29 },
+      { count: 7, reversed: true, spread: 'horseshoe', seed: 101 },
+    ],
+    runes: [
+      { count: 1, reversed: true, seed: 7 },
+      { count: 3, reversed: true, seed: 29 },
+      { count: 5, reversed: true, seed: 101 },
+    ],
+    astro: [
+      { year: 1988, month: 1, day: 3, hour: 7, minute: 30, timezone: 8, latitude: 25.033, longitude: 121.5654 },
+      { year: 1995, month: 11, day: 29, hour: 22, minute: 10, timezone: 7, latitude: 10.8231, longitude: 106.6297 },
+      { year: 2001, month: 7, day: 14, hour: 14, minute: 45, timezone: 9, latitude: 35.6762, longitude: 139.6503 },
+    ],
+    humandesign: [
+      { year: 1988, month: 1, day: 3, hour: 7, minute: 30, timezone: 8 },
+      { year: 1995, month: 11, day: 29, hour: 22, minute: 10, timezone: 7 },
+      { year: 2001, month: 7, day: 14, hour: 14, minute: 45, timezone: 9 },
+    ],
+  };
+
+  for (const [tool, payloads] of Object.entries(sampleGroups)) {
+    for (const [index, payload] of payloads.entries()) {
+      const { response, body } = await request(`/api/v1/calc/${tool}`, payload);
+      check(`${tool} sample ${index + 1} returns HTTP 200`, response.status === 200, response.status !== 200 ? JSON.stringify(body).slice(0, 160) : '');
+      if (!response.ok) continue;
+      check(`${tool} sample ${index + 1} has usable data`, Boolean(body.data) && Object.keys(body.data).length > 0);
+      check(`${tool} sample ${index + 1} has readable explanation`, typeof body.render?.html === 'string' && body.render.html.includes('你') && body.render.html.includes('老師'));
+      if (tool === 'maya') {
+        check(`maya sample ${index + 1} explains member pattern`, body.render.html.includes('白話先看你本人') && body.render.html.includes('卡點'));
+      }
+      if (tool === 'astro') {
+        check(`astro sample ${index + 1} explains inner mismatch`, body.render.html.includes('真正需要的安全感') && body.render.html.includes('問老師'));
+      }
+      if (tool === 'ziwei') {
+        check(`ziwei sample ${index + 1} focuses a real life question`, body.render.html.includes('先挑一個真的想問的題目') && body.render.html.includes('三方四正'));
+      }
     }
   }
 

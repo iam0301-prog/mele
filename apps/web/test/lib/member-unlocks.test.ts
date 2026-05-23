@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
-  buildUnlockedReadingContent,
+  buildUnlockContentMetadata,
   DAILY_POINT_AMOUNT,
   MEMBER_UNLOCK_OPTIONS,
   POINT_UNLOCK_COST,
@@ -55,7 +55,6 @@ describe('lib/member-unlocks', () => {
     it('namespaces by tool + type + period', () => {
       const key = unlockScopeKey(tarotResult, 'deep_reading');
       expect(key.startsWith('tarot:deep_reading:')).toBe(true);
-      // deep_reading 用 computed_at 前 10 碼
       expect(key.split(':')[2]).toBe('2026-05-04');
     });
 
@@ -63,6 +62,20 @@ describe('lib/member-unlocks', () => {
       expect(unlockScopeKey(tarotResult, 'deep_reading')).toBe(
         unlockScopeKey(tarotResult, 'deep_reading'),
       );
+    });
+
+    it('is stable when object keys are semantically equal but ordered differently', () => {
+      const a: CalcResponse = {
+        ...numerologyResult,
+        input: { year: 1990, month: 6, day: 15 },
+        data: { lifePath: 4, birthDay: 15, lifePathArchetype: '建造者' },
+      };
+      const b: CalcResponse = {
+        ...numerologyResult,
+        input: { day: 15, month: 6, year: 1990 },
+        data: { lifePathArchetype: '建造者', birthDay: 15, lifePath: 4 },
+      };
+      expect(unlockScopeKey(a, 'deep_reading')).toBe(unlockScopeKey(b, 'deep_reading'));
     });
 
     it('differs across unlock types', () => {
@@ -82,19 +95,13 @@ describe('lib/member-unlocks', () => {
     });
   });
 
-  describe('buildUnlockedReadingContent', () => {
-    it('renders deep_reading shape for tarot', () => {
-      const r = buildUnlockedReadingContent(tarotResult, 'deep_reading');
-      expect(r.title).toBeTruthy();
-      expect(r.summary).toBeTruthy();
-      expect(Array.isArray(r.sections)).toBe(true);
-      expect(r.sections.length).toBeGreaterThan(0);
-      expect(Array.isArray(r.tasks)).toBe(true);
-    });
-
-    it('renders transit_month for numerology without throwing', () => {
-      const r = buildUnlockedReadingContent(numerologyResult, 'transit_month');
-      expect(r.title).toContain('本月');
+  describe('buildUnlockContentMetadata', () => {
+    it('sends only compact result hints for backend-generated paid content', () => {
+      const metadata = buildUnlockContentMetadata(tarotResult);
+      expect(metadata.result_anchor).toBe('愚者');
+      expect(metadata.result_signals).toEqual(['愚者', '魔術師', '命運之輪']);
+      expect(JSON.stringify(metadata)).not.toContain('完整深入解釋');
+      expect(JSON.stringify(metadata)).not.toContain('今日流日解讀');
     });
 
     it('survives missing data gracefully', () => {
@@ -106,7 +113,7 @@ describe('lib/member-unlocks', () => {
         data: {},
         render: {},
       };
-      expect(() => buildUnlockedReadingContent(empty, 'deep_reading')).not.toThrow();
+      expect(() => buildUnlockContentMetadata(empty)).not.toThrow();
     });
   });
 });

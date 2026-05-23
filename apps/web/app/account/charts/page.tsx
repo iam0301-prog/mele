@@ -25,6 +25,13 @@ interface ContentUnlockRow {
   created_at: string;
 }
 
+interface PointRpcResult {
+  claimed?: boolean;
+  balance?: number;
+  lifetime_earned?: number;
+  lifetime_spent?: number;
+}
+
 const TOOL_LABEL: Record<string, string> = {
   numerology: '生命靈數',
   maya: '馬雅曆',
@@ -61,6 +68,8 @@ export default function ChartsPage() {
   const [loading, setLoading] = useState(true);
   const [testMode, setTestMode] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
+  const [claiming, setClaiming] = useState(false);
+  const [claimedToday, setClaimedToday] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -130,6 +139,57 @@ export default function ChartsPage() {
     };
   }, [router]);
 
+  const claimDailyPoints = async () => {
+    if (claiming) return;
+    setClaiming(true);
+    setNotice(null);
+
+    if (testMode) {
+      setWallet((current) => ({
+        user_id: current?.user_id ?? 'local-test-user',
+        balance: (current?.balance ?? 0) + DAILY_POINT_AMOUNT,
+        lifetime_earned: (current?.lifetime_earned ?? 0) + DAILY_POINT_AMOUNT,
+        lifetime_spent: current?.lifetime_spent ?? 0,
+        created_at: current?.created_at ?? new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      }));
+      setClaimedToday(true);
+      setNotice(`已領取今日 ${DAILY_POINT_AMOUNT} 點。正式會員會透過後端每日領點 RPC 紀錄。`);
+      setClaiming(false);
+      return;
+    }
+
+    const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      setClaiming(false);
+      router.push('/account/login?return=/account/charts');
+      return;
+    }
+
+    const { data, error } = await supabase.rpc('claim_daily_points');
+    if (error) {
+      setNotice(error.message);
+      setClaiming(false);
+      return;
+    }
+
+    const payload = (data || {}) as PointRpcResult;
+    setWallet((current) => ({
+      user_id: current?.user_id ?? user.id,
+      balance: typeof payload.balance === 'number' ? payload.balance : current?.balance ?? 0,
+      lifetime_earned: typeof payload.lifetime_earned === 'number' ? payload.lifetime_earned : current?.lifetime_earned ?? 0,
+      lifetime_spent: typeof payload.lifetime_spent === 'number' ? payload.lifetime_spent : current?.lifetime_spent ?? 0,
+      created_at: current?.created_at ?? new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    }));
+    setClaimedToday(true);
+    setNotice(payload.claimed
+      ? `已領取今日 ${DAILY_POINT_AMOUNT} 點，目前可用 ${payload.balance ?? wallet?.balance ?? 0} 點。`
+      : `今天已領取過 ${DAILY_POINT_AMOUNT} 點，明天再回來補充。`);
+    setClaiming(false);
+  };
+
   return (
     <main className="container mx-auto max-w-5xl px-5 py-12">
       <header className="text-center pb-8">
@@ -157,6 +217,12 @@ export default function ChartsPage() {
           <span>POINT WALLET</span>
           <h2>會員點數</h2>
           <p>每天可領 200 點；每次深入解釋、流日、流月、流年目前皆以 100 點解鎖。會員先理解自己，再決定是否進一步請老師細看。</p>
+          <div className="member-vault__claim">
+            <button type="button" onClick={claimDailyPoints} disabled={loading || claiming || claimedToday} className="mele-btn-primary">
+              {claiming ? '領取中...' : claimedToday ? '今日已領取' : `領取今日 ${DAILY_POINT_AMOUNT} 點`}
+            </button>
+            <Link href="/account/profile" className="mele-btn-secondary">補齊出生資料</Link>
+          </div>
         </div>
         <div className="member-vault__stats">
           <article>

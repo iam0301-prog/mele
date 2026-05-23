@@ -2,6 +2,7 @@
 node_modules/
 apps/web/node_modules/
 python_api/venv/
+.venv-pytest/
 .py312-packages/
 
 # Environment and secrets
@@ -44,3 +45,5 @@ Thumbs.db
 # Local extraction / scratch files
 sample_extracted.html
 新增 RTF 格式.rtf
+.vercel
+.playwright-libs/

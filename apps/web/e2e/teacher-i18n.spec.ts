@@ -1,5 +1,10 @@
 import { expect, test } from '@playwright/test';
 
+function isLocalBaseURL(baseURL: unknown) {
+  const hostname = new URL(String(baseURL ?? 'http://127.0.0.1')).hostname;
+  return ['localhost', '127.0.0.1', '::1'].includes(hostname);
+}
+
 const teacherHeadings = [
   ['en', 'Guidance Directory'],
   ['vi', 'Danh mục hướng dẫn'],
@@ -34,13 +39,20 @@ test.describe('Teacher multilingual surfaces', () => {
     await expect(page.getByText('老師申請')).toHaveCount(0);
   });
 
-  test('teacher portal exposes a localized reading assist workspace', async ({ page }) => {
+  test('teacher portal exposes a localized reading assist workspace', async ({ page }, testInfo) => {
     await page.goto('/account/login?return=/account/charts', { waitUntil: 'domcontentloaded' });
+
+    if (!isLocalBaseURL(testInfo.project.use.baseURL)) {
+      await expect(page.getByRole('button', { name: '使用本機測試帳號' })).toHaveCount(0);
+      await expect(page.getByRole('button', { name: '登入' }).first()).toBeVisible();
+      return;
+    }
+
     await page.getByRole('button', { name: '使用本機測試帳號' }).click();
     await expect(page).toHaveURL(/\/account\/charts$/);
 
     await page.goto('/en/teacher-portal', { waitUntil: 'domcontentloaded' });
-    await expect(page.getByRole('heading', { name: 'Guide Workspace' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Guide Workspace', exact: true })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Reading Assist' })).toBeVisible();
     await expect(page.getByText('Suggested opening questions')).toBeVisible();
     await expect(page.getByText('老師後台')).toHaveCount(0);

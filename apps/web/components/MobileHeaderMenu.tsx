@@ -90,15 +90,14 @@ export function MobileHeaderMenu({
       {open && (
         <div
           id="mobile-header-menu"
-          className="absolute right-0 mt-2 w-[min(86vw,340px)] rounded-lg border border-accent-dim bg-primary/95 p-3 shadow-gold-soft backdrop-blur-xl"
+          className="absolute right-0 mt-2 max-h-[calc(100vh-6rem)] w-[min(86vw,340px)] overflow-y-auto rounded-lg border border-accent-dim bg-primary/95 p-3 shadow-gold-soft backdrop-blur-xl"
         >
-          <nav className="grid gap-2" aria-label={labels?.mobileMenu ?? 'Menu'}>
+          <nav className="grid gap-2" aria-label={labels?.mobileMenu ?? 'Mobile menu'}>
             {primaryLinks.map((item) => (
-              <a key={item.href} href={localizePath(item.href, locale)} className={mobileLinkClass}>
+              <a key={item.href} href={localizePath(item.href, locale)} className={mobileLinkClass} onClick={close}>
                 {item.label}
               </a>
             ))}
-            <LanguageSwitcher label={labels?.language ?? 'Language'} variant="panel" onNavigate={close} />
             {isSignedIn ? (
               <HeaderUserMenu
                 displayName={displayName}
@@ -117,11 +116,12 @@ export function MobileHeaderMenu({
               />
             ) : (
               guestLinks.map((item) => (
-                <a key={item.href} href={localizePath(item.href, locale)} className={mobileLinkClass}>
+                <a key={item.href} href={localizePath(item.href, locale)} className={mobileLinkClass} onClick={close}>
                   {item.label}
                 </a>
               ))
             )}
+            <LanguageSwitcher label="Language" variant="panel" onNavigate={close} />
           </nav>
         </div>
       )}

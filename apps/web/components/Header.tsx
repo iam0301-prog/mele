@@ -1,5 +1,4 @@
 import { headers } from 'next/headers';
-import Link from 'next/link';
 import { DEFAULT_LOCALE, LOCALE_HEADER, getDictionary, isLocale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
 import { getServerTestUser } from '@/lib/test-auth-server';
@@ -40,10 +39,10 @@ export async function Header() {
   ];
 
   return (
-    <header className="fixed left-0 right-0 top-0 z-[100] flex items-start justify-between gap-2 px-4 py-3">
-      <Link href={`/${locale}`} className="header-brand-link">
+    <header className="site-header fixed left-0 right-0 top-0 z-[100] flex items-start justify-between gap-2 px-4 py-3">
+      <a href={`/${locale}`} className="header-brand-link">
         <SeaStarLogo />
-      </Link>
+      </a>
 
       <MobileHeaderMenu
         isSignedIn={Boolean(user || testUser)}

@@ -54,7 +54,12 @@ export function useProfile(): BirthProfile {
 
       if (!mounted) return;
 
-      const hasData = Boolean(data && (data.birth_date || data.birth_time || data.birth_lat || data.birth_lon));
+      const hasData = Boolean(data && (
+        data.birth_date
+        || data.birth_time
+        || (data.birth_lat !== null && data.birth_lat !== undefined)
+        || (data.birth_lon !== null && data.birth_lon !== undefined)
+      ));
       setProfile({
         loaded: true,
         isAuthed: true,

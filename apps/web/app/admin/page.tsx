@@ -163,10 +163,49 @@ export default async function AdminDashboard() {
               這裡集中追蹤發布前最重要的營運狀態：老師審核、預約金流、每日互動、評價公開與上線檢查。正式公開前，P0 項目必須全數完成。
             </p>
           </div>
-          <Link href="/admin/launch" className="mele-btn-primary">
-            查看上線檢查
-          </Link>
+          <div className="flex flex-col gap-2 sm:flex-row md:flex-col lg:flex-row">
+            <Link href="/admin/applications" className="mele-btn-success">
+              審核老師申請
+            </Link>
+            <Link href="/admin/teachers" className="mele-btn-primary">
+              調整老師資料
+            </Link>
+            <Link href="/teacher-portal" className="mele-btn-secondary">
+              老師後台
+            </Link>
+          </div>
         </div>
+      </section>
+
+      <section className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+        <Link href="/admin/applications" className="mele-card admin-action-row">
+          <div>
+            <strong>老師申請審核</strong>
+            <p>處理新申請、證件附件、面談、補件、審核通過與正式上架。</p>
+          </div>
+          <span>進入</span>
+        </Link>
+        <Link href="/admin/teachers" className="mele-card admin-action-row">
+          <div>
+            <strong>老師資料調整</strong>
+            <p>調整已上架老師的公開資料、專長、佣金、暫停接案與停權。</p>
+          </div>
+          <span>調整</span>
+        </Link>
+        <Link href="/teacher-portal" className="mele-card admin-action-row">
+          <div>
+            <strong>老師後台</strong>
+            <p>以老師本人視角查看預約、會員問題、解盤脈絡與服務前準備內容。</p>
+          </div>
+          <span>查看</span>
+        </Link>
+        <Link href="/admin/members" className="mele-card admin-action-row">
+          <div>
+            <strong>會員與點數</strong>
+            <p>查會員帳號、出生資料、點數錢包、解鎖紀錄與手動補點。</p>
+          </div>
+          <span>管理</span>
+        </Link>
       </section>
 
       <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">

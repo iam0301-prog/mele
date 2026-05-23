@@ -5,11 +5,12 @@ import { PATH_HEADER, isLocalizedPath, stripLocaleFromPathname } from '@/lib/i18
 import { createClient } from '@/lib/supabase/server';
 
 const TABS = [
-  { href: '/admin/testers', label: '封測名單' },
-  { href: '/admin/members', label: '會員管理' },
   { href: '/admin', label: '統計', exact: true },
   { href: '/admin/applications', label: '申請審核' },
-  { href: '/admin/teachers', label: '老師管理' },
+  { href: '/admin/teachers', label: '老師資料調整' },
+  { href: '/teacher-portal', label: '老師後台' },
+  { href: '/admin/members', label: '會員管理' },
+  { href: '/admin/testers', label: '封測名單' },
   { href: '/admin/bookings', label: '預約監看' },
   { href: '/admin/reviews', label: '評價管理' },
   { href: '/admin/launch', label: '上線檢查' },
@@ -28,7 +29,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect(`/account/login?return=${encodeURIComponent(returnPath)}`);
   const { data: admin } = await supabase.from('admins').select('role').eq('user_id', user.id).maybeSingle();
-  if (!admin) redirect('/?error=not_admin');
+  if (!admin) redirect(`/account/login?return=${encodeURIComponent(returnPath)}&error=not_admin&force_signout=1`);
 
   return (
     <div className="container mx-auto max-w-6xl px-5 py-8">
@@ -40,15 +41,23 @@ export default async function AdminLayout({ children }: { children: React.ReactN
       </header>
 
       <nav className="flex gap-1 border-b border-accent-dim mb-6 overflow-x-auto no-scrollbar">
-        {TABS.map((t) => (
-          <Link
-            key={t.href}
-            href={t.href}
-            className="px-5 py-3 text-sm tracking-widest text-white/60 hover:text-white border-b-2 border-transparent hover:border-accent-dim transition-colors whitespace-nowrap"
-          >
-            {t.label}
-          </Link>
-        ))}
+        {TABS.map((t) => {
+          const active = t.exact ? returnPath === t.href : returnPath.startsWith(t.href);
+          return (
+            <Link
+              key={t.href}
+              href={t.href}
+              aria-current={active ? 'page' : undefined}
+              className={`px-5 py-3 text-sm tracking-widest border-b-2 transition-colors whitespace-nowrap ${
+                active
+                  ? 'border-accent text-accent bg-accent/10'
+                  : 'border-transparent text-white/60 hover:text-white hover:border-accent-dim'
+              }`}
+            >
+              {t.label}
+            </Link>
+          );
+        })}
       </nav>
 
       {children}

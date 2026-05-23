@@ -8,9 +8,9 @@ const PATH_HEADER = 'x-mele-pathname';
 
 const LOCALIZED_APP_ROUTES = new Set([
   '/',
-  '/spiritual',
   '/tools',
   '/beta',
+  '/feedback',
   '/daily',
   '/mobile',
   '/ar',
@@ -136,6 +136,15 @@ function setLocaleCookie(response: NextResponse, locale: Locale) {
   return response;
 }
 
+function sameOriginUrl(request: NextRequest, pathname: string) {
+  const forwardedProto = request.headers.get('x-forwarded-proto')?.split(',')[0]?.trim();
+  const protocol = forwardedProto || request.nextUrl.protocol.replace(':', '') || 'https';
+  const forwardedHost = request.headers.get('x-forwarded-host')?.split(',')[0]?.trim();
+  let host = forwardedHost || request.headers.get('host') || request.nextUrl.host;
+  if (host.toLowerCase() === 'localhost:3006') host = '127.0.0.1:3006';
+  return new URL(pathname, `${protocol}://${host}`);
+}
+
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const locale = localeFromRequest(request);
@@ -146,8 +155,7 @@ export function middleware(request: NextRequest) {
   }
 
   if (pathname === '/') {
-    const url = request.nextUrl.clone();
-    url.pathname = `/${locale}`;
+    const url = sameOriginUrl(request, `/${locale}`);
     return setLocaleCookie(NextResponse.redirect(url), locale);
   }
 

@@ -95,7 +95,7 @@ const zhTools: Record<ToolPageSlug, ToolPageCopy> = {
   numerology: {
     title: '生命靈數',
     subtitle: 'LIFE PATH NUMBER',
-    description: '用出生日期計算生命靈數、生日數與主數 11 / 22 / 33，快速看見你的天賦傾向、人生課題與行動風格。',
+    description: '用出生日期計算生命靈數、生日數與主數 11 / 22 / 33；若出現大師數，會同時標示 11/2、22/4、33/6，避免不同派別看法造成混淆。',
     spec: '生命靈數',
     dateHint: '生命靈數只需要出生日期，不需要出生時間。',
     validation: { dateRequired: '請先選擇出生日期。' },
@@ -153,7 +153,7 @@ const zhTools: Record<ToolPageSlug, ToolPageCopy> = {
     },
     styleLabel: '牌組風格',
     tarotStyles: [
-      { value: 'forest_athena', label: '森林女神', desc: '柔和、療癒、帶有森林與女神意象。' },
+      { value: 'forest_athena', label: '森林女神', desc: '柔和、安定、帶有森林與女神意象。' },
       { value: 'ocean_poseidon', label: '海神星辰', desc: '深海、星光、帶有流動與直覺感。' },
       { value: 'ancient_pharaoh', label: '古埃及法老', desc: '金色、神殿、帶有命運與儀式感。' },
     ],
@@ -287,7 +287,7 @@ const enTools: Record<ToolPageSlug, ToolPageCopy> = {
     },
     styleLabel: 'Deck style',
     tarotStyles: [
-      { value: 'forest_athena', label: 'Forest Athena', desc: 'Soft, healing, forest-goddess atmosphere.' },
+      { value: 'forest_athena', label: 'Forest Athena', desc: 'Soft, grounding, forest-goddess atmosphere.' },
       { value: 'ocean_poseidon', label: 'Ocean Poseidon', desc: 'Deep ocean, starlight, intuition and flow.' },
       { value: 'ancient_pharaoh', label: 'Ancient Pharaoh', desc: 'Gold, temples, fate and ritual presence.' },
     ],
@@ -361,7 +361,7 @@ const enTools: Record<ToolPageSlug, ToolPageCopy> = {
 
 const localeCopies: Record<Locale, ToolLocaleCopy> = {
   'zh-TW': {
-    shell: { backLabel: '回到身心靈入口', eyebrow: '神諭工具實驗室' },
+    shell: { backLabel: '回到工具入口', eyebrow: '解讀工具實驗室' },
     consult: {
       title: '想讓結果變成真正可用的提醒？',
       body: '免費工具適合先看方向；若你想把結果放進感情、工作、人生選擇或長期運勢裡理解，可以帶著這份結果找老師深入解讀。',
@@ -382,7 +382,7 @@ const localeCopies: Record<Locale, ToolLocaleCopy> = {
     tools: zhTools,
   },
   en: {
-    shell: { backLabel: 'Back to spiritual hub', eyebrow: 'ORACLE TOOL LAB' },
+    shell: { backLabel: 'Back to tools hub', eyebrow: 'ORACLE TOOL LAB' },
     consult: {
       title: 'Want to turn this result into usable guidance?',
       body: 'Free tools are a first map. If you want to connect the result to love, work, life choices, or timing, bring it to a teacher for a deeper reading.',
@@ -434,7 +434,7 @@ const localeCopies: Record<Locale, ToolLocaleCopy> = {
     },
   },
   id: {
-    shell: { backLabel: 'Kembali ke hub spiritual', eyebrow: 'LAB ALAT ORAKEL' },
+    shell: { backLabel: 'Kembali ke hub alat', eyebrow: 'LAB ALAT ORAKEL' },
     consult: {
       title: 'Ingin mengubah hasil ini menjadi panduan yang berguna?',
       body: 'Alat gratis memberi peta awal. Untuk mengaitkan hasil dengan relasi, kerja, pilihan hidup, atau waktu, bawalah ke guru untuk bacaan lebih dalam.',

@@ -5,7 +5,6 @@ import { SITE_URL } from '@/lib/i18n/seo';
 const PUBLIC_ROUTES = [
   '/',
   '/beta',
-  '/spiritual',
   '/tools',
   '/daily',
   '/mobile',
@@ -41,7 +40,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
         url: absolute(url),
         lastModified: new Date(),
         changeFrequency: route === '/' ? 'daily' : 'weekly',
-        priority: route === '/' ? 1 : route === '/spiritual' ? 0.9 : 0.7,
+        priority: route === '/' ? 1 : route === '/tools' ? 0.9 : 0.7,
         alternates: {
           languages,
         },

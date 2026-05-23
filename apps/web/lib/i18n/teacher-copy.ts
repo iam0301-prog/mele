@@ -310,7 +310,7 @@ export const teacherCopies: Record<Locale, TeacherCopy> = {
       introLong: '長版介紹',
       introLongPlaceholder: '為什麼想成為命理老師、你的特色、可以幫助什麼樣的人...',
       quote: '一句格言',
-      quotePlaceholder: '例：宇宙從不為難準備好的靈魂',
+      quotePlaceholder: '例：真正的理解，會讓人更有力量做選擇',
       docsKicker: '證件 / 影片',
       idFront: '證件正面（身分證 / 護照）',
       idBack: '證件背面',

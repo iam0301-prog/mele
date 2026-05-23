@@ -5,7 +5,7 @@
     "description": "MELE adalah platform multibahasa untuk memahami diri melalui tes gratis, tarot, rune, kalender Maya, Bazi, Human Design, astrologi, numerologi, ritual harian, dan poin member.",
     "keywords": [
       "memahami diri",
-      "alat spiritual",
+      "alat eksplorasi diri",
       "tarot",
       "kalender Maya",
       "Bazi",
@@ -183,47 +183,47 @@
         "name": "Gerbang Taiwan",
         "status": "Pasar utama",
         "body": "Konten Mandarin Tradisional, LINE, alur konsultasi, dan ritual harian.",
-        "href": "/zh-TW/spiritual"
+        "href": "/tools"
       },
       {
         "locale": "vi",
         "name": "Gerbang Vietnam",
         "status": "Pasar utama",
         "body": "Tes Vietnam, video pendek, dan kanal sosial.",
-        "href": "/vi/spiritual"
+        "href": "/tools"
       },
       {
         "locale": "id",
         "name": "Gerbang Indonesia",
         "status": "Pasar utama",
         "body": "Konten Indonesia, sosial, dan kolaborasi pemandu.",
-        "href": "/id/spiritual"
+        "href": "/tools"
       },
       {
         "locale": "en",
         "name": "Gerbang Inggris",
         "status": "Global",
         "body": "Onboarding Inggris untuk alat dan konsultasi.",
-        "href": "/en/spiritual"
+        "href": "/tools"
       },
       {
         "locale": "ja",
         "name": "Gerbang Jepang",
         "status": "Disiapkan",
         "body": "Struktur SEO dan konten siap dilengkapi.",
-        "href": "/ja/spiritual"
+        "href": "/tools"
       },
       {
         "locale": "ko",
         "name": "Gerbang Korea",
         "status": "Disiapkan",
         "body": "Struktur SEO dan konten siap dilengkapi.",
-        "href": "/ko/spiritual"
+        "href": "/tools"
       }
     ],
     "page": {
-      "kicker": "SPIRITUAL MARKET",
-      "heroTitle": "Gerbang pasar spiritual",
+      "kicker": "SELF DISCOVERY",
+      "heroTitle": "Gerbang eksplorasi diri",
       "heroBody": "Landing page lokal untuk tes gratis, insight persona, artikel, video pendek, kanal resmi, dan alur konsultasi saat dibutuhkan.",
       "freeTests": "Pintu tes gratis",
       "freeTestsBody": "Numerologi, Human Design, tarot, kalender Maya, dan ritual harian menjadi lapisan interaksi pertama.",

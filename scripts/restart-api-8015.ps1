@@ -2,7 +2,26 @@ $ErrorActionPreference = "Stop"
 
 $root = Split-Path -Parent $PSScriptRoot
 $port = 8015
-$startScript = Join-Path $PSScriptRoot "start-python-api-8015.cmd"
+
+function Wait-ForHttpOk {
+  param(
+    [Parameter(Mandatory = $true)][string]$Url,
+    [int]$TimeoutSeconds = 30
+  )
+
+  $deadline = (Get-Date).AddSeconds($TimeoutSeconds)
+  while ((Get-Date) -lt $deadline) {
+    try {
+      $response = Invoke-WebRequest -UseBasicParsing -Uri $Url -TimeoutSec 2
+      if ($response.StatusCode -ge 200 -and $response.StatusCode -lt 500) {
+        return $true
+      }
+    } catch {
+      Start-Sleep -Milliseconds 700
+    }
+  }
+  return $false
+}
 
 Write-Host "Restarting MELE Python API on http://127.0.0.1:$port ..."
 
@@ -27,6 +46,21 @@ foreach ($processId in $processIds) {
 
 Start-Sleep -Seconds 1
 
-& cmd.exe /c "start `"Mele API`" /min cmd.exe /k $startScript"
+$launcher = Join-Path $root "scripts\start-python-api-8015.cmd"
+if (-not (Test-Path $launcher)) {
+  throw "API launcher not found: $launcher"
+}
 
-Write-Host "MELE Python API is starting: http://127.0.0.1:$port"
+$env:PYTHONPATH = "$root\.py312-packages;$root\python_api"
+$env:PYTHONIOENCODING = "utf-8"
+
+$startCommand = "start ""Mele API"" /min cmd.exe /k ""$launcher"""
+& cmd.exe /c $startCommand
+
+if (-not (Wait-ForHttpOk -Url "http://127.0.0.1:$port/health" -TimeoutSeconds 45)) {
+  throw "MELE Python API did not become reachable on http://127.0.0.1:$port after starting $launcher"
+}
+
+$listener = Get-NetTCPConnection -LocalPort $port -State Listen -ErrorAction SilentlyContinue | Select-Object -First 1
+$processId = if ($listener) { $listener.OwningProcess } else { "unknown" }
+Write-Host "MELE Python API is ready: http://127.0.0.1:$port (PID $processId)"

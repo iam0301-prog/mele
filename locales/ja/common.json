@@ -84,7 +84,7 @@
       }
     ],
     "marketsKicker": "MULTI-LANGUAGE ENTRY",
-    "marketsTitle": "多言語の自己理解入口",
+    "marketsTitle": "多言語のツール入口",
     "marketsBody": "台湾、ベトナム、インドネシア、英語圏、そして将来の日本・韓国市場が、それぞれの言語で同じツール体系に入れます。",
     "toolsKicker": "FREE TESTS",
     "toolsTitle": "深掘りの前に、まず自分を理解する",
@@ -183,46 +183,46 @@
         "name": "台湾入口",
         "status": "主要市場",
         "body": "繁体字、LINE、相談導線、毎日の儀式を中心にします。",
-        "href": "/zh-TW/spiritual"
+        "href": "/tools"
       },
       {
         "locale": "vi",
         "name": "ベトナム入口",
         "status": "主要市場",
         "body": "ベトナム語診断、短尺動画、SNS導線を準備します。",
-        "href": "/vi/spiritual"
+        "href": "/tools"
       },
       {
         "locale": "id",
         "name": "インドネシア入口",
         "status": "主要市場",
         "body": "インドネシア語コンテンツとガイド協業を準備します。",
-        "href": "/id/spiritual"
+        "href": "/tools"
       },
       {
         "locale": "en",
         "name": "英語国際入口",
         "status": "国際版",
         "body": "英語でツールと相談導線を説明します。",
-        "href": "/en/spiritual"
+        "href": "/tools"
       },
       {
         "locale": "ja",
         "name": "日本入口",
         "status": "準備中",
         "body": "SEO と市場ページの骨格を先に用意します。",
-        "href": "/ja/spiritual"
+        "href": "/tools"
       },
       {
         "locale": "ko",
         "name": "韓国入口",
         "status": "準備中",
         "body": "SEO と市場ページの骨格を先に用意します。",
-        "href": "/ko/spiritual"
+        "href": "/tools"
       }
     ],
     "page": {
-      "kicker": "SPIRITUAL MARKET",
+      "kicker": "SELF DISCOVERY",
       "heroTitle": "スピリチュアル市場入口",
       "heroBody": "無料診断、自己分析、記事、短尺動画、公式SNS、必要なときの相談入口を持つローカルページです。",
       "freeTests": "無料診断入口",

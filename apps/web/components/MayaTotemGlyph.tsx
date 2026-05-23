@@ -71,7 +71,7 @@ export const MAYA_TOTEMS: MayaTotem[] = [
   { idx: 4, slug: 'yellow-seed', zh: '黃種子', en: 'Yellow Seed', color: 'yellow', keywords: ['萌芽', '目標', '耐心成長'], summary: '黃種子提醒你選定方向，把能量放進真正值得培養的地方。', assetPath: assetPath('yellow-seed') },
   { idx: 5, slug: 'red-serpent', zh: '紅蛇', en: 'Red Serpent', color: 'red', keywords: ['本能', '生命力', '身體智慧'], summary: '紅蛇連結身體的警覺與慾望，讓你回到最直接的生命感。', assetPath: assetPath('red-serpent') },
   { idx: 6, slug: 'white-worldbridger', zh: '白世界橋', en: 'White Worldbridger', color: 'white', keywords: ['橋接', '放下', '轉換階段'], summary: '白世界橋幫你跨過舊局，透過放下讓新的關係與可能性進來。', assetPath: assetPath('white-worldbridger') },
-  { idx: 7, slug: 'blue-hand', zh: '藍手', en: 'Blue Hand', color: 'blue', keywords: ['療癒', '實作', '完成'], summary: '藍手把理解落到行動，今天適合親手修補、整理、完成一件事。', assetPath: assetPath('blue-hand') },
+  { idx: 7, slug: 'blue-hand', zh: '藍手', en: 'Blue Hand', color: 'blue', keywords: ['修復', '實作', '完成'], summary: '藍手把理解落到行動，今天適合親手修補、整理、完成一件事。', assetPath: assetPath('blue-hand') },
   { idx: 8, slug: 'yellow-star', zh: '黃星星', en: 'Yellow Star', color: 'yellow', keywords: ['美感', '和諧', '優雅展現'], summary: '黃星星讓混亂回到秩序，也提醒你用更美、更精準的方式呈現自己。', assetPath: assetPath('yellow-star') },
   { idx: 9, slug: 'red-moon', zh: '紅月', en: 'Red Moon', color: 'red', keywords: ['淨化', '情緒流', '敏銳感受'], summary: '紅月像潮汐一樣清洗情緒，讓你看見心中真正需要被照顧的地方。', assetPath: assetPath('red-moon') },
   { idx: 10, slug: 'white-dog', zh: '白狗', en: 'White Dog', color: 'white', keywords: ['愛', '忠誠', '心的選擇'], summary: '白狗把焦點帶回關係與心意，問你是否願意忠於真正珍惜的人事物。', assetPath: assetPath('white-dog') },

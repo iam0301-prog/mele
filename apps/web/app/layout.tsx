@@ -44,6 +44,34 @@ const localPreviewCacheResetScript = `
 })();
 `;
 
+const externalIntegrationErrorGuardScript = `
+(function () {
+  function isExternalIntegrationPermissionError(reason) {
+    try {
+      if (!reason || typeof reason !== 'object') return false;
+      var reqInfo = reason.reqInfo || {};
+      var data = reason.data || {};
+      var originalError = reason.originalError || {};
+      var message = String(reason.message || data.msg || originalError.message || '');
+      return (
+        message === 'permission error' &&
+        (reason.code === 403 || data.code === 403) &&
+        reqInfo.pathPrefix === '/site_integration' &&
+        reqInfo.path === '/template_list'
+      );
+    } catch (_) {
+      return false;
+    }
+  }
+
+  window.addEventListener('unhandledrejection', function (event) {
+    if (isExternalIntegrationPermissionError(event.reason)) {
+      event.preventDefault();
+    }
+  }, true);
+})();
+`;
+
 export async function generateMetadata(): Promise<Metadata> {
   const requestHeaders = await headers();
   const headerLocale = requestHeaders.get(LOCALE_HEADER);
@@ -92,6 +120,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html lang={locale}>
       <body className="font-sans">
+        <script dangerouslySetInnerHTML={{ __html: externalIntegrationErrorGuardScript }} />
         <script dangerouslySetInnerHTML={{ __html: localPreviewCacheResetScript }} />
         <ToastProvider>
           <LocaleProvider locale={locale}>
