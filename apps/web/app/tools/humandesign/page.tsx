@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import Link from 'next/link';
 import { AutofillBanner } from '@/components/AutofillBanner';
 import { BirthDateTimeFields } from '@/components/BirthInputs';
 import { ToolError, ToolLoading } from '@/components/ToolFeedback';
@@ -10,7 +9,6 @@ import { ConsultCTA, ToolShell } from '@/components/ToolShell';
 import { useToast } from '@/components/ToastProvider';
 import { calc, CalcError, type CalcResponse } from '@/lib/api';
 import { normalizeTime, useProfile } from '@/lib/use-profile';
-import { localizePath } from '@/lib/i18n/config';
 import { useCurrentLocale } from '@/lib/i18n/use-current-locale';
 import { getToolPageCopy } from '@/lib/i18n/tool-page-copy';
 import { getBrowserTimeZone, timezoneOffsetAt } from '@/lib/timezone';
@@ -113,19 +111,6 @@ export default function HumanDesignPage() {
           </button>
         </div>
       </form>
-
-      {copy.visualNote && (
-        <section className="ritual-panel mt-6">
-          <div className="ritual-kicker">{copy.visualNote.kicker}</div>
-          <h2>{copy.visualNote.title}</h2>
-          <p>{copy.visualNote.body}</p>
-          <div className="ritual-stage__actions">
-            <Link href={localizePath('/ar', locale)} className="mele-btn-secondary">
-              {copy.visualNote.action}
-            </Link>
-          </div>
-        </section>
-      )}
 
       {loading && <ToolLoading locale={locale} label={copy.loadingLabel} />}
       {error && !loading && <ToolError locale={locale} message={error} />}

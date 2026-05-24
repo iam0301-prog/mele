@@ -10265,3 +10265,238 @@ footer {
   }
 }
 
+/* MELE result layout polish: clearer reading flow + cleaner Human Design BodyGraph */
+.reading-ar {
+  gap: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 24px;
+  padding: clamp(18px, 4vw, 32px);
+  background:
+    radial-gradient(circle at 18% 0%, rgba(113, 112, 255, 0.14), transparent 34%),
+    radial-gradient(circle at 88% 22%, rgba(106, 183, 199, 0.12), transparent 32%),
+    rgba(255, 255, 255, 0.028);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 24px 70px rgba(0, 0, 0, 0.28);
+}
+
+.reading-ar__copy { max-width: 760px; }
+
+.reading-ar__copy > span,
+.reading-ar__hd-frame-label span,
+.result-reading-map .result-game__hero span,
+.beginner-guide__header span,
+.result-insights__header span {
+  color: rgba(130, 143, 255, 0.92);
+  letter-spacing: 0.18em;
+}
+
+.reading-ar__copy h2 {
+  color: #f7f8f8;
+  font-size: clamp(28px, 4vw, 44px);
+  line-height: 1.05;
+  letter-spacing: -0.04em;
+}
+
+.reading-ar__copy p {
+  max-width: 680px;
+  color: rgba(208, 214, 224, 0.82);
+  font-size: 15px;
+  line-height: 1.85;
+}
+
+.reading-ar__viewer-state {
+  border-color: rgba(255, 255, 255, 0.09);
+  color: rgba(247, 248, 248, 0.82);
+  background: rgba(255, 255, 255, 0.045);
+}
+
+.reading-ar__stage {
+  min-height: 0;
+  border-color: rgba(255, 255, 255, 0.08);
+  border-radius: 22px;
+  padding: clamp(16px, 3vw, 28px);
+  overflow: visible;
+  background:
+    radial-gradient(circle at 50% 16%, rgba(113, 112, 255, 0.15), transparent 28%),
+    radial-gradient(circle at 78% 80%, rgba(106, 183, 199, 0.1), transparent 34%),
+    rgba(8, 9, 10, 0.72);
+}
+
+.reading-ar--humandesign .reading-ar__stage { grid-template-columns: minmax(0, 1fr); }
+
+.reading-ar--humandesign .reading-ar__model-zone,
+.reading-ar--humandesign .reading-ar__model-fallback {
+  min-height: 0;
+  width: 100%;
+}
+
+.reading-ar__hd-planar {
+  width: min(100%, 980px);
+  gap: 16px;
+}
+
+.reading-ar__hd-planar-frame {
+  overflow: visible;
+  border-color: rgba(255, 255, 255, 0.1);
+  border-radius: 22px;
+  padding: clamp(14px, 2.5vw, 24px);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.018)),
+    radial-gradient(circle at 50% 0%, rgba(130, 143, 255, 0.16), transparent 38%),
+    #0b0c10;
+}
+
+.reading-ar__hd-planar-frame::before {
+  inset: 12px;
+  border-color: rgba(255, 255, 255, 0.06);
+  border-radius: 18px;
+}
+
+.reading-ar__hd-frame-label {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px 16px;
+  margin-bottom: 14px;
+}
+
+.reading-ar__hd-frame-label strong {
+  color: rgba(247, 248, 248, 0.86);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.reading-ar__hd-svg {
+  display: grid;
+  place-items: center;
+  max-height: none;
+  overflow: visible;
+}
+
+.reading-ar__hd-svg svg {
+  width: min(100%, 720px) !important;
+  max-width: 100% !important;
+  height: auto !important;
+  margin: 0 auto;
+  border-radius: 18px;
+  filter: drop-shadow(0 26px 55px rgba(0, 0, 0, 0.34));
+}
+
+.reading-ar__hd-planar-copy {
+  display: grid;
+  gap: 12px;
+  border-color: rgba(255, 255, 255, 0.09);
+  border-radius: 18px;
+  padding: clamp(16px, 3vw, 22px);
+  background:
+    linear-gradient(135deg, rgba(113, 112, 255, 0.12), transparent 44%),
+    rgba(255, 255, 255, 0.035);
+}
+
+.reading-ar__hd-planar-copy strong {
+  margin-top: 0;
+  color: #f7f8f8;
+  font-size: clamp(21px, 3vw, 30px);
+  line-height: 1.18;
+  letter-spacing: -0.025em;
+}
+
+.reading-ar__hd-planar-copy p {
+  margin-top: 0;
+  color: rgba(208, 214, 224, 0.78);
+  font-size: 14px;
+}
+
+.reading-ar__hd-planar-copy dl {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.reading-ar__hd-planar-copy dl div {
+  grid-template-columns: 1fr;
+  gap: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.075);
+  border-radius: 14px;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.reading-ar__hd-planar-copy dt {
+  color: rgba(138, 143, 152, 0.95);
+  font-size: 11px;
+}
+
+.reading-ar__hd-planar-copy dd {
+  color: #f7f8f8;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.result-reading-map,
+.beginner-guide,
+.member-resonance,
+.result-insights,
+.personal-reading {
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  border-radius: 22px !important;
+  background:
+    radial-gradient(circle at 0% 0%, rgba(113, 112, 255, 0.1), transparent 30%),
+    rgba(255, 255, 255, 0.028) !important;
+}
+
+.result-reading-map .result-game__hero { grid-template-columns: 1fr; }
+
+.result-reading-map .result-game__hero h2,
+.beginner-guide__header h2,
+.result-insights__header h2 {
+  color: #f7f8f8;
+  letter-spacing: -0.03em;
+}
+
+.result-reading-map .result-game__meter,
+.result-reading-map .result-game__badges,
+.result-reading-map .result-game__sigil { display: none; }
+
+.result-reading-map .result-game__quests { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+.result-reading-map .result-game__quest {
+  border-color: rgba(255, 255, 255, 0.08);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.result-reading-map .result-game__quest h3 {
+  margin: 7px 0 8px;
+  color: #f7f8f8;
+  font-size: 17px;
+  line-height: 1.35;
+}
+
+.result-reading-map .result-game__quest span { color: rgba(130, 143, 255, 0.92); }
+
+.result-reading-map .result-game__actions a {
+  border-color: rgba(130, 143, 255, 0.38);
+  background: #5e6ad2;
+  color: #fff;
+}
+
+@media (max-width: 860px) {
+  .reading-ar__hd-planar-copy dl,
+  .result-reading-map .result-game__quests { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 560px) {
+  .reading-ar {
+    border-radius: 18px;
+    padding: 16px;
+  }
+
+  .reading-ar__stage,
+  .reading-ar__hd-planar-frame,
+  .reading-ar__hd-planar-copy { border-radius: 16px; }
+
+  .reading-ar__hd-svg svg { width: 100% !important; }
+}
+

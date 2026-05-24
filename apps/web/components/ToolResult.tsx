@@ -1673,26 +1673,18 @@ function BeginnerGuidePanel({ guide }: { guide: BeginnerGuide }) {
 
 function ResultGamePanel({ profile }: { profile: GameProfile }) {
   return (
-    <section className="result-game" aria-label="新手閱讀順序">
+    <section className="result-game result-reading-map" aria-label="新手閱讀順序">
       <div className="result-game__hero">
         <div>
           <span>READING MAP</span>
-          <h2>{profile.title}</h2>
-          <p>{profile.className} · {profile.rank}</p>
-          <p className="result-game__plain-note">不用一次看懂全部，照下面三步先抓主軸、再看圖面、最後選一個今天能做的行動。</p>
+          <h2>這份結果怎麼看？</h2>
+          <p>{profile.title} · {profile.className}</p>
+          <p className="result-game__plain-note">不用一次讀完所有名詞。先照三步抓主軸：先看核心摘要，再看視覺盤面，最後選一個今天可以練習的提醒。</p>
         </div>
-        <div className="result-game__sigil" aria-hidden="true">
-          <i />
-          <b />
-        </div>
-      </div>
-
-      <div className="result-game__meter" aria-label={`探索度 ${profile.progress}%`}>
-        <i style={{ width: `${profile.progress}%` }} />
       </div>
 
       <div className="result-game__stats">
-        {profile.stats.map((stat) => (
+        {profile.stats.slice(0, 3).map((stat) => (
           <div key={stat.label} className={`result-game__stat result-game__stat--${stat.tone}`}>
             <span>{stat.label}</span>
             <strong>{stat.value}</strong>
@@ -1700,16 +1692,11 @@ function ResultGamePanel({ profile }: { profile: GameProfile }) {
         ))}
       </div>
 
-      <div className="result-game__badges" aria-label="本次解鎖徽章">
-        {profile.badges.map((badge) => (
-          <em key={badge}>{badge}</em>
-        ))}
-      </div>
-
       <div className="result-game__quests">
-        {profile.quests.map((quest) => (
+        {profile.quests.map((quest, index) => (
           <article key={quest.title} className="result-game__quest">
-            <span>{quest.title}</span>
+            <span>STEP {index + 1}</span>
+            <h3>{quest.title}</h3>
             <p>{quest.body}</p>
             <strong>{quest.reward}</strong>
           </article>
@@ -1717,8 +1704,8 @@ function ResultGamePanel({ profile }: { profile: GameProfile }) {
       </div>
 
       <div className="result-game__actions">
-        <a href="#reading-ar-stage">前往視覺展示</a>
-        <small>目前先使用穩定 2D 展示；正式 AR 會等模型質感完成後再開放。</small>
+        <a href="#reading-ar-stage">看視覺盤面</a>
+        <small>下面會把重點拆成白話卡片，不需要懂專有名詞也能讀。</small>
       </div>
     </section>
   );
@@ -2278,7 +2265,7 @@ export function ToolResult({ result }: { result: CalcResponse | null }) {
     <div ref={ref} className={`mele-card tool-result-card tool-result-card--${result.tool} mt-6 animate-fade-in`}>
       {result.tool === 'maya' ? (
         <MayaOracleBoard result={result} />
-      ) : svg && (
+      ) : svg && result.tool !== 'humandesign' && (
         <div
           className={`mele-svg-wrap mele-svg-wrap--${result.tool} mb-6 flex justify-center`}
           dangerouslySetInnerHTML={{ __html: svg }}

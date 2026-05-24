@@ -181,7 +181,7 @@ const ASSETS: Record<ReadingArKind, AssetMeta> = {
     title: '人類圖 2D BodyGraph',
     label: 'BodyGraph',
     className: 'humandesign',
-    note: '人類圖暫停 3D/AR 模型展示，先用精修 2D BodyGraph 保留可讀性與正式感。',
+    note: '用一張清楚的 BodyGraph 先整理能量中心、通道與啟動閘門，讓新手不用一次讀完所有細節。',
     fallbackGlyph: 'HD',
   },
 };
@@ -526,11 +526,15 @@ function PlatePreview({ kind, result, asset }: { kind: ReadingArKind; result?: C
 
 function HumanDesignPlanarPreview({ result }: { result?: CalcResponse | null }) {
   const svg = result?.render?.svg;
-  const summary = getGenericSummary('humandesign', result);
+  const summary = getGenericSummary('humandesign', result).slice(0, 4);
 
   return (
     <div className="reading-ar__hd-planar" aria-label="人類圖 2D BodyGraph 視覺展示">
       <div className="reading-ar__hd-planar-frame">
+        <div className="reading-ar__hd-frame-label">
+          <span>BodyGraph</span>
+          <strong>先看這張圖，不用一次看懂所有閘門</strong>
+        </div>
         {svg ? (
           <div className="reading-ar__hd-svg" dangerouslySetInnerHTML={{ __html: svg }} />
         ) : (
@@ -541,12 +545,12 @@ function HumanDesignPlanarPreview({ result }: { result?: CalcResponse | null }) 
         )}
       </div>
       <div className="reading-ar__hd-planar-copy">
-        <span>精修 2D 展示</span>
-        <strong>先把能量結構看清楚</strong>
-        <p>人類圖目前不展示未成熟 3D 模型，改用可讀的 BodyGraph 盤面呈現中心、通道與啟動閘門。</p>
+        <span>你的閱讀順序</span>
+        <strong>先抓三件事：類型、權威、策略</strong>
+        <p>人類圖先不要從一堆閘門開始讀。先知道你怎麼用能量、怎麼做決定，再回頭看中心與通道。</p>
         {summary.length > 0 && (
           <dl>
-            {summary.slice(0, 4).map((item) => (
+            {summary.map((item) => (
               <div key={item.label}>
                 <dt>{item.label}</dt>
                 <dd>{item.value}</dd>
@@ -628,12 +632,14 @@ function ReadingDetails({
     );
   }
 
+  if (kind === 'humandesign') return null;
+
   const summary = getGenericSummary(kind, result);
   return (
     <div className="reading-ar__details">
       <span>{asset.label}</span>
       <h3>{asset.title}</h3>
-      {summary.length > 0 ? summary.map((item) => <p key={item.label}>{item.label}：{item.value}</p>) : <p>這裡會整理本次結果的核心訊息。</p>}
+      {summary.length > 0 ? summary.slice(0, 4).map((item) => <p key={item.label}>{item.label}：{item.value}</p>) : <p>這裡會整理本次結果的核心訊息。</p>}
     </div>
   );
 }
@@ -686,10 +692,10 @@ export function ReadingArStage({ kind, result }: { kind: ReadingArKind; result?:
   return (
     <section id="reading-ar-stage" className={`reading-ar reading-ar--${asset.className} reading-ar--${kind}`}>
       <div className="reading-ar__copy">
-        <span>VISUAL RESULT STAGE</span>
+        <span>視覺結果</span>
         <h2>{asset.title}</h2>
         <p>{asset.note}</p>
-        <em className="reading-ar__viewer-state reading-ar__viewer-state--fallback">使用精修 2D 結果展示</em>
+        <em className="reading-ar__viewer-state reading-ar__viewer-state--fallback">清楚可讀的 2D 盤面</em>
       </div>
 
       <div className="reading-ar__stage">
@@ -730,15 +736,19 @@ export function ReadingArStage({ kind, result }: { kind: ReadingArKind; result?:
         <VisualDiagramGuide kind={kind} result={result} />
       </div>
 
-      <div className="reading-ar__actions" aria-label="AR 狀態說明">
-        <span className="reading-ar__model-link reading-ar__model-link--disabled">AR / 3D 正式版準備中</span>
-        <p>我先停用目前品質不夠好的 3D 模型，避免讓使用者看到未完成品。正式 AR 會等卡牌、石面與盤面模型達到可發布水準後再開放。</p>
-      </div>
+      {kind !== 'humandesign' && (
+        <>
+          <div className="reading-ar__actions" aria-label="AR 狀態說明">
+            <span className="reading-ar__model-link reading-ar__model-link--disabled">AR / 3D 正式版準備中</span>
+            <p>這一版先用穩定 2D 盤面讓結果看得懂；正式 AR 會等卡牌、石面與盤面模型達到可發布水準後再開放。</p>
+          </div>
 
-      <div className="reading-ar__support reading-ar__support--limited">
-        <strong>目前採用穩定 2D 體驗</strong>
-        <p>手機與桌面都能直接觀看，不需要額外啟動 AR。這一版先確保清楚、精緻、可測試。</p>
-      </div>
+          <div className="reading-ar__support reading-ar__support--limited">
+            <strong>目前採用穩定 2D 體驗</strong>
+            <p>手機與桌面都能直接觀看，不需要額外啟動 AR。</p>
+          </div>
+        </>
+      )}
     </section>
   );
 }
