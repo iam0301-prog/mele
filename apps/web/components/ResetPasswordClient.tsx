@@ -10,6 +10,7 @@ export function ResetPasswordClient({ locale }: { locale?: Locale }) {
   const toast = useToast();
   const [checking, setChecking] = useState(true);
   const [hasSession, setHasSession] = useState(false);
+  const [checkTimedOut, setCheckTimedOut] = useState(false);
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
   const [saving, setSaving] = useState(false);
@@ -17,11 +18,30 @@ export function ResetPasswordClient({ locale }: { locale?: Locale }) {
   const profileHref = locale ? localizePath('/account/profile', locale) : '/account/profile';
 
   useEffect(() => {
+    let active = true;
     const supabase = createClient();
+    const timeout = window.setTimeout(() => {
+      if (!active) return;
+      setCheckTimedOut(true);
+      setChecking(false);
+    }, 4000);
+
     void supabase.auth.getSession().then(({ data }) => {
+      if (!active) return;
+      window.clearTimeout(timeout);
       setHasSession(Boolean(data.session));
       setChecking(false);
+    }).catch(() => {
+      if (!active) return;
+      window.clearTimeout(timeout);
+      setCheckTimedOut(true);
+      setChecking(false);
     });
+
+    return () => {
+      active = false;
+      window.clearTimeout(timeout);
+    };
   }, []);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
@@ -51,7 +71,11 @@ export function ResetPasswordClient({ locale }: { locale?: Locale }) {
         <div className="mb-5 text-base tracking-[0.5em] text-accent opacity-70">PASSWORD RESET</div>
         <h1 className="mb-2 font-serif text-4xl tracking-widest">設定新密碼</h1>
         <p className="mt-3 text-sm leading-relaxed text-white/60">
-          請在這裡輸入新密碼。完成後系統會登出，讓你用新密碼重新登入。
+          {checking
+            ? '正在確認重設連結，確認成功後就可以輸入新密碼。'
+            : hasSession
+              ? '請在這裡輸入新密碼。完成後系統會登出，讓你用新密碼重新登入。'
+              : '如果重設信已過期或沒有成功建立登入狀態，請重新寄送一次忘記密碼信。'}
         </p>
       </header>
 
@@ -61,7 +85,9 @@ export function ResetPasswordClient({ locale }: { locale?: Locale }) {
         ) : !hasSession ? (
           <div className="space-y-4">
             <div className="rounded-lg border border-reverse/50 bg-reverse/10 p-3 text-sm leading-relaxed text-rose-100">
-              這個重設連結沒有成功建立登入狀態，可能已過期、已使用過，或是在不同瀏覽器開啟。請回登入頁重新寄送一次「忘記密碼」信。
+              {checkTimedOut
+                ? '系統確認重設連結花費太久，可能是網路暫時不穩或這個連結沒有成功建立登入狀態。請先重新整理；如果仍然看到這個訊息，請回登入頁重新寄送一次「忘記密碼」信。'
+                : '這個重設連結沒有成功建立登入狀態，可能已過期、已使用過，或是在不同瀏覽器開啟。請回登入頁重新寄送一次「忘記密碼」信。'}
             </div>
             <Link href={loginHref} className="mele-btn-primary inline-flex">回登入頁重新寄送</Link>
           </div>
