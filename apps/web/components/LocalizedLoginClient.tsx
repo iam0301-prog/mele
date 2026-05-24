@@ -282,7 +282,7 @@ export function LocalizedLoginClient({ locale }: { locale: Locale }) {
     try {
       const supabase = createClient();
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: buildAuthCallbackUrl(localizePath('/account/profile', locale)),
+        redirectTo: buildAuthCallbackUrl(localizePath('/account/reset-password', locale)),
       });
       if (error) throw error;
       setSignupNotice(copy.resetSent);

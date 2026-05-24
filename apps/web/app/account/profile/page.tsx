@@ -225,6 +225,7 @@ export default function ProfilePage() {
           <button type="button" onClick={save} disabled={saving} aria-disabled={saving} className="mele-btn-primary">
             {saving ? '儲存中...' : '儲存資料'}
           </button>
+          <Link href="/account/reset-password" className="mele-btn-secondary">更改密碼</Link>
           <Link href="/account/privacy" className="mele-btn-secondary">資料權利</Link>
           <Link href="/account/mybookings" className="mele-btn-secondary">我的諮詢</Link>
           <Link href="/account/charts" className="mele-btn-secondary">我的命盤</Link>

@@ -309,7 +309,7 @@ function LoginInner() {
     try {
       const supabase = createClient();
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent('/account/profile')}`,
+        redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent('/account/reset-password')}`,
       });
       if (error) return toast(error.message, 'error');
       toast('密碼重設信已寄出，請到信箱查看。', 'success');
