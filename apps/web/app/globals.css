@@ -4635,6 +4635,23 @@ body::before {
   transform: translateZ(24px);
 }
 
+.sculpture-card__face--image-only {
+  display: block;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid rgba(232, 197, 71, 0.5);
+  background: #05070b;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.48);
+  text-align: initial;
+}
+
+.sculpture-card__face--image-only .reading-ar__card-art--image-only {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  transform: none;
+}
+
 .sculpture-card__face strong {
   color: #f4ead2;
   font-family: "Noto Sans TC", "Microsoft JhengHei", "PingFang TC", sans-serif;

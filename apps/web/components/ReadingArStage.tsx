@@ -329,7 +329,10 @@ function tarotRank(card?: TarotCardData): string {
 
 function tarotIllustrationPath(style: TarotStyle, card?: TarotCardData): string | null {
   const cardId = text(card?.id) || text(card?.number);
-  return cardId ? `/tarot/cards/${style}/${cardId}.webp` : null;
+  if (!cardId) return null;
+  const numericId = Number(cardId);
+  const extension = style === 'ocean_poseidon' && Number.isFinite(numericId) && numericId >= 30 ? 'png' : 'webp';
+  return `/tarot/cards/${style}/${cardId}.${extension}`;
 }
 
 function getGenericSummary(kind: ReadingArKind, result?: CalcResponse | null) {
@@ -412,42 +415,28 @@ function getVisualDiagramGuide(kind: ReadingArKind, result?: CalcResponse | null
 }
 
 function TarotArt({ style, card }: { style: TarotStyle; card?: TarotCardData }) {
-  const arcana = tarotArcana(card);
-  const rank = tarotRank(card);
-  const pipCount = arcana === 'major' ? 0 : TAROT_PIP_COUNT[rank] ?? 3;
   const illustrationPath = tarotIllustrationPath(style, card);
+  const [imageFailed, setImageFailed] = useState(false);
+
+  useEffect(() => {
+    setImageFailed(false);
+  }, [illustrationPath]);
+
   return (
-    <div className={`reading-ar__card-art reading-ar__card-art--${style} card-art--${arcana} card-art--rank-${rank.toLowerCase()}`} aria-hidden="true">
-      {illustrationPath && (
+    <div className="reading-ar__card-art reading-ar__card-art--image-only" aria-hidden="true">
+      {illustrationPath && !imageFailed ? (
         <Image
-          className="card-art__illustration"
+          className="card-art__illustration card-art__illustration--primary"
           src={illustrationPath}
           alt=""
           fill
-          sizes="132px"
+          sizes="(max-width: 640px) 220px, 260px"
           unoptimized
-          onError={(event) => {
-            event.currentTarget.hidden = true;
-          }}
+          onError={() => setImageFailed(true)}
         />
+      ) : (
+        <span className="card-art__missing-image">牌面圖片未找到</span>
       )}
-      <span className="card-art__mini-frame" />
-      <span className="card-art__halo" />
-      <span className="card-art__scene" />
-      <span className="card-art__primary" />
-      <span className="card-art__secondary" />
-      <span className="card-art__ground" />
-      <span className="card-art__stars" />
-      {pipCount > 0 && (
-        <span className="card-art__pips">
-          {Array.from({ length: pipCount }).map((_, index) => {
-            const pos = TAROT_PIP_POSITIONS[index] ?? TAROT_PIP_POSITIONS[2];
-            return <span key={index} className="card-art__pip" style={{ left: `${pos.left}%`, top: `${pos.top}%` }} />;
-          })}
-        </span>
-      )}
-      <span className={`card-art__sigil card-art__sigil--${style}`} />
-      <span className="card-art__caption" />
     </div>
   );
 }
@@ -455,15 +444,10 @@ function TarotArt({ style, card }: { style: TarotStyle; card?: TarotCardData }) 
 function TarotPreview({ draw, style, activeIndex }: { draw: TarotDraw | null; style: TarotStyle; activeIndex?: number }) {
   const card = draw?.card;
   const name = card?.name_zh || card?.name_en || '塔羅牌';
-  const meta = [drawSlotLabel(draw, activeIndex), positionLabel(draw?.position), TAROT_STYLE_META[style].label].filter(Boolean).join(' / ');
   return (
     <div className={`reading-ar__sculpture reading-ar__sculpture--tarot reading-ar__sculpture--${style}`} aria-label={`${name} 牌面視覺展示`}>
-      <div className="sculpture-card__thickness" />
-      <div className="sculpture-card__face">
-        <span className="sculpture-card__number">{card?.number ?? 'I'}</span>
+      <div className="sculpture-card__face sculpture-card__face--image-only">
         <TarotArt style={style} card={card} />
-        <strong>{name}</strong>
-        <small>{meta}</small>
       </div>
       <span className="sculpture-shadow" />
     </div>
@@ -737,17 +721,10 @@ export function ReadingArStage({ kind, result }: { kind: ReadingArKind; result?:
       </div>
 
       {kind !== 'humandesign' && (
-        <>
-          <div className="reading-ar__actions" aria-label="AR 狀態說明">
-            <span className="reading-ar__model-link reading-ar__model-link--disabled">AR / 3D 正式版準備中</span>
-            <p>這一版先用穩定 2D 盤面讓結果看得懂；正式 AR 會等卡牌、石面與盤面模型達到可發布水準後再開放。</p>
-          </div>
-
-          <div className="reading-ar__support reading-ar__support--limited">
-            <strong>目前採用穩定 2D 體驗</strong>
-            <p>手機與桌面都能直接觀看，不需要額外啟動 AR。</p>
-          </div>
-        </>
+        <div className="reading-ar__support reading-ar__support--limited">
+          <strong>目前採用正式 2D 視覺結果</strong>
+          <p>{kind === 'tarot' ? '塔羅會直接顯示已上線的牌面圖片，搭配牌位與正逆位閱讀。' : '手機與桌面都能直接觀看，重點放在看得懂的盤面與解讀。'}</p>
+        </div>
       )}
     </section>
   );

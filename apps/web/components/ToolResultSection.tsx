@@ -33,7 +33,8 @@ export function ToolResultSection({
   locale?: Locale;
 }) {
   void locale;
-  const arStage = showAr ? <ReadingArStage kind={kind} result={result} /> : null;
+  const shouldRenderVisualStage = showAr && kind !== 'maya';
+  const arStage = shouldRenderVisualStage ? <ReadingArStage kind={kind} result={result} /> : null;
   const shouldShowArFirst = arFirst || kind !== 'tarot';
 
   return (

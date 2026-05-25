@@ -186,14 +186,14 @@ const BEGINNER_GUIDES: Record<CalcTool, BeginnerGuide> = {
     note: '初階先看「我像什麼」，再看「我最近可以練習什麼」。',
   },
   maya: {
-    title: '瑪雅曆初步認識自己',
-    intro: '瑪雅曆把生日換成 Kin、調性與圖騰，像是在看你的內在節奏：你如何啟動事情、如何與世界互動，以及什麼力量最能支持你。',
+    title: '瑪雅曆初步認識自己：用 Kin 看行動節奏',
+    intro: '先不要把 Kin 當神祕名詞。它比較像一張「我怎麼啟動、怎麼卡住、該借哪股力」的說明書：調性看節奏，圖騰看天賦，神諭板看你遇到壓力時可以怎麼轉向。',
     items: [
-      { label: 'Kin', title: 'Kin 是你的瑪雅曆身份編號', body: '它像一個總索引，整理你的調性、圖騰與當天能量，讓你知道這份解讀在看哪一組生命節奏。' },
-      { label: 'Tone', title: '調性像是你的做事節奏', body: '調性會描述你啟動、整理、合作或完成事情的方式；初階可以把它看成「我怎麼推動人生」。' },
-      { label: 'Seal', title: '圖騰像是你的核心天賦', body: '圖騰會指出你比較自然的力量，例如溝通、照顧、創造、覺察或突破，也會提醒你容易卡住的模式。' },
+      { label: 'Kin', title: 'Kin 是你的瑪雅曆身份編號，但不是流水號', body: '它把你的調性、圖騰、支持與挑戰串在一起。先看它，是為了知道整份解讀在講哪一種生命操作模式。' },
+      { label: 'Tone', title: '調性像是你的做事節奏：看你怎麼推進事情', body: '有人需要先有目的，有人需要先整理阻力，有人要透過行動才有感。調性會直接指出：你順的時候怎麼動，卡的時候常卡在哪。' },
+      { label: 'Seal', title: '圖騰像是你的核心天賦，也是你的慣用武器', body: '圖騰不是好聽稱號，而是你的慣用力量。例如溝通、照顧、突破、整理、美感或直覺；優勢用過頭時，也會變成壓力反應。' },
     ],
-    note: '初階先看 Kin 的總感覺，再看調性與圖騰：一個看節奏，一個看天賦。',
+    note: '讀法：先看「先給會員的命中感」有沒有刺中，再看神諭板的支持與挑戰，最後只選一個今日行動。',
   },
   bazi: {
     title: '八字初步認識自己',
@@ -264,9 +264,9 @@ const TOOL_COPY: Record<CalcTool, { eyebrow: string; title: string; intro: strin
     intro: '這份結果會先整理你的主要數字，再把它轉成容易理解的性格傾向、行動風格與提醒。數字不是限制，而是一種觀察自己的語言。',
   },
   maya: {
-    eyebrow: '馬雅曆解讀',
-    title: 'Kin、調性與圖騰形成你的能量節奏',
-    intro: '馬雅曆適合觀察一天或一個人的節奏、使命感與互動方式。請把它當成能量地圖，而不是單一結論。',
+    eyebrow: '馬雅 Kin 解讀',
+    title: '這不是稱號表，是你的行動節奏與壓力反應',
+    intro: '先看調性，再看圖騰：調性說你怎麼推進事情，圖騰說你最自然的力量。下面會把它翻成白話：你順的時候怎麼動、卡住時容易怎麼反應、今天可以先做哪一步。',
   },
   bazi: {
     eyebrow: '八字解讀',
@@ -307,9 +307,9 @@ const RESULT_NEXT_STEPS: Record<CalcTool, NextStep[]> = {
     { title: '補充生活情境', body: '若要做職涯、關係或年度主題，可以帶著結果預約老師深談。' },
   ],
   maya: [
-    { title: '先看 Kin 與圖騰', body: '確認 Kin、調性、圖騰，再看引導、支持、挑戰與隱藏力量。' },
-    { title: '往下看 2D 視覺盤', body: '視覺展示會把馬雅符號整理成能量盤，讓 Kin 與神諭關係更好理解。' },
-    { title: '用每日節奏驗證', body: '把今日狀態和 Kin 的語氣對照，會比只背關鍵字更有感。' },
+    { title: '先看一句命中感', body: '不要先研究名詞。先看「你順的時候怎麼動、卡住時怎麼反應」那段，有刺中再往下看。' },
+    { title: '再看神諭板怎麼借力', body: '本命是主軸，指引是下一步，支持是補給，挑戰是卡點，隱藏力量是低潮裡會冒出的資源。接著可以前往視覺展示，用穩定 2D 展示看五個位置怎麼互相牽動。' },
+    { title: '今天只做一個小實驗', body: '把結果轉成一個 24 小時內能做的動作：說一句話、放掉一件事、整理一個界線，先驗證有沒有變順。' },
   ],
   bazi: [
     { title: '先看日主與五行', body: '日主代表你站在世界中的基本質地，五行分布則看資源與壓力來源。' },
@@ -666,15 +666,33 @@ function positionLabel(position: unknown): string {
   return cleanText(position) === 'reversed' ? '逆位' : '正位';
 }
 
+function tarotPositionReading(slot: string, position: string, meaning: string): string {
+  const label = slot || '這張牌';
+  const reversed = position === 'reversed';
+  if (/過去|背景|起因/.test(label)) {
+    return `${label}：這裡不是重複牌義，而是在看事情怎麼開始。${meaning} ${reversed ? '逆位表示這個舊狀態還沒完全鬆開，可能仍在影響你現在的判斷。' : '正位表示這股力量曾經幫你撐住局面，但現在要看它是否還適用。'}`;
+  }
+  if (/現在|當下|現況/.test(label)) {
+    return `${label}：這張牌只看你此刻正在面對的核心壓力。${meaning} ${reversed ? '逆位表示你現在可能卡在不敢承認、或不想正面處理的狀態。' : '正位表示現在最該先承認這個訊號，而不是急著跳到結論。'}`;
+  }
+  if (/未來|下一步|建議|行動|結果/.test(label)) {
+    return `${label}：這裡要轉成可以做的事。${meaning} ${reversed ? '逆位提醒你先停下錯誤慣性，不要用同一種方式硬推。' : '正位提醒你把這張牌變成一個具體行動，今天先做最小的一步。'}`;
+  }
+  return `${label}：${meaning} ${reversed ? '逆位重點是阻塞、壓抑或過度使用這股能量。' : '正位重點是把這股能量用在正確的位置。'}`;
+}
+
 function tarotCards(data: Dict): InsightCard[] {
   return asArray(data.cards).slice(0, 6).map((item, index) => {
     const draw = asDict(item);
     const card = asDict(draw.card);
     const name = cleanText(card.name_zh) || cleanText(card.name_en) || `第 ${index + 1} 張牌`;
+    const slot = cleanText(draw.spread_position) || cleanText(draw.slot) || `位置 ${index + 1}`;
+    const position = cleanText(draw.position);
+    const meaning = meaningFrom(draw, card) || '這張牌指出你目前最需要面對的心理狀態與下一步提醒。';
     return {
       title: name,
-      subtitle: `${cleanText(draw.spread_position) || cleanText(draw.slot) || `位置 ${index + 1}`} / ${positionLabel(draw.position)}`,
-      body: meaningFrom(draw, card) || '請把這張牌放回你原本的問題中觀察，它描述的是當下需要被看見的心理狀態與行動提醒。',
+      subtitle: `${slot} / ${positionLabel(position)}`,
+      body: tarotPositionReading(slot, position, meaning),
       tags: keywordsFrom(draw, card),
     };
   });
@@ -712,16 +730,22 @@ function mayaCards(data: Dict): InsightCard[] {
       const tone = asDict(item.tone);
       const kin = cleanText(item.kin);
       const sealText = formatPrimitive(seal);
+      const toneText = formatPrimitive(tone);
       const memberCopy = mayaMemberCopy(sealText);
+      const toneCopy = mayaToneCopy(toneText);
+      const roleCopy: Record<string, string> = {
+        self: `${memberCopy.gift} ${toneCopy.rhythm}`,
+        guide: `卡住時先借這股引導：${memberCopy.gift} 把它化成動作，就是先問「我下一步怎麼做會比較像自己」。`,
+        analog: `這是你的補給站：${memberCopy.gift} 需要支持時，不要硬撐，先把這種力量找回來。`,
+        antipode: `${memberCopy.shadow} 它不是來否定你，而是提醒你把反面能力練成熟。`,
+        occult: `低潮或意外裡會冒出的暗線：${memberCopy.gift} 這通常不是計畫出來的，而是在你願意放鬆控制時出現。`,
+      };
       if (!kin && !formatPrimitive(item)) return null;
       return {
         title: label,
-        subtitle: kin ? `Kin ${kin}` : undefined,
-        body: compact([
-          compact([formatPrimitive(tone), formatPrimitive(seal)], ''),
-          key === 'antipode' ? memberCopy.shadow : key === 'self' ? memberCopy.gift : MAYA_ORACLE_COPY[key],
-        ], '：') || '這個位置說明今日能量如何與你的核心 Kin 互動。',
-        tags: compact([formatPrimitive(seal), formatPrimitive(tone)], ' / ').split(' / ').filter(Boolean).slice(0, 3),
+        subtitle: kin ? `Kin ${kin}｜${compact([toneText, sealText], ' ')}` : undefined,
+        body: roleCopy[key] || MAYA_ORACLE_COPY[key] || '這個位置說明今日能量如何與你的核心 Kin 互動。',
+        tags: compact([sealText, toneText], ' / ').split(' / ').filter(Boolean).slice(0, 3),
         mayaSeal: seal,
       };
     })
@@ -765,6 +789,15 @@ function mayaMemberCopy(seal: string): SymbolMemberCopy {
     shadow: '卡住時通常不是圖騰不好，而是你把這股力量用得太急、太滿，或用在不適合的地方。',
     teacherQuestion: '我的圖騰力量現在最該用在哪個生活問題上？',
   });
+}
+
+function mayaToneCopy(tone: string): MayaToneCopy {
+  const entry = Object.entries(MAYA_TONE_MEMBER_COPY).find(([key]) => tone.includes(key));
+  return entry?.[1] ?? {
+    rhythm: '你的調性描述你推進事情的節奏：你是先召喚、先校準、先行動，還是先整理成形。',
+    stuck: '卡住時，通常不是你沒有天賦，而是節奏用錯了。',
+    action: '今天先觀察一件事：我是在硬推，還是在用自己的節奏前進？',
+  };
 }
 
 function astroMemberCopy(point: string): SymbolMemberCopy {
@@ -817,6 +850,80 @@ type SymbolMemberCopy = {
   gift: string;
   shadow: string;
   teacherQuestion: string;
+};
+
+type MayaToneCopy = {
+  rhythm: string;
+  stuck: string;
+  action: string;
+};
+
+const MAYA_TONE_MEMBER_COPY: Record<string, MayaToneCopy> = {
+  磁性: {
+    rhythm: '你做事需要先抓到「我為什麼要做」。目的感一清楚，人才會聚過來，事情也比較不會散。',
+    stuck: '卡住時，你會一直找方向，或把別人的期待誤認成自己的任務。',
+    action: '今天只寫一句主題：我現在最想召喚的是什麼？不要先排十個計畫。',
+  },
+  月亮: {
+    rhythm: '你很容易看見事情的兩面：想前進，也會立刻看見阻力。這不是負面，而是你的校準能力。',
+    stuck: '卡住時，你會把挑戰看得太大，還沒開始就先防守。',
+    action: '今天先把阻力寫出來，再圈出一個你真的能處理的點。',
+  },
+  電力: {
+    rhythm: '你的節奏是透過行動把能量接起來。只想不做會悶，開始服務某件事後，靈感反而會回來。',
+    stuck: '卡住時，你容易一直幫忙，卻忘了問自己是不是還有電。',
+    action: '今天只做一個小服務：一句提醒、一個整理、一個交付就好。',
+  },
+  自我存在: {
+    rhythm: '你需要把模糊感變成形式。越能定義規則、邊界和步驟，越能安心往下做。',
+    stuck: '卡住時，你會一直想把事情想完整，結果拖到遲遲不開始。',
+    action: '今天先定義一個框：這件事的範圍是什麼？先做到哪裡算完成？',
+  },
+  超頻: {
+    rhythm: '你有把人和資源聚焦起來的力量。當你相信自己可以發號施令，事情會比較快成形。',
+    stuck: '卡住時，你可能想證明自己夠強，反而變得硬撐或太用力。',
+    action: '今天只選一件事加強，不要全部都想推到滿。',
+  },
+  韻律: {
+    rhythm: '你的重點是節奏與平衡。環境太亂、責任不均時，你會比別人更快失去穩定感。',
+    stuck: '卡住時，你容易一邊想公平，一邊默默承擔太多。',
+    action: '今天調整一個節奏：時間、空間、工作量或關係裡的責任分配。',
+  },
+  共振: {
+    rhythm: '你像天線，容易接收到場域裡的情緒、語氣與靈感。狀態對了，你會很會說中重點。',
+    stuck: '卡住時，你會吸太多訊號，分不清哪些是自己的感覺。',
+    action: '今天先安靜十分鐘，再決定要回應什麼，不要一接收到就立刻反應。',
+  },
+  銀河星系: {
+    rhythm: '你在意一致性。表面做對沒有用，你需要感覺自己的選擇和價值觀是對齊的。',
+    stuck: '卡住時，你會很怕自己不夠完整，或因為想維持形象而不敢改變。',
+    action: '今天檢查一件事：我現在做的選擇，真的跟我想成為的人一致嗎？',
+  },
+  太陽: {
+    rhythm: '你的節奏是把意圖推到明處。當你願意明確說出想要什麼，事情會開始往前。',
+    stuck: '卡住時，你會一直等更有把握，結果意圖沒有被任何人看見。',
+    action: '今天把一個想法說出口，哪怕只是傳給一個可信任的人。',
+  },
+  行星: {
+    rhythm: '你需要看見結果落地。只談感覺會讓你不踏實，能被實際驗證的進展會讓你有力量。',
+    stuck: '卡住時，你容易把價值綁在結果上，沒有成果就否定自己。',
+    action: '今天做一個能被看見的小成果，不求完美，只求真的完成。',
+  },
+  光譜: {
+    rhythm: '你有釋放舊模式的能力。你不是一定要一直維持原樣，很多時候你的力量來自敢鬆手。',
+    stuck: '卡住時，你會一邊想自由，一邊又抓著舊責任不放。',
+    action: '今天釋放一件事：一個不必要的承諾、一個過期期待，或一個一直拖著你的念頭。',
+  },
+  水晶: {
+    rhythm: '你的能量適合合作與分享。你不是單打獨鬥型，對的人會讓你的判斷變清楚。',
+    stuck: '卡住時，你可能太顧團體，或一直等大家都同意才敢動。',
+    action: '今天找一個人討論，但最後要留下你自己的選擇。',
+  },
+  宇宙: {
+    rhythm: '你像在收尾一個大循環。很多事不是要更用力，而是要消化、保存，讓經驗變成智慧。',
+    stuck: '卡住時，你會不想結束，或把已經完成的事反覆拿出來重想。',
+    action: '今天為一件事寫下結語：我從這裡學到什麼？下一輪不想再重複什麼？',
+  },
 };
 
 const MAYA_SEAL_MEMBER_COPY: Record<string, SymbolMemberCopy> = {
@@ -1187,25 +1294,29 @@ function buildMemberResonance(result: CalcResponse): MemberResonance {
     const label = firstValue(data, ['label', 'seal'], '本命 Kin');
     const tone = firstValue(data, ['tone'], '調性');
     const copy = mayaMemberCopy(label);
+    const toneCopy = mayaToneCopy(tone);
     const oracle = asDict(data.oracle);
     const guideSeal = formatPrimitive(asDict(asDict(oracle.guide).seal));
     const analogSeal = formatPrimitive(asDict(asDict(oracle.analog).seal));
     const antipodeSeal = formatPrimitive(asDict(asDict(oracle.antipode).seal));
+    const occultSeal = formatPrimitive(asDict(asDict(oracle.occult).seal));
     const guideCopy = mayaMemberCopy(guideSeal);
     const analogCopy = mayaMemberCopy(analogSeal);
     const antipodeCopy = mayaMemberCopy(antipodeSeal);
+    const occultCopy = mayaMemberCopy(occultSeal);
 
     return {
       eyebrow: '先給會員的命中感',
-      title: `${label} 不是稱號，而是在說你怎麼做選擇、怎麼卡住`,
-      lead: `你的入口是 ${kin}、${tone}、${label}。白話來看，${copy.gift}`,
-      mirror: `如果這段有中，通常會中在這裡：${copy.shadow}`,
+      title: `${label}：你不是沒方向，而是需要照自己的節奏動`,
+      lead: `你的入口是 ${kin}、${tone}、${label}。白話來看，${copy.gift} ${toneCopy.rhythm}`,
+      mirror: `如果這段有中，通常會中在壓力反應：${copy.shadow} ${toneCopy.stuck}`,
       points: [
-        { label: '主軸', title: label, body: copy.gift },
-        { label: '借力', title: compact([guideSeal, analogSeal], ' / ') || '引導與支持', body: compact([guideCopy.gift, analogCopy.gift], ' ') || '引導力量像指南針，支持力量像補給，這兩個位置最適合轉成下一步行動。' },
-        { label: '卡點', title: antipodeSeal || '挑戰力量', body: antipodeCopy.shadow },
+        { label: '主軸', title: `${label}｜${tone}`, body: `${copy.gift} ${toneCopy.rhythm}` },
+        { label: '借力', title: compact([guideSeal, analogSeal], ' / ') || '引導與支持', body: `卡住時不要硬撐。先借「${guideSeal || '指引'}」來決定下一步，再借「${analogSeal || '支持'}」補能量。${compact([guideCopy.gift, analogCopy.gift], ' ')}` },
+        { label: '卡點', title: antipodeSeal || '挑戰力量', body: `${antipodeCopy.shadow} 這個位置不是敵人，是你需要練成熟的反面能力。` },
+        { label: '今日行動', title: '先做一個 24 小時小實驗', body: toneCopy.action },
       ],
-      nextQuestion: copy.teacherQuestion,
+      nextQuestion: occultSeal ? `${copy.teacherQuestion} 另外，${occultSeal} 這條隱藏線也可以問：${occultCopy.teacherQuestion}` : copy.teacherQuestion,
     };
   }
 
@@ -1352,15 +1463,23 @@ function buildPersonalReading(result: CalcResponse): PersonalReading {
     const label = firstValue(data, ['label', 'seal'], '本命 Kin');
     const tone = firstValue(data, ['tone'], '調性');
     const copy = mayaMemberCopy(label);
+    const toneCopy = mayaToneCopy(tone);
+    const oracle = asDict(data.oracle);
+    const guideSeal = formatPrimitive(asDict(asDict(oracle.guide).seal));
+    const analogSeal = formatPrimitive(asDict(asDict(oracle.analog).seal));
+    const antipodeSeal = formatPrimitive(asDict(asDict(oracle.antipode).seal));
+    const guideCopy = mayaMemberCopy(guideSeal);
+    const analogCopy = mayaMemberCopy(analogSeal);
+    const antipodeCopy = mayaMemberCopy(antipodeSeal);
     return {
       eyebrow: 'PERSONAL READING',
       title: `${title}：${label}`,
-      subtitle: `你的入口是 ${kin}、${tone}、${label}。這不是稱號，而是在說你怎麼推進事情、怎麼卡住、怎麼找回節奏。`,
+      subtitle: `你的入口是 ${kin}、${tone}、${label}。這不是稱號，而是在說你怎麼推進事情、怎麼卡住、怎麼找回節奏；這裡會把它翻成今天可以驗證的小動作。`,
       points: [
-        { label: '我在看什麼', title: `${label} 的本人感`, body: copy.gift },
-        { label: '我的優勢', title: '可借力的位置', body: '支持與引導不是裝飾資訊，而是當你卡住時，最適合拿來當下一步方法的力量。' },
-        { label: '可能卡點', title: '挑戰力量', body: copy.shadow },
-        { label: '想問老師', title: '把感覺變成問題', body: copy.teacherQuestion },
+        { label: '我在看什麼', title: `${label} × ${tone}`, body: `${copy.gift} ${toneCopy.rhythm}` },
+        { label: '我的優勢', title: compact([guideSeal, analogSeal], ' / ') || '可借力的位置', body: `支持與引導不是裝飾資訊。${guideCopy.gift} ${analogCopy.gift}` },
+        { label: '可能卡點', title: antipodeSeal || '挑戰力量', body: `${copy.shadow} ${toneCopy.stuck} ${antipodeCopy.shadow}` },
+        { label: '今日行動', title: '把 Kin 變成一個小動作', body: toneCopy.action },
       ],
     };
   }
@@ -2263,9 +2382,7 @@ export function ToolResult({ result }: { result: CalcResponse | null }) {
 
   return (
     <div ref={ref} className={`mele-card tool-result-card tool-result-card--${result.tool} mt-6 animate-fade-in`}>
-      {result.tool === 'maya' ? (
-        <MayaOracleBoard result={result} />
-      ) : svg && result.tool !== 'humandesign' && (
+      {result.tool !== 'tarot' && result.tool !== 'maya' && svg && result.tool !== 'humandesign' && (
         <div
           className={`mele-svg-wrap mele-svg-wrap--${result.tool} mb-6 flex justify-center`}
           dangerouslySetInnerHTML={{ __html: svg }}
@@ -2273,22 +2390,10 @@ export function ToolResult({ result }: { result: CalcResponse | null }) {
       )}
 
       <MemberResonancePanel resonance={memberResonance} />
-      {result.tool !== 'tarot' && <BeginnerGuidePanel guide={beginnerGuide} />}
-      {result.tool === 'maya' && <MayaTotemGallery activeSeal={result.data.seal} />}
-      {result.tool !== 'tarot' && <ResultGamePanel profile={gameProfile} />}
-      <ResultInsightPanel insight={insight} speech={result.tool === 'tarot' ? undefined : speech} />
+      {result.tool !== 'maya' && <ResultInsightPanel insight={insight} speech={result.tool === 'tarot' ? undefined : speech} />}
       <ZiweiPlainGuide result={result} />
       {result.tool !== 'tarot' && <PersonalReadingPanel reading={personalReading} />}
       <PointUnlockPanel result={result} />
-      {result.tool !== 'tarot' && <ResultNextSteps tool={result.tool} />}
-      {result.tool !== 'tarot' && <MemberActionPath tool={result.tool} />}
-
-      {html && (
-        <details className="result-backend-details">
-          <summary>查看完整技術明細</summary>
-          <div className="prose prose-invert max-w-none result-backend-explanation" dangerouslySetInnerHTML={{ __html: html }} />
-        </details>
-      )}
     </div>
   );
 }
