@@ -301,3 +301,279 @@ runes:
           一段「收成的真相」階段。你會看清哪些是禮物、哪些是該認的帳。
         inquiry: |
           你現在收的這份成果，是 12 個月前的你種下的，還是別人種的？
+
+  "Eihwaz":
+    symbol: "ᛇ"
+    name_zh: "艾瓦茲"
+    meaning: "紫杉 / 生死之軸"
+    reversible: false
+    teaser:
+      friend: |
+        Eihwaz 是世界樹——根在死的世界、頂在生的世界。這個符文出現代表你在跨越一個門檻。會有點怕，但這正是你必須單獨走過的那一段。
+    full:
+      master:
+        upright_core: |
+          轉化、生死門檻、垂直的連結、根深而能高。
+        upright_focus: |
+          這週承認一件「我必須單獨完成」的事。別找隊友、別找退路。
+        reversed_core: |
+          （無反位）阻塞時：卡在門檻拒絕跨越、用恐懼建造盔甲。
+        reversed_shadow: |
+          假裝這場轉化不必發生；用日常忙碌掩蓋深處的呼喊。
+        situation: |
+          一個內在的「之前 / 之後」分界線。跨過去之後你會是不同的人。
+        inquiry: |
+          那扇門你站在前面多久了？要再多久才推開它？
+
+  "Perthro":
+    symbol: "ᛈ"
+    name_zh: "佩斯洛"
+    meaning: "命運杯 / 神秘"
+    reversible: true
+    teaser:
+      friend: |
+        Perthro 是搖籤的杯——有些事你算不出來，因為它的本質就是未知。這個符文出現代表現在不是「努力分析」的階段，是「願意相信並下注」的階段。
+    full:
+      master:
+        upright_core: |
+          神秘、命運、機運、未顯化但即將揭曉。
+        upright_focus: |
+          這週對一件事下一個「不知道結果」的注。不算回報、不問機率，下了再說。
+        reversed_core: |
+          被命運壓著、不肯下注、過度想控制不可控的事。
+        reversed_shadow: |
+          把「我得先確定」說一輩子；或用占卜當逃避決定的擋箭牌。
+        situation: |
+          一段你必須跟未知合作的階段。算太多反而錯過。
+        inquiry: |
+          如果你必須在不知道結果的情況下選一個，你會選哪個？
+
+  "Algiz":
+    symbol: "ᛉ"
+    name_zh: "阿吉茲"
+    meaning: "麋鹿 / 保護"
+    reversible: true
+    teaser:
+      friend: |
+        Algiz 是高舉的手——保護、警戒、神聖的連結。這個符文出現代表你的直覺在豎起耳朵。某件事你已經感覺不對，這次別忽略它。
+    full:
+      master:
+        upright_core: |
+          保護、靈性連結、本能警覺、被更大的力量看顧。
+        upright_focus: |
+          這週對一個你感覺「怪怪的」的人或場合說不。不需要證據，相信直覺。
+        reversed_core: |
+          失去保護、過度暴露、忽略警訊、被消耗。
+        reversed_shadow: |
+          把「我要相信人」當不設防的藉口，最後被傷了還怪自己。
+        situation: |
+          一個必須劃界、收回邊界的時刻。守住自己才能守住別人。
+        inquiry: |
+          最近哪個地方、哪個人，你的直覺其實一直在拉警報？
+
+  "Sowilo":
+    symbol: "ᛋ"
+    name_zh: "索維洛"
+    meaning: "太陽 / 勝利之光"
+    reversible: false
+    teaser:
+      friend: |
+        Sowilo 是太陽——勝利、活力、被看見。這個符文出現代表你進入一段「不必躲」的時期。把該亮的亮出來，世界已經準備好看見你。
+    full:
+      master:
+        upright_core: |
+          勝利、清晰、生命力的高峰、自信的展現。
+        upright_focus: |
+          這週公開展示一個你過去藏起來的成果。不謙虛、不解釋。
+        reversed_core: |
+          （無反位）阻塞時：自我懷疑遮住光、害怕被看見、太多光反而看不清。
+        reversed_shadow: |
+          用「我不想出風頭」掩蓋怕被評價；或被光照得太亮反而失去陰影的智慧。
+        situation: |
+          一段「該被看見」的時期。藏起來就是辜負了這個時機。
+        inquiry: |
+          如果你完全放下「會不會太招搖」的擔心，你會做什麼？
+
+  "Tiwaz":
+    symbol: "ᛏ"
+    name_zh: "提瓦茲"
+    meaning: "戰神 Tyr / 正義"
+    reversible: true
+    teaser:
+      friend: |
+        Tiwaz 是斷腕的戰神 Tyr——為了正義願意付出代價。這個符文出現代表你正在面對一個「要犧牲什麼來守住原則」的選擇。不會無痛，但會榮耀。
+    full:
+      master:
+        upright_core: |
+          正義、犧牲、原則、有代價的勇氣。
+        upright_focus: |
+          這週為一個原則付出一次代價——拒絕一筆錢、得罪一個人、退一個會。
+        reversed_core: |
+          失去信念、原則被妥協、勇氣消失、自我懷疑壓過正義感。
+        reversed_shadow: |
+          用「現實考量」當放棄原則的擋箭牌；或把固執當原則。
+        situation: |
+          一場原則的考驗。妥協會輕鬆，但你會記得自己讓步那一刻。
+        inquiry: |
+          這次你願意為這個原則，付什麼代價？不付，又會付什麼代價？
+
+  "Berkano":
+    symbol: "ᛒ"
+    name_zh: "貝爾卡諾"
+    meaning: "樺樹 / 新生"
+    reversible: true
+    teaser:
+      friend: |
+        Berkano 是初春的樺樹——溫柔、新生、孕育中的東西。這個符文出現代表有某個新生命在萌芽——可能是計畫、可能是關係、可能是新的你。這段需要保護。
+    full:
+      master:
+        upright_core: |
+          新生、孕育、療癒、溫柔而堅韌的成長。
+        upright_focus: |
+          這週保護一件剛萌芽的事——不要急著公開、不要急著評估、給它時間。
+        reversed_core: |
+          發育受阻、家庭問題、新生力量被打壓、流產感。
+        reversed_shadow: |
+          太早曝光脆弱的新事物；或用「保護」之名綁住該長大的東西。
+        situation: |
+          一段「新生命需要保護期」的時刻。不是表演的時候。
+        inquiry: |
+          那個剛萌芽的東西，你準備給它多久才公開？
+
+  "Ehwaz":
+    symbol: "ᛖ"
+    name_zh: "艾瓦茲（馬）"
+    meaning: "馬 / 夥伴關係"
+    reversible: true
+    teaser:
+      friend: |
+        Ehwaz 是馬與騎士——靠合作前進。這個符文出現代表你不是單打獨鬥的階段。找對的人、跟對的隊，比自己拼命更遠。
+    full:
+      master:
+        upright_core: |
+          夥伴、合作、雙人或多人推進的力量、信任。
+        upright_focus: |
+          這週主動找一個對的人合作一件事。不要再「我自己來」。
+        reversed_core: |
+          錯位的夥伴、合作破裂、騎錯馬、對方拖累你。
+        reversed_shadow: |
+          忠誠於不再對等的關係；用「我們一起這麼久」當不分手的擋箭牌。
+        situation: |
+          一段「夥伴大檢視」的階段。誰能跟你走下一程，要看清楚。
+        inquiry: |
+          現在跟你並肩的這個人，是要去下一段路的同伴嗎？
+
+  "Mannaz":
+    symbol: "ᛗ"
+    name_zh: "曼納茲"
+    meaning: "人 / 自我"
+    reversible: true
+    teaser:
+      friend: |
+        Mannaz 是「人」的符文——關於你是誰、你跟人類社群的關係。這個符文出現代表你正在被問：拋開所有頭銜，你到底是誰？
+    full:
+      master:
+        upright_core: |
+          自我認同、人類經驗、社群中的位置、共同的脆弱。
+        upright_focus: |
+          這週對一個信任的人說一件你的脆弱——不為求安慰，為練習「人」的真實。
+        reversed_core: |
+          自我迷失、與人疏離、把自己當機器或角色而非人。
+        reversed_shadow: |
+          躲在頭銜後面活著；或把孤獨美化成獨立。
+        situation: |
+          一段「重新認識自己是誰」的階段。不靠角色，看本質。
+        inquiry: |
+          拿掉你所有的頭銜、職稱、關係身份，你還剩什麼？
+
+  "Laguz":
+    symbol: "ᛚ"
+    name_zh: "拉古茲"
+    meaning: "水 / 直覺與流動"
+    reversible: true
+    teaser:
+      friend: |
+        Laguz 是水——深、流、能感應到別人感受不到的事。這個符文出現代表你的直覺正在強化。別用邏輯壓制它，讓水帶你去。
+    full:
+      master:
+        upright_core: |
+          直覺、情感深度、流動、潛意識中的智慧。
+        upright_focus: |
+          這週對一件事「先感受再思考」——做之前先停 30 秒，問身體怎麼說。
+        reversed_core: |
+          情緒淹沒、失去方向、被感受牽走、否認直覺。
+        reversed_shadow: |
+          用「我太敏感」貶低自己；或把情緒當理性決定的偽裝。
+        situation: |
+          一個感受比邏輯更準的時刻。腦袋會說錯，水會說對。
+        inquiry: |
+          你最近一次被身體 / 直覺警告，但被你說服自己「想太多」是什麼？
+
+  "Ingwaz":
+    symbol: "ᛜ"
+    name_zh: "因瓦茲"
+    meaning: "生育神 Ing / 內在能量"
+    reversible: false
+    teaser:
+      friend: |
+        Ingwaz 是儲存的能量——已經累積夠了，正在等釋放的時機。這個符文出現代表你內在有某件事醞釀很久，準備分娩。不要催，時機到了會自己出來。
+    full:
+      master:
+        upright_core: |
+          內在累積、潛能蓄積、預備中的爆發、種子期。
+        upright_focus: |
+          這週不要強推一件還在醞釀的事。讓它再蹲一週，看下一週是不是自然成熟。
+        reversed_core: |
+          （無反位）阻塞時：能量積太久變停滯、催生未成熟之事、內耗。
+        reversed_shadow: |
+          用「我還沒準備好」拖延已成熟之事；或撕開蛹強迫蝴蝶出來。
+        situation: |
+          一個必要的醞釀期。重點是辨識「還沒熟」與「太晚」的差別。
+        inquiry: |
+          這件事是還沒到時機，還是你怕承擔出來後的責任？
+
+  "Dagaz":
+    symbol: "ᛞ"
+    name_zh: "達加茲"
+    meaning: "白晝 / 突破"
+    reversible: false
+    teaser:
+      friend: |
+        Dagaz 是黎明的那一刻——黑變白的轉捩點。這個符文出現代表你正在跨越一個徹底的轉變。回不去、也不必回去。
+    full:
+      master:
+        upright_core: |
+          突破、覺醒、徹底的轉變、新的視角永久取代舊的。
+        upright_focus: |
+          這週做一件「跨過去就回不來」的決定。慶祝它，不要後悔。
+        reversed_core: |
+          （無反位）阻塞時：對突破恐懼、想退回舊版本的自己。
+        reversed_shadow: |
+          用「我比較喜歡以前」當不前進的擋箭牌；或在黎明前再多睡一輪而錯過。
+        situation: |
+          一個徹底的「之前 / 之後」分水嶺。意識正在升級。
+        inquiry: |
+          那個你已經知道的真相，要不要這次就承認過去回不去了？
+
+  "Othala":
+    symbol: "ᛟ"
+    name_zh: "歐沙拉"
+    meaning: "家園 / 遺產"
+    reversible: true
+    teaser:
+      friend: |
+        Othala 是繼承來的家園——你從哪裡來、帶著什麼基因、有什麼根。這個符文出現代表你必須面對「家族的東西」。不全是包袱，也有寶。
+    full:
+      master:
+        upright_core: |
+          根、家族、繼承、神聖的歸屬、長期累積的資產。
+        upright_focus: |
+          這週聯繫一位家族長輩、或重訪一個對你有根感的地方。聽不是說。
+        reversed_core: |
+          失根、家族糾葛、被遺產困住、認同混亂。
+        reversed_shadow: |
+          把家族傷痛當不療癒的藉口；或拒絕承認自己其實複製了家族模式。
+        situation: |
+          一段必須跟「我從哪裡來」和解的階段。和解不是接受全部，是看清楚。
+        inquiry: |
+          你想從家族繼承什麼？想結束什麼到你為止？

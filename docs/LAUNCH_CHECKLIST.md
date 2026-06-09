@@ -95,7 +95,7 @@
 - [x] **八字文案 v1** ✅（10 天干 + 12 地支 + 五行平衡，commit eb890e3；engine 接線 commit 6308e63 — `explain_bazi` 已實際讀取 bazi.yaml）
 - [x] **塔羅文案 v1（大牌）** ✅（22 大牌 × 正逆位 × 6 區塊 voice，python_api/data/copy/tarot.yaml）；78 張小牌待補
   - ⚠️ **engine 尚未接線**：`explain_tarot` 目前仍只讀 `data.cards`，未讀 tarot.yaml → 文案還沒到使用者眼前。需比照 `_bazi_copy`/`explain_bazi` 補上 `_tarot_copy` 接線
-- [ ] **盧恩文案 v1**：24 符文 × 正逆位
+- [x] **盧恩文案 v1** ✅（24 符文 × 6 區塊 voice，非反位用 merkstave；python_api/data/copy/runes.yaml）
 - [ ] **占星文案 v1**：太陽 / 月亮 / 上升 × 12 星座 + 行星宮位重點
 - [ ] **紫微文案 v1**：14 主星 + 命宮 + 大運基本詮釋
 - [ ] **人類圖文案 v1**：64 閘門 + 9 中心 + 5 類型 + 4 內在權威

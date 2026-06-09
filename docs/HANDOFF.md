@@ -4,7 +4,7 @@
 >
 > 維護規則：每完成一個里程碑，更新本檔的「已完成」與「下一步」兩段，commit。
 
-最後更新：2026-06-09（bazi + tarot 完成）
+最後更新：2026-06-09（bazi + tarot + runes 完成）
 
 ---
 
@@ -33,9 +33,9 @@
 
 【請依序做，每完成一份就 commit 一次】
 1. ~~補 bazi.yaml 的 12 地支 + 五行平衡章節~~ ✅ 已完成 (eb890e3)
-2. ~~重寫 tarot.yaml（22 大牌 voice）~~ ✅ 已完成（batch 1: 22ec264, batch 2 待 commit）
-3. 接 explain_tarot（python_api/engines/explanations.py）
-4. runes.yaml（24 符文 × 正逆位），接 explain_runes
+2. ~~重寫 tarot.yaml（22 大牌 voice）~~ ✅ 已完成 (22ec264 + 34b7341)
+3. ~~runes.yaml（24 符文 × 正逆位）~~ ✅ 已完成 (0d109dd + 待 commit batch 2)
+4. 接 explain_tarot / explain_runes（python_api/engines/explanations.py）
 5. astro.yaml（太陽/月亮/上升 × 12 + 行星宮位），接 explain_astro
 6. ziwei.yaml（14 主星 + 命宮 + 大運），接 explain_ziwei
 7. human_design.yaml（64 閘門 + 9 中心 + 5 類型 + 4 內在權威），接 explain_human_design
@@ -87,7 +87,7 @@
 - [x] maya — 完整 + 已接線 ✅
 - [x] bazi — YAML 完整 + **engine 已接線**（`explain_bazi` 讀 bazi.yaml，commit 6308e63）✅
 - [x] tarot — YAML 完整（22 大牌）✅ ／ ⚠️ **engine 尚未接線**：`explain_tarot` 還沒讀 tarot.yaml
-- [ ] runes — 未建檔
+- [x] runes — YAML 完整（24 符文 × 6 區塊；非反位用 merkstave）✅ ／ ⚠️ **engine 尚未接線**：`explain_runes` 還沒讀 runes.yaml
 - [ ] astro — 未建檔
 - [ ] ziwei — 未建檔
 - [ ] human_design — 未建檔
