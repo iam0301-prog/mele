@@ -82,15 +82,21 @@
 
 ## 🤖 Claude 可以繼續做的（P1）
 
-### 工具文案 voice YAML
-- [x] numerology — 完整 ✅
-- [x] maya — 完整 ✅
-- [x] bazi — 完整（10 天干 + 12 地支 + 五行平衡）✅
-- [x] tarot — 完整（22 大牌 × 6 區塊 voice）✅
+### 工具文案 voice YAML（YAML 完成 ≠ 上線；engine 要讀到才算數）
+- [x] numerology — 完整 + 已接線 ✅
+- [x] maya — 完整 + 已接線 ✅
+- [x] bazi — YAML 完整 + **engine 已接線**（`explain_bazi` 讀 bazi.yaml，commit 6308e63）✅
+- [x] tarot — YAML 完整（22 大牌）✅ ／ ⚠️ **engine 尚未接線**：`explain_tarot` 還沒讀 tarot.yaml
 - [ ] runes — 未建檔
 - [ ] astro — 未建檔
 - [ ] ziwei — 未建檔
 - [ ] human_design — 未建檔
+
+> ⚠️ **接線提醒（重要）**：寫 YAML 只是第一半，engine 沒接線文案就到不了使用者。
+> 目前只有 numerology / maya / bazi 三個 `explain_*` 真的讀了對應 YAML。
+> 新工具請比照 bazi 的 pattern：`_<tool>_copy()` loader + `explain_<tool>` 讀 YAML
+> （teaser=friend、full=master 六區塊）+ 在 `main.py` 對應 endpoint forward `voice`。
+> 下一步建議：先補 `explain_tarot` 接線（tarot.yaml 已寫好但目前是 dead content）。
 
 ### 其他可代勞項目
 - [ ] 7 個工具的老師後台 Voice tab UI 接線（馬雅 master voice 已寫好，只欠 UI）
