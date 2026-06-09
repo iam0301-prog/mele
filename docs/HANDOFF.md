@@ -88,7 +88,7 @@
 - [x] bazi — YAML 完整 + **engine 已接線**（`explain_bazi` 讀 bazi.yaml，commit 6308e63）✅
 - [x] tarot — YAML 完整（22 大牌）✅ ／ ⚠️ **engine 尚未接線**：`explain_tarot` 還沒讀 tarot.yaml
 - [x] runes — YAML 完整（24 符文 × 6 區塊；非反位用 merkstave）✅ ／ ⚠️ **engine 尚未接線**：`explain_runes` 還沒讀 runes.yaml
-- [ ] astro — 未建檔
+- [x] astro — YAML 完整（太陽/月亮/上升 × 12 + 12 宮位 + 8 行星宮位重點）✅ ／ ⚠️ **engine 尚未接線**：`explain_astro` 還沒讀 astro.yaml
 - [ ] ziwei — 未建檔
 - [ ] human_design — 未建檔
 
