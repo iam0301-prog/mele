@@ -4,7 +4,7 @@
 >
 > 維護規則：每完成一個里程碑，更新本檔的「已完成」與「下一步」兩段，commit。
 
-最後更新：2026-06-09（bazi 完成、tarot 待重寫）
+最後更新：2026-06-09（bazi + tarot 完成）
 
 ---
 
@@ -24,7 +24,7 @@
 - python_api/data/copy/numerology.yaml（594 行，完整）
 - python_api/data/copy/maya.yaml（515 行，完整）
 - python_api/data/copy/bazi.yaml（548 行，10 天干 + 12 地支 + 五行平衡完整）
-- python_api/data/copy/tarot.yaml（7 行空殼，需重寫）
+- python_api/data/copy/tarot.yaml（463 行，22 大牌正逆位 voice 完整）
 
 【已完成的法務 / SOP】
 - docs/LAUNCH_CHECKLIST.md
@@ -33,11 +33,12 @@
 
 【請依序做，每完成一份就 commit 一次】
 1. ~~補 bazi.yaml 的 12 地支 + 五行平衡章節~~ ✅ 已完成 (eb890e3)
-2. 重寫 tarot.yaml（22 大牌 voice），接 explain_tarot
-3. runes.yaml（24 符文 × 正逆位），接 explain_runes
-4. astro.yaml（太陽/月亮/上升 × 12 + 行星宮位），接 explain_astro
-5. ziwei.yaml（14 主星 + 命宮 + 大運），接 explain_ziwei
-6. human_design.yaml（64 閘門 + 9 中心 + 5 類型 + 4 內在權威），接 explain_human_design
+2. ~~重寫 tarot.yaml（22 大牌 voice）~~ ✅ 已完成（batch 1: 22ec264, batch 2 待 commit）
+3. 接 explain_tarot（python_api/engines/explanations.py）
+4. runes.yaml（24 符文 × 正逆位），接 explain_runes
+5. astro.yaml（太陽/月亮/上升 × 12 + 行星宮位），接 explain_astro
+6. ziwei.yaml（14 主星 + 命宮 + 大運），接 explain_ziwei
+7. human_design.yaml（64 閘門 + 9 中心 + 5 類型 + 4 內在權威），接 explain_human_design
 
 【voice 風格】
 參考 numerology.yaml 和 maya.yaml 的既有調性——scholar / friend / master
@@ -85,7 +86,7 @@
 - [x] numerology — 完整 ✅
 - [x] maya — 完整 ✅
 - [x] bazi — 完整（10 天干 + 12 地支 + 五行平衡）✅
-- [ ] tarot — 7 行空殼需重寫
+- [x] tarot — 完整（22 大牌 × 6 區塊 voice）✅
 - [ ] runes — 未建檔
 - [ ] astro — 未建檔
 - [ ] ziwei — 未建檔
