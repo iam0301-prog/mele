@@ -4,7 +4,7 @@
 >
 > 維護規則：每完成一個里程碑，更新本檔的「已完成」與「下一步」兩段，commit。
 
-最後更新：2026-06-09（**全部 8 個工具 YAML 完成**；engine 接線待補）
+最後更新：2026-06-09（**全部 8 個工具 YAML + engine 接線完成**）
 
 ---
 
@@ -60,7 +60,7 @@
 |---|---|---|
 | L1 自用 | ✅ 通過 | — |
 | **L2 封測** | ⏳ 卡關 | P0 七件外部服務串接（只有你能做） |
-| L3 公開 | ⏳ 推進中 | 工具文案 3/8、Sentry 真實 SDK、律師審法務 |
+| L3 公開 | ⏳ 推進中 | 工具文案 **8/8 ✅**、Sentry 真實 SDK、律師審法務 |
 | L4 商業營運 | — | 還早 |
 
 詳細打勾清單見 [LAUNCH_CHECKLIST.md](LAUNCH_CHECKLIST.md)。
@@ -86,17 +86,16 @@
 - [x] numerology — 完整 + 已接線 ✅
 - [x] maya — 完整 + 已接線 ✅
 - [x] bazi — YAML 完整 + **engine 已接線**（`explain_bazi` 讀 bazi.yaml，commit 6308e63）✅
-- [x] tarot — YAML 完整（22 大牌）✅ ／ ⚠️ **engine 尚未接線**：`explain_tarot` 還沒讀 tarot.yaml
-- [x] runes — YAML 完整（24 符文 × 6 區塊；非反位用 merkstave）✅ ／ ⚠️ **engine 尚未接線**：`explain_runes` 還沒讀 runes.yaml
-- [x] astro — YAML 完整（太陽/月亮/上升 × 12 + 12 宮位 + 8 行星宮位重點）✅ ／ ⚠️ **engine 尚未接線**：`explain_astro` 還沒讀 astro.yaml
-- [x] ziwei — YAML 完整（14 主星 + 12 宮位 + 大運基本概念）✅ ／ ⚠️ **engine 尚未接線**：`explain_ziwei` 還沒讀 ziwei.yaml
-- [x] human_design — YAML 完整（5 類型 + 4 權威 + 9 中心 + 64 閘門精簡版）✅ ／ ⚠️ **engine 尚未接線**：`explain_human_design` 還沒讀 human_design.yaml
+- [x] tarot — YAML 完整 + **engine 已接線**（`explain_tarot` 讀 tarot.yaml；正逆位分流）✅
+- [x] runes — YAML 完整 + **engine 已接線**（`explain_runes` 讀 runes.yaml；transliteration 為 key）✅
+- [x] astro — YAML 完整 + **engine 已接線**（`explain_astro` 讀 astro.yaml；太陽/月亮/上升各自的 section schema）✅
+- [x] ziwei — YAML 完整 + **engine 已接線**（`explain_ziwei` 讀 ziwei.yaml；命宮主星 + 12 宮 + 大運原則）✅
+- [x] human_design — YAML 完整 + **engine 已接線**（`explain_humandesign` 讀 human_design.yaml；含未定義中心 not_self 提示）✅
 
-> ⚠️ **接線提醒（重要）**：寫 YAML 只是第一半，engine 沒接線文案就到不了使用者。
-> 目前只有 numerology / maya / bazi 三個 `explain_*` 真的讀了對應 YAML。
-> 新工具請比照 bazi 的 pattern：`_<tool>_copy()` loader + `explain_<tool>` 讀 YAML
-> （teaser=friend、full=master 六區塊）+ 在 `main.py` 對應 endpoint forward `voice`。
-> 下一步建議：先補 `explain_tarot` 接線（tarot.yaml 已寫好但目前是 dead content）。
+> ✅ **接線完成**：所有 8 個 `explain_*` 都已讀對應 YAML（lazy load + graceful fallback）。
+> 各工具的 master section schema 略有不同（占星按 sun/moon/rising 分流、
+> 紫微在命宮主星 + 大運原則、人類圖補了未定義中心 not_self 提示），詳見
+> `python_api/engines/explanations.py` 的 `_*_SECTIONS` 常數與 `explain_*` 實作。
 
 ### 其他可代勞項目
 - [ ] 7 個工具的老師後台 Voice tab UI 接線（馬雅 master voice 已寫好，只欠 UI）

@@ -16,6 +16,11 @@ _DATA_DIR = Path(__file__).resolve().parent.parent / "data" / "copy"
 _NUMEROLOGY_CACHE: dict[str, Any] | None = None
 _MAYA_CACHE: dict[str, Any] | None = None
 _BAZI_CACHE: dict[str, Any] | None = None
+_TAROT_CACHE: dict[str, Any] | None = None
+_RUNES_CACHE: dict[str, Any] | None = None
+_ASTRO_CACHE: dict[str, Any] | None = None
+_ZIWEI_CACHE: dict[str, Any] | None = None
+_HD_CACHE: dict[str, Any] | None = None
 
 
 def _load_yaml(path: Path) -> dict[str, Any]:
@@ -53,6 +58,46 @@ def _bazi_copy() -> dict[str, Any]:
     if _BAZI_CACHE is None:
         _BAZI_CACHE = _load_yaml(_DATA_DIR / "bazi.yaml")
     return _BAZI_CACHE
+
+
+def _tarot_copy() -> dict[str, Any]:
+    """Lazy-load tarot.yaml once; gracefully degrade if YAML missing."""
+    global _TAROT_CACHE
+    if _TAROT_CACHE is None:
+        _TAROT_CACHE = _load_yaml(_DATA_DIR / "tarot.yaml")
+    return _TAROT_CACHE
+
+
+def _runes_copy() -> dict[str, Any]:
+    """Lazy-load runes.yaml once; gracefully degrade if YAML missing."""
+    global _RUNES_CACHE
+    if _RUNES_CACHE is None:
+        _RUNES_CACHE = _load_yaml(_DATA_DIR / "runes.yaml")
+    return _RUNES_CACHE
+
+
+def _astro_copy() -> dict[str, Any]:
+    """Lazy-load astro.yaml once; gracefully degrade if YAML missing."""
+    global _ASTRO_CACHE
+    if _ASTRO_CACHE is None:
+        _ASTRO_CACHE = _load_yaml(_DATA_DIR / "astro.yaml")
+    return _ASTRO_CACHE
+
+
+def _ziwei_copy() -> dict[str, Any]:
+    """Lazy-load ziwei.yaml once; gracefully degrade if YAML missing."""
+    global _ZIWEI_CACHE
+    if _ZIWEI_CACHE is None:
+        _ZIWEI_CACHE = _load_yaml(_DATA_DIR / "ziwei.yaml")
+    return _ZIWEI_CACHE
+
+
+def _humandesign_copy() -> dict[str, Any]:
+    """Lazy-load human_design.yaml once; gracefully degrade if YAML missing."""
+    global _HD_CACHE
+    if _HD_CACHE is None:
+        _HD_CACHE = _load_yaml(_DATA_DIR / "human_design.yaml")
+    return _HD_CACHE
 
 
 # Maya seals come from the engine prefixed with their tribal color
@@ -639,12 +684,38 @@ def _star_name(star: object) -> str:
     return _text(star)
 
 
-def explain_ziwei(data: dict, detail: DetailLevel = "teaser") -> str:
+# ziwei main star full-master sections
+_ZIWEI_STAR_SECTIONS: list[tuple[str, str, bool]] = [
+    ("core", "核心", False),
+    ("shadow", "暗面", False),
+    ("milestones", "關鍵時刻", True),
+    ("focus", "本次可聚焦", False),
+    ("relationship", "關係模式", False),
+]
+
+
+def explain_ziwei(
+    data: dict,
+    detail: DetailLevel = "teaser",
+    voice: Voice = DEFAULT_VOICE,
+) -> str:
+    """Ziwei explanation backed by python_api/data/copy/ziwei.yaml.
+
+    - Teaser: main star teaser.friend for each star in 命宮.
+    - Full: master block per 命宮 star + palace-by-palace YAML note where
+      available, falling back to legacy listing.
+    """
+    _ = voice  # accepted for endpoint parity; master-only for now
     ming = data.get("mingGong") or {}
     palaces = data.get("palaces") or []
     soul = data.get("soul")
     body = data.get("body")
     five = data.get("fiveElementsClass")
+
+    copy = _ziwei_copy()
+    stars_copy: dict[str, Any] = copy.get("main_stars", {}) if isinstance(copy, dict) else {}
+    palaces_copy: dict[str, Any] = copy.get("palaces", {}) if isinstance(copy, dict) else {}
+    cycles_copy: dict[str, Any] = copy.get("great_cycles", {}) if isinstance(copy, dict) else {}
 
     ming_name = ming.get("name") or ming.get("earthlyBranch") or ""
     ming_stars = ming.get("majorStarNames") or ming.get("majorStars") or []
@@ -662,6 +733,24 @@ def explain_ziwei(data: dict, detail: DetailLevel = "teaser") -> str:
     if ming_stars:
         parts.append(_line(f"命宮主要星曜：<strong>{_join(_star_name(star) for star in ming_stars)}</strong>。"))
 
+    # YAML-driven star voice for the 命宮 主星
+    for star_obj in ming_stars:
+        star_name = _star_name(star_obj)
+        star_raw = stars_copy.get(star_name)
+        star_entry: dict[str, Any] = star_raw if isinstance(star_raw, dict) else {}
+        if not star_entry:
+            continue
+        if detail == "teaser":
+            star_teaser = (star_entry.get("teaser") or {}).get("friend")
+            if star_teaser:
+                parts.append(_section(f"命宮主星 — {star_name}"))
+                parts.append(_paragraph(str(star_teaser)))
+        else:
+            star_master = (star_entry.get("full") or {}).get("master")
+            if isinstance(star_master, dict) and star_master:
+                parts.append(_section(f"命宮主星 — {star_name}"))
+                parts.extend(_render_block_sections(star_master, _ZIWEI_STAR_SECTIONS))
+
     parts.append(_section("十二宮閱讀方式"))
     parts.append(_line("紫微斗數不是只看單一主星，而是同時看宮位、星曜、四化、三方四正與大限流年。"))
     parts.append(_line("本頁先呈現命宮與十二宮架構，適合用來建立人生主題、關係模式與事業方向的第一層理解。"))
@@ -670,7 +759,31 @@ def explain_ziwei(data: dict, detail: DetailLevel = "teaser") -> str:
         for palace in palaces[:12]:
             stars = palace.get("majorStarNames") or palace.get("majorStars") or []
             star_text = _join(_star_name(star) for star in stars) or "無主星"
-            parts.append(_line(f"<strong>{_text(palace.get('name'))}</strong>：{_text(palace.get('heavenlyStem'))}{_text(palace.get('earthlyBranch'))}，主星 {star_text}。"))
+            palace_name = _text(palace.get("name"))
+            parts.append(_line(f"<strong>{palace_name}</strong>：{_text(palace.get('heavenlyStem'))}{_text(palace.get('earthlyBranch'))}，主星 {star_text}。"))
+            palace_raw = palaces_copy.get(palace.get("name") or "")
+            palace_entry: dict[str, Any] = palace_raw if isinstance(palace_raw, dict) else {}
+            palace_teaser = palace_entry.get("teaser") if palace_entry else None
+            if palace_teaser:
+                parts.append(_paragraph(str(palace_teaser)))
+
+        # great_cycles intro + principles
+        cycle_intro = (cycles_copy.get("intro") or {}).get("teaser") if isinstance(cycles_copy, dict) else None
+        if cycle_intro:
+            parts.append(_section("大運閱讀原則"))
+            parts.append(_paragraph(str(cycle_intro)))
+            principles = cycles_copy.get("master_principles") if isinstance(cycles_copy, dict) else None
+            if isinstance(principles, list):
+                bullets = []
+                for principle in principles:
+                    if isinstance(principle, dict):
+                        title = principle.get("title")
+                        detail_text = principle.get("detail")
+                        if title and detail_text:
+                            bullets.append(f"<strong>{_text(title)}</strong>：{_text(str(detail_text).strip())}")
+                if bullets:
+                    parts.append(_bullets(bullets))
+
         parts.append(_line("正式諮詢時，建議把命宮、身宮、財帛、官祿、夫妻與遷移宮串成一條人生敘事，而不是逐宮孤立解讀。"))
     return _wrap(parts, detail)
 
@@ -684,19 +797,102 @@ def _sign_text(value: object) -> str:
     return _text(sign or value.get("zh") or value.get("label"))
 
 
-def explain_astro(data: dict, detail: DetailLevel = "teaser") -> str:
+# astro full-master section configs differ per dimension
+_ASTRO_SUN_SECTIONS: list[tuple[str, str, bool]] = [
+    ("core", "核心", False),
+    ("shadow", "暗面", False),
+    ("relationship", "關係模式", False),
+    ("growth", "本次可聚焦", False),
+]
+
+_ASTRO_MOON_SECTIONS: list[tuple[str, str, bool]] = [
+    ("core", "情緒核心", False),
+    ("need", "深層需要", False),
+    ("shadow", "暗面", False),
+    ("focus", "本次可聚焦", False),
+]
+
+_ASTRO_RISING_SECTIONS: list[tuple[str, str, bool]] = [
+    ("external", "外顯氣質", False),
+    ("mask", "面具底下", False),
+    ("adjustment", "本次可調整", False),
+]
+
+
+def _sign_zh(value: object) -> str:
+    """Extract Chinese sign name from various engine data shapes."""
+    if not isinstance(value, dict):
+        return ""
+    sign = value.get("sign")
+    if isinstance(sign, dict):
+        return str(sign.get("zh") or "")
+    return str(value.get("zh") or sign or "")
+
+
+def explain_astro(
+    data: dict,
+    detail: DetailLevel = "teaser",
+    voice: Voice = DEFAULT_VOICE,
+) -> str:
+    """Astro explanation backed by python_api/data/copy/astro.yaml.
+
+    - Teaser (客戶端): YAML teaser.friend for sun / moon / rising; else legacy.
+    - Full (老師後台): YAML full.master sections per dimension (sun's
+      core+shadow+relationship+growth, moon's core+need+shadow+focus,
+      rising's external+mask+adjustment).
+    """
+    _ = voice  # accepted for endpoint parity; master-only for now
     planets = data.get("planets") or {}
     sun = data.get("sun") or planets.get("sun") or {}
     moon = data.get("moon") or planets.get("moon") or {}
     asc = data.get("ascendant") or {}
     mc = data.get("midheaven") or {}
 
-    parts = [
-        _line(f"太陽：<strong>{_sign_text(sun)}</strong>，代表你的意志、生命力與想成為的樣子。"),
-        _line(f"月亮：<strong>{_sign_text(moon)}</strong>，代表情緒需求、直覺反應與安全感來源。"),
-        _line(f"上升：<strong>{_sign_text(asc)}</strong>，代表你進入世界的方式與他人第一眼感受到的氣質。"),
-        _line(f"天頂：<strong>{_sign_text(mc)}</strong>，代表事業形象、成就方向與社會角色。"),
-    ]
+    copy = _astro_copy()
+    sun_signs: dict[str, Any] = copy.get("sun_signs", {}) if isinstance(copy, dict) else {}
+    moon_signs: dict[str, Any] = copy.get("moon_signs", {}) if isinstance(copy, dict) else {}
+    rising_signs: dict[str, Any] = copy.get("rising_signs", {}) if isinstance(copy, dict) else {}
+
+    sun_zh = _sign_zh(sun)
+    moon_zh = _sign_zh(moon)
+    asc_zh = _sign_zh(asc)
+
+    def _render_axis(
+        label: str,
+        sign_data: dict,
+        sign_zh: str,
+        copy_dict: dict[str, Any],
+        legacy_hint: str,
+        full_sections: list[tuple[str, str, bool]],
+    ) -> list[str]:
+        raw = copy_dict.get(sign_zh) if sign_zh else None
+        entry: dict[str, Any] = raw if isinstance(raw, dict) else {}
+        if detail == "teaser":
+            voice_text = (entry.get("teaser") or {}).get("friend") if entry else None
+            if voice_text:
+                return [
+                    _line(f"{label}：<strong>{_sign_text(sign_data)}</strong>"),
+                    _paragraph(str(voice_text)),
+                ]
+            return [_line(f"{label}：<strong>{_sign_text(sign_data)}</strong>，{legacy_hint}")]
+        # full
+        out = [_section(f"{label} — {_sign_text(sign_data)}")]
+        master_block = (entry.get("full") or {}).get("master") if entry else None
+        if isinstance(master_block, dict) and master_block:
+            out.extend(_render_block_sections(master_block, full_sections))
+        else:
+            out.append(_line(legacy_hint))
+        return out
+
+    parts: list[str] = []
+    parts.extend(_render_axis("太陽", sun, sun_zh, sun_signs,
+                              "代表你的意志、生命力與想成為的樣子。", _ASTRO_SUN_SECTIONS))
+    parts.extend(_render_axis("月亮", moon, moon_zh, moon_signs,
+                              "代表情緒需求、直覺反應與安全感來源。", _ASTRO_MOON_SECTIONS))
+    parts.extend(_render_axis("上升", asc, asc_zh, rising_signs,
+                              "代表你進入世界的方式與他人第一眼感受到的氣質。", _ASTRO_RISING_SECTIONS))
+    parts.append(_line(f"天頂：<strong>{_sign_text(mc)}</strong>，代表事業形象、成就方向與社會角色。"))
+
     if detail == "full":
         parts.extend([
             _section("深度解讀方向"),
@@ -842,7 +1038,50 @@ def _hd_center_label(value: object) -> str:
     return HD_CENTER_LABELS.get(text, text)
 
 
-def explain_humandesign(data: dict, detail: DetailLevel = "teaser") -> str:
+# human design master section configs
+_HD_TYPE_SECTIONS: list[tuple[str, str, bool]] = [
+    ("core", "核心", False),
+    ("strategy", "策略", False),
+    ("not_self_signature", "失衡訊號", False),
+    ("shadow", "暗面", False),
+    ("focus", "本次可聚焦", False),
+]
+
+_HD_AUTHORITY_SECTIONS: list[tuple[str, str, bool]] = [
+    ("core", "核心", False),
+    ("practice", "實踐方式", False),
+    ("shadow", "暗面", False),
+    ("focus", "本次可聚焦", False),
+]
+
+# YAML key → engine center key mapping
+_HD_CENTER_KEY_MAP = {
+    "Head": "Head",
+    "Ajna": "Ajna",
+    "Throat": "Throat",
+    "G": "G",
+    "Heart": "Heart",
+    "Sacral": "Sacral",
+    "Spleen": "Splenic",       # engine: Spleen ↔ YAML: Splenic
+    "Splenic": "Splenic",
+    "SolarPlexus": "Solar Plexus",  # engine: SolarPlexus ↔ YAML: Solar Plexus
+    "Solar Plexus": "Solar Plexus",
+    "Root": "Root",
+}
+
+
+def explain_humandesign(
+    data: dict,
+    detail: DetailLevel = "teaser",
+    voice: Voice = DEFAULT_VOICE,
+) -> str:
+    """Human Design explanation backed by python_api/data/copy/human_design.yaml.
+
+    - Teaser: YAML teaser.friend for type and authority; gate essence one-liners.
+    - Full: master 5-block for type, 4-block for authority, plus undefined-center
+      shadow notes and gate gift/shadow lookup.
+    """
+    _ = voice  # accepted for endpoint parity; master-only for now
     defined = data.get("definedCenters") or []
     channels = data.get("definedChannels") or []
     gates = data.get("activatedGates") or []
@@ -853,23 +1092,116 @@ def explain_humandesign(data: dict, detail: DetailLevel = "teaser") -> str:
     authority_label = _hd_label(authority_raw, HD_AUTHORITY_LABELS)
     strategy_label = _hd_label(strategy_raw, HD_STRATEGY_LABELS)
 
+    copy = _humandesign_copy()
+    types_copy: dict[str, Any] = copy.get("types", {}) if isinstance(copy, dict) else {}
+    authorities_copy: dict[str, Any] = copy.get("authorities", {}) if isinstance(copy, dict) else {}
+    centers_copy: dict[str, Any] = copy.get("centers", {}) if isinstance(copy, dict) else {}
+    gates_copy: dict[str, Any] = copy.get("gates", {}) if isinstance(copy, dict) else {}
+
+    type_entry_raw = types_copy.get(str(type_raw))
+    type_entry: dict[str, Any] = type_entry_raw if isinstance(type_entry_raw, dict) else {}
+    authority_entry_raw = authorities_copy.get(str(authority_raw))
+    authority_entry: dict[str, Any] = authority_entry_raw if isinstance(authority_entry_raw, dict) else {}
+
     parts = [
         _line(f"你的類型是 <strong>{_text(type_label)}</strong>，策略是 <strong>{_text(strategy_label)}</strong>。"),
-        _line(HD_TYPE_GUIDE.get(str(type_raw), "類型說明你和世界交換能量的方式，重點是把它落實到日常決策，而不是只記名稱。")),
-        _line(f"內在權威：<strong>{_text(authority_label)}</strong>。{HD_AUTHORITY_GUIDE.get(str(authority_raw), '這是做重要決定時最需要信任的身體訊號。')}"),
-        _line(f"人生角色 Profile：<strong>{_text(data.get('profile'))}</strong>，描述你學習、互動與被他人看見的方式。"),
     ]
+
+    # Type voice (YAML or legacy)
+    if detail == "teaser":
+        type_voice = (type_entry.get("teaser") or {}).get("friend") if type_entry else None
+        if type_voice:
+            parts.append(_paragraph(str(type_voice)))
+        else:
+            parts.append(_line(HD_TYPE_GUIDE.get(str(type_raw), "類型說明你和世界交換能量的方式，重點是把它落實到日常決策，而不是只記名稱。")))
+    else:
+        type_master = (type_entry.get("full") or {}).get("master") if type_entry else None
+        if isinstance(type_master, dict) and type_master:
+            parts.append(_section(f"類型 — {type_label}"))
+            parts.extend(_render_block_sections(type_master, _HD_TYPE_SECTIONS))
+        else:
+            parts.append(_line(HD_TYPE_GUIDE.get(str(type_raw), "類型說明你和世界交換能量的方式，重點是把它落實到日常決策，而不是只記名稱。")))
+
+    # Authority voice
+    parts.append(_line(f"內在權威：<strong>{_text(authority_label)}</strong>。"))
+    if detail == "teaser":
+        auth_voice = (authority_entry.get("teaser") or {}).get("friend") if authority_entry else None
+        if auth_voice:
+            parts.append(_paragraph(str(auth_voice)))
+        else:
+            parts.append(_line(HD_AUTHORITY_GUIDE.get(str(authority_raw), "這是做重要決定時最需要信任的身體訊號。")))
+    else:
+        auth_master = (authority_entry.get("full") or {}).get("master") if authority_entry else None
+        if isinstance(auth_master, dict) and auth_master:
+            parts.append(_section(f"內在權威 — {authority_label}"))
+            parts.extend(_render_block_sections(auth_master, _HD_AUTHORITY_SECTIONS))
+        else:
+            parts.append(_line(HD_AUTHORITY_GUIDE.get(str(authority_raw), "這是做重要決定時最需要信任的身體訊號。")))
+
+    parts.append(_line(f"人生角色 Profile：<strong>{_text(data.get('profile'))}</strong>，描述你學習、互動與被他人看見的方式。"))
+
     if defined:
         center_names = [_hd_center_label(center) for center in defined]
         parts.append(_line(f"已定義中心：<strong>{_join(center_names)}</strong>，代表較穩定、可持續輸出的能量。"))
+
+    # Full mode: undefined-center shadow notes from YAML
+    if detail == "full" and centers_copy:
+        defined_set = {str(c) for c in defined}
+        # Canonical engine-side center names (matches HD_CENTER_LABELS)
+        engine_centers = ["Head", "Ajna", "Throat", "G", "Heart", "Sacral", "SolarPlexus", "Spleen", "Root"]
+        rendered_yaml_keys: set[str] = set()
+        undefined_notes: list[str] = []
+        for engine_key in engine_centers:
+            if engine_key in defined_set:
+                continue
+            yaml_key = _HD_CENTER_KEY_MAP.get(engine_key, engine_key)
+            if yaml_key in rendered_yaml_keys or yaml_key not in centers_copy:
+                continue
+            entry_raw = centers_copy.get(yaml_key)
+            if not isinstance(entry_raw, dict):
+                continue
+            label = _hd_center_label(engine_key)
+            master = (entry_raw.get("full") or {}).get("master") or {}
+            not_self = master.get("not_self") if isinstance(master, dict) else None
+            if not_self:
+                undefined_notes.append(f"<strong>{label}（未定義）</strong>：{_text(str(not_self).strip())}")
+            rendered_yaml_keys.add(yaml_key)
+        if undefined_notes:
+            parts.append(_section("未定義中心 — 容易受場域放大的主題"))
+            parts.append(_bullets(undefined_notes))
+
     if channels:
         parts.append(_line(f"已定義通道：<strong>{_join(channels)}</strong>，可視為你較固定的天賦迴路。"))
+
+    # Gates — YAML lookup first, legacy GATE_MEANINGS as fallback
     if gates:
         parts.append(_section("啟動閘門重點"))
         for raw_gate in gates[:8]:
-            gate = _safe_int(raw_gate.get("gate") if isinstance(raw_gate, dict) else raw_gate)
-            title, copy = GATE_MEANINGS.get(gate, ("能量主題", "這個閘門描述一種被啟動的能量，需放回你的類型、策略與權威下理解。"))
-            parts.append(_line(f"<strong>第 {gate} 閘門｜{_text(title)}</strong>：{_text(copy)}"))
+            gate_num = _safe_int(raw_gate.get("gate") if isinstance(raw_gate, dict) else raw_gate)
+            yaml_entry_raw = gates_copy.get(gate_num) if gates_copy else None
+            yaml_entry: dict[str, Any] = yaml_entry_raw if isinstance(yaml_entry_raw, dict) else {}
+            if yaml_entry:
+                gate_name = yaml_entry.get("name_zh") or "能量主題"
+                if detail == "teaser":
+                    essence = yaml_entry.get("essence")
+                    if essence:
+                        parts.append(_line(f"<strong>第 {gate_num} 閘門｜{_text(gate_name)}</strong>：{_text(str(essence).strip())}"))
+                        continue
+                else:
+                    master_note = yaml_entry.get("master_note")
+                    gift = yaml_entry.get("gift")
+                    shadow = yaml_entry.get("shadow")
+                    parts.append(_line(f"<strong>第 {gate_num} 閘門｜{_text(gate_name)}</strong>"))
+                    if shadow:
+                        parts.append(_line(f"<em>陰影</em>：{_text(str(shadow).strip())}"))
+                    if gift:
+                        parts.append(_line(f"<em>禮物</em>：{_text(str(gift).strip())}"))
+                    if master_note:
+                        parts.append(_paragraph(str(master_note)))
+                    continue
+            # legacy fallback
+            title, hint = GATE_MEANINGS.get(gate_num, ("能量主題", "這個閘門描述一種被啟動的能量，需放回你的類型、策略與權威下理解。"))
+            parts.append(_line(f"<strong>第 {gate_num} 閘門｜{_text(title)}</strong>：{_text(hint)}"))
 
     if detail == "full":
         parts.extend([
@@ -881,21 +1213,78 @@ def explain_humandesign(data: dict, detail: DetailLevel = "teaser") -> str:
     return _wrap(parts, detail)
 
 
-def explain_tarot(data: dict, detail: DetailLevel = "teaser") -> str:
+def _tarot_master_block(entry_master: dict[str, Any], is_reversed: bool) -> list[str]:
+    """Render the 6-field tarot master block, branching by upright/reversed."""
+    if is_reversed:
+        sections = [
+            ("reversed_core", "逆位核心", False),
+            ("reversed_shadow", "逆位陰影", False),
+            ("situation", "出現此牌的處境", False),
+            ("inquiry", "可向客戶反問", False),
+        ]
+    else:
+        sections = [
+            ("upright_core", "正位核心", False),
+            ("upright_focus", "正位行動建議", False),
+            ("situation", "出現此牌的處境", False),
+            ("inquiry", "可向客戶反問", False),
+        ]
+    return _render_block_sections(entry_master, sections)
+
+
+def explain_tarot(
+    data: dict,
+    detail: DetailLevel = "teaser",
+    voice: Voice = DEFAULT_VOICE,
+) -> str:
+    """Tarot explanation backed by python_api/data/copy/tarot.yaml.
+
+    - Teaser (客戶端): YAML teaser.friend per card when available, else legacy.
+    - Full (老師後台): YAML full.master 6-block (branched by upright / reversed),
+      else legacy short paragraph. Master voice only for now.
+    """
+    _ = voice  # accepted for endpoint parity; master-only for now
     cards = data.get("cards") or []
+    copy = _tarot_copy()
+    cards_copy: dict[str, Any] = copy.get("cards", {}) if isinstance(copy, dict) else {}
+
     parts = [_section("牌陣重點")]
     reversed_count = sum(1 for draw in cards if draw.get("position") == "reversed")
     parts.append(_line(f"本次抽出 {len(cards)} 張牌，其中 {reversed_count} 張逆位。請同時看牌名、位置與正逆位，不要只看單張牌。"))
 
     for index, draw in enumerate(cards, start=1):
         card = draw.get("card") or {}
-        position = "逆位" if draw.get("position") == "reversed" else "正位"
+        is_reversed = draw.get("position") == "reversed"
+        position = "逆位" if is_reversed else "正位"
         name = card.get("name_zh") or card.get("name_en") or f"第 {index} 張牌"
-        meaning = draw.get("meaning")
-        if not meaning:
-            meaning_source = card.get("reversed") if position == "逆位" else card.get("upright")
-            meaning = (meaning_source or {}).get("text")
-        parts.append(_line(f"<strong>{index}. {_text(name)} / {position}</strong>：{_text(meaning, '這張牌指出當下需要被看見的主題。')}"))
+
+        yaml_raw = cards_copy.get(str(name))
+        yaml_entry: dict[str, Any] = yaml_raw if isinstance(yaml_raw, dict) else {}
+
+        if detail == "teaser":
+            voice_text = (yaml_entry.get("teaser") or {}).get("friend") if yaml_entry else None
+            if voice_text:
+                parts.append(_line(f"<strong>{index}. {_text(name)} / {position}</strong>"))
+                parts.append(_paragraph(str(voice_text)))
+                continue
+            # legacy fallback
+            meaning = draw.get("meaning")
+            if not meaning:
+                meaning_source = card.get("reversed") if is_reversed else card.get("upright")
+                meaning = (meaning_source or {}).get("text")
+            parts.append(_line(f"<strong>{index}. {_text(name)} / {position}</strong>：{_text(meaning, '這張牌指出當下需要被看見的主題。')}"))
+        else:
+            master_block = (yaml_entry.get("full") or {}).get("master") if yaml_entry else None
+            if isinstance(master_block, dict) and master_block:
+                parts.append(_section(f"{index}. {name}（{position}）"))
+                parts.extend(_tarot_master_block(master_block, is_reversed))
+                continue
+            # legacy fallback
+            meaning = draw.get("meaning")
+            if not meaning:
+                meaning_source = card.get("reversed") if is_reversed else card.get("upright")
+                meaning = (meaning_source or {}).get("text")
+            parts.append(_line(f"<strong>{index}. {_text(name)} / {position}</strong>：{_text(meaning, '這張牌指出當下需要被看見的主題。')}"))
 
     if detail == "full":
         parts.extend([
@@ -906,9 +1295,37 @@ def explain_tarot(data: dict, detail: DetailLevel = "teaser") -> str:
     return _wrap(parts, detail)
 
 
-def explain_runes(data: dict, detail: DetailLevel = "teaser") -> str:
+def _rune_lookup(name_lat: str, name_zh: str, runes_copy: dict[str, Any]) -> dict[str, Any]:
+    """Match a rune by transliteration first, then Chinese name fallback."""
+    if isinstance(runes_copy, dict):
+        entry = runes_copy.get(name_lat)
+        if isinstance(entry, dict):
+            return entry
+        # name_zh fallback (engine may produce 中文名 if data layer changes)
+        for body in runes_copy.values():
+            if isinstance(body, dict) and body.get("name_zh") == name_zh:
+                return body
+    return {}
+
+
+def explain_runes(
+    data: dict,
+    detail: DetailLevel = "teaser",
+    voice: Voice = DEFAULT_VOICE,
+) -> str:
+    """Runes explanation backed by python_api/data/copy/runes.yaml.
+
+    - Teaser (客戶端): YAML teaser.friend per rune when available, else legacy.
+    - Full (老師後台): YAML full.master 6-block (upright_core / upright_focus,
+      reversed_core / reversed_shadow, situation, inquiry) per rune.
+      Non-reversible runes route the reversed_* slots to merkstave reading.
+    """
+    _ = voice  # accepted for endpoint parity; master-only for now
     runes = data.get("runes") or []
     material = (data.get("meta") or {}).get("material")
+    copy = _runes_copy()
+    runes_copy: dict[str, Any] = copy.get("runes", {}) if isinstance(copy, dict) else {}
+
     parts = [
         _section("盧恩訊息"),
         _line(f"本次抽出 {len(runes)} 顆符文{f'，材質為 {_text(material)}' if material else ''}。盧恩適合讀成提醒、阻力與下一步。"),
@@ -916,13 +1333,39 @@ def explain_runes(data: dict, detail: DetailLevel = "teaser") -> str:
 
     for index, draw in enumerate(runes, start=1):
         rune = draw.get("rune") or {}
-        position = "逆位" if draw.get("position") == "reversed" else "正位"
-        name = rune.get("zh") or rune.get("name") or f"第 {index} 顆符文"
-        meaning = draw.get("meaning")
-        if not meaning:
-            meaning_source = rune.get("reversed") if position == "逆位" else rune.get("upright")
-            meaning = (meaning_source or {}).get("text")
-        parts.append(_line(f"<strong>{_text(rune.get('glyph'))} {_text(name)} / {position}</strong>：{_text(meaning, '這顆符文提醒你留意當下事件背後的能量。')}"))
+        is_reversed = draw.get("position") == "reversed"
+        position = "逆位" if is_reversed else "正位"
+        name_zh = rune.get("zh") or ""
+        name_lat = rune.get("name") or ""
+        display_name = name_zh or name_lat or f"第 {index} 顆符文"
+        glyph = rune.get("glyph")
+
+        yaml_entry = _rune_lookup(str(name_lat), str(name_zh), runes_copy)
+
+        if detail == "teaser":
+            voice_text = (yaml_entry.get("teaser") or {}).get("friend") if yaml_entry else None
+            if voice_text:
+                parts.append(_line(f"<strong>{_text(glyph)} {_text(display_name)} / {position}</strong>"))
+                parts.append(_paragraph(str(voice_text)))
+                continue
+            # legacy fallback
+            meaning = draw.get("meaning")
+            if not meaning:
+                meaning_source = rune.get("reversed") if is_reversed else rune.get("upright")
+                meaning = (meaning_source or {}).get("text")
+            parts.append(_line(f"<strong>{_text(glyph)} {_text(display_name)} / {position}</strong>：{_text(meaning, '這顆符文提醒你留意當下事件背後的能量。')}"))
+        else:
+            master_block = (yaml_entry.get("full") or {}).get("master") if yaml_entry else None
+            if isinstance(master_block, dict) and master_block:
+                parts.append(_section(f"{index}. {glyph or ''} {display_name}（{position}）".strip()))
+                parts.extend(_tarot_master_block(master_block, is_reversed))
+                continue
+            # legacy fallback
+            meaning = draw.get("meaning")
+            if not meaning:
+                meaning_source = rune.get("reversed") if is_reversed else rune.get("upright")
+                meaning = (meaning_source or {}).get("text")
+            parts.append(_line(f"<strong>{_text(glyph)} {_text(display_name)} / {position}</strong>：{_text(meaning, '這顆符文提醒你留意當下事件背後的能量。')}"))
 
     if detail == "full":
         parts.extend([
