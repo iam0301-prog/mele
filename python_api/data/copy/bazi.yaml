@@ -1,8 +1,11 @@
 # =====================================================================
 # Mele 命理媒介中心 — 八字解讀文案
 # =====================================================================
-# v1 範圍：10 天干日主 × (客戶 teaser + 老師 master full)
-# 之後再補：12 地支、五行平衡、月令格局、大運流年
+# v1 範圍：
+#   - day_masters：10 天干日主 × (客戶 teaser + 老師 master full 六區塊)
+#   - earthly_branches：12 地支 × 處境詮釋（nature 藏干 + master core/traits/shadow/focus）
+#   - five_elements：五行（木火土金水）過旺(excess) / 過弱(deficient) 的解讀
+# 之後再補：月令格局、十神、喜忌、大運流年
 #
 # 客戶端 (/tools/bazi) 使用 teaser.friend
 # 老師後台 voice tab 切換 full.master

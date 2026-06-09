@@ -15,6 +15,7 @@ DEFAULT_VOICE: Voice = "friend"
 _DATA_DIR = Path(__file__).resolve().parent.parent / "data" / "copy"
 _NUMEROLOGY_CACHE: dict[str, Any] | None = None
 _MAYA_CACHE: dict[str, Any] | None = None
+_BAZI_CACHE: dict[str, Any] | None = None
 
 
 def _load_yaml(path: Path) -> dict[str, Any]:
@@ -44,6 +45,14 @@ def _maya_copy() -> dict[str, Any]:
     if _MAYA_CACHE is None:
         _MAYA_CACHE = _load_yaml(_DATA_DIR / "maya.yaml")
     return _MAYA_CACHE
+
+
+def _bazi_copy() -> dict[str, Any]:
+    """Lazy-load bazi.yaml once; gracefully degrade if YAML missing."""
+    global _BAZI_CACHE
+    if _BAZI_CACHE is None:
+        _BAZI_CACHE = _load_yaml(_DATA_DIR / "bazi.yaml")
+    return _BAZI_CACHE
 
 
 # Maya seals come from the engine prefixed with their tribal color
@@ -88,16 +97,16 @@ def _section(title: str) -> str:
 
 
 def _wrap(parts: list[str], detail: DetailLevel) -> str:
+    """Wrap rendered explanation parts.
+
+    Positioning fix (2026-05): teaser used to end with a "想看完整深度解讀？"
+    paywall that framed the free reading as incomplete. The auto-reading is
+    now considered complete and sufficient — the teacher invitation lives in
+    the frontend ConsultCTA component with a different, non-pressuring frame
+    ("這是選項，不是必須"). The backend just renders the reading.
+    """
     inner = "".join(parts)
-    if detail == "teaser":
-        cta = """
-<div class='exp-paywall'>
-  <div class='exp-paywall-title'>想看完整深度解讀？</div>
-  <div class='exp-paywall-hint'>可預約老師，將此盤面延伸成關係、事業、流年與行動建議。</div>
-  <a class='exp-paywall-btn' href='/teachers'>預約老師解盤</a>
-</div>"""
-        return f"<div class='explanation'>{inner}{cta}</div>"
-    return f"<div class='explanation explanation-full'>{inner}</div>"
+    return f"<div class='explanation explanation-{detail}'>{inner}</div>"
 
 
 # Legacy guide kept as a last-resort fallback if the YAML file is missing
@@ -204,17 +213,11 @@ def _numerology_lookup_key(life_path: object, life_path_reduced: object) -> str:
     return ""
 
 
-def _render_full_block(block: dict[str, Any]) -> list[str]:
-    """Render a 6-block YAML structure into HTML parts."""
+def _render_block_sections(
+    block: dict[str, Any], sections: list[tuple[str, str, bool]]
+) -> list[str]:
+    """Render an ordered set of (key, label, is_list) sections into HTML parts."""
     parts: list[str] = []
-    sections: list[tuple[str, str, bool]] = [
-        ("core", "核心", False),
-        ("shadow", "暗面", False),
-        ("milestones", "關鍵時刻", True),
-        ("inquiries", "諮詢探問", True),
-        ("crosses", "盤面交叉", True),
-        ("focus", "本次諮詢可聚焦", False),
-    ]
     for key, label, is_list in sections:
         value = block.get(key)
         if not value:
@@ -225,6 +228,30 @@ def _render_full_block(block: dict[str, Any]) -> list[str]:
         else:
             parts.append(_paragraph(str(value)))
     return parts
+
+
+# Numerology / Maya / BaZi day-master full reading share this 6-block shape.
+_FULL_BLOCK_SECTIONS: list[tuple[str, str, bool]] = [
+    ("core", "核心", False),
+    ("shadow", "暗面", False),
+    ("milestones", "關鍵時刻", True),
+    ("inquiries", "諮詢探問", True),
+    ("crosses", "盤面交叉", True),
+    ("focus", "本次諮詢可聚焦", False),
+]
+
+# BaZi 地支（月令）uses a leaner 4-block shape — 處境 rather than 性格.
+_BAZI_BRANCH_SECTIONS: list[tuple[str, str, bool]] = [
+    ("core", "本質", False),
+    ("traits", "顯化特質", False),
+    ("shadow", "暗面", False),
+    ("focus", "本次可聚焦", False),
+]
+
+
+def _render_full_block(block: dict[str, Any]) -> list[str]:
+    """Render a 6-block YAML structure into HTML parts."""
+    return _render_block_sections(block, _FULL_BLOCK_SECTIONS)
 
 
 def explain_numerology(
@@ -474,30 +501,127 @@ def _wuxing_balance_lines(counts: dict, day_wuxing: object) -> list[str]:
     return lines
 
 
-def explain_bazi(data: dict, detail: DetailLevel = "teaser") -> str:
+def _bazi_element_commentary(counts: dict, elements: dict[str, Any]) -> list[str]:
+    """Full-mode master commentary on the most over/under-represented 五行.
+
+    Adds at most one 過旺 (strongest) and one 偏弱 (weakest) paragraph, sourced
+    from five_elements.<element>.full.master.{excess,deficient} in bazi.yaml.
+    """
+    if not isinstance(elements, dict) or not elements:
+        return []
+    numeric = {str(name): _safe_int(count) for name, count in counts.items()}
+    if not numeric:
+        return []
+    max_count = max(numeric.values())
+    min_count = min(numeric.values())
+    parts: list[str] = []
+
+    def _master(name: str, field: str) -> str | None:
+        entry = elements.get(name)
+        if not isinstance(entry, dict):
+            return None
+        master = (entry.get("full") or {}).get("master")
+        if not isinstance(master, dict):
+            return None
+        text = master.get(field)
+        return str(text) if text else None
+
+    for name, count in numeric.items():
+        if count == max_count and count > 0:
+            text = _master(name, "excess")
+            if text:
+                parts.append(_section(f"{name} 過旺"))
+                parts.append(_paragraph(text))
+            break
+    for name, count in numeric.items():
+        if count == min_count:
+            text = _master(name, "deficient")
+            if text:
+                parts.append(_section(f"{name} 偏弱"))
+                parts.append(_paragraph(text))
+            break
+    return parts
+
+
+def explain_bazi(
+    data: dict,
+    detail: DetailLevel = "teaser",
+    voice: Voice = DEFAULT_VOICE,
+) -> str:
+    """BaZi explanation backed by python_api/data/copy/bazi.yaml.
+
+    - Teaser (客戶端): friendly day-master + 月令(month branch) blurbs + 五行分布.
+    - Full (老師後台): day-master master 6-block, 月令 4-block, plus 五行平衡
+      master commentary. Only the master voice is authored in YAML today, so any
+      requested `voice` falls back to it (mirrors the maya explainer).
+
+    Gracefully degrades to the legacy hardcoded guides if the YAML is missing.
+    """
+    _ = voice  # accepted for endpoint parity; full copy is master-only for now
     pillars = data.get("pillars") or {}
     counts = (data.get("wuxing") or {}).get("counts") or {}
     day_master = data.get("dayMaster")
     day_wuxing = data.get("dayMasterWuxing")
     day_yinyang = data.get("dayMasterYinYang")
+    month_pillar = pillars.get("month") or []
+    month_branch = month_pillar[1] if len(month_pillar) > 1 else ""
+
+    copy = _bazi_copy()
+    day_masters: dict[str, Any] = copy.get("day_masters", {}) if isinstance(copy, dict) else {}
+    branches: dict[str, Any] = copy.get("earthly_branches", {}) if isinstance(copy, dict) else {}
+    elements: dict[str, Any] = copy.get("five_elements", {}) if isinstance(copy, dict) else {}
+    dm_raw = day_masters.get(str(day_master))
+    dm_entry: dict[str, Any] = dm_raw if isinstance(dm_raw, dict) else {}
 
     parts = [
         _line(f"你的日主是 <strong>{_text(day_yinyang)}{_text(day_wuxing)}（{_text(day_master)}）</strong>，這是八字解讀的核心入口。"),
-        _line(DAY_MASTER_GUIDE.get(day_master, WUXING_GUIDE.get(day_wuxing, "日主代表你最核心的自我運作方式。"))),
-        _section("四柱結構"),
     ]
 
+    # Day master narrative — YAML when present, legacy guide otherwise.
+    if detail == "teaser":
+        dm_teaser = (dm_entry.get("teaser") or {}).get("friend") if dm_entry else None
+        if dm_teaser:
+            parts.append(_paragraph(str(dm_teaser)))
+        else:
+            parts.append(_line(DAY_MASTER_GUIDE.get(day_master, WUXING_GUIDE.get(day_wuxing, "日主代表你最核心的自我運作方式。"))))
+    else:
+        dm_full = (dm_entry.get("full") or {}).get("master") if dm_entry else None
+        if isinstance(dm_full, dict) and dm_full:
+            parts.extend(_render_full_block(dm_full))
+        else:
+            parts.append(_line(DAY_MASTER_GUIDE.get(day_master, WUXING_GUIDE.get(day_wuxing, "日主代表你最核心的自我運作方式。"))))
+
+    parts.append(_section("四柱結構"))
     for key in ("year", "month", "day", "time"):
         label, role = PILLAR_ROLES[key]
         pillar = pillars.get(key) or []
         if pillar:
             parts.append(_line(f"{label}：<strong>{_join(pillar, '')}</strong>，主要看 {role}。"))
 
+    # 月令（month branch）— the seasonal hand the day master was dealt.
+    branch_raw = branches.get(str(month_branch)) if month_branch else None
+    branch_entry: dict[str, Any] = branch_raw if isinstance(branch_raw, dict) else {}
+    if branch_entry:
+        parts.append(_section(f"月令 — {_text(month_branch)}"))
+        nature = branch_entry.get("nature")
+        if nature:
+            parts.append(_line(f"<strong>{_text(month_branch)}</strong>：{_text(nature)}"))
+        if detail == "teaser":
+            br_teaser = (branch_entry.get("teaser") or {}).get("friend")
+            if br_teaser:
+                parts.append(_paragraph(str(br_teaser)))
+        else:
+            br_full = (branch_entry.get("full") or {}).get("master")
+            if isinstance(br_full, dict) and br_full:
+                parts.extend(_render_block_sections(br_full, _BAZI_BRANCH_SECTIONS))
+
     if counts:
         parts.append(_section("五行分布"))
         parts.append(_line("五行計數：" + _join([f"{name}{count}" for name, count in counts.items()])))
         for line in _wuxing_balance_lines(counts, day_wuxing):
             parts.append(_line(line))
+        if detail == "full":
+            parts.extend(_bazi_element_commentary(counts, elements))
 
     if detail == "full":
         parts.extend([

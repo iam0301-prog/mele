@@ -351,8 +351,15 @@ async def calc_maya(
 
 
 @app.post("/api/v1/calc/bazi", response_model=CalcResponse, tags=["Calc"])
-async def calc_bazi(req: BaziRequest, detail: DetailQuery = Query("teaser")):
-    """八字：四柱、五行分布與日主觀察。"""
+async def calc_bazi(
+    req: BaziRequest,
+    detail: DetailQuery = Query("teaser"),
+    voice: VoiceQuery = Query("friend"),
+):
+    """八字：四柱、五行分布與日主觀察。
+
+    `voice` 在 full 模式下切換敘述語氣（目前 master 為主，其他 voice 退回 master fallback）。
+    """
 
     data = await run_calc(
         "bazi",
@@ -365,7 +372,7 @@ async def calc_bazi(req: BaziRequest, detail: DetailQuery = Query("teaser")):
         req.sect,
         req.longitude,
     )
-    return wrap("bazi", req.model_dump(), data, bazi_render.render(data), detail=detail)
+    return wrap("bazi", req.model_dump(), data, bazi_render.render(data), detail=detail, voice=voice)
 
 
 @app.post("/api/v1/calc/ziwei", response_model=CalcResponse, tags=["Calc"])
