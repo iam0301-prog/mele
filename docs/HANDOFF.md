@@ -4,7 +4,7 @@
 >
 > 維護規則：每完成一個里程碑，更新本檔的「已完成」與「下一步」兩段，commit。
 
-最後更新：2026-06-09
+最後更新：2026-06-09（bazi 完成、tarot 待重寫）
 
 ---
 
@@ -23,7 +23,7 @@
 【已完成的 P1 工具文案】
 - python_api/data/copy/numerology.yaml（594 行，完整）
 - python_api/data/copy/maya.yaml（515 行，完整）
-- python_api/data/copy/bazi.yaml（265 行，只完成 10 天干，缺 12 地支 + 五行平衡）
+- python_api/data/copy/bazi.yaml（548 行，10 天干 + 12 地支 + 五行平衡完整）
 - python_api/data/copy/tarot.yaml（7 行空殼，需重寫）
 
 【已完成的法務 / SOP】
@@ -32,7 +32,7 @@
 - docs/TEACHER_CONTRACT_TEMPLATE.md
 
 【請依序做，每完成一份就 commit 一次】
-1. 補 bazi.yaml 的 12 地支 + 五行平衡章節
+1. ~~補 bazi.yaml 的 12 地支 + 五行平衡章節~~ ✅ 已完成 (eb890e3)
 2. 重寫 tarot.yaml（22 大牌 voice），接 explain_tarot
 3. runes.yaml（24 符文 × 正逆位），接 explain_runes
 4. astro.yaml（太陽/月亮/上升 × 12 + 行星宮位），接 explain_astro
@@ -84,7 +84,7 @@
 ### 工具文案 voice YAML
 - [x] numerology — 完整 ✅
 - [x] maya — 完整 ✅
-- [ ] bazi — 10 天干完成，缺 12 地支 + 五行平衡
+- [x] bazi — 完整（10 天干 + 12 地支 + 五行平衡）✅
 - [ ] tarot — 7 行空殼需重寫
 - [ ] runes — 未建檔
 - [ ] astro — 未建檔
