@@ -1,0 +1,303 @@
+# =====================================================================
+# Mele 命理媒介中心 — 北歐盧恩文案
+# =====================================================================
+# v1 範圍：24 個古弗薩克符文（Elder Futhark）
+#   - 三組（aett）：Freyr / Heimdall / Tyr 各 8 個
+#   - 每個含正位 + 反位（不可反者用 merkstave 阻塞讀法）
+#
+# 客戶端 (/tools/runes) 使用 teaser.friend
+# 老師後台 voice tab 切換 full.master
+#
+# YAML key = 拉丁轉寫名（業界通用，e.g. Fehu）
+#
+# 每個符文六區塊：
+#   upright_core   — 正位核心訊息
+#   upright_focus  — 正位行動建議
+#   reversed_core  — 反位 / 阻塞核心訊息
+#   reversed_shadow— 反位陰影
+#   situation      — 出現此符文代表的處境
+#   inquiry        — 給客戶反問的問句
+#
+# Voice 原則：master = 溫暖長者，敢說重話、不打安全牌、有立場
+# 註：reversible=false 者，reversed_* 為阻塞 / 影面（merkstave）讀法
+# =====================================================================
+
+schema_version: 1
+
+# Aett 1: Freyr 之列（Fehu–Wunjo）—— 生產、資源、生命力
+runes:
+  "Fehu":
+    symbol: "ᚠ"
+    name_zh: "菲胡"
+    meaning: "牛 / 流動的財富"
+    reversible: true
+    teaser:
+      friend: |
+        Fehu 不是叫你發財——是問你「你定義的富足是什麼」。這個符文出現，代表你開始能掌握自己的能量與資源，但要小心：不流動的財富會腐敗。
+    full:
+      master:
+        upright_core: |
+          流動的豐盛、創造性能量、生命力與物質回報。
+        upright_focus: |
+          這週把一筆錢、一份資源、一段精力流出去——投資、贈與、分配。不要囤。
+        reversed_core: |
+          資源被卡、財務焦慮、想抓住卻流失更快。
+        reversed_shadow: |
+          把安全感建立在數字上、用「我還沒夠」拒絕慷慨。
+        situation: |
+          一段關於「擁有 vs 流動」的功課。你緊握的東西正在死，鬆手的會活。
+        inquiry: |
+          你想要的富足，是讓你自由，還是讓你更怕失去？
+
+  "Uruz":
+    symbol: "ᚢ"
+    name_zh: "烏魯茲"
+    meaning: "野牛 / 原始力量"
+    reversible: true
+    teaser:
+      friend: |
+        Uruz 是野生的、不馴服的——你內在那股不講道理就是要前進的力量。這個符文出現，代表該結束「乖小孩」的階段，把那股原始的氣放出來。
+    full:
+      master:
+        upright_core: |
+          原始體能、突破限制、不證自明的生命力。
+        upright_focus: |
+          這週做一件「身體先動腦袋再跟上」的事——運動、攀爬、體力勞動。
+        reversed_core: |
+          虛弱、被馴服、把野性鎖住成順從。
+        reversed_shadow: |
+          用「我要文明」當壓抑本能的擋箭牌，最後變成慢性疲倦。
+        situation: |
+          需要重新接觸身體與本能的階段。腦袋已經想夠了。
+        inquiry: |
+          上一次你「身體說對、頭腦說錯」是什麼時候？你聽了誰的？
+
+  "Thurisaz":
+    symbol: "ᚦ"
+    name_zh: "瑟里薩茲"
+    meaning: "巨人 / 突破之刺"
+    reversible: true
+    teaser:
+      friend: |
+        Thurisaz 是一根刺——刺穿假象、戳破不該再忍的事。這個符文出現代表會痛，但這痛是治療性的。把該爆的爆出來。
+    full:
+      master:
+        upright_core: |
+          銳利的衝擊、防衛、必要的對抗、突破停滯的力量。
+        upright_focus: |
+          這週對一件你忍很久的事正面交鋒。不必客氣、不必鋪墊，直接戳。
+        reversed_core: |
+          衝突失控、反應過度、傷害無辜的人。
+        reversed_shadow: |
+          把怒氣對準錯的對象；用「我在守護自己」掩飾報復。
+        situation: |
+          某個系統 / 關係必須被打破才能往前。你已經知道哪個，只是怕。
+        inquiry: |
+          那根刺你拿在手上多久了？要不要這週用出去？
+
+  "Ansuz":
+    symbol: "ᚨ"
+    name_zh: "安蘇茲"
+    meaning: "神 / 訊息"
+    reversible: true
+    teaser:
+      friend: |
+        Ansuz 是神的話語——一個重要訊息正在抵達你。可能是某句話、某個夢、某個人的回應。這個符文出現代表：這次不要解釋掉，認真聽。
+    full:
+      master:
+        upright_core: |
+          訊息、啟示、智慧的傳遞、清晰的溝通。
+        upright_focus: |
+          這週說一句你一直藏著的真話。對的人會接得住、錯的人會走，兩個結果都好。
+        reversed_core: |
+          錯誤訊息、被誤導、自欺、嘴巴跟心走不同方向。
+        reversed_shadow: |
+          用花俏的話術掩蓋空洞；或被別人漂亮的話騙了還幫他講好話。
+        situation: |
+          一個需要清楚講話、清楚聽話的時刻。語言的力量正在運作。
+        inquiry: |
+          你最近一次說的話，是真話、客套、還是表演？
+
+  "Raidho":
+    symbol: "ᚱ"
+    name_zh: "萊多"
+    meaning: "旅行 / 節奏"
+    reversible: true
+    teaser:
+      friend: |
+        Raidho 不只是旅行——是「對的節奏」。這個符文出現，代表你的人生鼓點正在被調整。可能要動身、可能要換步調，重點是順著節奏走。
+    full:
+      master:
+        upright_core: |
+          對的時機、對的節奏、有方向的移動、旅程帶來的轉化。
+        upright_focus: |
+          這週啟動一段「短旅程」——實際出門、或心理上換場景。打破慣性。
+        reversed_core: |
+          錯的節奏、被迫移動、計畫亂掉、走錯方向。
+        reversed_shadow: |
+          用「我很忙」當作不停下來檢視的藉口；或被外力推著走還說是自己選的。
+        situation: |
+          你的節奏不對。不是你不努力，是你的拍子跟人生的拍子對不上。
+        inquiry: |
+          如果你不必趕，你會用什麼節奏過這個月？
+
+  "Kenaz":
+    symbol: "ᚲ"
+    name_zh: "肯納茲"
+    meaning: "火炬 / 工藝之火"
+    reversible: true
+    teaser:
+      friend: |
+        Kenaz 是工坊裡的火——讓你看見、讓你打造、讓你燒掉不要的。這個符文出現代表你已經有材料，差的是把那把火點起來開工。
+    full:
+      master:
+        upright_core: |
+          靈感、技藝、創造之火、看見過去看不見的。
+        upright_focus: |
+          這週把一個構想做出第一版實體——粗糙沒關係，重點是手感與光照出來。
+        reversed_core: |
+          創造力被遮蔽、技藝退步、缺乏指引。
+        reversed_shadow: |
+          完美主義熄火；用「靈感還沒來」當不開工的藉口。
+        situation: |
+          一個需要動手做、不是再思考的階段。火已備好。
+        inquiry: |
+          那個一直「想做」的東西，這週能不能讓它真的存在一小塊？
+
+  "Gebo":
+    symbol: "ᚷ"
+    name_zh: "蓋伯"
+    meaning: "禮物 / 交換"
+    reversible: false
+    teaser:
+      friend: |
+        Gebo 是禮物——但禮物的本質是「來回流動」。這個符文出現代表你正在被給予，或正在被要求給出。對等才會持久，單向都會壞。
+    full:
+      master:
+        upright_core: |
+          禮物、契約、夥伴關係、能量的雙向流動。
+        upright_focus: |
+          這週主動給出一件東西——時間、心意、物品。不為回報，但留意誰會回。
+        reversed_core: |
+          （無反位）阻塞時：給太多沒收回、收太多不知怎麼還、關係失衡。
+        reversed_shadow: |
+          用「我這是為你好」綁住別人；或把所有付出記帳等對方還。
+        situation: |
+          一段關係到了「需要重新校準誰給誰多少」的時刻。
+        inquiry: |
+          這段關係裡，你給的、收的，比例是多少？你心裡的數字是？
+
+  "Wunjo":
+    symbol: "ᚹ"
+    name_zh: "溫究"
+    meaning: "喜悅 / 和諧"
+    reversible: true
+    teaser:
+      friend: |
+        Wunjo 是回家的感覺——你終於跟自己人、自己的事和諧了。這個符文出現代表你正在進入一段「對」的時期。不要急著證明，先享受。
+    full:
+      master:
+        upright_core: |
+          純粹的喜悅、歸屬感、群體和諧、找到對的位置。
+        upright_focus: |
+          這週做一件單純讓你開心的事——不為生產力、不為他人。
+        reversed_core: |
+          失調、不在對的位置、被群體排除、強顏歡笑。
+        reversed_shadow: |
+          假裝融入而消耗自己；用「我很好」掩蓋深層孤獨。
+        situation: |
+          一段「歸屬感校準」的階段。你正在學會區分「真正屬於」與「勉強適應」。
+        inquiry: |
+          哪些地方、哪些人，讓你最近一次覺得「啊，我是這裡的」？
+
+  "Hagalaz":
+    symbol: "ᚺ"
+    name_zh: "哈格拉茲"
+    meaning: "冰雹 / 中斷"
+    reversible: false
+    teaser:
+      friend: |
+        Hagalaz 是突然砸下來的冰雹——你擋不了，但它會過。這個符文出現代表會有一段被中斷的時期。不要對抗、不要解釋，撐過去就會看見它清理了什麼。
+    full:
+      master:
+        upright_core: |
+          突發性中斷、外力打破、破壞性的清理力量。
+        upright_focus: |
+          這週不要強行修補正在被打破的事。讓它斷、讓它清，再看廢墟。
+        reversed_core: |
+          （無反位）抗拒時：拖延崩潰反而讓代價更大、扛得越久越傷。
+        reversed_shadow: |
+          假裝沒事；用「我能 handle」拒絕承認某件事已經被宇宙接管。
+        situation: |
+          一個你控制不了的中斷正在發生。承認它的尺寸是第一步。
+        inquiry: |
+          這場冰雹是衝著什麼來的？它在強迫你看見什麼？
+
+  "Nauthiz":
+    symbol: "ᚾ"
+    name_zh: "瑙提茲"
+    meaning: "需要 / 限制"
+    reversible: true
+    teaser:
+      friend: |
+        Nauthiz 是火種棒摩擦的時刻——困、緊、不夠。但這個符文不是來懲罰你，是來提醒你：限制裡藏著你被忽略的核心需求。
+    full:
+      master:
+        upright_core: |
+          覺察真實需要、被限制中發現本質、必要的辛苦。
+        upright_focus: |
+          這週寫下三件「我以為要、其實不要」、三件「我以為不重要、其實核心」的事。
+        reversed_core: |
+          被匱乏感淹沒、抗拒限制、把欲望當需要。
+        reversed_shadow: |
+          用「我沒選擇」當逃避責任的擋箭牌；其實你有，只是不想付代價。
+        situation: |
+          一段被緊縮的階段。重點不是擴張，是看清核心需要的最小集合。
+        inquiry: |
+          如果只能保留三件事，你會留下哪三件？
+
+  "Isa":
+    symbol: "ᛁ"
+    name_zh: "伊薩"
+    meaning: "冰 / 凍結"
+    reversible: false
+    teaser:
+      friend: |
+        Isa 是冰——一切暫停。這個符文出現不代表壞，代表「現在不要動」。冰會在它該融的時候融，你不需要去敲它。
+    full:
+      master:
+        upright_core: |
+          停滯、暫停、凍結中的清晰、強制的休止。
+        upright_focus: |
+          這週對一件你想推的事按暫停。什麼都不做、不催、不算。看 7 天後發生什麼。
+        reversed_core: |
+          （無反位）阻塞時：強行融冰反而碎裂；該動時還在凍。
+        reversed_shadow: |
+          把「我在等時機」說十年；或暴力打破本來會自然融化的東西。
+        situation: |
+          一段必要的靜止期。動就會壞，靜會看清楚。
+        inquiry: |
+          這個你急著推的事，如果先放三個月，世界會崩塌嗎？
+
+  "Jera":
+    symbol: "ᛃ"
+    name_zh: "耶拉"
+    meaning: "年 / 收穫的循環"
+    reversible: false
+    teaser:
+      friend: |
+        Jera 是「該結果的會結」——你前面種的，現在到了收的季節。這個符文出現代表耐心會被獎勵，但你也要承認：種瓜得瓜，這次也包括那些你不想看見的。
+    full:
+      master:
+        upright_core: |
+          循環、季節、自然收成、按時節推進的智慧。
+        upright_focus: |
+          這週盤點過去 12 個月種了什麼，現在在收什麼。把「沒種的別期待」這件事記住。
+        reversed_core: |
+          （無反位）阻塞時：想揠苗助長、不耐煩、跳過必要的季節。
+        reversed_shadow: |
+          用「快速捷徑」說服自己，最後比走完整年還慢。
+        situation: |
+          一段「收成的真相」階段。你會看清哪些是禮物、哪些是該認的帳。
+        inquiry: |
+          你現在收的這份成果，是 12 個月前的你種下的，還是別人種的？
