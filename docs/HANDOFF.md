@@ -4,7 +4,7 @@
 >
 > 維護規則：每完成一個里程碑，更新本檔的「已完成」與「下一步」兩段，commit。
 
-最後更新：2026-06-09（bazi + tarot + runes 完成）
+最後更新：2026-06-09（**全部 8 個工具 YAML 完成**；engine 接線待補）
 
 ---
 
@@ -90,7 +90,7 @@
 - [x] runes — YAML 完整（24 符文 × 6 區塊；非反位用 merkstave）✅ ／ ⚠️ **engine 尚未接線**：`explain_runes` 還沒讀 runes.yaml
 - [x] astro — YAML 完整（太陽/月亮/上升 × 12 + 12 宮位 + 8 行星宮位重點）✅ ／ ⚠️ **engine 尚未接線**：`explain_astro` 還沒讀 astro.yaml
 - [x] ziwei — YAML 完整（14 主星 + 12 宮位 + 大運基本概念）✅ ／ ⚠️ **engine 尚未接線**：`explain_ziwei` 還沒讀 ziwei.yaml
-- [ ] human_design — 未建檔
+- [x] human_design — YAML 完整（5 類型 + 4 權威 + 9 中心 + 64 閘門精簡版）✅ ／ ⚠️ **engine 尚未接線**：`explain_human_design` 還沒讀 human_design.yaml
 
 > ⚠️ **接線提醒（重要）**：寫 YAML 只是第一半，engine 沒接線文案就到不了使用者。
 > 目前只有 numerology / maya / bazi 三個 `explain_*` 真的讀了對應 YAML。

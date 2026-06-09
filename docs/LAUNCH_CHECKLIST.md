@@ -98,7 +98,7 @@
 - [x] **盧恩文案 v1** ✅（24 符文 × 6 區塊 voice，非反位用 merkstave；python_api/data/copy/runes.yaml）
 - [x] **占星文案 v1** ✅（太陽 / 月亮 / 上升 × 12 + 12 宮位 + 8 行星宮位重點；python_api/data/copy/astro.yaml）
 - [x] **紫微文案 v1** ✅（14 主星 + 12 宮位 + 大運基本詮釋；python_api/data/copy/ziwei.yaml）
-- [ ] **人類圖文案 v1**：64 閘門 + 9 中心 + 5 類型 + 4 內在權威
+- [x] **人類圖文案 v1** ✅（5 類型 + 4 內在權威 + 9 中心 + 64 閘門精簡版；python_api/data/copy/human_design.yaml）
 
 ### 老師後台 UI
 
