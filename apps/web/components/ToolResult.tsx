@@ -2394,6 +2394,9 @@ export function ToolResult({ result }: { result: CalcResponse | null }) {
       <ZiweiPlainGuide result={result} />
       {result.tool !== 'tarot' && <PersonalReadingPanel reading={personalReading} />}
       <PointUnlockPanel result={result} />
+      <p className="mt-6 border-t border-accent-dim pt-4 text-center text-[11px] leading-relaxed text-white/40">
+        工具結果僅供自我探索參考，不構成任何診斷、治療、醫療或心理專業建議。若有身心不適，請尋求專業醫療或心理協助。
+      </p>
     </div>
   );
 }

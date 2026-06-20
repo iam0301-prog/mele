@@ -39,10 +39,14 @@ function TeachersInner() {
           setTeachers(rows);
           setDemoMode(false);
         } else {
+          const sortByRating = (list: typeof DEMO_TEACHERS) =>
+            [...list].sort((a, b) => Number(b.rating ?? 0) - Number(a.rating ?? 0));
           setTeachers(
-            filter && filter !== '全部'
-              ? DEMO_TEACHERS.filter((teacher) => (teacher.specialties || []).includes(filter))
-              : DEMO_TEACHERS,
+            sortByRating(
+              filter && filter !== '全部'
+                ? DEMO_TEACHERS.filter((teacher) => (teacher.specialties || []).includes(filter))
+                : DEMO_TEACHERS,
+            ),
           );
           setDemoMode(true);
         }

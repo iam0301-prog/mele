@@ -34,32 +34,32 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 const homeCopy = {
   'zh-TW': {
-    eyebrow: 'PUBLIC BETA · 公開測試中',
-    title: '先試一個工具，告訴我們哪裡不夠好。',
-    body: 'MELE 現在進入公開測試階段。你可以不用付費先完成每日儀式、塔羅、生命靈數等工具；我們會用你的回饋修正文案、手機流程、點數解鎖與老師諮詢入口。',
-    primary: '開始公開測試',
+    eyebrow: '公測進行中 ｜ 自我理解工具',
+    title: '先整理自己，再決定下一步。',
+    body: '一個讓你先整理自己、再決定下一步的工具平台。從每日儀式、命理探索到深入解讀，陪你多一個看自己的角度。需要的時候，再找老師深聊。',
+    primary: '開始每日儀式',
     secondary: '看全部工具',
     tarot: '試抽塔羅',
     beta: '測試任務清單',
     teacher: '需要時找老師',
-    secondaryRoutesLabel: '其他測試入口',
-    points: '每日可領 200 測試點',
-    unlock: '100 點解鎖深度解讀',
-    teacherNote: '老師諮詢仍是選項，不是強迫購買',
-    previewTitle: '公開測試流程',
-    previewSubtitle: '3 分鐘內完成第一輪回饋',
-    steps: ['免費試工具', '領測試點數', '回報卡住處'],
-    promiseTitle: '公開測試先承諾這三件事',
+    secondaryRoutesLabel: '其他入口',
+    points: '八種命理入口可直接開始',
+    unlock: '每日儀式保留一點儀式感',
+    teacherNote: '老師是選項，不是必須',
+    previewTitle: '自我探索任務台',
+    previewSubtitle: '先認識自己，再決定要不要深入',
+    steps: ['基本工具了解自己', '開啟延伸說明', '需要時找老師'],
+    promiseTitle: '公測中先承諾這三件事',
     promises: [
       {
-        label: '不假裝正式版',
-        title: '還在測，所以會明講限制',
-        body: '部分解讀文字、付款流程、老師後台仍在調整；頁面會把測試狀態講清楚，不把使用者推進不確定的購買流程。',
+        label: '公測進行中',
+        title: '先跑一輪，再慢慢完善',
+        body: '這個階段最重要的事是：你用得順不順、看不看得懂。有任何卡住或看不懂的地方，請告訴我們。',
       },
       {
-        label: '先免費體驗',
-        title: '先讓你知道工具有沒有感',
-        body: '第一輪目標是驗證「看得懂、願意回來、知道下一步」，所以核心工具與每日流程優先開放測試。',
+        label: '工具優先',
+        title: '先認識自己，再決定要不要深入',
+        body: '從生命靈數、人類圖到每日塔羅，八種工具入口都可以直接開始，不需要先搞懂每一個系統。',
       },
       {
         label: '手機優先',
@@ -68,12 +68,15 @@ const homeCopy = {
       },
     ],
     testerTitle: '今天請你幫忙測這 4 件事',
-    testerBody: '不用全部功能都玩完。只要照順序跑一輪，我們就能知道產品是否已經接近可公開。',
-    testerItems: ['一個免費工具是否看得懂', '每日儀式是否有回訪理由', '點數與解鎖是否清楚', '哪個按鈕或字讓你猶豫'],
+    testerBody: '不用全部功能都玩完。只要照順序跑一輪，我們就能知道哪裡需要改善。',
+    testerItems: ['一個工具是否看得懂', '每日儀式是否有回訪理由', '延伸說明是否夠清楚', '哪個按鈕或字讓你猶豫'],
     noticeTitle: '測試提醒',
-    noticeBody: 'MELE 是自我理解與娛樂性工具，不取代醫療、法律、投資或心理治療建議。公開測試期間若遇到付款、登入、資料保存異常，請先不要重複操作，回報問題即可。',
+    noticeBody: 'MELE 是自我理解與娛樂性工具，不取代醫療、法律、投資或心理治療建議。工具結果僅供自我探索參考，不構成任何診斷或醫療建議。若有身心不適，請尋求專業醫療或心理協助。',
+    philosophyKicker: 'OUR APPROACH',
+    philosophyTitle: '我們在做的事，其實很簡單',
+    philosophyBody: '我們不替你下結論，只是多給你一個看自己的角度。工具結果是參考，不是替你下定論；老師是選項，不是必須。你隨時可以只用工具、不找老師。平台上的老師誰排在前面，由評價與上線狀態等客觀條件決定，排序依公開規則呈現，平台不偏袒特定老師。',
     finalTitle: '準備好就從最短路線開始',
-    finalBody: '建議先跑「每日儀式 → 一個工具 → 解鎖或回報」這條線。這比一次打開八種工具更能測出真實問題。',
+    finalBody: '建議先跑「每日儀式 → 一個工具 → 有感就繼續看」這條線。給自己五分鐘，試試看。',
   },
   en: {
     eyebrow: 'PUBLIC BETA · testing now',
@@ -217,6 +220,16 @@ export default async function LocalizedHomePage({ params }: PageProps) {
           ))}
         </ol>
       </section>
+
+      {locale !== 'en' && (
+        <section className="beta2-path" aria-label={homeCopy['zh-TW'].philosophyTitle}>
+          <article>
+            <span className="beta2-path-note">{homeCopy['zh-TW'].philosophyKicker}</span>
+            <h3>{homeCopy['zh-TW'].philosophyTitle}</h3>
+            <p>{homeCopy['zh-TW'].philosophyBody}</p>
+          </article>
+        </section>
+      )}
 
       <section className="beta2-notice" aria-label={copy.noticeTitle}>
         <div>
