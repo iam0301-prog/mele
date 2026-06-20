@@ -19,6 +19,12 @@ const config: Config = {
           light: '#E8C547',
           dim: 'rgba(201, 162, 39, 0.3)',
         },
+        // P0 視覺美編：暖珊瑚輔色，用於 CTA 按鈕與情感性元素
+        warm: {
+          DEFAULT: '#E8935A',
+          light: '#F0B07A',
+          dim: 'rgba(232, 147, 90, 0.25)',
+        },
         reverse: '#B8001F',
         success: '#2D6A4F',
         warning: '#F4A261',
@@ -49,10 +55,15 @@ const config: Config = {
         gold: '0 8px 25px rgba(201, 162, 39, 0.4)',
         'gold-soft': '0 8px 25px rgba(201, 162, 39, 0.15)',
         'gold-focus': '0 0 0 3px rgba(201, 162, 39, 0.15)',
+        warm: '0 8px 25px rgba(232, 147, 90, 0.35)',
+        'warm-focus': '0 0 0 3px rgba(232, 147, 90, 0.2)',
       },
       letterSpacing: {
+        // 標題/標籤用：保留適度質感字距
         widest: '0.25em',
         'mele-xl': '0.5em',
+        // 長段中文正文用：收緊到可讀範圍
+        'mele-prose': '0.03em',
       },
       animation: {
         'fade-in': 'fadeIn 0.5s ease-out',
