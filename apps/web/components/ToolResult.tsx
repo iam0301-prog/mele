@@ -2091,9 +2091,9 @@ function taipeiDatePart(part: 'day' | 'month' | 'year') {
 }
 
 function pointErrorMessage(message: string) {
-  if (message.includes('insufficient_points')) return '點數不足，先領每日 200 點或明天再回來解鎖。';
-  if (message.includes('not_authenticated')) return '請先登入會員，再使用點數解鎖。';
-  return `點數操作失敗：${message}`;
+  if (message.includes('insufficient_points')) return '目前無法查看，請明天再回來或先完成每日儀式。';
+  if (message.includes('not_authenticated')) return '請先登入會員，再查看延伸內容。';
+  return '操作暫時失敗，請稍後再試。';
 }
 
 function PointUnlockPanel({ result }: { result: CalcResponse }) {
@@ -2206,14 +2206,14 @@ function PointUnlockPanel({ result }: { result: CalcResponse }) {
     const payload = (data || {}) as PointRpcResult;
     setBalance(typeof payload.balance === 'number' ? payload.balance : balance);
     setClaimedToday(true);
-    setNotice(payload.claimed ? `已領取每天可領 200 點，目前可用 ${payload.balance ?? balance ?? 0} 點。` : '今天已領取過 200 點，明天再回來補充。');
+    setNotice(payload.claimed ? '今日簽到完成，可以繼續查看延伸內容。' : '今天已完成簽到，明天再回來。');
     setBusy(null);
   };
 
   const unlockContent = async (option: MemberUnlockOption) => {
     if (!userId) return;
     if ((balance ?? 0) < POINT_UNLOCK_COST && !unlocked[option.type]) {
-      setNotice('點數不足，先領每日 200 點再解鎖。');
+      setNotice('請先完成今日簽到再查看延伸內容。');
       return;
     }
 
@@ -2241,37 +2241,37 @@ function PointUnlockPanel({ result }: { result: CalcResponse }) {
     if (payload.content) {
       setUnlockedContent((prev) => ({ ...prev, [option.type]: payload.content }));
     }
-    setNotice(payload.already_unlocked ? `${option.label}已經解鎖，可以直接查看。` : `已用 100 點解鎖 ${option.label}。`);
+    setNotice(payload.already_unlocked ? `${option.label}已經可以查看。` : `${option.label}內容已載入。`);
     setBusy(null);
   };
 
   return (
-    <section className="point-unlock" aria-label="會員點數解鎖">
+    <section className="point-unlock" aria-label="會員延伸解讀">
       <div className="point-unlock__header">
         <div>
-          <span>MEMBER POINTS</span>
-          <h2>會員點數解鎖</h2>
-          <p>每天可領 200 點；深入解釋與流日解鎖先設定為 100 點，流月、流年也先接好同一套付費內容入口。</p>
+          <span>MEMBER EXTENDED</span>
+          <h2>延伸解讀</h2>
+          <p>登入會員後可查看深入解釋、流日、流月、流年等延伸解讀。免費工具本身就完整，延伸內容是選項。</p>
         </div>
         <div className="point-unlock__balance">
-          <span>目前點數</span>
-          <strong>{userId ? (ready ? balance ?? 0 : '...') : '-'}</strong>
+          <span>會員狀態</span>
+          <strong>{userId ? (ready ? '已登入' : '...') : '-'}</strong>
         </div>
       </div>
 
       {!userId ? (
         <div className="point-unlock__guest">
-          <p>登入會員後可以領每日點數、保存已解鎖結果，之後每項工具的流日、流月、流年都會沿用這套紀錄。</p>
-          <Link href="/account/login?return=/account/charts">登入領點</Link>
+          <p>登入會員後可查看延伸解讀，每項工具的流日、流月、流年都會保存在你的會員紀錄。</p>
+          <Link href="/account/login?return=/account/charts">登入查看</Link>
         </div>
       ) : (
         <div className="point-unlock__claim">
           <div>
-            <strong>每日補給</strong>
-            <p>{claimedToday ? '今天已領取 200 點。' : '今天還可以領 200 點，用來解鎖一次深入解釋或流日。'}</p>
+            <strong>每日儀式</strong>
+            <p>{claimedToday ? '今天已完成每日簽到。' : '完成每日儀式可開啟今日延伸解讀。'}</p>
           </div>
           <button type="button" onClick={claimDailyPoints} disabled={busy !== null || claimedToday}>
-            {busy === 'claim' ? '領取中...' : claimedToday ? '今日已領' : '領取 200 點'}
+            {busy === 'claim' ? '處理中...' : claimedToday ? '今日已完成' : '完成每日簽到'}
           </button>
         </div>
       )}
@@ -2287,13 +2287,13 @@ function PointUnlockPanel({ result }: { result: CalcResponse }) {
               <h3>{option.title}</h3>
               <p>{option.body}</p>
               <div className="point-unlock__option-footer">
-                <strong>{option.label} / 100 點</strong>
+                <strong>{option.label}</strong>
                 <button
                   type="button"
                   onClick={() => unlockContent(option)}
                   disabled={!userId || busy !== null || (isUnlocked && hasRevealedContent)}
                 >
-                  {isUnlocked && hasRevealedContent ? '已解鎖' : busy === option.type ? '解鎖中...' : isUnlocked ? '載入內容' : `解鎖 ${option.label}`}
+                  {isUnlocked && hasRevealedContent ? '已查看' : busy === option.type ? '載入中...' : isUnlocked ? '載入內容' : `查看${option.label}`}
                 </button>
               </div>
               {isUnlocked && reading && (

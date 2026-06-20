@@ -123,7 +123,7 @@ const en: ReleaseCopy = {
     primary: 'Start daily ritual',
     secondary: 'Explore tools',
     panels: [
-      { title: 'Daily return loop', body: 'One daily choice, 200 claimable points, and 100-point unlocks keep the beta simple.', href: '/daily', action: 'Open ritual' },
+      { title: 'Daily return loop', body: 'One daily choice, a daily ritual, and extended readings keep the beta simple.', href: '/daily', action: 'Open ritual' },
       { title: 'Self-discovery tools', body: 'Numerology, Human Design, tarot, runes, Maya, Bazi, Zi Wei, and astrology stay available as first-layer tests.', href: '/tools', action: 'Open tools' },
       { title: 'Guide handoff', body: 'Guides appear after users understand their own context, not before.', href: '/teachers', action: 'Find guidance' },
     ],
@@ -131,7 +131,7 @@ const en: ReleaseCopy = {
   login: {
     kicker: 'ACCOUNT PORTAL',
     title: 'Log in or create your beta account',
-    body: 'Save readings, claim points, unlock deeper views, and prepare context before meeting a guide.',
+    body: 'Save readings, access extended views, and prepare context before meeting a guide.',
     signIn: 'Log in',
     signUp: 'Sign up',
     email: 'Email',
@@ -180,12 +180,12 @@ const en: ReleaseCopy = {
     privacy: {
       kicker: 'PRIVACY',
       title: 'Privacy and data use',
-      body: 'MELE stores only the information needed for accounts, readings, member points, guide bookings, and service safety.',
+      body: 'MELE stores only the information needed for accounts, readings, member records, guide bookings, and service safety.',
       primary: 'Open account',
       secondary: 'Back home',
       sections: [
         { title: 'Account data', body: 'Email, profile, birth data, and consent records support login and reading features.' },
-        { title: 'Reading data', body: 'Saved readings and unlocks help members review their own archive.' },
+        { title: 'Reading data', body: 'Saved readings and extended views help members review their own archive.' },
         { title: 'Control', body: 'Members can request data export, correction, or deletion through the account privacy page.' },
       ],
     },
@@ -239,11 +239,11 @@ const zh: ReleaseCopy = {
   mobile: {
     kicker: '手機版',
     title: '把自我理解放進每日節奏',
-    body: '手機版先服務封測者的日常回訪：每日抽牌、保存紀錄、領取點數，當需要更深支持時再交給老師。',
+    body: '手機版先服務封測者的日常回訪：每日抽牌、保存紀錄、完成每日儀式，當需要更深支持時再交給老師。',
     primary: '開始每日儀式',
     secondary: '查看全部工具',
     panels: [
-      { title: '每日回訪', body: '每日一次選擇、200 點領取、100 點解鎖，讓封測流程簡單可驗證。', href: '/daily', action: '開啟儀式' },
+      { title: '每日回訪', body: '每日一次選擇、完成儀式、查看延伸解讀，讓封測流程簡單可驗證。', href: '/daily', action: '開啟儀式' },
       { title: '多元工具', body: '生命靈數、人類圖、塔羅、盧恩、瑪雅、八字、紫微與占星，都可先做初階理解。', href: '/tools', action: '查看工具' },
       { title: '老師銜接', body: '老師媒合應該出現在使用者理解自己之後，協助他把問題帶進諮詢。', href: '/teachers', action: '尋找老師' },
     ],
@@ -251,7 +251,7 @@ const zh: ReleaseCopy = {
   login: {
     kicker: '會員入口',
     title: '登入或建立封測帳號',
-    body: '保存解讀、領取點數、解鎖深入內容，也能在諮詢前整理好自己的問題與命盤脈絡。',
+    body: '保存解讀、查看延伸內容，也能在諮詢前整理好自己的問題與命盤脈絡。',
     signIn: '登入',
     signUp: '註冊',
     email: 'Email',
@@ -300,12 +300,12 @@ const zh: ReleaseCopy = {
     privacy: {
       kicker: '隱私權',
       title: '隱私與資料使用',
-      body: 'MELE 只保存帳號、解讀、會員點數、老師預約與服務安全所需資料。',
+      body: 'MELE 只保存帳號、解讀、會員紀錄、老師預約與服務安全所需資料。',
       primary: '前往帳號',
       secondary: '回首頁',
       sections: [
         { title: '帳號資料', body: 'Email、個人資料、出生資料與同意紀錄，用於登入與解讀功能。' },
-        { title: '解讀資料', body: '保存的解讀與解鎖紀錄，協助會員回看自己的探索歷程。' },
+        { title: '解讀資料', body: '保存的解讀與延伸內容紀錄，協助會員回看自己的探索歷程。' },
         { title: '資料控制', body: '會員可在帳號隱私頁要求匯出、更正或刪除資料。' },
       ],
     },
@@ -407,7 +407,7 @@ const releaseCopy: Record<Locale, ReleaseCopy> = {
     login: {
       kicker: 'TÀI KHOẢN',
       title: 'Đăng nhập hoặc tạo tài khoản beta',
-      body: 'Lưu kết quả, nhận điểm, mở khóa nội dung sâu hơn và chuẩn bị bối cảnh trước khi gặp chuyên gia.',
+      body: 'Lưu kết quả, xem nội dung mở rộng và chuẩn bị bối cảnh trước khi gặp chuyên gia.',
       signIn: 'Đăng nhập',
       signUp: 'Đăng ký',
       displayName: 'Tên hiển thị',
@@ -456,7 +456,7 @@ const releaseCopy: Record<Locale, ReleaseCopy> = {
     login: {
       kicker: 'PORTAL AKUN',
       title: 'Masuk atau buat akun beta',
-      body: 'Simpan bacaan, klaim poin, buka tampilan mendalam, dan siapkan konteks sebelum bertemu pembimbing.',
+      body: 'Simpan bacaan, akses tampilan mendalam, dan siapkan konteks sebelum bertemu pembimbing.',
       signIn: 'Masuk',
       signUp: 'Daftar',
       displayName: 'Nama tampilan',
@@ -505,7 +505,7 @@ const releaseCopy: Record<Locale, ReleaseCopy> = {
     login: {
       kicker: 'アカウント',
       title: 'ログインまたはベータ登録',
-      body: '結果を保存し、ポイントを受け取り、深い表示を解放し、ガイド相談前に文脈を整えます。',
+      body: '結果を保存し、詳細な表示を確認し、ガイド相談前に文脈を整えます。',
       signIn: 'ログイン',
       signUp: '登録',
       displayName: '表示名',
@@ -554,7 +554,7 @@ const releaseCopy: Record<Locale, ReleaseCopy> = {
     login: {
       kicker: '계정 포털',
       title: '로그인 또는 베타 계정 만들기',
-      body: '해석을 저장하고, 포인트를 받고, 깊은 보기를 열고, 가이드 상담 전 맥락을 준비하세요.',
+      body: '해석을 저장하고, 심층 보기를 열고, 가이드 상담 전 맥락을 준비하세요.',
       signIn: '로그인',
       signUp: '가입',
       displayName: '표시 이름',

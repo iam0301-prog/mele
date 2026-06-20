@@ -27,8 +27,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return {
     title: isEnglish ? 'MELE Public Beta' : 'MELE 公開測試',
     description: isEnglish
-      ? 'A public beta self-discovery flow: try free tools, claim daily points, unlock deeper readings, and tell us what should improve before launch.'
-      : 'MELE 公開測試入口：先免費試工具、領每日點數、解鎖深度解讀，回報正式上線前最需要改善的地方。',
+      ? 'A public beta self-discovery flow: try free tools, complete daily rituals, explore deeper readings, and tell us what should improve before launch.'
+      : 'MELE 公開測試入口：先免費試工具、完成每日儀式、查看延伸解讀，回報正式上線前最需要改善的地方。',
   };
 }
 
@@ -81,19 +81,19 @@ const homeCopy = {
   en: {
     eyebrow: 'PUBLIC BETA · testing now',
     title: 'Try one tool first, then tell us what feels unclear.',
-    body: 'MELE is now in public beta. You can start with free tools, daily rituals, tarot, numerology, and point unlocks while we improve copy, mobile flow, guidance, and trust before launch.',
+    body: 'MELE is now in public beta. You can start with free tools, daily rituals, tarot, numerology, and extended readings while we improve copy, mobile flow, guidance, and trust before launch.',
     primary: 'Start public beta',
     secondary: 'See all tools',
     tarot: 'Try tarot',
     beta: 'Testing checklist',
     teacher: 'Find a guide if needed',
     secondaryRoutesLabel: 'Other beta routes',
-    points: 'Claim 200 test points daily',
-    unlock: 'Unlock depth with 100 points',
+    points: 'Eight self-discovery tools, free to try',
+    unlock: 'Extended readings available after daily ritual',
     teacherNote: 'Guides are optional, never forced',
     previewTitle: 'Public beta flow',
     previewSubtitle: 'Finish the first feedback loop in 3 minutes',
-    steps: ['Try a free tool', 'Claim test points', 'Report friction'],
+    steps: ['Try a free tool', 'Complete daily ritual', 'Report friction'],
     promiseTitle: 'What this beta promises',
     promises: [
       {
@@ -114,11 +114,11 @@ const homeCopy = {
     ],
     testerTitle: 'Please test these 4 things today',
     testerBody: 'You do not need to try every feature. One clean loop tells us whether the product is close to public-ready.',
-    testerItems: ['Whether one free tool is readable', 'Whether the daily ritual gives a reason to return', 'Whether points and unlocks are clear', 'Which button or sentence makes you hesitate'],
+    testerItems: ['Whether one free tool is readable', 'Whether the daily ritual gives a reason to return', 'Whether extended readings feel clear after login', 'Which button or sentence makes you hesitate'],
     noticeTitle: 'Testing note',
     noticeBody: 'MELE is for self-discovery and entertainment. It does not replace medical, legal, investment, or therapy advice. During public beta, if payment, login, or saved data looks wrong, stop repeating the action and report it.',
     finalTitle: 'Start with the shortest path',
-    finalBody: 'Use the daily ritual → one tool → unlock or report loop. It reveals real problems better than opening every tool at once.',
+    finalBody: 'Use the daily ritual → one tool → explore or report loop. It reveals real problems better than opening every tool at once.',
   },
 } as const;
 
@@ -185,7 +185,7 @@ export default async function LocalizedHomePage({ params }: PageProps) {
           <div className="beta2-phone" aria-label={copy.previewTitle}>
             <div className="beta2-phone__top">
               <span>{copy.previewTitle}</span>
-              <strong>200</strong>
+              <strong>Beta</strong>
             </div>
             <p>{copy.previewSubtitle}</p>
             <ol>
