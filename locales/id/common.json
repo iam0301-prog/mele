@@ -43,7 +43,7 @@
     "badge": "Closed Beta | ALAT MEMAHAMI DIRI",
     "title": "MELE",
     "subtitle": "Ruang alat memahami diri",
-    "description": "Ruang alat multibahasa agar orang dapat memahami dirinya lebih dulu: tes gratis, alat reflektif, ritual harian, poin member, dan bacaan mendalam saat siap.",
+    "description": "Ruang alat multibahasa agar orang dapat memahami dirinya lebih dulu: tes gratis, alat reflektif, ritual harian, dan bacaan mendalam saat siap.",
     "actions": {
       "daily": "Mulai ritual harian",
       "tarot": "Coba tarot",
@@ -57,20 +57,20 @@
       "mayaAlt": "Totem Maya Yellow Human",
       "tasks": [
         "Mulai dari alat gratis untuk memahami ritme, energi, dan keadaan saat ini.",
-        "Member mendapat 200 poin setiap hari dan dapat membuka bacaan mendalam dengan 100 poin.",
+        "Member dapat menyelesaikan ritual harian dan membuka bacaan lanjutan kapan pun siap.",
         "Pemandu hanya opsi dukungan ketika pengguna ingin percakapan lebih dalam."
       ]
     },
     "stats": [
       {
-        "label": "200 poin harian",
-        "value": "200",
-        "hint": "Membentuk kebiasaan kembali untuk member beta."
+        "label": "Ritual harian",
+        "value": "Setiap hari",
+        "hint": "Membentuk kebiasaan kembali untuk member."
       },
       {
-        "label": "100 poin per unlock",
-        "value": "100",
-        "hint": "Bacaan dalam, transit harian, bulanan, dan tahunan memakai logika poin yang sama."
+        "label": "Bacaan lanjutan",
+        "value": "Kapan pun siap",
+        "hint": "Bacaan dalam, transit harian, bulanan, dan tahunan tersedia saat kamu mau."
       },
       {
         "label": "8 pintu alat",
@@ -156,7 +156,7 @@
       {
         "role": "Member",
         "title": "Pahami diri sebelum masuk lebih dalam",
-        "body": "Member mulai dari penjelasan sederhana, lalu memakai poin untuk membuka bacaan mendalam dan transit.",
+        "body": "Member mulai dari penjelasan sederhana, lalu membuka bacaan mendalam dan transit kapan pun siap.",
         "href": "/account/charts",
         "action": "Buka arsip member"
       },
@@ -250,7 +250,7 @@
     "seoDescription": "Ikuti beta tertutup MELE untuk mencoba alat gratis, ritual harian, poin anggota, dan bacaan yang lebih dalam.",
     "badge": "CLOSED BETA INVITATION",
     "title": "Kenali diri dulu, lalu memilih dengan lebih jernih",
-    "description": "Halaman ini untuk penguji awal. Mulai dari alat gratis, klaim 200 poin harian, buka bacaan lebih dalam dengan 100 poin, lalu beri tahu kami bagian yang jelas atau membingungkan.",
+    "description": "Halaman ini untuk penguji awal. Mulai dari alat gratis, selesaikan ritual harian, buka bacaan lanjutan, lalu beri tahu kami bagian yang jelas atau membingungkan.",
     "primaryCta": "Ikut beta",
     "secondaryCta": "Lihat alat",
     "dailyCta": "Ritual harian",
@@ -259,20 +259,20 @@
     "panelTitle": "Coba tiga hal ini hari ini",
     "panelItems": [
       "Jalankan satu tes gratis dan cek apakah hasilnya mudah dibaca.",
-      "Klaim 200 poin harian dan buka satu bacaan mendalam.",
+      "Selesaikan ritual harian dan buka satu bacaan lanjutan.",
       "Laporkan hal yang membingungkan, rusak, atau terasa berguna."
     ],
-    "rulesTitle": "Aturan poin beta",
+    "rulesTitle": "Panduan beta",
     "rules": [
       {
-        "label": "Klaim harian",
-        "value": "200 poin",
-        "body": "Anggota bisa klaim sekali per hari."
+        "label": "Ritual harian",
+        "value": "Setiap hari",
+        "body": "Anggota menyelesaikan ritual harian sekali per hari."
       },
       {
-        "label": "Biaya buka",
-        "value": "100 poin",
-        "body": "Bacaan mendalam dan transit memakai ritme ini."
+        "label": "Bacaan lanjutan",
+        "value": "Kapan pun siap",
+        "body": "Bacaan mendalam dan transit tersedia kapan pun kamu mau."
       },
       {
         "label": "Tarikan harian",
@@ -296,13 +296,13 @@
       },
       {
         "title": "Langkah 2: Ritme harian",
-        "body": "Coba tarikan harian, poin harian, dan alasan untuk kembali.",
+        "body": "Coba tarikan harian, ritual harian, dan alasan untuk kembali.",
         "href": "/daily",
         "action": "Mulai ritual"
       },
       {
-        "title": "Langkah 3: Simpan dan buka",
-        "body": "Login untuk melihat chart, poin, dan konten terbuka.",
+        "title": "Langkah 3: Simpan dan jelajahi",
+        "body": "Login untuk melihat chart dan bacaan lanjutan yang sudah dibuka.",
         "href": "/account/charts",
         "action": "Buka arsip"
       }
@@ -311,8 +311,8 @@
     "feedbackBody": "Teks membingungkan, tombol tidak jelas, tampilan mobile terlalu padat, hasil terasa kuat, atau hasil terasa lemah.",
     "proof": [
       "Alat gratis dulu",
-      "200 poin harian",
-      "Buka 100 poin",
+      "Ritual harian",
+      "Bacaan lanjutan kapan pun siap",
       "Guide opsional",
       "Tes mobile-first"
     ]

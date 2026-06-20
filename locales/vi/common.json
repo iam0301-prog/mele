@@ -43,7 +43,7 @@
     "badge": "Closed Beta | SELF DISCOVERY TOOLS",
     "title": "MELE",
     "subtitle": "Self-discovery tool space",
-    "description": "A multilingual tool space for people to understand themselves first: free tests, intuitive tools, daily rituals, member points, and deeper readings when they are ready.",
+    "description": "A multilingual tool space for people to understand themselves first: free tests, intuitive tools, daily rituals, and extended readings when they are ready.",
     "actions": {
       "daily": "Start daily ritual",
       "tarot": "Try tarot",
@@ -57,20 +57,20 @@
       "mayaAlt": "Totem Maya Yellow Human",
       "tasks": [
         "Start with free tools so visitors can understand their rhythm, energy, and current state.",
-        "Members can claim 200 points daily and unlock deeper readings for 100 points when ready.",
+        "Thành viên có thể hoàn thành nghi thức hằng ngày và xem giải thích mở rộng khi sẵn sàng.",
         "Guides are optional support for deeper conversations, not the center of the product."
       ]
     },
     "stats": [
       {
-        "label": "200 điểm mỗi ngày",
-        "value": "200",
-        "hint": "Tạo thói quen quay lại nhẹ nhàng cho thành viên beta."
+        "label": "Nghi thức hằng ngày",
+        "value": "Mỗi ngày",
+        "hint": "Tạo thói quen quay lại nhẹ nhàng cho thành viên."
       },
       {
-        "label": "100 điểm mỗi mở khóa",
-        "value": "100",
-        "hint": "Giải thích sâu, lưu ngày, lưu tháng, lưu năm dùng cùng logic điểm."
+        "label": "Giải thích mở rộng",
+        "value": "Khi sẵn sàng",
+        "hint": "Giải thích sâu, vận hằng ngày, tháng, năm đều có sẵn khi bạn muốn xem."
       },
       {
         "label": "8 lối vào công cụ",
@@ -156,7 +156,7 @@
       {
         "role": "Thành viên",
         "title": "Hiểu mình trước khi đi sâu",
-        "body": "Thành viên bắt đầu với giải thích dễ hiểu, rồi dùng điểm mở khóa phần sâu và lưu ngày/tháng/năm.",
+        "body": "Thành viên bắt đầu với giải thích dễ hiểu, rồi mở phần sâu và vận hằng ngày/tháng/năm khi sẵn sàng.",
         "href": "/account/charts",
         "action": "Mở kho giải đọc"
       },
@@ -250,7 +250,7 @@
     "seoDescription": "Tham gia bản thử nghiệm MELE để dùng công cụ miễn phí, nghi thức hằng ngày, điểm thành viên và phần đọc sâu hơn.",
     "badge": "CLOSED BETA INVITATION",
     "title": "Hiểu bản thân trước, rồi chọn lựa rõ ràng hơn",
-    "description": "Trang này dành cho người thử nghiệm sớm. Hãy bắt đầu bằng công cụ miễn phí, nhận 200 điểm mỗi ngày, mở khóa nội dung sâu hơn với 100 điểm và gửi phản hồi cho chúng tôi.",
+    "description": "Trang này dành cho người thử nghiệm sớm. Hãy bắt đầu bằng công cụ miễn phí, hoàn thành nghi thức hằng ngày, xem nội dung mở rộng và gửi phản hồi cho chúng tôi.",
     "primaryCta": "Tham gia beta",
     "secondaryCta": "Xem công cụ",
     "dailyCta": "Nghi thức hôm nay",
@@ -259,20 +259,20 @@
     "panelTitle": "Hôm nay hãy thử ba việc này",
     "panelItems": [
       "Làm một bài thử miễn phí và xem kết quả có dễ hiểu không.",
-      "Nhận 200 điểm mỗi ngày và mở khóa một phần đọc sâu.",
+      "Hoàn thành nghi thức hằng ngày và xem một nội dung mở rộng.",
       "Báo lại điều khó hiểu, lỗi, hoặc điểm bạn thấy hữu ích."
     ],
-    "rulesTitle": "Quy tắc điểm beta",
+    "rulesTitle": "Hướng dẫn beta",
     "rules": [
       {
-        "label": "Mỗi ngày nhận",
-        "value": "200 điểm",
-        "body": "Thành viên có thể nhận một lần mỗi ngày."
+        "label": "Nghi thức hằng ngày",
+        "value": "Mỗi ngày",
+        "body": "Thành viên hoàn thành nghi thức một lần mỗi ngày."
       },
       {
-        "label": "Mỗi mở khóa",
-        "value": "100 điểm",
-        "body": "Nội dung đọc sâu dùng cùng nhịp này."
+        "label": "Nội dung mở rộng",
+        "value": "Khi sẵn sàng",
+        "body": "Nội dung đọc sâu sẵn sàng khi bạn muốn xem thêm."
       },
       {
         "label": "Rút hằng ngày",
@@ -296,13 +296,13 @@
       },
       {
         "title": "Bước 2: Nhịp hằng ngày",
-        "body": "Thử rút hằng ngày, điểm hằng ngày và lý do quay lại.",
+        "body": "Thử rút hằng ngày, nghi thức hằng ngày và lý do quay lại.",
         "href": "/daily",
         "action": "Bắt đầu"
       },
       {
-        "title": "Bước 3: Lưu và mở khóa",
-        "body": "Đăng nhập để xem hồ sơ, điểm và nội dung đã mở.",
+        "title": "Bước 3: Lưu và khám phá",
+        "body": "Đăng nhập để xem hồ sơ và nội dung mở rộng đã xem.",
         "href": "/account/charts",
         "action": "Xem hồ sơ"
       }
@@ -311,8 +311,8 @@
     "feedbackBody": "Văn bản khó hiểu, nút không rõ, giao diện điện thoại chật, kết quả rất đúng hoặc chưa có cảm giác đều rất hữu ích.",
     "proof": [
       "Công cụ miễn phí trước",
-      "200 điểm mỗi ngày",
-      "Mở khóa 100 điểm",
+      "Nghi thức hằng ngày",
+      "Nội dung mở rộng khi sẵn sàng",
       "Guide là tùy chọn",
       "Ưu tiên điện thoại"
     ]
