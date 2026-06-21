@@ -232,7 +232,7 @@
     "page": {
       "kicker": "SELF DISCOVERY",
       "heroTitle": "工具入口",
-      "heroBody": "這裡保留工具、每日儀式、會員解鎖與諮詢入口。",
+      "heroBody": "這裡保留工具、每日儀式、延伸解讀與諮詢入口。",
       "freeTests": "免費測驗入口",
       "freeTestsBody": "生命靈數、人類圖、塔羅、馬雅曆與每日儀式適合作為第一層互動。",
       "persona": "角色分析入口",
@@ -309,7 +309,7 @@
         "action": "開始每日儀式"
       },
       {
-        "title": "第三步：保存與解鎖",
+        "title": "第三步：保存與探索",
         "body": "登入後查看命盤紀錄與已開啟的延伸解讀。",
         "href": "/account/charts",
         "action": "查看解讀庫"
