@@ -73,9 +73,8 @@ export default function MyBookingsPage() {
   useEffect(() => { load(); }, [load]);
 
   const cancel = async (b: Booking) => {
-    const hours = (new Date(b.scheduled_at).getTime() - Date.now()) / 3600000;
-    const refund = hours >= 24 ? '全額退款' : hours > 0 ? '退 50%' : '無法退款';
-    if (!confirm(`確定取消？預計：${refund}`)) return;
+    // PAYMENT_GATE: 公測期間無費用，取消說明不涉退款。待開收費時可補退款邏輯。
+    if (!confirm('確定取消這筆預約？公測期間取消不涉及任何費用。')) return;
     const supabase = createClient();
     const { error } = await supabase.rpc('cancel_booking', { p_booking_id: b.id, p_reason: '客戶自行取消' });
     if (error) {
