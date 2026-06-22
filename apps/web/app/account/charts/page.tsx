@@ -212,7 +212,9 @@ export default function ChartsPage() {
         </div>
       )}
 
-      <section className="member-vault" aria-label="會員點數">
+      {/* PAYMENT_GATE: 公測期間隱藏點數錢包顯示，保留底層點數邏輯不刪。
+          待開收費時：移除此 section 的 hidden class，恢復點數介面。 */}
+      <section className="member-vault hidden" aria-label="會員點數">
         <div>
           <span>POINT WALLET</span>
           <h2>會員點數</h2>
@@ -240,6 +242,15 @@ export default function ChartsPage() {
         </div>
       </section>
 
+      <section className="member-vault-beta" aria-label="公測說明">
+        <div className="rounded-xl border border-success/30 bg-success/10 p-4 text-sm leading-relaxed">
+          <span className="text-xs tracking-widest text-success">OPEN BETA</span>
+          <h2 className="mt-1 font-serif text-lg text-accent">公測期免費體驗</h2>
+          <p className="mt-2 text-white/70">公測期間深入解讀、流日、流月、流年均可直接查看完整內容，無需任何操作。正式收費規則將在公測結束後另行公告。</p>
+          <Link href="/account/profile" className="mt-3 inline-block text-accent underline text-xs">補齊出生資料，讓解讀更準確</Link>
+        </div>
+      </section>
+
       <section className="member-unlock-history" aria-label="解鎖紀錄">
         <div className="member-section-heading">
           <span>UNLOCK HISTORY</span>
@@ -248,7 +259,7 @@ export default function ChartsPage() {
         {loading && <div className="member-empty-state">載入解鎖紀錄中...</div>}
         {!loading && unlocks.length === 0 && (
           <div className="member-empty-state">
-            目前尚未解鎖內容。你可以先到任一工具取得簡易解釋，再用點數開啟文言感深度解讀。
+            目前尚未查看深度內容。你可以先到任一工具取得簡易解釋，再查看完整深度解讀。
             <div><Link href="/" className="member-inline-link">前往工具首頁</Link></div>
           </div>
         )}
@@ -258,7 +269,7 @@ export default function ChartsPage() {
               <article key={item.id}>
                 <span>{TOOL_LABEL[item.tool] ?? item.tool}</span>
                 <h3>{UNLOCK_LABEL[item.unlock_type] ?? item.unlock_type}</h3>
-                <p>已使用 {item.cost_points} 點開啟。老師諮詢時可依此脈絡延伸，不必從零開始。</p>
+                <p>已查看完整內容。老師諮詢時可依此脈絡延伸，不必從零開始。</p>
                 <time>{formatDate(item.created_at)}</time>
               </article>
             ))}
@@ -274,7 +285,7 @@ export default function ChartsPage() {
         {loading && <div className="member-empty-state">載入排盤紀錄中...</div>}
         {!loading && records.length === 0 && (
           <div className="member-empty-state">
-            尚未保存任何排盤。先做一份免費簡易解釋，之後再視需要付點數看深度內容。
+            尚未保存任何排盤。先做一份簡易解釋，之後再查看完整深度內容。
             <div><Link href="/" className="member-inline-link">開始第一份解讀</Link></div>
           </div>
         )}
