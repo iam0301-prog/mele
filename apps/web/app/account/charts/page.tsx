@@ -196,7 +196,7 @@ export default function ChartsPage() {
         <h1 className="font-serif text-3xl tracking-widest mb-2">會員解讀庫</h1>
         <div className="mele-subtitle">MEMBER ORACLE ARCHIVE</div>
         <p className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-white/68">
-          會員在前台先看簡易解釋；付 {POINT_UNLOCK_COST} 點可開深入解釋、流日、流月或流年。已解鎖的內容會留在這裡，方便回看，也方便日後與老師諮詢銜接。
+          公測期間，深入解釋、流日、流月與流年均可直接查看完整內容。已查看的紀錄會留在這裡，方便回看，也方便日後與老師諮詢銜接。
         </p>
       </header>
 
