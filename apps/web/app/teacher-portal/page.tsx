@@ -972,7 +972,7 @@ export default async function TeacherPortalPage({ searchParams }: TeacherPortalP
                   <tr key={b.id} className="border-b border-accent-dim/30">
                     <td className="py-3 px-3 text-xs">{new Date(b.scheduled_at).toLocaleString(localeTag)}</td>
                     <td className="py-3 px-3 text-xs">{copy.statusLabels[b.status] ?? b.status}</td>
-                    <td className="py-3 px-3">NT$ {b.amount_ntd.toLocaleString(localeTag)}</td>
+                    <td className="py-3 px-3 text-xs text-success">{copy.portal.freeTest}</td>
                     <td className="py-3 px-3 text-xs text-white/62">
                       {['paid', 'confirmed'].includes(b.status) ? copy.portal.paidReminder : copy.portal.noAction}
                     </td>
@@ -991,7 +991,7 @@ export default async function TeacherPortalPage({ searchParams }: TeacherPortalP
           <div key={s.id} className="flex justify-between items-center border-b border-accent-dim/30 py-3">
             <div>
               <div className="text-sm">{s.name}</div>
-              <div className="text-xs text-white/60">{s.duration_minutes} min · NT$ {s.price_ntd.toLocaleString(localeTag)}</div>
+              <div className="text-xs text-white/60">{s.duration_minutes} min · {copy.portal.freeTest}</div>
             </div>
             <span className={`px-2 py-0.5 rounded text-xs ${s.is_active ? 'bg-success/30 text-success' : 'bg-white/10 text-white/60'}`}>
               {s.is_active ? copy.portal.active : copy.portal.inactive}

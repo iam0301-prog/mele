@@ -87,6 +87,7 @@ type BookCopy = {
   reviewNote: string;
   reviewChart: string;
   amount: string;
+  betaFreeLabel: string;
   freeBadge: string;
   freeReviewNote: string;
   paidReviewNote: string;
@@ -138,10 +139,10 @@ const BOOK_COPY: Record<Locale, BookCopy> = {
     ],
     prefixes: { topic: '想問主題：', pain: '目前卡點：', goal: '這次想帶走：', note: '客人補充：' },
     empty: { topic: '尚未選擇', pain: '尚未選擇', goal: '尚未選擇', note: '尚未補充', selectedTime: '尚未選擇' },
-    steps: ['確認服務', '選擇時段', '填寫問題', '確認付款'],
+    steps: ['確認服務', '選擇時段', '填寫問題', '確認預約'],
     title: '預約諮詢',
     subtitle: 'BOOK A SESSION',
-    intro: '預約會分成四步：確認服務、選擇時段、先讓老師理解你的問題、確認付款。付款完成後，老師會依你的問題與附加命盤準備諮詢。',
+    intro: '預約會分成四步：確認服務、選擇時段、先讓老師理解你的問題、確認預約。公測期間全程免費體驗，老師會依你的問題與附加命盤準備諮詢。',
     teacherServiceHint: '你即將預約這位老師的服務',
     freeTest: '測試期免費：你可以先完整測試預約流程，不會進入付款頁，也不會產生實際收費。',
     serviceReminder: '建議先確認這項服務是否符合你的問題類型。若需要臨時補充背景，付款後仍可在「我的諮詢」查看與管理。',
@@ -168,7 +169,7 @@ const BOOK_COPY: Record<Locale, BookCopy> = {
     female: '女',
     male: '男',
     reviewTitle: '確認預約',
-    reviewSubtitle: 'REVIEW & PAY',
+    reviewSubtitle: 'REVIEW & CONFIRM',
     reviewTeacher: '老師',
     reviewService: '服務',
     reviewTime: '時間',
@@ -177,21 +178,22 @@ const BOOK_COPY: Record<Locale, BookCopy> = {
     reviewGoal: '想帶走',
     reviewNote: '補充',
     reviewChart: '附加命盤',
-    amount: '金額',
-    freeBadge: '測試期免費',
-    freeReviewNote: '測試期免費，確認後會直接建立預約並回到「我的諮詢」，不會前往付款頁。',
-    paidReviewNote: '付款後可在「我的諮詢」查看狀態、聯繫老師、取消預約或在完成後留下評價。若付款頁沒有自動開啟，請回到我的諮詢點選「前往付款」。',
-    cancelPolicyTitle: '取消政策',
-    cancelPolicyLines: ['諮詢前 24 小時取消：全額退款', '諮詢前 24 小時內取消：退 50%', '諮詢開始後不予退款', '老師取消：100% 退款'],
+    amount: '公測狀態：',
+    betaFreeLabel: '公測期免費體驗',
+    freeBadge: '公測期免費',
+    freeReviewNote: '公測期間全程免費體驗，確認後會直接建立預約並回到「我的諮詢」。',
+    paidReviewNote: '確認後可在「我的諮詢」查看狀態、聯繫老師或取消預約。',
+    cancelPolicyTitle: '取消說明',
+    cancelPolicyLines: ['公測期間可隨時取消預約，不涉及任何費用。', '正式開放後將另行公告取消與調整規則。'],
     submitting: '建立預約中...',
-    confirmFree: '確認免費預約',
-    confirmPay: '確認並前往付款',
+    confirmFree: '確認預約',
+    confirmPay: '確認預約',
     missingParams: '缺少老師或服務參數。請回到諮詢老師入口重新選擇。',
     loading: '正在讀取預約資料...',
     validationError: '請先選擇時段，並填好主題、卡點、想帶走的結果與一句補充',
     bookingFailed: '預約建立失敗，請稍後再試。',
-    freeCreated: '測試期免費預約已建立，不會收費。',
-    paidCreated: '預約已建立，正在前往付款頁。',
+    freeCreated: '公測期免費預約已建立，不會收費。',
+    paidCreated: '預約已建立，正在前往確認頁。',
   },
   en: {
     chartTools: [
@@ -227,10 +229,10 @@ const BOOK_COPY: Record<Locale, BookCopy> = {
     ],
     prefixes: { topic: 'Topic: ', pain: 'Current block: ', goal: 'Takeaway: ', note: 'Client note: ' },
     empty: { topic: 'Not selected', pain: 'Not selected', goal: 'Not selected', note: 'No extra note', selectedTime: 'Not selected' },
-    steps: ['Service', 'Time', 'Question', 'Payment'],
+    steps: ['Service', 'Time', 'Question', 'Confirm'],
     title: 'Book a session',
     subtitle: 'BOOK A SESSION',
-    intro: 'Booking has four steps: confirm the service, choose a time, help the guide understand your question, then confirm payment. After payment, the guide will prepare from your question and attached chart.',
+    intro: 'Booking has four steps: confirm the service, choose a time, help the guide understand your question, then confirm. During the open beta all sessions are complimentary. The guide will prepare from your question and attached chart.',
     teacherServiceHint: 'You are booking this guide’s service',
     freeTest: 'Free test mode: you can test the full booking flow without payment or real charges.',
     serviceReminder: 'Confirm this service fits your question. You can still manage details in My Sessions after booking.',
@@ -257,7 +259,7 @@ const BOOK_COPY: Record<Locale, BookCopy> = {
     female: 'Female',
     male: 'Male',
     reviewTitle: 'Review booking',
-    reviewSubtitle: 'REVIEW & PAY',
+    reviewSubtitle: 'REVIEW & CONFIRM',
     reviewTeacher: 'Guide',
     reviewService: 'Service',
     reviewTime: 'Time',
@@ -266,21 +268,22 @@ const BOOK_COPY: Record<Locale, BookCopy> = {
     reviewGoal: 'Takeaway',
     reviewNote: 'Note',
     reviewChart: 'Attached chart',
-    amount: 'Amount',
-    freeBadge: 'Free test mode',
-    freeReviewNote: 'Free test mode will create the booking and return to My Sessions without opening payment.',
-    paidReviewNote: 'After payment, you can check status, contact the guide, cancel, or review from My Sessions.',
-    cancelPolicyTitle: 'Cancellation policy',
-    cancelPolicyLines: ['Cancel 24+ hours before session: full refund', 'Cancel within 24 hours: 50% refund', 'After the session starts: no refund', 'Guide cancels: 100% refund'],
+    amount: 'Beta status:',
+    betaFreeLabel: 'Open beta — complimentary',
+    freeBadge: 'Open beta',
+    freeReviewNote: 'All sessions are complimentary during the open beta. Confirming will create the booking and return to My Sessions.',
+    paidReviewNote: 'After confirming, you can check status, contact the guide, or cancel from My Sessions.',
+    cancelPolicyTitle: 'Cancellation',
+    cancelPolicyLines: ['During open beta, bookings can be cancelled at any time at no cost.', 'Cancellation terms for paid sessions will be announced when billing opens.'],
     submitting: 'Creating booking...',
-    confirmFree: 'Confirm free booking',
-    confirmPay: 'Confirm and pay',
+    confirmFree: 'Confirm booking',
+    confirmPay: 'Confirm booking',
     missingParams: 'Missing guide or service. Please return to the guide entry and choose again.',
     loading: 'Loading booking details...',
     validationError: 'Choose a time and complete topic, block, takeaway, and one short note first.',
     bookingFailed: 'Booking failed. Please try again later.',
-    freeCreated: 'Free test booking created. No charge was made.',
-    paidCreated: 'Booking created. Opening payment page.',
+    freeCreated: 'Beta booking created. No charge was made.',
+    paidCreated: 'Booking created. Redirecting to confirmation.',
   },
   vi: {} as BookCopy,
   id: {} as BookCopy,
@@ -501,19 +504,20 @@ Object.assign(BOOK_COPY.vi, {
   reviewGoal: 'Muốn mang về',
   reviewNote: 'Ghi chú',
   reviewChart: 'Lá số đính kèm',
-  amount: 'Số tiền',
-  freeBadge: 'Chế độ thử miễn phí',
-  freeReviewNote: 'Chế độ thử miễn phí sẽ tạo lịch và quay về trang tư vấn của tôi, không mở thanh toán.',
-  paidReviewNote: 'Sau khi thanh toán, bạn có thể xem trạng thái, liên hệ guide, hủy lịch hoặc đánh giá trong trang tư vấn của tôi.',
-  cancelPolicyTitle: 'Chính sách hủy',
-  cancelPolicyLines: ['Hủy trước 24 giờ: hoàn tiền toàn bộ', 'Hủy trong 24 giờ: hoàn 50%', 'Sau khi buổi tư vấn bắt đầu: không hoàn tiền', 'Guide hủy: hoàn 100%'],
+  amount: 'Trạng thái beta:',
+  betaFreeLabel: 'Thử nghiệm mở — miễn phí',
+  freeBadge: 'Thử nghiệm mở',
+  freeReviewNote: 'Trong giai đoạn thử nghiệm, tất cả buổi tư vấn đều miễn phí. Xác nhận sẽ tạo lịch và quay về trang tư vấn của tôi.',
+  paidReviewNote: 'Sau khi xác nhận, bạn có thể xem trạng thái, liên hệ guide hoặc hủy lịch trong trang tư vấn của tôi.',
+  cancelPolicyTitle: 'Hủy lịch',
+  cancelPolicyLines: ['Trong giai đoạn thử nghiệm, có thể hủy lịch bất cứ lúc nào, không phát sinh chi phí.', 'Điều khoản hủy cho buổi tính phí sẽ thông báo khi mở thanh toán.'],
   submitting: 'Đang tạo lịch...',
-  confirmFree: 'Xác nhận lịch miễn phí',
-  confirmPay: 'Xác nhận và thanh toán',
+  confirmFree: 'Xác nhận đặt lịch',
+  confirmPay: 'Xác nhận đặt lịch',
   missingParams: 'Thiếu guide hoặc dịch vụ. Vui lòng quay lại lối vào tư vấn và chọn lại.',
   bookingFailed: 'Tạo lịch thất bại. Vui lòng thử lại sau.',
-  freeCreated: 'Đã tạo lịch thử miễn phí, không thu phí.',
-  paidCreated: 'Đã tạo lịch, đang mở trang thanh toán.',
+  freeCreated: 'Đã tạo lịch beta miễn phí, không thu phí.',
+  paidCreated: 'Đã tạo lịch, đang chuyển đến trang xác nhận.',
 });
 Object.assign(BOOK_COPY.id, {
   pickTimeTitle: 'Pilih waktu',
@@ -536,19 +540,20 @@ Object.assign(BOOK_COPY.id, {
   reviewGoal: 'Tujuan',
   reviewNote: 'Catatan',
   reviewChart: 'Bagan terlampir',
-  amount: 'Jumlah',
-  freeBadge: 'Mode uji gratis',
-  freeReviewNote: 'Mode uji gratis akan membuat booking dan kembali ke halaman konsultasi saya tanpa membuka pembayaran.',
-  paidReviewNote: 'Setelah pembayaran, Anda dapat melihat status, menghubungi guide, membatalkan, atau memberi ulasan dari halaman konsultasi saya.',
-  cancelPolicyTitle: 'Kebijakan pembatalan',
-  cancelPolicyLines: ['Batal 24+ jam sebelum sesi: refund penuh', 'Batal dalam 24 jam: refund 50%', 'Setelah sesi mulai: tidak ada refund', 'Guide membatalkan: refund 100%'],
+  amount: 'Status beta:',
+  betaFreeLabel: 'Beta terbuka — gratis',
+  freeBadge: 'Beta terbuka',
+  freeReviewNote: 'Selama beta terbuka, semua sesi gratis. Konfirmasi akan membuat booking dan kembali ke halaman konsultasi saya.',
+  paidReviewNote: 'Setelah konfirmasi, Anda dapat melihat status, menghubungi guide, atau membatalkan dari halaman konsultasi saya.',
+  cancelPolicyTitle: 'Pembatalan',
+  cancelPolicyLines: ['Selama beta terbuka, booking dapat dibatalkan kapan saja tanpa biaya.', 'Ketentuan pembatalan untuk sesi berbayar akan diumumkan saat tagihan dibuka.'],
   submitting: 'Membuat booking...',
-  confirmFree: 'Konfirmasi booking gratis',
-  confirmPay: 'Konfirmasi dan bayar',
+  confirmFree: 'Konfirmasi booking',
+  confirmPay: 'Konfirmasi booking',
   missingParams: 'Guide atau layanan belum lengkap. Silakan kembali dan pilih ulang.',
   bookingFailed: 'Booking gagal. Coba lagi nanti.',
-  freeCreated: 'Booking uji gratis dibuat. Tidak ada biaya.',
-  paidCreated: 'Booking dibuat. Membuka halaman pembayaran.',
+  freeCreated: 'Booking beta gratis dibuat. Tidak ada biaya.',
+  paidCreated: 'Booking dibuat. Mengarahkan ke halaman konfirmasi.',
 });
 Object.assign(BOOK_COPY.ja, {
   pickTimeTitle: '時間を選ぶ',
@@ -571,19 +576,20 @@ Object.assign(BOOK_COPY.ja, {
   reviewGoal: '持ち帰りたいこと',
   reviewNote: 'メモ',
   reviewChart: '添付命盤',
-  amount: '金額',
-  freeBadge: '無料テスト',
-  freeReviewNote: '無料テストでは支払いページを開かず、予約を作成して「自分の相談」に戻ります。',
-  paidReviewNote: '支払い後、「自分の相談」から状態確認、連絡、キャンセル、評価ができます。',
-  cancelPolicyTitle: 'キャンセルポリシー',
-  cancelPolicyLines: ['24時間前までのキャンセル：全額返金', '24時間以内のキャンセル：50%返金', '相談開始後：返金不可', '鑑定者キャンセル：100%返金'],
+  amount: 'ベータ状況：',
+  betaFreeLabel: 'オープンベータ — 無料',
+  freeBadge: 'オープンベータ',
+  freeReviewNote: 'オープンベータ期間中はすべてのセッションが無料です。確定すると予約が作成され「自分の相談」に戻ります。',
+  paidReviewNote: '確定後は「自分の相談」から状態確認、連絡、キャンセルができます。',
+  cancelPolicyTitle: 'キャンセルについて',
+  cancelPolicyLines: ['オープンベータ期間中はいつでも無料でキャンセルできます。', '有料セッションのキャンセル規定は課金開始時に案内します。'],
   submitting: '予約を作成中...',
-  confirmFree: '無料予約を確定',
-  confirmPay: '確定して支払う',
+  confirmFree: '予約を確定',
+  confirmPay: '予約を確定',
   missingParams: '鑑定者またはサービスが不足しています。入口に戻って選び直してください。',
   bookingFailed: '予約作成に失敗しました。後でもう一度お試しください。',
-  freeCreated: '無料テスト予約を作成しました。請求はありません。',
-  paidCreated: '予約を作成しました。支払いページへ移動します。',
+  freeCreated: 'ベータ予約を作成しました。請求はありません。',
+  paidCreated: '予約を作成しました。確認ページへ移動します。',
 });
 Object.assign(BOOK_COPY.ko, {
   pickTimeTitle: '시간 선택',
@@ -606,19 +612,20 @@ Object.assign(BOOK_COPY.ko, {
   reviewGoal: '가져가고 싶은 것',
   reviewNote: '메모',
   reviewChart: '첨부 차트',
-  amount: '금액',
-  freeBadge: '무료 테스트',
-  freeReviewNote: '무료 테스트는 결제 페이지 없이 예약을 만들고 내 상담으로 돌아갑니다.',
-  paidReviewNote: '결제 후 내 상담에서 상태 확인, 상담자 연락, 취소, 평가를 할 수 있습니다.',
-  cancelPolicyTitle: '취소 정책',
-  cancelPolicyLines: ['상담 24시간 전 취소: 전액 환불', '24시간 이내 취소: 50% 환불', '상담 시작 후: 환불 불가', '상담자 취소: 100% 환불'],
+  amount: '베타 상태:',
+  betaFreeLabel: '오픈 베타 — 무료',
+  freeBadge: '오픈 베타',
+  freeReviewNote: '오픈 베타 기간 중 모든 세션은 무료입니다. 확정하면 예약이 생성되고 내 상담으로 돌아갑니다.',
+  paidReviewNote: '확정 후 내 상담에서 상태 확인, 상담자 연락, 취소를 할 수 있습니다.',
+  cancelPolicyTitle: '취소 안내',
+  cancelPolicyLines: ['오픈 베타 기간 중에는 언제든지 무료로 취소할 수 있습니다.', '유료 세션 취소 규정은 결제 시작 시 별도 안내드립니다.'],
   submitting: '예약 생성 중...',
-  confirmFree: '무료 예약 확정',
-  confirmPay: '확정하고 결제',
+  confirmFree: '예약 확정',
+  confirmPay: '예약 확정',
   missingParams: '상담자 또는 서비스 정보가 부족합니다. 상담 입구로 돌아가 다시 선택해 주세요.',
   bookingFailed: '예약 생성에 실패했습니다. 잠시 후 다시 시도해 주세요.',
-  freeCreated: '무료 테스트 예약이 생성되었습니다. 결제는 없습니다.',
-  paidCreated: '예약이 생성되었습니다. 결제 페이지로 이동합니다.',
+  freeCreated: '베타 예약이 생성되었습니다. 결제는 없습니다.',
+  paidCreated: '예약이 생성되었습니다. 확인 페이지로 이동합니다.',
 });
 
 function optionLabel(options: readonly QuestionOption[], value: string) {
@@ -835,8 +842,10 @@ function BookFormInner() {
       return;
     }
 
+    // PAYMENT_GATE: 公測期間付款入口停用，所有預約一律導回 mybookings。
+    // 待開收費時：移除下兩行，改回 router.push(localizePath(`/account/payment/${bookingId}`, locale))
     toast(copy.paidCreated);
-    router.push(localizePath(`/account/payment/${bookingId}`, locale));
+    router.push(localizePath('/account/mybookings', locale));
   };
 
   if (!teacherId || !serviceId) {
@@ -879,7 +888,7 @@ function BookFormInner() {
             </div>
             <div className="rounded-xl border border-accent-dim p-5">
               <div className="text-lg">{service.name}</div>
-              <div className="mt-1 text-xs text-white/60">{service.duration_minutes} min · NT$ {service.price_ntd.toLocaleString(localeTag)}</div>
+              <div className="mt-1 text-xs text-white/60">{service.duration_minutes} min · {copy.betaFreeLabel}</div>
               {FREE_BOOKING_TEST_MODE && (
                 <div className="mt-3 rounded-lg border border-success/30 bg-success/10 p-3 text-xs leading-relaxed text-success">
                   {copy.freeTest}
@@ -1043,9 +1052,8 @@ function BookFormInner() {
               <div><strong className="text-accent">{copy.reviewNote}</strong>　{question || copy.empty.note}</div>
               {chartTool && <div><strong className="text-accent">{copy.reviewChart}</strong>　{copy.chartTools.find((tool) => tool.value === chartTool)?.label}</div>}
               <div className="mt-4 border-t border-accent-dim pt-4 text-lg">
-                <strong className="text-accent">{copy.amount}</strong>　
-                <span className="font-serif text-2xl text-accent-light">NT$ {service.price_ntd.toLocaleString(localeTag)}</span>
-                {FREE_BOOKING_TEST_MODE && <span className="ml-3 align-middle text-xs text-success">{copy.freeBadge}</span>}
+                <strong className="text-accent">{copy.amount}</strong>
+                <span className="font-serif text-xl text-success">{copy.betaFreeLabel}</span>
               </div>
             </div>
             <div className="mb-5 rounded-xl border border-accent-dim bg-white/[0.035] p-4 text-xs leading-relaxed text-white/68">

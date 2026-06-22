@@ -96,6 +96,12 @@ export default async function PaymentResultPage({ searchParams }: { searchParams
 
   return (
     <main className="container mx-auto max-w-2xl px-5 py-12">
+      {/* PAYMENT_GATE: 公測期間此頁不應被使用者觸達。保留供正式收費時使用。 */}
+      <div className="mb-6 rounded-xl border border-success/30 bg-success/10 p-4 text-sm text-success leading-relaxed">
+        <strong>公測期免費體驗</strong>
+        <p className="mt-1 text-white/70">目前平台處於公測期，所有諮詢預約均為免費體驗。</p>
+        <Link href="/account/mybookings" className="mt-2 inline-block text-accent underline text-xs">前往我的諮詢</Link>
+      </div>
       <section className={`mele-card payment-result payment-result--${copy.tone}`}>
         <div className="mele-subtitle">PAYMENT RETURN</div>
         <h1 className="font-serif text-3xl tracking-widest text-accent mt-3">{copy.title}</h1>

@@ -24,9 +24,9 @@ interface Booking {
 }
 
 const STATUS_LABEL: Record<string, string> = {
-  pending: '待付款', paid: '已付款', confirmed: '已確認', in_progress: '進行中',
+  pending: '待確認', paid: '已確認', confirmed: '已確認', in_progress: '進行中',
   completed: '已完成', cancelled_customer: '客戶取消',
-  cancelled_teacher: '老師取消', refunded: '已退款', no_show: '未出席',
+  cancelled_teacher: '老師取消', refunded: '已取消', no_show: '未出席',
 };
 
 export default function MyBookingsPage() {
@@ -152,7 +152,7 @@ export default function MyBookingsPage() {
                     'bg-info/30 text-info'
                   }`}>{STATUS_LABEL[b.status] || b.status}</span>
                   {b.payment_provider === 'free_test' && (
-                    <span className="ml-2 rounded-md bg-success/20 px-2 py-0.5 text-[10px] text-success">測試期免費</span>
+                    <span className="ml-2 rounded-md bg-success/20 px-2 py-0.5 text-[10px] text-success">公測期免費</span>
                   )}
                 </div>
                 {b.customer_question && (
@@ -160,7 +160,9 @@ export default function MyBookingsPage() {
                 )}
               </div>
               <div className="flex gap-2 flex-wrap">
-                {b.status === 'pending' && b.payment_provider !== 'free_test' && (
+                {/* PAYMENT_GATE: 公測期間付款入口停用。
+                    待開收費時：移除 false &&，恢復付款連結顯示。 */}
+                {false && b.status === 'pending' && b.payment_provider !== 'free_test' && (
                   <Link href={`/account/payment/${b.id}`} className="mele-btn-primary !px-4 !py-2 !text-xs">前往付款</Link>
                 )}
                 {(b.status === 'paid' || b.status === 'confirmed') && (
