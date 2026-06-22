@@ -397,7 +397,9 @@ def _sign_text(value: object) -> str:
         return _text(value)
     sign = value.get("sign")
     if isinstance(sign, dict):
-        return _join([sign.get("symbol"), sign.get("zh"), f"{sign.get('degInSign')}度" if sign.get("degInSign") is not None else None], " ")
+        deg = sign.get("degInSign")
+        deg_str = f"{round(float(deg), 1):.1f}度" if deg is not None else None
+        return _join([sign.get("symbol"), sign.get("zh"), deg_str], " ")
     return _text(sign or value.get("zh") or value.get("label"))
 
 

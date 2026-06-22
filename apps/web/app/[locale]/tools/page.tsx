@@ -18,10 +18,10 @@ const betaStatusBySlug = {
   tarot: { zh: '推薦先測', en: 'Start here', level: 'ready' },
   maya: { zh: '已可測', en: 'Testable', level: 'ready' },
   runes: { zh: '已可測', en: 'Testable', level: 'ready' },
-  humandesign: { zh: '內容待補強', en: 'Copy needs testing', level: 'needs-copy' },
-  bazi: { zh: '內容待補強', en: 'Copy needs testing', level: 'needs-copy' },
-  astro: { zh: '需確認出生資料', en: 'Birth data sensitive', level: 'careful' },
-  ziwei: { zh: '需確認出生資料', en: 'Birth data sensitive', level: 'careful' },
+  humandesign: { zh: '已可測', en: 'Testable', level: 'ready' },
+  bazi: { zh: '已可測', en: 'Testable', level: 'ready' },
+  astro: { zh: '已可測', en: 'Testable', level: 'ready' },
+  ziwei: { zh: '已可測', en: 'Testable', level: 'ready' },
 } as const;
 
 type ToolSlug = keyof typeof betaStatusBySlug;

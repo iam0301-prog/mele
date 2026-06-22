@@ -98,8 +98,10 @@ def draw(count: int = 3, reversed_enabled: bool = True,
         is_reversed = (
             (rng.random() < 0.5) if rng else (secrets.randbelow(2) == 0)
         ) if reversed_enabled else False
+        # 複製牌資料並移除 script（運營導購話術，不對前端回傳）
+        card_data = {k: v for k, v in deck[idx].items() if k != "script"}
         cards.append({
-            "card": deck[idx],
+            "card": card_data,
             "position": "reversed" if is_reversed else "upright",
             "drawIndex": idx,
         })

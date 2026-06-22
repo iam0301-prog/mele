@@ -26,13 +26,11 @@ export async function Header() {
   }
 
   const primaryLinks = [
-    { href: '/beta', label: dict.nav.beta },
     { href: '/tools', label: dict.nav.tools },
     { href: '/daily', label: dict.nav.daily },
-    { href: '/mobile', label: dict.nav.mobile },
-    { href: '/ar', label: dict.nav.ar },
     { href: '/teachers', label: dict.nav.teachers },
   ];
+  // 已隱藏入口（路由保留，暫不在導覽顯示）：/beta, /mobile, /ar, /feedback
   const guestLinks = [
     { href: '/account/login', label: dict.nav.login },
     { href: '/teachers/apply', label: dict.nav.teacherApply },
