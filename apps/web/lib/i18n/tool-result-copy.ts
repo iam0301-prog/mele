@@ -1,4 +1,5 @@
 import { DEFAULT_LOCALE, type Locale } from '@/lib/i18n/config';
+import type { CalcTool } from '@/lib/api';
 
 /** 占卜結果頁所有寫死的靜態 UI 文字，抽成 i18n 結構 */
 export type ToolResultCopy = {
@@ -101,6 +102,9 @@ export type ToolResultCopy = {
     'deep_reading' | 'transit_day' | 'transit_month' | 'transit_year',
     { label: string; title: string; body: string }
   >;
+
+  /** 各工具的「下一步建議」（三條），六語言版本 */
+  nextStepsTools: Record<CalcTool, Array<{ title: string; body: string }>>;
 
   /** ZiweiPlainGuide */
   ziweiGuide: {
@@ -280,6 +284,48 @@ const zhTW: ToolResultCopy = {
       body: '查看今年大方向：哪些事值得長期投入、哪些慣性要調整，幫你把一年拆成可走的階段。',
     },
   },
+  nextStepsTools: {
+    numerology: [
+      { title: '先看核心數字', body: '生命靈數先看生命數、生日數與原型，再回頭理解你常用的行動模式。' },
+      { title: '往下看 2D 視覺盤', body: '視覺展示會把核心數字整理成儀式星盤，先確保手機上清楚可讀。' },
+      { title: '補充生活情境', body: '若要深入職涯、關係或年度主題，可以帶著結果預約老師深談。' },
+    ],
+    maya: [
+      { title: '先看一句命中感', body: '不要先研究名詞。先看「你順的時候怎麼動、卡住時怎麼反應」那段，有刺中再往下看。' },
+      { title: '再看神諭板怎麼借力', body: '本命是主軸，指引是下一步，支持是補給，挑戰是卡點，隱藏力量是低潮裡會冒出的資源。再前往視覺展示，用穩定 2D 看五個位置怎麼互相牽動。' },
+      { title: '今天只做一個小實驗', body: '把結果轉成一個 24 小時內能做的動作：說一句話、放掉一件事、整理一個界線，觀察自己的感受與回饋。' },
+    ],
+    bazi: [
+      { title: '先看日主與五行', body: '日主代表你站在世界中的基本質地，五行分布則看資源與壓力來源。' },
+      { title: '往下看 2D 四柱盤', body: '視覺展示會把四柱與五行整理成可讀圖像，方便整體感受命盤結構。' },
+      { title: '再看實際議題', body: '八字很適合延伸到事業節奏、關係互動與長期決策。' },
+    ],
+    ziwei: [
+      { title: '先看命宮身宮', body: '命宮像人生主軸，身宮像實際落地方式，再搭配主星理解性格。' },
+      { title: '往下看 2D 命盤', body: '視覺展示會用清楚盤面呈現命宮、身宮與宮位入口，降低初學者看盤門檻。' },
+      { title: '挑一個宮位深看', body: '不要一次讀完全部，先從事業、感情或財務其中一個問題切入。' },
+    ],
+    tarot: [
+      { title: '先看問題與位置', body: '塔羅要先回到你問的問題，再看每張牌落在過去、現在或未來的位置。' },
+      { title: '往下看 2D 牌面', body: '視覺展示會顯示牌名、正逆位、關鍵字與你選的牌組風格。' },
+      { title: '把答案化成行動', body: '最後整理成今天能做的一步，不要只停在觀察。' },
+    ],
+    runes: [
+      { title: '先看符文與正逆位', body: '盧恩訊息通常直接，先看符文主題，再看它提醒的是阻礙或資源。' },
+      { title: '往下看 2D 石面', body: '視覺展示會依石面、木頭或水晶材質呈現符文，讓抽石更有儀式感。' },
+      { title: '留下今日行動句', body: '把結果整理成一句今天可執行的提醒，最容易養成回訪習慣。' },
+    ],
+    astro: [
+      { title: '先看太陽月亮上升', body: '太陽看核心意志，月亮看情緒需求，上升看外在應對方式。' },
+      { title: '往下看 2D 星盤', body: '視覺展示會把行星重點轉成星盤摘要，幫你先建立整體感。' },
+      { title: '再看宮位與相位', body: '想深入解讀人生事件時，再進一步看宮位與相位互動。' },
+    ],
+    humandesign: [
+      { title: '先看類型與權威', body: '類型決定互動方式，內在權威決定你如何做決策。' },
+      { title: '往下看 2D BodyGraph', body: '先用清楚的 2D BodyGraph 整理中心、通道與閘門，建立整體架構感。' },
+      { title: '挑啟動閘門深讀', body: '先從已啟動閘門挑三個最有感的主題，不需要一次讀完全部。' },
+    ],
+  },
 };
 
 const en: ToolResultCopy = {
@@ -418,6 +464,48 @@ const en: ToolResultCopy = {
       title: "View this year's transit reading",
       body: "See the big picture for the year: what's worth long-term investment, which habits to shift, and how to break the year into walkable stages.",
     },
+  },
+  nextStepsTools: {
+    numerology: [
+      { title: 'Start with the core numbers', body: 'Look at your Life Path number, Birthday number, and archetype first — then go back to understand your usual patterns of action.' },
+      { title: 'Explore the 2D visual chart', body: 'The visual display arranges your core numbers into a ritual chart. Make sure it reads clearly on your device before diving deeper.' },
+      { title: 'Bring in a life context', body: 'If you want to explore career, relationships, or a yearly theme, bring these results to a teacher for a deeper conversation.' },
+    ],
+    maya: [
+      { title: 'Find the line that lands', body: "Don't start with the terminology. Find the part that describes how you move when things flow — and how you react when stuck. If it resonates, read on." },
+      { title: 'See how the oracle board works together', body: 'Your birth seal is the main axis. Guidance is your next step, Support is your resource, Challenge is the stuck point, and Hidden Power is what surfaces in low moments. Then check the 2D display to see how all five positions interact.' },
+      { title: 'Run one small experiment today', body: 'Translate the result into one action within the next 24 hours: say something, let something go, set a boundary. Notice what shifts in how you feel.' },
+    ],
+    bazi: [
+      { title: 'Start with Day Master and Five Elements', body: 'Your Day Master shows your core quality in relation to the world. The Five Element balance reveals where your resources and pressures come from.' },
+      { title: 'Explore the 2D Four Pillars chart', body: 'The visual display organises the Four Pillars and Five Elements into a readable image so you can take in the overall structure.' },
+      { title: 'Connect it to a real situation', body: "Ba Zi works well for career timing, relationship dynamics, and long-term decisions. Bring a specific question to make it practical." },
+    ],
+    ziwei: [
+      { title: 'Start with Life Palace and Body Palace', body: 'The Life Palace is your main axis; the Body Palace is how that energy lands in practice. Pair them with the major star to understand your character.' },
+      { title: 'Explore the 2D chart', body: 'The visual display shows the Life Palace, Body Palace, and palace entrances on a clear grid — a good starting point before going palace by palace.' },
+      { title: 'Pick one palace to go deep', body: "Don't try to read everything at once. Start with the palace that matches your current question — career, relationships, or finances." },
+    ],
+    tarot: [
+      { title: 'Return to your question and position', body: 'Go back to what you asked, then look at where each card sits — past, present, or future.' },
+      { title: 'Explore the 2D card spread', body: 'The visual display shows card names, upright or reversed orientation, key words, and the deck style you chose.' },
+      { title: 'Turn the answer into one action', body: 'Finish by identifying one step you can take today. The reading is most useful when it moves you forward.' },
+    ],
+    runes: [
+      { title: 'Start with the rune and its orientation', body: "Rune messages tend to be direct. Look at the core theme first, then see whether it's pointing to an obstacle or a resource." },
+      { title: 'Explore the 2D stone display', body: 'The visual display renders each rune on the material you chose — stone, wood, or crystal — to give the reading a more grounded feel.' },
+      { title: 'Write one action sentence for today', body: 'Distil the result into a single reminder you can act on today. That habit builds the most natural reason to return.' },
+    ],
+    astro: [
+      { title: 'Start with Sun, Moon, and Ascendant', body: 'Sun shows core intent, Moon shows emotional needs, Ascendant shows how you meet the outside world.' },
+      { title: 'Explore the 2D chart', body: 'The visual display turns the key planetary positions into a chart summary so you can build a sense of the whole before zooming in.' },
+      { title: 'Then look at houses and aspects', body: 'When you want to understand specific life events more precisely, go deeper into house placements and planetary aspects.' },
+    ],
+    humandesign: [
+      { title: 'Start with Type and Authority', body: 'Your Type shapes how you engage with the world; your Inner Authority guides how you make decisions that feel right.' },
+      { title: 'Explore the 2D BodyGraph', body: 'Use the clear 2D BodyGraph to orient yourself around the centres, channels, and gates before going into detail.' },
+      { title: 'Pick three activated gates to explore', body: "Choose the three activated gates that resonate most strongly. There's no need to work through everything at once." },
+    ],
   },
 };
 
@@ -558,6 +646,48 @@ const vi: ToolResultCopy = {
       body: 'Xem bức tranh lớn của năm: điều gì đáng đầu tư dài hạn, thói quen nào cần điều chỉnh.',
     },
   },
+  nextStepsTools: {
+    numerology: [
+      { title: 'Bắt đầu với các con số cốt lõi', body: 'Xem số Đường Đời, số Ngày Sinh và nguyên mẫu trước — rồi quay lại hiểu các kiểu hành động thường dùng của bạn.' },
+      { title: 'Khám phá biểu đồ 2D', body: 'Màn hình trực quan sắp xếp các con số cốt lõi thành sơ đồ. Hãy đảm bảo nó hiển thị rõ ràng trên thiết bị trước khi đọc sâu hơn.' },
+      { title: 'Kết nối với bối cảnh thực tế', body: 'Nếu muốn khám phá sự nghiệp, các mối quan hệ hoặc chủ đề năm, hãy mang kết quả này đến gặp thầy để trao đổi sâu hơn.' },
+    ],
+    maya: [
+      { title: 'Tìm câu chạm đúng tim', body: 'Đừng bắt đầu bằng thuật ngữ. Tìm đoạn mô tả cách bạn vận động khi thuận — và phản ứng khi kẹt. Nếu cộng hưởng, hãy đọc tiếp.' },
+      { title: 'Xem cách bảng thần chú kết nối', body: 'Mệnh là trục chính, Hướng dẫn là bước tiếp, Hỗ trợ là nguồn lực, Thách thức là điểm kẹt, Sức mạnh ẩn là thứ nổi lên lúc khó khăn. Sau đó xem màn hình 2D để thấy năm vị trí tương tác thế nào.' },
+      { title: 'Chỉ làm một thử nghiệm nhỏ hôm nay', body: 'Biến kết quả thành một hành động trong 24 giờ: nói điều gì đó, buông bỏ điều gì đó, thiết lập một ranh giới. Quan sát cảm nhận và phản hồi của bạn.' },
+    ],
+    bazi: [
+      { title: 'Bắt đầu với Nhật Chủ và Ngũ Hành', body: 'Nhật Chủ cho thấy chất lượng cốt lõi của bạn. Phân bố Ngũ Hành cho thấy nguồn lực và áp lực từ đâu đến.' },
+      { title: 'Khám phá biểu đồ 2D Tứ Trụ', body: 'Màn hình trực quan tổ chức Tứ Trụ và Ngũ Hành thành hình ảnh dễ đọc để bạn nắm bắt cấu trúc tổng thể.' },
+      { title: 'Kết nối với tình huống thực tế', body: 'Bát Tự phù hợp để khám phá nhịp điệu sự nghiệp, động lực mối quan hệ và quyết định dài hạn. Hãy mang câu hỏi cụ thể để đi sâu hơn.' },
+    ],
+    ziwei: [
+      { title: 'Bắt đầu với Mệnh Cung và Thân Cung', body: 'Mệnh Cung là trục chính; Thân Cung là cách năng lượng đó thể hiện trong thực tế. Kết hợp với chính tinh để hiểu tính cách.' },
+      { title: 'Khám phá biểu đồ 2D', body: 'Màn hình trực quan hiển thị Mệnh Cung, Thân Cung và các cung trên lưới rõ ràng — điểm khởi đầu tốt trước khi đi vào từng cung.' },
+      { title: 'Chọn một cung để đi sâu', body: 'Đừng cố đọc tất cả mọi thứ cùng lúc. Bắt đầu với cung phù hợp với câu hỏi hiện tại của bạn — sự nghiệp, các mối quan hệ hoặc tài chính.' },
+    ],
+    tarot: [
+      { title: 'Quay lại câu hỏi và vị trí', body: 'Nhớ lại điều bạn hỏi, rồi xem mỗi lá bài nằm ở đâu — quá khứ, hiện tại hay tương lai.' },
+      { title: 'Khám phá trải bài 2D', body: 'Màn hình trực quan hiển thị tên lá bài, xuôi hay ngược, từ khóa và phong cách bộ bài bạn chọn.' },
+      { title: 'Biến câu trả lời thành hành động', body: 'Kết thúc bằng cách xác định một bước bạn có thể thực hiện hôm nay. Bài đọc hữu ích nhất khi nó giúp bạn tiến về phía trước.' },
+    ],
+    runes: [
+      { title: 'Bắt đầu với rune và chiều hướng', body: 'Thông điệp rune thường trực tiếp. Xem chủ đề cốt lõi trước, rồi xem nó đang chỉ ra trở ngại hay nguồn lực.' },
+      { title: 'Khám phá màn hình đá 2D', body: 'Màn hình trực quan hiển thị mỗi rune trên chất liệu bạn chọn — đá, gỗ hoặc pha lê — để buổi bói đá có cảm giác nghi thức hơn.' },
+      { title: 'Viết một câu hành động cho hôm nay', body: 'Cô đọng kết quả thành một lời nhắc bạn có thể thực hiện hôm nay. Thói quen đó xây dựng lý do tự nhiên nhất để quay lại.' },
+    ],
+    astro: [
+      { title: 'Bắt đầu với Mặt Trời, Mặt Trăng và Ascendant', body: 'Mặt Trời cho thấy ý chí cốt lõi, Mặt Trăng cho thấy nhu cầu cảm xúc, Ascendant cho thấy cách bạn gặp gỡ thế giới bên ngoài.' },
+      { title: 'Khám phá biểu đồ 2D', body: 'Màn hình trực quan chuyển các vị trí hành tinh quan trọng thành tóm tắt biểu đồ để bạn xây dựng cảm nhận tổng thể trước khi đi vào chi tiết.' },
+      { title: 'Rồi xem cung và khía cạnh', body: 'Khi muốn hiểu chính xác hơn các sự kiện trong cuộc sống, hãy đi sâu vào vị trí cung và các khía cạnh hành tinh.' },
+    ],
+    humandesign: [
+      { title: 'Bắt đầu với Loại và Thẩm quyền', body: 'Loại của bạn định hình cách bạn tương tác với thế giới; Thẩm quyền Nội tâm hướng dẫn cách bạn ra quyết định cảm thấy đúng.' },
+      { title: 'Khám phá BodyGraph 2D', body: 'Dùng BodyGraph 2D rõ ràng để định hướng các trung tâm, kênh và cổng trước khi đi vào chi tiết.' },
+      { title: 'Chọn ba cổng được kích hoạt để khám phá', body: 'Chọn ba cổng được kích hoạt mà bạn cộng hưởng mạnh nhất. Không cần phải xem qua tất cả mọi thứ cùng một lúc.' },
+    ],
+  },
 };
 
 const id: ToolResultCopy = {
@@ -696,6 +826,48 @@ const id: ToolResultCopy = {
       title: 'Lihat bacaan transit tahun ini',
       body: 'Lihat gambaran besar tahun ini: apa yang layak investasi jangka panjang, kebiasaan mana yang perlu disesuaikan.',
     },
+  },
+  nextStepsTools: {
+    numerology: [
+      { title: 'Mulai dengan angka inti', body: 'Lihat Angka Jalur Kehidupan, Angka Hari Lahir, dan arketipe dulu — lalu kembali untuk memahami pola tindakan yang biasa Anda gunakan.' },
+      { title: 'Jelajahi diagram 2D', body: 'Tampilan visual menyusun angka-angka inti ke dalam diagram ritual. Pastikan terbaca jelas di perangkat Anda sebelum membaca lebih dalam.' },
+      { title: 'Hubungkan dengan konteks nyata', body: 'Jika ingin menjelajahi karier, hubungan, atau tema tahunan, bawa hasil ini ke guru untuk percakapan yang lebih mendalam.' },
+    ],
+    maya: [
+      { title: 'Temukan kalimat yang tepat sasaran', body: 'Jangan mulai dengan istilah. Temukan bagian yang menggambarkan cara Anda bergerak saat lancar — dan bereaksi saat terjebak. Jika beresonansi, lanjutkan membaca.' },
+      { title: 'Lihat cara papan oracle bekerja bersama', body: 'Kelahiran adalah sumbu utama, Panduan adalah langkah berikutnya, Dukungan adalah sumber daya, Tantangan adalah titik macet, Kekuatan Tersembunyi adalah yang muncul di saat sulit. Lalu cek tampilan 2D untuk melihat bagaimana kelima posisi berinteraksi.' },
+      { title: 'Lakukan satu percobaan kecil hari ini', body: 'Ubah hasil menjadi satu tindakan dalam 24 jam: katakan sesuatu, lepaskan sesuatu, tetapkan batas. Perhatikan perasaan dan umpan balik Anda.' },
+    ],
+    bazi: [
+      { title: 'Mulai dengan Tuan Hari dan Lima Elemen', body: 'Tuan Hari menunjukkan kualitas inti Anda. Distribusi Lima Elemen menunjukkan dari mana sumber daya dan tekanan Anda berasal.' },
+      { title: 'Jelajahi diagram 2D Empat Pilar', body: 'Tampilan visual mengatur Empat Pilar dan Lima Elemen menjadi gambar yang mudah dibaca agar Anda dapat memahami struktur secara keseluruhan.' },
+      { title: 'Hubungkan dengan situasi nyata', body: 'Ba Zi cocok untuk mengeksplorasi ritme karier, dinamika hubungan, dan keputusan jangka panjang. Bawa pertanyaan spesifik untuk lebih mendalam.' },
+    ],
+    ziwei: [
+      { title: 'Mulai dengan Istana Kehidupan dan Istana Raga', body: 'Istana Kehidupan adalah sumbu utama; Istana Raga adalah cara energi itu mendarat dalam praktik. Padukan dengan bintang utama untuk memahami karakter.' },
+      { title: 'Jelajahi diagram 2D', body: 'Tampilan visual menunjukkan Istana Kehidupan, Istana Raga, dan pintu masuk istana pada kisi yang jelas — titik awal yang baik sebelum melihat per istana.' },
+      { title: 'Pilih satu istana untuk diperdalam', body: 'Jangan coba membaca semuanya sekaligus. Mulailah dengan istana yang sesuai pertanyaan Anda saat ini — karier, hubungan, atau keuangan.' },
+    ],
+    tarot: [
+      { title: 'Kembali ke pertanyaan dan posisi', body: 'Ingat apa yang Anda tanyakan, lalu lihat di mana setiap kartu berada — masa lalu, sekarang, atau masa depan.' },
+      { title: 'Jelajahi spread kartu 2D', body: 'Tampilan visual menunjukkan nama kartu, tegak atau terbalik, kata kunci, dan gaya deck yang Anda pilih.' },
+      { title: 'Ubah jawaban menjadi satu tindakan', body: 'Akhiri dengan mengidentifikasi satu langkah yang bisa Anda ambil hari ini. Bacaan paling berguna ketika mendorong Anda maju.' },
+    ],
+    runes: [
+      { title: 'Mulai dengan rune dan orientasinya', body: 'Pesan rune cenderung langsung. Lihat tema inti dulu, lalu apakah menunjuk ke hambatan atau sumber daya.' },
+      { title: 'Jelajahi tampilan batu 2D', body: 'Tampilan visual menampilkan setiap rune pada material yang Anda pilih — batu, kayu, atau kristal — memberi nuansa ritual lebih kuat.' },
+      { title: 'Tulis satu kalimat tindakan untuk hari ini', body: 'Rangkum hasil menjadi satu pengingat yang bisa Anda lakukan hari ini. Kebiasaan itu membangun alasan paling alami untuk kembali.' },
+    ],
+    astro: [
+      { title: 'Mulai dengan Matahari, Bulan, dan Ascendant', body: 'Matahari menunjukkan niat inti, Bulan menunjukkan kebutuhan emosional, Ascendant menunjukkan cara Anda menghadapi dunia luar.' },
+      { title: 'Jelajahi diagram 2D', body: 'Tampilan visual mengubah posisi planet utama menjadi ringkasan diagram agar Anda dapat membangun gambaran keseluruhan sebelum memperbesar detail.' },
+      { title: 'Lalu lihat rumah dan aspek', body: 'Saat ingin memahami peristiwa kehidupan tertentu dengan lebih tepat, perdalam penempatan rumah dan aspek planet.' },
+    ],
+    humandesign: [
+      { title: 'Mulai dengan Tipe dan Otoritas', body: 'Tipe Anda membentuk cara Anda terlibat dengan dunia; Otoritas Batin membimbing cara membuat keputusan yang terasa tepat.' },
+      { title: 'Jelajahi BodyGraph 2D', body: 'Gunakan BodyGraph 2D yang jelas untuk mengorientasikan diri pada pusat-pusat, saluran, dan gerbang sebelum masuk ke detail.' },
+      { title: 'Pilih tiga gerbang aktif untuk dijelajahi', body: 'Pilih tiga gerbang aktif yang paling beresonansi kuat. Tidak perlu mengerjakan semuanya sekaligus.' },
+    ],
   },
 };
 
@@ -836,6 +1008,48 @@ const ja: ToolResultCopy = {
       body: '今年の全体像: 長期投資に値するもの、調整すべき習慣、年を歩きやすい段階に分ける方法。',
     },
   },
+  nextStepsTools: {
+    numerology: [
+      { title: 'まずコアナンバーから', body: 'ライフパスナンバー、バースデーナンバー、アーキタイプを先に見てから、普段の行動パターンへ戻りましょう。' },
+      { title: '2D ビジュアルチャートを確認', body: 'ビジュアル表示がコアナンバーをまとめた儀式的なチャートを作ります。深く読む前にデバイス上で読みやすいことを確認してください。' },
+      { title: 'リアルなテーマに結びつける', body: 'キャリア・関係・年のテーマを深く探りたいなら、この結果を持って先生に相談してみましょう。' },
+    ],
+    maya: [
+      { title: '刺さる一文を見つける', body: '用語から入らないで。「調子がいいときどう動くか、詰まるとどう反応するか」の部分を先に読んで、響いたら続けましょう。' },
+      { title: 'オラクルボードのつながりを見る', body: '本命が主軸、ガイダンスが次の一歩、サポートが補給、チャレンジが詰まり、ヒドゥンパワーが低潮期に現れるもの。その後 2D 表示でどう相互作用するかを確認しましょう。' },
+      { title: '今日ひとつだけ小さな実験を', body: '結果を 24 時間以内にできる行動に変えましょう：何か言う、手放す、境界を整える。自分の感覚やフィードバックをそのまま観察してください。' },
+    ],
+    bazi: [
+      { title: 'まず日主と五行から', body: '日主は世界に対するあなたの基本的な質を示します。五行の分布はリソースとプレッシャーの出どころを教えてくれます。' },
+      { title: '2D 四柱盤を確認', body: 'ビジュアル表示は四柱と五行をわかりやすい図像にまとめ、命盤の全体構造を把握しやすくします。' },
+      { title: '実際の場面と結びつける', body: '八字はキャリアのリズム、関係の動き、長期的な意思決定の探求に向いています。具体的な問いを持ってくると深く読めます。' },
+    ],
+    ziwei: [
+      { title: 'まず命宮と身宮から', body: '命宮は人生の主軸、身宮はそのエネルギーが実際に着地する方法。主星と組み合わせて性格を理解しましょう。' },
+      { title: '2D 命盤を確認', body: 'ビジュアル表示は命宮・身宮・宮位の入り口を明確なグリッドで表示します。宮位ごとに読む前の良い出発点です。' },
+      { title: '一つの宮位を深く読む', body: '全部一度に読もうとしないで。今の問い（キャリア・関係・財務）に合う宮位から始めましょう。' },
+    ],
+    tarot: [
+      { title: '問いと位置に戻る', body: '何を聞いたかを思い出してから、各カードがどの位置（過去・現在・未来）にあるかを見ましょう。' },
+      { title: '2D カードスプレッドを確認', body: 'ビジュアル表示はカード名、正逆位、キーワード、選んだデッキスタイルを表示します。' },
+      { title: '答えを一つの行動に変える', body: '今日できる一歩を特定して終わりましょう。リーディングは前へ進む力になってこそ役立ちます。' },
+    ],
+    runes: [
+      { title: 'まずルーンと向きから', body: 'ルーンのメッセージはたいてい直接的です。まずコアテーマを見て、障害を指しているのかリソースを指しているのかを確認しましょう。' },
+      { title: '2D ストーン表示を確認', body: 'ビジュアル表示は選んだ素材（石・木・クリスタル）でルーンを描き出し、儀式感のある読み方ができます。' },
+      { title: '今日の行動文を一つ書く', body: '結果を今日実行できるひとつのリマインダーに凝縮しましょう。その習慣が自然な再訪の動機になります。' },
+    ],
+    astro: [
+      { title: 'まず太陽・月・アセンダントから', body: '太陽はコアの意志、月は感情的なニーズ、アセンダントは外の世界との出会い方を示します。' },
+      { title: '2D チャートを確認', body: 'ビジュアル表示は主要な惑星の配置をチャートサマリーにまとめ、細部に入る前に全体感を掴めます。' },
+      { title: 'それからハウスとアスペクトへ', body: 'より具体的な人生の出来事を理解したいときに、ハウスの配置と惑星アスペクトを深く見ていきましょう。' },
+    ],
+    humandesign: [
+      { title: 'まずタイプと権威から', body: 'タイプは世界との関わり方を形作り、内なる権威は自分らしい意思決定の方法を示します。' },
+      { title: '2D BodyGraph を確認', body: '明確な 2D BodyGraph でセンター・チャンネル・ゲートを把握してから、詳細に入りましょう。' },
+      { title: '共鳴する3つのゲートを選んで深く読む', body: '最も強く響いた活性化ゲートを3つ選びましょう。すべてを一度にこなす必要はありません。' },
+    ],
+  },
 };
 
 const ko: ToolResultCopy = {
@@ -974,6 +1188,48 @@ const ko: ToolResultCopy = {
       title: '올해 트랜짓 리딩 보기',
       body: '올해 큰 그림: 장기 투자할 가치가 있는 것, 조정해야 할 습관, 한 해를 걷기 좋은 단계로 나누는 방법.',
     },
+  },
+  nextStepsTools: {
+    numerology: [
+      { title: '핵심 숫자부터 시작', body: '생명수, 생일수, 원형을 먼저 보고 — 평소 행동 패턴으로 돌아가 이해하세요.' },
+      { title: '2D 비주얼 차트 탐색', body: '비주얼 화면이 핵심 숫자를 의식적인 차트로 정리합니다. 더 깊이 읽기 전에 기기에서 잘 보이는지 확인하세요.' },
+      { title: '실제 상황과 연결', body: '커리어, 관계, 연간 주제를 더 탐구하고 싶다면, 이 결과를 가지고 선생님과 깊은 대화를 나눠보세요.' },
+    ],
+    maya: [
+      { title: '공명하는 문장 찾기', body: '용어부터 시작하지 마세요. 잘 흘러갈 때 어떻게 움직이는지, 막힐 때 어떻게 반응하는지 설명하는 부분을 먼저 읽고 공명하면 계속 읽어보세요.' },
+      { title: '오라클 보드가 어떻게 연결되는지 보기', body: '출생 인장은 주축, 가이드는 다음 단계, 서포트는 자원, 도전은 막힌 지점, 숨겨진 힘은 힘든 순간에 떠오르는 것. 이후 2D 화면에서 다섯 위치가 어떻게 상호작용하는지 확인하세요.' },
+      { title: '오늘 작은 실험 하나만', body: '결과를 24시간 내 실행 가능한 행동 하나로 바꿔보세요: 뭔가 말하거나, 뭔가 내려놓거나, 경계 하나를 정하세요. 자신의 느낌과 반응을 그대로 관찰해보세요.' },
+    ],
+    bazi: [
+      { title: '일주와 오행부터 시작', body: '일주는 세상에서 당신의 기본적인 질을 나타냅니다. 오행 분포는 자원과 압박이 어디서 오는지 알려줍니다.' },
+      { title: '2D 사주 차트 탐색', body: '비주얼 화면이 사주와 오행을 읽기 쉬운 이미지로 정리해 전체 구조를 파악하기 쉽게 합니다.' },
+      { title: '실제 상황과 연결', body: '사주는 커리어 리듬, 관계 역학, 장기 결정 탐구에 잘 맞습니다. 구체적인 질문을 가져오면 더 깊이 읽을 수 있습니다.' },
+    ],
+    ziwei: [
+      { title: '명궁과 신궁부터 시작', body: '명궁은 주축, 신궁은 그 에너지가 실제로 착지하는 방식. 주성과 결합해 성격을 이해하세요.' },
+      { title: '2D 명반 탐색', body: '비주얼 화면이 명궁, 신궁, 궁위 입구를 명확한 격자로 표시합니다. 궁위별로 읽기 전 좋은 출발점입니다.' },
+      { title: '한 궁위를 골라 깊이 읽기', body: '한 번에 모두 읽으려 하지 마세요. 지금 질문(커리어, 관계, 재정)에 맞는 궁위부터 시작하세요.' },
+    ],
+    tarot: [
+      { title: '질문과 위치로 돌아가기', body: '무엇을 물었는지 떠올리고, 각 카드가 어느 위치(과거, 현재, 미래)에 있는지 보세요.' },
+      { title: '2D 카드 스프레드 탐색', body: '비주얼 화면이 카드 이름, 정방향/역방향, 키워드, 선택한 덱 스타일을 보여줍니다.' },
+      { title: '답을 행동 하나로 바꾸기', body: '오늘 할 수 있는 한 걸음을 찾아 마무리하세요. 리딩은 앞으로 나아가게 할 때 가장 유용합니다.' },
+    ],
+    runes: [
+      { title: '룬과 방향부터 시작', body: '룬 메시지는 대체로 직접적입니다. 핵심 테마를 먼저 보고, 장애물을 가리키는지 자원을 가리키는지 확인하세요.' },
+      { title: '2D 돌 화면 탐색', body: '비주얼 화면이 선택한 재질(돌, 나무, 크리스탈)로 각 룬을 렌더링해 더 의식적인 느낌을 줍니다.' },
+      { title: '오늘의 실행 문장 하나 쓰기', body: '결과를 오늘 실행 가능한 리마인더 하나로 압축하세요. 그 습관이 자연스러운 재방문 동기가 됩니다.' },
+    ],
+    astro: [
+      { title: '태양, 달, 어센던트부터 시작', body: '태양은 핵심 의지, 달은 감정적 필요, 어센던트는 외부 세계와 만나는 방식을 보여줍니다.' },
+      { title: '2D 차트 탐색', body: '비주얼 화면이 주요 행성 위치를 차트 요약으로 변환해, 세부 사항에 들어가기 전에 전체적인 감을 잡을 수 있습니다.' },
+      { title: '그 다음 하우스와 어스펙트 보기', body: '특정 인생 사건을 더 정확하게 이해하고 싶을 때, 하우스 배치와 행성 어스펙트를 깊이 살펴보세요.' },
+    ],
+    humandesign: [
+      { title: '타입과 권위부터 시작', body: '타입은 세계와 관계 맺는 방식을 형성하고, 내면 권위는 자신에게 맞는 결정 방법을 안내합니다.' },
+      { title: '2D BodyGraph 탐색', body: '명확한 2D BodyGraph로 센터, 채널, 게이트를 파악한 후 세부 사항에 들어가세요.' },
+      { title: '공명하는 게이트 3개 골라 탐구', body: '가장 강하게 공명하는 활성화된 게이트 3개를 선택하세요. 모든 것을 한 번에 다룰 필요는 없습니다.' },
+    ],
   },
 };
 

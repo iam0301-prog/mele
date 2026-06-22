@@ -41,11 +41,6 @@ type ResultInsight = {
   cards: InsightCard[];
 };
 
-type NextStep = {
-  title: string;
-  body: string;
-};
-
 type PersonalReadingPoint = {
   label: string;
   title: string;
@@ -302,48 +297,6 @@ const TOOL_COPY: Record<CalcTool, { eyebrow: string; title: string; intro: strin
   },
 };
 
-const RESULT_NEXT_STEPS: Record<CalcTool, NextStep[]> = {
-  numerology: [
-    { title: '先看核心數字', body: '生命靈數先看生命數、生日數與原型，再回頭理解你常用的行動模式。' },
-    { title: '往下看 2D 視覺盤', body: '視覺展示會把核心數字整理成儀式星盤，先確保手機上清楚可讀。' },
-    { title: '補充生活情境', body: '若要做職涯、關係或年度主題，可以帶著結果預約老師深談。' },
-  ],
-  maya: [
-    { title: '先看一句命中感', body: '不要先研究名詞。先看「你順的時候怎麼動、卡住時怎麼反應」那段，有刺中再往下看。' },
-    { title: '再看神諭板怎麼借力', body: '本命是主軸，指引是下一步，支持是補給，挑戰是卡點，隱藏力量是低潮裡會冒出的資源。接著可以前往視覺展示，用穩定 2D 展示看五個位置怎麼互相牽動。' },
-    { title: '今天只做一個小實驗', body: '把結果轉成一個 24 小時內能做的動作：說一句話、放掉一件事、整理一個界線，先驗證有沒有變順。' },
-  ],
-  bazi: [
-    { title: '先看日主與五行', body: '日主代表你站在世界中的基本質地，五行分布則看資源與壓力來源。' },
-    { title: '往下看 2D 四柱盤', body: '視覺展示會把四柱與五行整理成可讀圖像，正式 AR 完成後再開放。' },
-    { title: '再看實際議題', body: '八字很適合延伸到事業節奏、關係互動與長期決策。' },
-  ],
-  ziwei: [
-    { title: '先看命宮身宮', body: '命宮像人生主軸，身宮像實際落地方式，再搭配主星理解性格。' },
-    { title: '往下看 2D 命盤', body: '視覺展示會用清楚盤面呈現命宮、身宮與宮位入口，降低初學者看盤門檻。' },
-    { title: '挑一個宮位深看', body: '不要一次讀完全部，先從事業、感情或財務其中一個問題切入。' },
-  ],
-  tarot: [
-    { title: '先看問題與位置', body: '塔羅要先回到你問的問題，再看每張牌落在過去、現在或未來的位置。' },
-    { title: '往下看 2D 牌面', body: '視覺展示會顯示牌名、正逆位、關鍵字與你選的牌組風格。' },
-    { title: '把答案化成行動', body: '最後整理成今天能做的一步，不要只停在預測。' },
-  ],
-  runes: [
-    { title: '先看符文與正逆位', body: '盧恩訊息通常直接，先看符文主題，再看它提醒的是阻礙或資源。' },
-    { title: '往下看 2D 石面', body: '視覺展示會依石面、木頭或水晶材質呈現符文，讓抽石更有儀式感。' },
-    { title: '留下今日行動句', body: '把結果整理成一句今天可執行的提醒，最容易產生回訪習慣。' },
-  ],
-  astro: [
-    { title: '先看太陽月亮上升', body: '太陽看核心意志，月亮看情緒需求，上升看外在應對方式。' },
-    { title: '往下看 2D 星盤', body: '視覺展示會把行星重點轉成星盤摘要，幫你先建立整體感。' },
-    { title: '再看宮位與相位', body: '想精準解讀人生事件時，再進一步看宮位與相位互動。' },
-  ],
-  humandesign: [
-    { title: '先看類型與權威', body: '類型決定互動方式，內在權威決定你如何做決策。' },
-    { title: '往下看 2D BodyGraph', body: '先用清楚的 2D BodyGraph 整理中心、通道與閘門；正式 AR 會等模型質感完成後再開放。' },
-    { title: '挑啟動閘門深讀', body: '先從已啟動閘門挑三個最有感的主題，不需要一次讀完全部。' },
-  ],
-};
 
 const TOOL_PERSONA_TITLE: Record<CalcTool, string> = {
   numerology: '你的生命節奏',
@@ -2007,7 +1960,7 @@ function PersonalReadingPanel({ reading, t }: { reading: PersonalReading; t: Too
 }
 
 function ResultNextSteps({ tool, t }: { tool: CalcTool; t: ToolResultCopy }) {
-  const steps = RESULT_NEXT_STEPS[tool];
+  const steps = t.nextStepsTools[tool];
   const ns = t.nextSteps;
   return (
     <section className="result-next-steps" aria-label={ns.kicker}>
