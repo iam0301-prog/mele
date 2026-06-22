@@ -15,6 +15,8 @@ import {
   type MemberUnlockType,
 } from '@/lib/member-unlocks';
 import { createClient } from '@/lib/supabase/client';
+import { DEFAULT_LOCALE, type Locale } from '@/lib/i18n/config';
+import { getToolResultCopy, type ToolResultCopy } from '@/lib/i18n/tool-result-copy';
 
 type Dict = Record<string, unknown>;
 
@@ -1667,7 +1669,7 @@ function palaceStars(palace: Dict) {
   return stars.slice(0, 4);
 }
 
-function ZiweiPlainGuide({ result }: { result: CalcResponse }) {
+function ZiweiPlainGuide({ result, t }: { result: CalcResponse; t: ToolResultCopy }) {
   if (result.tool !== 'ziwei') return null;
 
   const data = result.data ?? {};
@@ -1675,42 +1677,36 @@ function ZiweiPlainGuide({ result }: { result: CalcResponse }) {
   const shen = firstValue(data, ['shenGong', 'bodyPalace'], '身宮');
   const wuxing = firstValue(data, ['fiveElementsClass'], '五行局');
   const palaces = palaceListFrom(data).slice(0, 12);
-  const questionRoutes = [
-    { topic: '感情', palace: '夫妻宮', body: '看關係模式、相處安全感與伴侶互動。' },
-    { topic: '事業', palace: '官祿宮', body: '看工作風格、職涯方向與適合投入的位置。' },
-    { topic: '財務', palace: '財帛宮', body: '看賺錢方式、資源流動與金錢壓力。' },
-    { topic: '家庭', palace: '田宅 / 父母 / 兄弟', body: '看家族支持、居住安全感與親近關係。' },
-    { topic: '外界', palace: '遷移宮', body: '看出外發展、合作機會與環境變動。' },
-  ];
+  const g = t.ziweiGuide;
 
   return (
-    <section className="ziwei-guide" aria-label="紫微斗數白話導讀">
+    <section className="ziwei-guide" aria-label={g.kicker}>
       <div className="ziwei-guide__header">
-        <span>紫微白話導讀</span>
-        <h2>先看這三件事，再進十二宮</h2>
-        <p>紫微不是一次把全部宮位背起來，而是先抓主軸，再依照你真正想問的問題看對應宮位。</p>
+        <span>{g.kicker}</span>
+        <h2>{g.title}</h2>
+        <p>{g.body}</p>
       </div>
 
       <div className="ziwei-guide__core">
         <article>
           <span>01</span>
-          <h3>命宮：{ming}</h3>
-          <p>命宮像人生主軸，代表你習慣怎麼面對世界，以及別人第一眼容易感受到的氣質。</p>
+          <h3>{t.ziweiGuide.mingGongLabel}：{ming}</h3>
+          <p>{t.ziweiGuide.mingGongDesc}</p>
         </article>
         <article>
           <span>02</span>
-          <h3>身宮：{shen}</h3>
-          <p>身宮像落地方式，表示你長大後更常用哪種方式做選擇、承擔責任與累積人生。</p>
+          <h3>{t.ziweiGuide.shenGongLabel}：{shen}</h3>
+          <p>{t.ziweiGuide.shenGongDesc}</p>
         </article>
         <article>
           <span>03</span>
-          <h3>五行局：{wuxing}</h3>
-          <p>五行局像命盤底色，幫你理解整張盤的節奏，不是吉凶判決，而是運作方式。</p>
+          <h3>{t.ziweiGuide.wuxingLabel}：{wuxing}</h3>
+          <p>{t.ziweiGuide.wuxingDesc}</p>
         </article>
       </div>
 
       <div className="ziwei-guide__routes">
-        {questionRoutes.map((item) => (
+        {g.questionRoutes.map((item) => (
           <article key={item.topic}>
             <strong>{item.topic}</strong>
             <h3>{item.palace}</h3>
@@ -1729,7 +1725,7 @@ function ZiweiPlainGuide({ result }: { result: CalcResponse }) {
               <article key={`${title}-${index}`}>
                 <span>{branch || String(index + 1).padStart(2, '0')}</span>
                 <h3>{title}</h3>
-                <p>{stars.length > 0 ? stars.join(' / ') : '暫無主星，需看對宮與三方四正。'}</p>
+                <p>{stars.length > 0 ? stars.join(' / ') : t.palaceNoStar}</p>
               </article>
             );
           })}
@@ -1739,9 +1735,9 @@ function ZiweiPlainGuide({ result }: { result: CalcResponse }) {
   );
 }
 
-function MemberResonancePanel({ resonance }: { resonance: MemberResonance }) {
+function MemberResonancePanel({ resonance, t }: { resonance: MemberResonance; t: ToolResultCopy }) {
   return (
-    <section className="member-resonance" aria-label="會員初步命中感">
+    <section className="member-resonance" aria-label="member resonance">
       <div className="member-resonance__header">
         <span>{resonance.eyebrow}</span>
         <h2>{resonance.title}</h2>
@@ -1749,7 +1745,7 @@ function MemberResonancePanel({ resonance }: { resonance: MemberResonance }) {
       </div>
 
       <div className="member-resonance__mirror">
-        <strong>你可以先這樣理解</strong>
+        <strong>{t.resonance.understandPrefix}</strong>
         <p>{resonance.mirror}</p>
       </div>
 
@@ -1763,14 +1759,14 @@ function MemberResonancePanel({ resonance }: { resonance: MemberResonance }) {
         ))}
       </div>
 
-      <p className="member-resonance__question">帶去問老師：{resonance.nextQuestion}</p>
+      <p className="member-resonance__question">{t.resonance.questionPrefix}{resonance.nextQuestion}</p>
     </section>
   );
 }
 
 function BeginnerGuidePanel({ guide }: { guide: BeginnerGuide }) {
   return (
-    <section className="beginner-guide" aria-label="會員初階導讀">
+    <section className="beginner-guide" aria-label="beginner guide">
       <div className="beginner-guide__header">
         <span>MEMBER STARTER</span>
         <h2>{guide.title}</h2>
@@ -1790,15 +1786,16 @@ function BeginnerGuidePanel({ guide }: { guide: BeginnerGuide }) {
   );
 }
 
-function ResultGamePanel({ profile }: { profile: GameProfile }) {
+function ResultGamePanel({ profile, t }: { profile: GameProfile; t: ToolResultCopy }) {
+  const g = t.game;
   return (
-    <section className="result-game result-reading-map" aria-label="新手閱讀順序">
+    <section className="result-game result-reading-map" aria-label={g.kicker}>
       <div className="result-game__hero">
         <div>
-          <span>READING MAP</span>
-          <h2>這份結果怎麼看？</h2>
+          <span>{g.kicker}</span>
+          <h2>{g.title}</h2>
           <p>{profile.title} · {profile.className}</p>
-          <p className="result-game__plain-note">不用一次讀完所有名詞。先照三步抓主軸：先看核心摘要，再看視覺盤面，最後選一個今天可以練習的提醒。</p>
+          <p className="result-game__plain-note">{g.plainNote}</p>
         </div>
       </div>
 
@@ -1814,7 +1811,7 @@ function ResultGamePanel({ profile }: { profile: GameProfile }) {
       <div className="result-game__quests">
         {profile.quests.map((quest, index) => (
           <article key={quest.title} className="result-game__quest">
-            <span>STEP {index + 1}</span>
+            <span>{g.stepPrefix} {index + 1}</span>
             <h3>{quest.title}</h3>
             <p>{quest.body}</p>
             <strong>{quest.reward}</strong>
@@ -1823,14 +1820,14 @@ function ResultGamePanel({ profile }: { profile: GameProfile }) {
       </div>
 
       <div className="result-game__actions">
-        <a href="#reading-ar-stage">看視覺盤面</a>
+        <a href="#reading-ar-stage">{g.arLink}</a>
         <small>下面會把重點拆成白話卡片，不需要懂專有名詞也能讀。</small>
       </div>
     </section>
   );
 }
 
-function ResultInsightPanel({ insight, speech }: { insight: ResultInsight; speech?: string }) {
+function ResultInsightPanel({ insight, speech, t }: { insight: ResultInsight; speech?: string; t: ToolResultCopy }) {
   const [expanded, setExpanded] = useState(false);
   const [activeCardIndex, setActiveCardIndex] = useState<number | null>(null);
   const [resonantCards, setResonantCards] = useState<number[]>([]);
@@ -1838,6 +1835,7 @@ function ResultInsightPanel({ insight, speech }: { insight: ResultInsight; speec
   const visibleCards = hasManyCards && !expanded ? insight.cards.slice(0, 3) : insight.cards;
   const cardSignature = insight.cards.map((card) => card.title).join('|');
   const resonantCount = resonantCards.length;
+  const ins = t.insight;
 
   useEffect(() => {
     setExpanded(false);
@@ -1860,7 +1858,7 @@ function ResultInsightPanel({ insight, speech }: { insight: ResultInsight; speec
   };
 
   return (
-    <section className="result-insights" aria-label="結果重點解讀">
+    <section className="result-insights" aria-label="result insights">
       <div className="result-insights__header">
         <span>{insight.eyebrow}</span>
         <h2>{insight.title}</h2>
@@ -1882,10 +1880,10 @@ function ResultInsightPanel({ insight, speech }: { insight: ResultInsight; speec
         <>
           <div className="result-insights__member-prompt" role="status" aria-live="polite">
             <div>
-              <span>MEMBER NOTE</span>
-              <strong>把有感的訊息收進本次解讀</strong>
+              <span>{ins.memberNoteKicker}</span>
+              <strong>{ins.memberNoteTitle}</strong>
             </div>
-            <p>{resonantCount > 0 ? `已標記 ${resonantCount} 張，預約老師時可以回頭看。` : '點開一張卡，留下真正有共鳴的訊息。'}</p>
+            <p>{resonantCount > 0 ? ins.memberNoteCount.replace('{count}', String(resonantCount)) : ins.memberNoteEmpty}</p>
           </div>
 
           <div className="result-insights__cards">
@@ -1914,9 +1912,9 @@ function ResultInsightPanel({ insight, speech }: { insight: ResultInsight; speec
                         {String(index + 1).padStart(2, '0')}
                       </span>
                     )}
-                    <span className="result-insights__card-kicker">{card.subtitle || '解讀卡片'}</span>
+                    <span className="result-insights__card-kicker">{card.subtitle || ins.cardSubtitleFallback}</span>
                     <strong>{card.title}</strong>
-                    <span className="result-insights__card-state">{isActive ? '收起解讀' : '展開解讀'}</span>
+                    <span className="result-insights__card-state">{isActive ? ins.cardCollapse : ins.cardExpand}</span>
                   </button>
 
                   <div className="result-insights__card-body" hidden={!isActive}>
@@ -1937,7 +1935,7 @@ function ResultInsightPanel({ insight, speech }: { insight: ResultInsight; speec
                       aria-pressed={isResonant}
                       onClick={() => toggleResonance(index)}
                     >
-                      {isResonant ? '已加入本次筆記' : '這張有共鳴'}
+                      {isResonant ? ins.cardResonated : ins.cardResonate}
                     </button>
                   </div>
                 </article>
@@ -1946,7 +1944,7 @@ function ResultInsightPanel({ insight, speech }: { insight: ResultInsight; speec
           </div>
           {hasManyCards && (
             <button type="button" className="result-insights__expand" onClick={toggleExpanded}>
-              {expanded ? '收合重點卡片' : `展開全部 ${insight.cards.length} 個重點`}
+              {expanded ? ins.collapseAll : ins.expandAll.replace('{count}', String(insight.cards.length))}
             </button>
           )}
         </>
@@ -1957,17 +1955,18 @@ function ResultInsightPanel({ insight, speech }: { insight: ResultInsight; speec
   );
 }
 
-function PersonalReadingPanel({ reading }: { reading: PersonalReading }) {
+function PersonalReadingPanel({ reading, t }: { reading: PersonalReading; t: ToolResultCopy }) {
   const [focusIndex, setFocusIndex] = useState<number | null>(null);
   const readingSignature = reading.points.map((point) => point.title).join('|');
   const selectedPoint = focusIndex === null ? null : reading.points[focusIndex];
+  const pr = t.personalReading;
 
   useEffect(() => {
     setFocusIndex(null);
   }, [reading.title, readingSignature, reading.points.length]);
 
   return (
-    <section className="personal-reading" aria-label="個人化解讀摘要">
+    <section className="personal-reading" aria-label="personal reading">
       <div className="personal-reading__header">
         <span>{reading.eyebrow}</span>
         <h2>{reading.title}</h2>
@@ -1976,7 +1975,7 @@ function PersonalReadingPanel({ reading }: { reading: PersonalReading }) {
 
       {selectedPoint && (
         <div className="personal-reading__focus" role="status">
-          <span>本次提醒</span>
+          <span>{pr.thisReminder}</span>
           <strong>{selectedPoint.title}</strong>
           <p>{selectedPoint.body}</p>
         </div>
@@ -1997,7 +1996,7 @@ function PersonalReadingPanel({ reading }: { reading: PersonalReading }) {
                 aria-pressed={isSelected}
                 onClick={() => setFocusIndex(isSelected ? null : index)}
               >
-                {isSelected ? '已設為提醒' : '設為提醒'}
+                {isSelected ? pr.reminderSet : pr.setReminder}
               </button>
             </article>
           );
@@ -2007,13 +2006,14 @@ function PersonalReadingPanel({ reading }: { reading: PersonalReading }) {
   );
 }
 
-function ResultNextSteps({ tool }: { tool: CalcTool }) {
+function ResultNextSteps({ tool, t }: { tool: CalcTool; t: ToolResultCopy }) {
   const steps = RESULT_NEXT_STEPS[tool];
+  const ns = t.nextSteps;
   return (
-    <section className="result-next-steps" aria-label="下一步閱讀順序">
+    <section className="result-next-steps" aria-label={ns.kicker}>
       <div className="result-next-steps__header">
-        <span>READING FLOW</span>
-        <h2>接下來可以這樣看</h2>
+        <span>{ns.kicker}</span>
+        <h2>{ns.title}</h2>
       </div>
       <div className="result-next-steps__grid">
         {steps.map((step, index) => (
@@ -2025,45 +2025,46 @@ function ResultNextSteps({ tool }: { tool: CalcTool }) {
         ))}
       </div>
       <div className="result-next-steps__actions">
-        <Link href="/teachers">預約老師解讀</Link>
-        <Link href="/account/charts">查看我的解讀紀錄</Link>
+        <Link href="/teachers">{ns.bookTeacher}</Link>
+        <Link href="/account/charts">{ns.viewHistory}</Link>
       </div>
     </section>
   );
 }
 
-function MemberActionPath({ tool }: { tool: CalcTool }) {
-  const toolName = TOOL_COPY[tool]?.title ?? '本次解讀';
+function MemberActionPath({ tool, t }: { tool: CalcTool; t: ToolResultCopy }) {
+  const toolName = TOOL_COPY[tool]?.title ?? '';
+  const ap = t.actionPath;
   const actions = [
     {
-      title: '保存這次解讀',
-      body: `${toolName} 可以先存進會員紀錄，之後預約老師時比較容易回頭對照。`,
+      title: ap.saveTitle,
+      body: toolName ? `${toolName} — ${ap.saveTitle}` : ap.saveTitle,
       href: '/account/login?return=/account/charts',
-      label: '登入並保存',
+      label: ap.saveLabel,
       primary: true,
     },
     {
-      title: '回到每日儀式',
-      body: '明天回來抽一張每日牌或盧恩，讓網站有持續陪伴感，而不是一次性工具。',
+      title: ap.dailyTitle,
+      body: ap.dailyBody,
       href: '/daily',
-      label: '今日儀式',
+      label: ap.dailyLabel,
       primary: false,
     },
     {
-      title: '找老師深度解讀',
-      body: '如果某張卡或某個命盤重點很有感，可以直接帶著問題找適合的老師。',
+      title: ap.consultTitle,
+      body: ap.consultBody,
       href: '/teachers',
-      label: '找老師深度解讀',
+      label: ap.consultLabel,
       primary: false,
     },
   ];
 
   return (
-    <section className="member-action-path" aria-label="會員下一步引導">
+    <section className="member-action-path" aria-label={ap.kicker}>
       <div className="member-action-path__header">
-        <span>MEMBER ONBOARDING</span>
-        <h2>下一步很清楚，會員才會留下來</h2>
-        <p>看完結果後，先保存、再回訪、最後把有感的問題交給老師深度解讀。</p>
+        <span>{ap.kicker}</span>
+        <h2>{ap.title}</h2>
+        <p>{ap.body}</p>
       </div>
       <div className="member-action-path__steps">
         {actions.map((action, index) => (
@@ -2076,8 +2077,8 @@ function MemberActionPath({ tool }: { tool: CalcTool }) {
         ))}
       </div>
       <div className="member-action-path__actions">
-        <Link href="/account/login?return=/account/charts">保存這次解讀</Link>
-        <Link href="/teachers">找老師深度解讀</Link>
+        <Link href="/account/login?return=/account/charts">{ap.footerSave}</Link>
+        <Link href="/teachers">{ap.footerConsult}</Link>
       </div>
     </section>
   );
@@ -2090,13 +2091,13 @@ function taipeiDatePart(part: 'day' | 'month' | 'year') {
   return day;
 }
 
-function pointErrorMessage(message: string) {
-  if (message.includes('insufficient_points')) return '目前無法查看，請明天再回來或先完成每日儀式。';
-  if (message.includes('not_authenticated')) return '請先登入會員，再查看延伸內容。';
-  return '操作暫時失敗，請稍後再試。';
+function pointErrorMessage(message: string, notices: ToolResultCopy['notices']) {
+  if (message.includes('insufficient_points')) return notices.insufficientPoints;
+  if (message.includes('not_authenticated')) return notices.notAuthenticated;
+  return notices.generic;
 }
 
-function PointUnlockPanel({ result }: { result: CalcResponse }) {
+function PointUnlockPanel({ result, t }: { result: CalcResponse; t: ToolResultCopy }) {
   const [userId, setUserId] = useState<string | null>(null);
   const [balance, setBalance] = useState<number | null>(null);
   const [claimedToday, setClaimedToday] = useState(false);
@@ -2153,7 +2154,7 @@ function PointUnlockPanel({ result }: { result: CalcResponse }) {
       if (cancelled) return;
 
       if (walletResult.error) {
-        setNotice(pointErrorMessage(walletResult.error.message));
+        setNotice(pointErrorMessage(walletResult.error.message, t.notices));
       }
 
       const wallet = walletResult.data as { balance?: number } | null;
@@ -2180,7 +2181,7 @@ function PointUnlockPanel({ result }: { result: CalcResponse }) {
 
     loadMemberPoints().catch((error: Error) => {
       if (!cancelled) {
-        setNotice(pointErrorMessage(error.message));
+        setNotice(pointErrorMessage(error.message, t.notices));
         setReady(true);
       }
     });
@@ -2188,7 +2189,7 @@ function PointUnlockPanel({ result }: { result: CalcResponse }) {
     return () => {
       cancelled = true;
     };
-  }, [result]);
+  }, [result, t.notices]);
 
   const claimDailyPoints = async () => {
     if (!userId) return;
@@ -2198,7 +2199,7 @@ function PointUnlockPanel({ result }: { result: CalcResponse }) {
     const supabase = createClient();
     const { data, error } = await supabase.rpc('claim_daily_points');
     if (error) {
-      setNotice(pointErrorMessage(error.message));
+      setNotice(pointErrorMessage(error.message, t.notices));
       setBusy(null);
       return;
     }
@@ -2206,14 +2207,14 @@ function PointUnlockPanel({ result }: { result: CalcResponse }) {
     const payload = (data || {}) as PointRpcResult;
     setBalance(typeof payload.balance === 'number' ? payload.balance : balance);
     setClaimedToday(true);
-    setNotice(payload.claimed ? '今日簽到完成，可以繼續查看延伸內容。' : '今天已完成簽到，明天再回來。');
+    setNotice(payload.claimed ? t.notices.claimSuccess : t.notices.claimAlready);
     setBusy(null);
   };
 
   const unlockContent = async (option: MemberUnlockOption) => {
     if (!userId) return;
     if ((balance ?? 0) < POINT_UNLOCK_COST && !unlocked[option.type]) {
-      setNotice('請先完成今日簽到再查看延伸內容。');
+      setNotice(t.notices.signInFirst);
       return;
     }
 
@@ -2230,7 +2231,7 @@ function PointUnlockPanel({ result }: { result: CalcResponse }) {
     });
 
     if (error) {
-      setNotice(pointErrorMessage(error.message));
+      setNotice(pointErrorMessage(error.message, t.notices));
       setBusy(null);
       return;
     }
@@ -2241,37 +2242,43 @@ function PointUnlockPanel({ result }: { result: CalcResponse }) {
     if (payload.content) {
       setUnlockedContent((prev) => ({ ...prev, [option.type]: payload.content }));
     }
-    setNotice(payload.already_unlocked ? `${option.label}已經可以查看。` : `${option.label}內容已載入。`);
+    const ul = t.unlock;
+    const localLabel = t.unlockOptions[option.type]?.label ?? option.label;
+    setNotice(payload.already_unlocked
+      ? ul.noticeAlreadyUnlocked.replace('{label}', localLabel)
+      : ul.noticeUnlocked.replace('{label}', localLabel));
     setBusy(null);
   };
 
+  const ul = t.unlock;
+
   return (
-    <section className="point-unlock" aria-label="會員延伸解讀">
+    <section className="point-unlock" aria-label={ul.kicker}>
       <div className="point-unlock__header">
         <div>
-          <span>MEMBER EXTENDED</span>
-          <h2>延伸解讀</h2>
-          <p>登入會員後可查看深入解釋、流日、流月、流年等延伸解讀。免費工具本身就完整，延伸內容是選項。</p>
+          <span>{ul.kicker}</span>
+          <h2>{ul.title}</h2>
+          <p>{ul.body}</p>
         </div>
         <div className="point-unlock__balance">
-          <span>會員狀態</span>
-          <strong>{userId ? (ready ? '已登入' : '...') : '-'}</strong>
+          <span>{ul.memberStatusLabel}</span>
+          <strong>{userId ? (ready ? ul.memberLoggedIn : ul.memberPending) : ul.memberGuest}</strong>
         </div>
       </div>
 
       {!userId ? (
         <div className="point-unlock__guest">
-          <p>登入會員後可查看延伸解讀，每項工具的流日、流月、流年都會保存在你的會員紀錄。</p>
-          <Link href="/account/login?return=/account/charts">登入查看</Link>
+          <p>{ul.guestBody}</p>
+          <Link href="/account/login?return=/account/charts">{ul.guestLogin}</Link>
         </div>
       ) : (
         <div className="point-unlock__claim">
           <div>
-            <strong>每日儀式</strong>
-            <p>{claimedToday ? '今天已完成每日簽到。' : '完成每日儀式可開啟今日延伸解讀。'}</p>
+            <strong>{ul.dailyTitle}</strong>
+            <p>{claimedToday ? ul.dailyDone : ul.dailyPending}</p>
           </div>
           <button type="button" onClick={claimDailyPoints} disabled={busy !== null || claimedToday}>
-            {busy === 'claim' ? '處理中...' : claimedToday ? '今日已完成' : '完成每日簽到'}
+            {busy === 'claim' ? ul.claimingBtn : claimedToday ? ul.claimedBtn : ul.claimBtn}
           </button>
         </div>
       )}
@@ -2281,19 +2288,30 @@ function PointUnlockPanel({ result }: { result: CalcResponse }) {
           const isUnlocked = Boolean(unlocked[option.type]);
           const reading = unlockedContent[option.type];
           const hasRevealedContent = Boolean(reading);
+          // 從 i18n 字典取翻譯版本，fallback 到原本英文 eyebrow
+          const optionI18n = t.unlockOptions[option.type];
+          const localLabel = optionI18n?.label ?? option.label;
+          const localTitle = optionI18n?.title ?? option.title;
+          const localBody = optionI18n?.body ?? option.body;
           return (
             <article key={option.type} className={`point-unlock__option${isUnlocked ? ' is-unlocked' : ''}`}>
               <span>{option.eyebrow}</span>
-              <h3>{option.title}</h3>
-              <p>{option.body}</p>
+              <h3>{localTitle}</h3>
+              <p>{localBody}</p>
               <div className="point-unlock__option-footer">
-                <strong>{option.label}</strong>
+                <strong>{localLabel}</strong>
                 <button
                   type="button"
                   onClick={() => unlockContent(option)}
                   disabled={!userId || busy !== null || (isUnlocked && hasRevealedContent)}
                 >
-                  {isUnlocked && hasRevealedContent ? '已查看' : busy === option.type ? '載入中...' : isUnlocked ? '載入內容' : `查看${option.label}`}
+                  {isUnlocked && hasRevealedContent
+                    ? ul.alreadyViewed
+                    : busy === option.type
+                      ? ul.loadingContent
+                      : isUnlocked
+                        ? ul.loadBtn
+                        : ul.viewBtn.replace('{label}', localLabel)}
                 </button>
               </div>
               {isUnlocked && reading && (
@@ -2326,9 +2344,10 @@ function PointUnlockPanel({ result }: { result: CalcResponse }) {
   );
 }
 
-export function ToolResult({ result }: { result: CalcResponse | null }) {
+export function ToolResult({ result, locale = DEFAULT_LOCALE }: { result: CalcResponse | null; locale?: Locale }) {
   const ref = useRef<HTMLDivElement>(null);
   const savedRecordKeys = useRef<Set<string>>(new Set());
+  const t = getToolResultCopy(locale);
 
   useEffect(() => {
     if (result && ref.current) {
@@ -2389,35 +2408,15 @@ export function ToolResult({ result }: { result: CalcResponse | null }) {
         />
       )}
 
-      <MemberResonancePanel resonance={memberResonance} />
-      {result.tool !== 'maya' && <ResultInsightPanel insight={insight} speech={result.tool === 'tarot' ? undefined : speech} />}
-      <ZiweiPlainGuide result={result} />
-      {result.tool !== 'tarot' && <PersonalReadingPanel reading={personalReading} />}
-      <PointUnlockPanel result={result} />
+      <MemberResonancePanel resonance={memberResonance} t={t} />
+      {result.tool !== 'maya' && <ResultInsightPanel insight={insight} speech={result.tool === 'tarot' ? undefined : speech} t={t} />}
+      <ZiweiPlainGuide result={result} t={t} />
+      {result.tool !== 'tarot' && <PersonalReadingPanel reading={personalReading} t={t} />}
+      <PointUnlockPanel result={result} t={t} />
       <p className="mt-6 border-t border-accent-dim pt-4 text-center text-[11px] leading-relaxed text-white/40">
-        工具結果僅供自我探索參考，不構成任何診斷、治療、醫療或心理專業建議。若有身心不適，請尋求專業醫療或心理協助。
+        {t.disclaimer}
       </p>
     </div>
   );
 }
 
-export function ToolLoading({ label = '正在整理解讀...' }: { label?: string }) {
-  return (
-    <div className="mele-card text-center py-16 mt-6">
-      <div className="text-3xl text-accent inline-block animate-spin">✦</div>
-      <div className="mt-4 tracking-widest text-sm text-white/70">{label}</div>
-    </div>
-  );
-}
-
-export function ToolError({ message }: { message: string }) {
-  return (
-    <div className="rounded-2xl border border-reverse bg-reverse/[0.05] p-8 mt-6 text-center text-rose-300">
-      <div className="text-2xl mb-2">解讀失敗</div>
-      <div className="text-sm">{message}</div>
-      <div className="text-xs mt-3 text-white/50">
-        請確認後端 API 正在執行，或稍後重新送出一次。
-      </div>
-    </div>
-  );
-}

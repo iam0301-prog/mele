@@ -1,23 +1,46 @@
 'use client';
 
+import type React from 'react';
 import dynamic from 'next/dynamic';
 import { ToolResult } from '@/components/ToolResult';
 import type { CalcResponse, CalcTool } from '@/lib/api';
-import { DEFAULT_LOCALE, type Locale } from '@/lib/i18n/config';
+import { DEFAULT_LOCALE, LOCALES, type Locale } from '@/lib/i18n/config';
+import { getToolResultCopy } from '@/lib/i18n/tool-result-copy';
+import type { ReadingArKind } from '@/components/ReadingArStage';
 
-const ReadingArStage = dynamic(
-  () => import('@/components/ReadingArStage').then((module) => module.ReadingArStage),
-  {
-    ssr: false,
-    loading: () => (
-      <section className="reading-ar reading-ar--loading" aria-label="視覺結果展示載入中">
-        <div className="ritual-kicker">VISUAL RESULT STAGE</div>
-        <h2>正在整理視覺結果展示</h2>
-        <p>這裡會用穩定的 2D 盤面、牌面或石面呈現結果；AR / 3D 正式版完成後再開放。</p>
-      </section>
+type ArStageProps = { kind: ReadingArKind; result?: CalcResponse | null };
+
+// 預先計算每個 locale 的 AR loading 文字（module top-level）
+const AR_LOADING_TEXT = Object.fromEntries(
+  LOCALES.map((locale) => {
+    const t = getToolResultCopy(locale);
+    return [locale, t.arLoading];
+  }),
+) as Record<Locale, { kicker: string; title: string; body: string }>;
+
+function makeReadingArStage(locale: Locale): React.ComponentType<ArStageProps> {
+  const ar = AR_LOADING_TEXT[locale];
+  return dynamic<ArStageProps>(
+    () => import('@/components/ReadingArStage').then(
+      (m) => m.ReadingArStage as React.ComponentType<ArStageProps>,
     ),
-  },
-);
+    {
+      ssr: false,
+      loading: () => (
+        <section className="reading-ar reading-ar--loading" aria-label={ar.kicker}>
+          <div className="ritual-kicker">{ar.kicker}</div>
+          <h2>{ar.title}</h2>
+          <p>{ar.body}</p>
+        </section>
+      ),
+    },
+  );
+}
+
+// 六語言各自的 dynamic 元件（module top-level）
+const READING_AR_STAGES = Object.fromEntries(
+  LOCALES.map((locale) => [locale, makeReadingArStage(locale)]),
+) as Record<Locale, React.ComponentType<ArStageProps>>;
 
 export function ToolResultSection({
   kind,
@@ -32,15 +55,15 @@ export function ToolResultSection({
   arFirst?: boolean;
   locale?: Locale;
 }) {
-  void locale;
   const shouldRenderVisualStage = showAr && kind !== 'maya';
+  const ReadingArStage = READING_AR_STAGES[locale] ?? READING_AR_STAGES[DEFAULT_LOCALE];
   const arStage = shouldRenderVisualStage ? <ReadingArStage kind={kind} result={result} /> : null;
   const shouldShowArFirst = arFirst || kind !== 'tarot';
 
   return (
     <>
       {shouldShowArFirst && arStage}
-      <ToolResult result={result} />
+      <ToolResult result={result} locale={locale} />
       {!shouldShowArFirst && arStage}
     </>
   );
