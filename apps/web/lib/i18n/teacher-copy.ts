@@ -23,6 +23,8 @@ export type TeacherCopy = {
     ratingUnit: string;
     reviewsUnit: string;
     casesUnit: string;
+    demoBadge: string;
+    emptyBody: string;
   };
   detail: {
     back: string;
@@ -236,6 +238,7 @@ export const teacherCopies: Record<Locale, TeacherCopy> = {
       loading: '正在讀取老師名單...',
       demoNotice: '目前資料庫尚未上架正式老師，以下顯示本機示範老師，方便測試諮詢引導、老師詳情與服務呈現。正式上線後會自動改用 Supabase 內的真實老師資料。',
       emptyTitle: '目前沒有符合條件的上架老師。',
+      emptyBody: '你可以切換專長篩選，或先去用免費工具探索自己；等老師上架後再回來預約。',
       emptyAction: '申請成為 MELE 諮詢老師',
       detailAction: '查看老師詳情',
       fallbackTitle: '自我探索諮詢老師',
@@ -243,6 +246,7 @@ export const teacherCopies: Record<Locale, TeacherCopy> = {
       ratingUnit: '分',
       reviewsUnit: '則評價',
       casesUnit: '次案例',
+      demoBadge: '示範 · 暫不開放預約',
     },
     detail: {
       back: '返回諮詢老師入口',
@@ -437,6 +441,7 @@ export const teacherCopies: Record<Locale, TeacherCopy> = {
       loading: 'Loading guides...',
       demoNotice: 'No approved production guides are available yet, so demo guides are shown for closed-beta testing. Production will automatically use approved Supabase guide records.',
       emptyTitle: 'No active guides match this filter yet.',
+      emptyBody: 'Try a different specialty filter, or explore the free tools first and come back when guides are available.',
       emptyAction: 'Apply as a MELE guide',
       detailAction: 'View guide profile',
       fallbackTitle: 'Self-discovery guide',
@@ -444,6 +449,7 @@ export const teacherCopies: Record<Locale, TeacherCopy> = {
       ratingUnit: 'rating',
       reviewsUnit: 'reviews',
       casesUnit: 'cases',
+      demoBadge: 'Demo · Booking not open',
     },
     detail: {
       back: 'Back to guidance directory',
@@ -714,6 +720,7 @@ teacherCopies.vi = inherit('vi', {
     loading: 'Đang tải danh sách guide...',
     demoNotice: 'Chưa có guide chính thức. Đang hiển thị guide thử nghiệm để kiểm tra giao diện. Khi ra mắt sẽ dùng dữ liệu thật từ Supabase.',
     emptyTitle: 'Chưa có guide phù hợp với bộ lọc này.',
+    emptyBody: 'Hãy thử chuyên môn khác, hoặc dùng công cụ miễn phí trước và quay lại khi có guide.',
     emptyAction: 'Đăng ký làm guide MELE',
     detailAction: 'Xem hồ sơ guide',
     fallbackTitle: 'Guide khám phá bản thân',
@@ -721,6 +728,7 @@ teacherCopies.vi = inherit('vi', {
     ratingUnit: 'điểm',
     reviewsUnit: 'đánh giá',
     casesUnit: 'buổi',
+    demoBadge: 'Thử nghiệm · Chưa mở đặt lịch',
   },
   detail: {
     back: 'Quay lại danh mục hướng dẫn',
@@ -930,6 +938,7 @@ teacherCopies.id = inherit('id', {
     loading: 'Memuat daftar guide...',
     demoNotice: 'Belum ada guide resmi. Menampilkan guide contoh untuk pengujian antarmuka. Saat diluncurkan akan menggunakan data nyata dari Supabase.',
     emptyTitle: 'Belum ada guide yang cocok dengan filter ini.',
+    emptyBody: 'Coba filter spesialisasi lain, atau jelajahi alat gratis dulu dan kembali saat ada guide.',
     emptyAction: 'Daftar sebagai guide MELE',
     detailAction: 'Lihat profil guide',
     fallbackTitle: 'Guide eksplorasi diri',
@@ -937,6 +946,7 @@ teacherCopies.id = inherit('id', {
     ratingUnit: 'rating',
     reviewsUnit: 'ulasan',
     casesUnit: 'sesi',
+    demoBadge: 'Demo · Pemesanan belum dibuka',
   },
   detail: {
     back: 'Kembali ke direktori panduan',
@@ -1146,6 +1156,7 @@ teacherCopies.ja = inherit('ja', {
     loading: 'ガイドを読み込み中...',
     demoNotice: '正式なガイドはまだ登録されていません。インターフェース確認用のデモガイドを表示しています。リリース後は Supabase の実際のデータに切り替わります。',
     emptyTitle: 'この条件に合うガイドはまだいません。',
+    emptyBody: '別の専門分野でフィルタリングするか、まず無料ツールを使い、ガイドが追加されてから戻ってきてください。',
     emptyAction: 'MELE ガイドとして申請する',
     detailAction: 'プロフィールを見る',
     fallbackTitle: '自己探求ガイド',
@@ -1153,6 +1164,7 @@ teacherCopies.ja = inherit('ja', {
     ratingUnit: '点',
     reviewsUnit: '件のレビュー',
     casesUnit: '件のセッション',
+    demoBadge: 'デモ · 予約受付外',
   },
   detail: {
     back: '相談ガイド一覧へ戻る',
@@ -1362,6 +1374,7 @@ teacherCopies.ko = inherit('ko', {
     loading: '가이드 목록을 불러오는 중...',
     demoNotice: '정식 가이드가 아직 없습니다. 인터페이스 확인을 위한 데모 가이드를 표시하고 있습니다. 정식 출시 후에는 Supabase의 실제 데이터로 전환됩니다.',
     emptyTitle: '이 조건에 맞는 가이드가 아직 없습니다.',
+    emptyBody: '다른 전문 분야로 필터를 바꾸거나, 무료 도구를 먼저 사용해 보고 가이드가 생기면 다시 오세요.',
     emptyAction: 'MELE 가이드 신청하기',
     detailAction: '가이드 프로필 보기',
     fallbackTitle: '자기 탐색 가이드',
@@ -1369,6 +1382,7 @@ teacherCopies.ko = inherit('ko', {
     ratingUnit: '점',
     reviewsUnit: '개의 후기',
     casesUnit: '회 세션',
+    demoBadge: '데모 · 예약 미오픈',
   },
   detail: {
     back: '상담 가이드 목록으로 돌아가기',

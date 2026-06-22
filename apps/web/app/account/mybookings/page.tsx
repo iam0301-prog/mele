@@ -1,10 +1,11 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import { useToast } from '@/components/ToastProvider';
+import { getLocaleFromPathname, localizePath } from '@/lib/i18n/config';
 
 type BookingTab = 'upcoming' | 'past' | 'cancelled';
 
@@ -30,6 +31,7 @@ const STATUS_LABEL: Record<string, string> = {
 
 export default function MyBookingsPage() {
   const router = useRouter();
+  const pathname = usePathname();
   const toast = useToast();
   const [tab, setTab] = useState<BookingTab>('upcoming');
   const [bookings, setBookings] = useState<Booking[]>([]);
@@ -41,7 +43,12 @@ export default function MyBookingsPage() {
     setLoading(true);
     const supabase = createClient();
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) { router.push('/account/login?return=/account/mybookings'); return; }
+    if (!user) {
+      const locale = getLocaleFromPathname(pathname ?? '/');
+      const returnTo = encodeURIComponent(pathname ?? '/account/mybookings');
+      router.push(localizePath(`/account/login?return=${returnTo}`, locale));
+      return;
+    }
     const now = new Date().toISOString();
     let q = supabase
       .from('bookings')
@@ -61,7 +68,7 @@ export default function MyBookingsPage() {
       setReviewedSet(new Set());
     }
     setLoading(false);
-  }, [tab, router]);
+  }, [tab, router, pathname]);
 
   useEffect(() => { load(); }, [load]);
 
@@ -117,7 +124,15 @@ export default function MyBookingsPage() {
         {!loading && bookings.length === 0 && (
           <div className="text-center py-12 text-white/60">
             <div className="text-4xl text-accent opacity-50 mb-3">○</div>
-            沒有紀錄
+            <p className="mb-2">
+              {tab === 'upcoming' ? '還沒有即將進行的諮詢' : tab === 'past' ? '還沒有完成的諮詢紀錄' : '沒有取消的預約'}
+            </p>
+            {tab === 'upcoming' && (
+              <p className="text-sm text-white/45 mb-4">可以先瀏覽老師，找到感興趣的再預約。</p>
+            )}
+            {tab === 'upcoming' && (
+              <Link href="/teachers" className="text-accent text-xs tracking-widest hover:opacity-80">→ 前往老師列表</Link>
+            )}
           </div>
         )}
         {!loading && bookings.map((b) => (

@@ -363,9 +363,9 @@ const localeCopies: Record<Locale, ToolLocaleCopy> = {
   'zh-TW': {
     shell: { backLabel: '回到工具入口', eyebrow: '解讀工具實驗室' },
     consult: {
-      title: '想讓結果變成真正可用的提醒？',
-      body: '免費工具適合先看方向；若你想把結果放進感情、工作、人生選擇或長期運勢裡理解，可以帶著這份結果找老師深入解讀。',
-      action: '找 {label} 老師',
+      title: '想更深入了解自己？',
+      body: '工具結果是一個參考起點。如果你想在感情、工作或人生方向上聊得更深，平台老師是一個選項，不是必須。',
+      action: '瀏覽 {label} 老師',
     },
     autofill: {
       icon: '✓',
@@ -384,9 +384,9 @@ const localeCopies: Record<Locale, ToolLocaleCopy> = {
   en: {
     shell: { backLabel: 'Back to tools hub', eyebrow: 'ORACLE TOOL LAB' },
     consult: {
-      title: 'Want to turn this result into usable guidance?',
-      body: 'Free tools are a first map. If you want to connect the result to love, work, life choices, or timing, bring it to a teacher for a deeper reading.',
-      action: 'Find a {label} teacher',
+      title: 'Want to explore further?',
+      body: 'This result is a starting point for reflection. If you want a deeper conversation about your question, a platform guide is one option — not a requirement.',
+      action: 'Browse {label} guides',
     },
     autofill: {
       icon: '✓',
@@ -405,9 +405,9 @@ const localeCopies: Record<Locale, ToolLocaleCopy> = {
   vi: {
     shell: { backLabel: 'Về cổng tâm linh', eyebrow: 'PHÒNG THỬ CÔNG CỤ' },
     consult: {
-      title: 'Muốn biến kết quả thành lời nhắc hữu ích?',
-      body: 'Công cụ miễn phí giúp bạn xem hướng ban đầu. Nếu muốn đọc sâu về tình cảm, công việc, lựa chọn sống hoặc thời vận, hãy mang kết quả này đến giáo viên.',
-      action: 'Tìm giáo viên {label}',
+      title: 'Muốn khám phá sâu hơn?',
+      body: 'Kết quả này là một điểm khởi đầu để suy ngẫm. Nếu bạn muốn trò chuyện sâu hơn, guide trên nền tảng là một lựa chọn — không bắt buộc.',
+      action: 'Xem guide {label}',
     },
     autofill: {
       icon: '✓',
@@ -436,9 +436,9 @@ const localeCopies: Record<Locale, ToolLocaleCopy> = {
   id: {
     shell: { backLabel: 'Kembali ke hub alat', eyebrow: 'LAB ALAT ORAKEL' },
     consult: {
-      title: 'Ingin mengubah hasil ini menjadi panduan yang berguna?',
-      body: 'Alat gratis memberi peta awal. Untuk mengaitkan hasil dengan relasi, kerja, pilihan hidup, atau waktu, bawalah ke guru untuk bacaan lebih dalam.',
-      action: 'Cari guru {label}',
+      title: 'Ingin mengeksplorasi lebih jauh?',
+      body: 'Hasil ini adalah titik awal untuk refleksi. Jika ingin percakapan lebih mendalam, guide di platform adalah salah satu pilihan — bukan keharusan.',
+      action: 'Lihat guide {label}',
     },
     autofill: {
       icon: '✓',
@@ -467,9 +467,9 @@ const localeCopies: Record<Locale, ToolLocaleCopy> = {
   ja: {
     shell: { backLabel: 'スピリチュアル入口へ戻る', eyebrow: 'オラクルツールラボ' },
     consult: {
-      title: 'この結果を実用的な助言にしたいですか？',
-      body: '無料ツールは最初の地図です。恋愛、仕事、人生の選択、時期読みまで深めたい場合は、この結果を先生に持っていけます。',
-      action: '{label} の先生を探す',
+      title: 'もっと深く自分を知りたいですか？',
+      body: 'この結果は振り返りのスタートポイントです。もっと深く話したい場合は、プラットフォームのガイドがひとつの選択肢です——必須ではありません。',
+      action: '{label} のガイドを見る',
     },
     autofill: {
       icon: '✓',
@@ -498,9 +498,9 @@ const localeCopies: Record<Locale, ToolLocaleCopy> = {
   ko: {
     shell: { backLabel: '영성 허브로 돌아가기', eyebrow: '오라클 도구 실험실' },
     consult: {
-      title: '이 결과를 실제 안내로 바꾸고 싶나요?',
-      body: '무료 도구는 첫 지도입니다. 사랑, 일, 삶의 선택, 흐름까지 깊게 보고 싶다면 이 결과를 선생님에게 가져가세요.',
-      action: '{label} 선생님 찾기',
+      title: '더 깊이 탐색하고 싶으신가요?',
+      body: '이 결과는 성찰의 출발점입니다. 더 깊이 대화하고 싶다면 플랫폼 가이드가 하나의 선택지입니다——필수는 아닙니다.',
+      action: '{label} 가이드 보기',
     },
     autofill: {
       icon: '✓',
