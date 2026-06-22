@@ -125,15 +125,9 @@ export default function PaymentPage() {
         <Link href="/account/mybookings" className="mt-3 inline-block text-accent underline text-xs">前往我的諮詢</Link>
       </div>
 
-      <header className="py-8 text-center opacity-40 pointer-events-none select-none">
-        <div className="mele-subtitle">SECURE PAYMENT</div>
-        <h1 className="mele-h1">確認付款</h1>
-        <p className="text-sm leading-loose text-white/65">
-          付款會透過綠界金流處理，平台不會保存你的信用卡資料。完成付款後，系統會等待綠界 webhook 確認，再更新預約狀態。
-        </p>
-      </header>
-
-      <section className="mele-card">
+      {/* PAYMENT_GATE: 公測期間整個付款 section 隱藏，不渲染金額與綠界表單。
+          待開收費時：移除此 hidden className，使付款介面重新顯示。 */}
+      <section className="mele-card hidden">
         {loading && <p className="text-center text-white/60">正在準備付款資料...</p>}
 
         {!loading && booking && (

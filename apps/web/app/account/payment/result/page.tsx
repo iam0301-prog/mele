@@ -102,7 +102,9 @@ export default async function PaymentResultPage({ searchParams }: { searchParams
         <p className="mt-1 text-white/70">目前平台處於公測期，所有諮詢預約均為免費體驗。</p>
         <Link href="/account/mybookings" className="mt-2 inline-block text-accent underline text-xs">前往我的諮詢</Link>
       </div>
-      <section className={`mele-card payment-result payment-result--${copy.tone}`}>
+      {/* PAYMENT_GATE: 公測期間整個付款結果 section 隱藏，不渲染金額與交易資訊。
+          待開收費時：移除此 hidden className，使付款結果介面重新顯示。 */}
+      <section className={`mele-card payment-result payment-result--${copy.tone} hidden`}>
         <div className="mele-subtitle">PAYMENT RETURN</div>
         <h1 className="font-serif text-3xl tracking-widest text-accent mt-3">{copy.title}</h1>
         <p className="mt-5 text-sm leading-loose text-white/72">{copy.body}</p>
