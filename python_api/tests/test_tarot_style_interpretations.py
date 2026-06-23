@@ -3,7 +3,6 @@ from pathlib import Path
 
 from engines import tarot
 
-
 ROOT = Path(__file__).resolve().parents[1]
 DECK = json.loads((ROOT / "data" / "tarot.json").read_text(encoding="utf-8"))
 STYLE_DATA = json.loads((ROOT / "data" / "tarot_style_interpretations.json").read_text(encoding="utf-8"))
@@ -31,15 +30,13 @@ def test_same_seed_same_cards_but_style_specific_meanings():
         for style in STYLES
     }
     names_by_style = {
-        style: [draw["card"]["name_zh"] for draw in data["cards"]]
-        for style, data in draws.items()
+        style: [draw["card"]["name_zh"] for draw in data["cards"]] for style, data in draws.items()
     }
     assert len({tuple(names) for names in names_by_style.values()}) == 1
 
     first_meanings = {style: data["cards"][0]["meaning"] for style, data in draws.items()}
     first_interpretations = {
-        style: data["cards"][0]["style_interpretation"]["scene"]
-        for style, data in draws.items()
+        style: data["cards"][0]["style_interpretation"]["scene"] for style, data in draws.items()
     }
     assert len(set(first_meanings.values())) == len(STYLES)
     assert len(set(first_interpretations.values())) == len(STYLES)

@@ -3,35 +3,114 @@
 from html import escape
 
 from engines.explanations import GATE_MEANINGS
+
 from .common import COMMON_KEYFRAMES, PALETTE, oracle_backdrop
 
-
 GATE_TO_CENTER = {
-    64: "Head", 61: "Head", 63: "Head",
-    47: "Ajna", 24: "Ajna", 4: "Ajna", 17: "Ajna", 43: "Ajna", 11: "Ajna",
-    62: "Throat", 23: "Throat", 56: "Throat", 16: "Throat", 20: "Throat",
-    31: "Throat", 8: "Throat", 33: "Throat", 35: "Throat", 12: "Throat", 45: "Throat",
-    7: "G", 1: "G", 13: "G", 25: "G", 10: "G", 15: "G", 2: "G", 46: "G",
-    21: "Heart", 40: "Heart", 26: "Heart", 51: "Heart",
-    34: "Sacral", 5: "Sacral", 14: "Sacral", 29: "Sacral",
-    59: "Sacral", 9: "Sacral", 3: "Sacral", 42: "Sacral", 27: "Sacral",
-    6: "SolarPlexus", 37: "SolarPlexus", 22: "SolarPlexus", 36: "SolarPlexus",
-    30: "SolarPlexus", 55: "SolarPlexus", 49: "SolarPlexus",
-    48: "Spleen", 57: "Spleen", 44: "Spleen", 50: "Spleen", 32: "Spleen", 28: "Spleen", 18: "Spleen",
-    53: "Root", 60: "Root", 52: "Root", 19: "Root", 39: "Root", 41: "Root", 58: "Root", 38: "Root", 54: "Root",
+    64: "Head",
+    61: "Head",
+    63: "Head",
+    47: "Ajna",
+    24: "Ajna",
+    4: "Ajna",
+    17: "Ajna",
+    43: "Ajna",
+    11: "Ajna",
+    62: "Throat",
+    23: "Throat",
+    56: "Throat",
+    16: "Throat",
+    20: "Throat",
+    31: "Throat",
+    8: "Throat",
+    33: "Throat",
+    35: "Throat",
+    12: "Throat",
+    45: "Throat",
+    7: "G",
+    1: "G",
+    13: "G",
+    25: "G",
+    10: "G",
+    15: "G",
+    2: "G",
+    46: "G",
+    21: "Heart",
+    40: "Heart",
+    26: "Heart",
+    51: "Heart",
+    34: "Sacral",
+    5: "Sacral",
+    14: "Sacral",
+    29: "Sacral",
+    59: "Sacral",
+    9: "Sacral",
+    3: "Sacral",
+    42: "Sacral",
+    27: "Sacral",
+    6: "SolarPlexus",
+    37: "SolarPlexus",
+    22: "SolarPlexus",
+    36: "SolarPlexus",
+    30: "SolarPlexus",
+    55: "SolarPlexus",
+    49: "SolarPlexus",
+    48: "Spleen",
+    57: "Spleen",
+    44: "Spleen",
+    50: "Spleen",
+    32: "Spleen",
+    28: "Spleen",
+    18: "Spleen",
+    53: "Root",
+    60: "Root",
+    52: "Root",
+    19: "Root",
+    39: "Root",
+    41: "Root",
+    58: "Root",
+    38: "Root",
+    54: "Root",
 }
 
 
 CHANNELS = [
-    (64, 47), (61, 24), (63, 4),
-    (17, 62), (43, 23), (11, 56),
-    (16, 48), (20, 57), (20, 10), (20, 34), (31, 7), (8, 1),
-    (33, 13), (35, 36), (12, 22), (45, 21),
-    (25, 51), (10, 34), (10, 57), (15, 5), (2, 14), (46, 29),
-    (40, 37), (26, 44),
-    (34, 57), (59, 6), (9, 52), (3, 60), (42, 53), (27, 50),
-    (30, 41), (55, 39), (49, 19),
-    (32, 54), (28, 38), (18, 58),
+    (64, 47),
+    (61, 24),
+    (63, 4),
+    (17, 62),
+    (43, 23),
+    (11, 56),
+    (16, 48),
+    (20, 57),
+    (20, 10),
+    (20, 34),
+    (31, 7),
+    (8, 1),
+    (33, 13),
+    (35, 36),
+    (12, 22),
+    (45, 21),
+    (25, 51),
+    (10, 34),
+    (10, 57),
+    (15, 5),
+    (2, 14),
+    (46, 29),
+    (40, 37),
+    (26, 44),
+    (34, 57),
+    (59, 6),
+    (9, 52),
+    (3, 60),
+    (42, 53),
+    (27, 50),
+    (30, 41),
+    (55, 39),
+    (49, 19),
+    (32, 54),
+    (28, 38),
+    (18, 58),
 ]
 
 
@@ -40,10 +119,31 @@ CENTER_META = {
     "Ajna": {"label": "邏輯", "shape": "triangle_down", "x": 360, "y": 282, "size": 76, "defined": "#aeb7c2"},
     "Throat": {"label": "喉嚨", "shape": "square", "x": 360, "y": 424, "size": 78, "defined": "#6ab7c7"},
     "G": {"label": "G中心", "shape": "diamond", "x": 360, "y": 582, "size": 80, "defined": "#d7b15d"},
-    "Heart": {"label": "意志", "shape": "triangle_left", "x": 505, "y": 600, "size": 56, "defined": "#c85b3f"},
+    "Heart": {
+        "label": "意志",
+        "shape": "triangle_left",
+        "x": 505,
+        "y": 600,
+        "size": 56,
+        "defined": "#c85b3f",
+    },
     "Sacral": {"label": "薦骨", "shape": "square", "x": 360, "y": 742, "size": 78, "defined": "#cf8b35"},
-    "SolarPlexus": {"label": "情緒", "shape": "triangle_right", "x": 522, "y": 760, "size": 76, "defined": "#ba7bd1"},
-    "Spleen": {"label": "脾臟", "shape": "triangle_left", "x": 198, "y": 760, "size": 76, "defined": "#82b366"},
+    "SolarPlexus": {
+        "label": "情緒",
+        "shape": "triangle_right",
+        "x": 522,
+        "y": 760,
+        "size": 76,
+        "defined": "#ba7bd1",
+    },
+    "Spleen": {
+        "label": "脾臟",
+        "shape": "triangle_left",
+        "x": 198,
+        "y": 760,
+        "size": 76,
+        "defined": "#82b366",
+    },
     "Root": {"label": "根部", "shape": "square", "x": 360, "y": 942, "size": 78, "defined": "#b94e4e"},
 }
 
@@ -143,12 +243,12 @@ def _gate_positions() -> dict[int, tuple[float, float]]:
             if side in ("top", "bottom"):
                 xs = _spread_slots(gates, x - half + 10, x + half - 10)
                 gy = y - half - offset if side == "top" else y + half + offset
-                for gate, gx in zip(gates, xs):
+                for gate, gx in zip(gates, xs, strict=False):
                     positions[gate] = (gx, gy)
             else:
                 ys = _spread_slots(gates, y - half + 10, y + half - 10)
                 gx = x - half - offset if side == "left" else x + half + offset
-                for gate, gy in zip(gates, ys):
+                for gate, gy in zip(gates, ys, strict=False):
                     positions[gate] = (gx, gy)
     return positions
 
@@ -160,11 +260,13 @@ def _activation_records(data: dict) -> dict[int, list[dict]]:
             gate = body.get("gate")
             if gate is None:
                 continue
-            records.setdefault(int(gate), []).append({
-                "layer": layer_label,
-                "planet": PLANET_LABELS.get(body_key, body_key),
-                "line": body.get("line"),
-            })
+            records.setdefault(int(gate), []).append(
+                {
+                    "layer": layer_label,
+                    "planet": PLANET_LABELS.get(body_key, body_key),
+                    "line": body.get("line"),
+                }
+            )
     return records
 
 
@@ -189,25 +291,17 @@ def _render_gate_cards(active_gates: list[int], records: dict[int, list[dict]]) 
         for record in records.get(gate, []):
             line = _fmt_line(record.get("line"))
             line_text = f" / {escape(line)}" if line else ""
-            body_rows.append(
-                f"<span>{escape(record['layer'])}・{escape(record['planet'])}{line_text}</span>"
-            )
+            body_rows.append(f"<span>{escape(record['layer'])}・{escape(record['planet'])}{line_text}</span>")
         body_html = "".join(body_rows) or "<span>此閘門被啟動</span>"
         cards.append(
-            """
+            f"""
 <div class="hd-gate-card">
-  <div class="hd-gate-number">第 {gate} 閘門｜{gate_title}</div>
-  <div class="hd-gate-center">{center}</div>
-  <div class="hd-gate-copy">{gate_copy}</div>
+  <div class="hd-gate-number">第 {gate} 閘門｜{escape(gate_title)}</div>
+  <div class="hd-gate-center">{escape(center)}</div>
+  <div class="hd-gate-copy">{escape(gate_copy)}</div>
   <div class="hd-gate-sources">{body_html}</div>
 </div>
-""".format(
-                gate=gate,
-                gate_title=escape(gate_title),
-                center=escape(center),
-                gate_copy=escape(gate_copy),
-                body_html=body_html,
-            )
+"""
         )
 
     template = """
@@ -355,7 +449,7 @@ def render(data: dict) -> dict:
             f'<circle cx="{x:.1f}" cy="{y:.1f}" r="{radius}" fill="{fill}" stroke="{stroke}" stroke-width="1.4"{cls}/>'
             f'<text x="{x:.1f}" y="{y + 2.9:.1f}" text-anchor="middle" font-size="{font_size}" '
             f'fill="{text_fill}" font-weight="700" stroke="rgba(5,7,11,.38)" stroke-width=".45" paint-order="stroke">{gate}</text>'
-            f'</g>'
+            f"</g>"
         )
 
     defined_list = "、".join(CENTER_META[c]["label"] for c in CENTER_META if c in defined) or "無定義中心"
@@ -374,29 +468,31 @@ def render(data: dict) -> dict:
 <text x="360" y="82" text-anchor="middle" font-size="11" fill="rgba(255,255,255,.58)" letter-spacing="1">64閘門 / 36通道 / 9大中心</text>
 
 <g opacity=".98">
-{''.join(channel_svg)}
+{"".join(channel_svg)}
 </g>
 <g>
-{''.join(centers_svg)}
+{"".join(centers_svg)}
 </g>
 <g>
-{''.join(gates_svg)}
+{"".join(gates_svg)}
 </g>
 
 <g class="fadein" style="animation-delay:.35s">
-  <rect x="70" y="1074" width="580" height="62" rx="8" fill="rgba(0,0,0,.48)" stroke="{PALETTE['accent_dim']}"/>
+  <rect x="70" y="1074" width="580" height="62" rx="8" fill="rgba(0,0,0,.48)" stroke="{PALETTE["accent_dim"]}"/>
   <line x1="250" y1="1084" x2="250" y2="1126" stroke="rgba(201,162,39,.22)"/>
   <line x1="470" y1="1084" x2="470" y2="1126" stroke="rgba(201,162,39,.22)"/>
   <text x="160" y="1098" text-anchor="middle" font-size="10" fill="rgba(255,255,255,.52)" letter-spacing="1.5">類型</text>
-  <text x="160" y="1120" text-anchor="middle" font-size="12" fill="{PALETTE['accent_light']}">{escape(str(type_label))}</text>
+  <text x="160" y="1120" text-anchor="middle" font-size="12" fill="{PALETTE["accent_light"]}">{escape(str(type_label))}</text>
   <text x="360" y="1098" text-anchor="middle" font-size="10" fill="rgba(255,255,255,.52)" letter-spacing="1.5">人生角色</text>
-  <text x="360" y="1120" text-anchor="middle" font-size="13" fill="{PALETTE['accent_light']}">{escape(str(profile))}</text>
+  <text x="360" y="1120" text-anchor="middle" font-size="13" fill="{PALETTE["accent_light"]}">{escape(str(profile))}</text>
   <text x="580" y="1098" text-anchor="middle" font-size="10" fill="rgba(255,255,255,.52)" letter-spacing="1.5">內在權威</text>
-  <text x="580" y="1120" text-anchor="middle" font-size="11.5" fill="{PALETTE['accent_light']}">{escape(str(authority_label))}</text>
+  <text x="580" y="1120" text-anchor="middle" font-size="11.5" fill="{PALETTE["accent_light"]}">{escape(str(authority_label))}</text>
 </g>
 </svg>"""
 
-    html = _render_member_prompt(type_label, authority_label, strategy) + _render_gate_cards(active_gates, records)
+    html = _render_member_prompt(type_label, authority_label, strategy) + _render_gate_cards(
+        active_gates, records
+    )
     speech = (
         f"你的人類圖類型是 {type_label}，人生角色是 {profile}，內在權威是 {authority_label}。"
         f"這張圖目前點亮 {len(active_gates)} 個閘門、{len(defined_channels)} 條完整通道；"

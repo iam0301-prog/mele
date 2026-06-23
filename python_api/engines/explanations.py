@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
+from collections.abc import Iterable
 from html import escape
-from typing import Iterable, Literal
+from typing import Literal
 
 DetailLevel = Literal["teaser", "full"]
 
@@ -112,26 +113,83 @@ def _maya_theme(name: object) -> str:
 
 
 MAYA_MEMBER_READING = {
-    "龍": ("你很容易成為把事情重新養起來的人，適合從建立基礎、照顧資源、讓一件事恢復生命力開始。", "要留意自己是不是又把所有人的需要都放在前面，忘了先問：我自己的根基穩不穩。"),
-    "風": ("你需要把感受說清楚，越願意把話講明白，關係與選擇就越容易流動。", "卡住時不是因為你不會說，而是你可能說了很多外圍，真正重要的需求還沒有出口。"),
-    "夜": ("你的內在世界很豐富，直覺、夢境與想像力常會比理性更早感覺到答案。", "要留意自己是不是把不安藏回心裡，讓別人看不見你真正需要什麼。"),
-    "種子": ("你適合專注培養一件事，只要環境對了，成長會很紮實。", "卡住時容易一直等更好的時機，結果真正想發芽的事停太久。"),
-    "蛇": ("你的身體感很強，喜歡、不喜歡、靠近或遠離，身體常比頭腦更早知道。", "要留意自己是不是壓住本能，直到最後用過度反應保護自己。"),
-    "世界橋": ("你有讓舊階段結束、轉換關係位置、重新連接的能力。", "卡住時常是捨不得放下不適合的角色，停在中間地帶。"),
-    "手": ("你適合親手處理問題，把理解落到修補、整理與完成。", "要留意自己是不是一直替別人完成本該由對方完成的事。"),
-    "星星": ("你對美感、和諧與秩序敏感，能把混亂整理成讓人舒服的形式。", "卡住時可能為了維持好看或和平，忽略真正不舒服的地方。"),
-    "月": ("你很會感覺情緒流動，能透過感受辨認什麼需要被清理或更新。", "要留意一時情緒浪潮，不要把它直接當成全部真相。"),
-    "狗": ("你的核心在信任、忠誠與心的連結，關係品質會深深影響你的狀態。", "卡住時容易因為在乎而過度忍耐，或把忠誠變成不能離開。"),
-    "猴": ("你有幽默、創意與打破僵局的能力，越放鬆越能找到新解法。", "要留意自己是不是用玩笑或轉移注意力避開真正脆弱的問題。"),
-    "人": ("你的課題在選擇與自由意志，你需要感覺這個決定真的屬於自己。", "卡住時容易聽太多意見，最後失去自己的判斷。"),
-    "天行者": ("你需要空間、經驗與探索，走出去會讓你更認識自己。", "要分辨自己想離開，是因為要拓展，還是因為不想面對眼前問題。"),
-    "巫師": ("你有很強的臨在感，不急著控制時，反而更能感覺到時機。", "卡住時可能停在等待，少了把感覺落地的下一步。"),
-    "鷹": ("你能看見大局與未來藍圖，適合把複雜狀況拉高一層重新設計。", "要留意自己是不是看得太遠，反而忽略眼前最需要處理的一步。"),
-    "戰士": ("你適合透過提問找到真相，越能誠實面對問題，越能長出勇氣。", "卡住時容易用質疑保護自己，一直追問到不敢行動。"),
-    "地球": ("你適合聽環境訊號與生活節奏，答案常透過身邊事件同步出現。", "要留意自己是不是太想找外在徵兆，反而忽略已經知道的感受。"),
+    "龍": (
+        "你很容易成為把事情重新養起來的人，適合從建立基礎、照顧資源、讓一件事恢復生命力開始。",
+        "要留意自己是不是又把所有人的需要都放在前面，忘了先問：我自己的根基穩不穩。",
+    ),
+    "風": (
+        "你需要把感受說清楚，越願意把話講明白，關係與選擇就越容易流動。",
+        "卡住時不是因為你不會說，而是你可能說了很多外圍，真正重要的需求還沒有出口。",
+    ),
+    "夜": (
+        "你的內在世界很豐富，直覺、夢境與想像力常會比理性更早感覺到答案。",
+        "要留意自己是不是把不安藏回心裡，讓別人看不見你真正需要什麼。",
+    ),
+    "種子": (
+        "你適合專注培養一件事，只要環境對了，成長會很紮實。",
+        "卡住時容易一直等更好的時機，結果真正想發芽的事停太久。",
+    ),
+    "蛇": (
+        "你的身體感很強，喜歡、不喜歡、靠近或遠離，身體常比頭腦更早知道。",
+        "要留意自己是不是壓住本能，直到最後用過度反應保護自己。",
+    ),
+    "世界橋": (
+        "你有讓舊階段結束、轉換關係位置、重新連接的能力。",
+        "卡住時常是捨不得放下不適合的角色，停在中間地帶。",
+    ),
+    "手": (
+        "你適合親手處理問題，把理解落到修補、整理與完成。",
+        "要留意自己是不是一直替別人完成本該由對方完成的事。",
+    ),
+    "星星": (
+        "你對美感、和諧與秩序敏感，能把混亂整理成讓人舒服的形式。",
+        "卡住時可能為了維持好看或和平，忽略真正不舒服的地方。",
+    ),
+    "月": (
+        "你很會感覺情緒流動，能透過感受辨認什麼需要被清理或更新。",
+        "要留意一時情緒浪潮，不要把它直接當成全部真相。",
+    ),
+    "狗": (
+        "你的核心在信任、忠誠與心的連結，關係品質會深深影響你的狀態。",
+        "卡住時容易因為在乎而過度忍耐，或把忠誠變成不能離開。",
+    ),
+    "猴": (
+        "你有幽默、創意與打破僵局的能力，越放鬆越能找到新解法。",
+        "要留意自己是不是用玩笑或轉移注意力避開真正脆弱的問題。",
+    ),
+    "人": (
+        "你的課題在選擇與自由意志，你需要感覺這個決定真的屬於自己。",
+        "卡住時容易聽太多意見，最後失去自己的判斷。",
+    ),
+    "天行者": (
+        "你需要空間、經驗與探索，走出去會讓你更認識自己。",
+        "要分辨自己想離開，是因為要拓展，還是因為不想面對眼前問題。",
+    ),
+    "巫師": (
+        "你有很強的臨在感，不急著控制時，反而更能感覺到時機。",
+        "卡住時可能停在等待，少了把感覺落地的下一步。",
+    ),
+    "鷹": (
+        "你能看見大局與未來藍圖，適合把複雜狀況拉高一層重新設計。",
+        "要留意自己是不是看得太遠，反而忽略眼前最需要處理的一步。",
+    ),
+    "戰士": (
+        "你適合透過提問找到真相，越能誠實面對問題，越能長出勇氣。",
+        "卡住時容易用質疑保護自己，一直追問到不敢行動。",
+    ),
+    "地球": (
+        "你適合聽環境訊號與生活節奏，答案常透過身邊事件同步出現。",
+        "要留意自己是不是太想找外在徵兆，反而忽略已經知道的感受。",
+    ),
     "鏡": ("你容易看見真相與界線，能把事情照得很清楚。", "卡住時容易太快切割或太銳利，讓清楚變成防衛。"),
-    "風暴": ("你有更新與重啟的力量，混亂有時是在逼你離開不適合的舊模式。", "要留意自己是不是在變動中急著抓回控制，反而更累。"),
-    "太陽": ("你有照亮事情、帶來清楚與溫暖的能力，適合把模糊處說明白。", "卡住時可能一直扮演明亮的人，卻沒有讓自己的需要被看見。"),
+    "風暴": (
+        "你有更新與重啟的力量，混亂有時是在逼你離開不適合的舊模式。",
+        "要留意自己是不是在變動中急著抓回控制，反而更累。",
+    ),
+    "太陽": (
+        "你有照亮事情、帶來清楚與溫暖的能力，適合把模糊處說明白。",
+        "卡住時可能一直扮演明亮的人，卻沒有讓自己的需要被看見。",
+    ),
 }
 
 
@@ -173,20 +231,28 @@ def explain_numerology(data: dict, detail: DetailLevel = "teaser") -> str:
     ]
 
     if is_master and lp_reduced:
-        parts.append(_line(
-            f"所以如果別的網站把你算成 <strong>{_text(lp_reduced)}</strong>，不是誰錯誰對；"
-            f"那是把大師數繼續化簡。本平台會顯示 <strong>{_text(lp_display)}</strong>，讓兩種派別都看得到。"
-        ))
+        parts.append(
+            _line(
+                f"所以如果別的網站把你算成 <strong>{_text(lp_reduced)}</strong>，不是誰錯誰對；"
+                f"那是把大師數繼續化簡。本平台會顯示 <strong>{_text(lp_display)}</strong>，讓兩種派別都看得到。"
+            )
+        )
 
     if bd and bd != lp:
-        parts.append(_line(f"生日數 <strong>{_text(bd_display)}</strong> 顯示你日常表現出的氣質：{_text(bd_arche.get('name'), '個人特質')}。"))
+        parts.append(
+            _line(
+                f"生日數 <strong>{_text(bd_display)}</strong> 顯示你日常表現出的氣質：{_text(bd_arche.get('name'), '個人特質')}。"
+            )
+        )
 
     if detail == "full":
-        parts.extend([
-            _section("深度解讀方向"),
-            _line("觀察你在壓力下會如何做決定，能看見生命靈數的陰影面。"),
-            _line("適合把此數字延伸到職涯角色、親密關係、財務模式與年度節奏。"),
-        ])
+        parts.extend(
+            [
+                _section("深度解讀方向"),
+                _line("觀察你在壓力下會如何做決定，能看見生命靈數的陰影面。"),
+                _line("適合把此數字延伸到職涯角色、親密關係、財務模式與年度節奏。"),
+            ]
+        )
     return _wrap(parts, detail)
 
 
@@ -199,10 +265,16 @@ def explain_maya(data: dict, detail: DetailLevel = "teaser") -> str:
     gift, shadow = _maya_member_reading(seal_name)
 
     parts = [
-        _line(f"你是 <strong>Kin {_text(data.get('kin'))}</strong>，能量名稱為 <strong>{_text(tone_name)}{_text(seal_name)}</strong>。"),
-        _line(f"白話先看你本人：<strong>{_text(seal_name)}</strong> 不是稱號，而是在說你的慣用節奏。{_text(gift)}"),
+        _line(
+            f"你是 <strong>Kin {_text(data.get('kin'))}</strong>，能量名稱為 <strong>{_text(tone_name)}{_text(seal_name)}</strong>。"
+        ),
+        _line(
+            f"白話先看你本人：<strong>{_text(seal_name)}</strong> 不是稱號，而是在說你的慣用節奏。{_text(gift)}"
+        ),
         _line(f"如果這段有中，通常會中在卡點：{_text(shadow)}"),
-        _line(f"銀河調性 <strong>{_text(tone_name)}</strong> 補充的是這股力量如何被啟動：{_tone_theme(tone_name)}"),
+        _line(
+            f"銀河調性 <strong>{_text(tone_name)}</strong> 補充的是這股力量如何被啟動：{_tone_theme(tone_name)}"
+        ),
     ]
 
     parts.append(_section("馬雅神諭關係"))
@@ -216,18 +288,24 @@ def explain_maya(data: dict, detail: DetailLevel = "teaser") -> str:
         if item_seal:
             kin_text = f"Kin {_text(item.get('kin'))}，" if item.get("kin") else ""
             tone_text = f"{_text(item_tone)}" if item_tone else ""
-            parts.append(_line(
-                f"<strong>{label}</strong>：{kin_text}{tone_text}{_text(item_seal)}。"
-                f"{role_copy}{_maya_member_reading(item_seal)[0]}"
-            ))
+            parts.append(
+                _line(
+                    f"<strong>{label}</strong>：{kin_text}{tone_text}{_text(item_seal)}。"
+                    f"{role_copy}{_maya_member_reading(item_seal)[0]}"
+                )
+            )
 
     if detail == "full":
         starroot = data.get("starroot") or {}
-        parts.extend([
-            _section("跨曆法對照"),
-            _line(f"Dreamspell / 13 Moon / 傳統卓爾金等對照可用來確認同一天在不同系統中的定位：{_text(starroot.get('dreamspell', {}).get('label'))}。"),
-            _line("若要作為正式諮詢，建議同時說明所採用的曆法系統，避免使用者把不同流派混為一談。"),
-        ])
+        parts.extend(
+            [
+                _section("跨曆法對照"),
+                _line(
+                    f"Dreamspell / 13 Moon / 傳統卓爾金等對照可用來確認同一天在不同系統中的定位：{_text(starroot.get('dreamspell', {}).get('label'))}。"
+                ),
+                _line("若要作為正式諮詢，建議同時說明所採用的曆法系統，避免使用者把不同流派混為一談。"),
+            ]
+        )
     return _wrap(parts, detail)
 
 
@@ -281,19 +359,31 @@ def _wuxing_balance_lines(counts: dict, day_wuxing: object) -> list[str]:
 
     lines = []
     if missing:
-        lines.append(f"這張盤裡目前沒有 <strong>{_join(missing)}</strong> 的能量，不必擔心——這不代表缺陷，而是說這些能量在你身上不是主場，更常需要靠環境、身邊的人或有意識的習慣來補充。")
+        lines.append(
+            f"這張盤裡目前沒有 <strong>{_join(missing)}</strong> 的能量，不必擔心——這不代表缺陷，而是說這些能量在你身上不是主場，更常需要靠環境、身邊的人或有意識的習慣來補充。"
+        )
     else:
-        lines.append("這張盤的五行都有出現，代表你的能量底色算是齊全的。接下來要看的不是「缺什麼」，而是「哪一股能量太強、哪一股偏弱」——這才是讓你真正了解自己的關鍵。")
+        lines.append(
+            "這張盤的五行都有出現，代表你的能量底色算是齊全的。接下來要看的不是「缺什麼」，而是「哪一股能量太強、哪一股偏弱」——這才是讓你真正了解自己的關鍵。"
+        )
 
     if strong:
-        lines.append(f"其中 <strong>{_join(strong)}</strong> 的能量最突出，這通常是你用起來最自然、也最順手的部分；同時也留意，太熟悉的能量有時會不自覺地過度使用。")
+        lines.append(
+            f"其中 <strong>{_join(strong)}</strong> 的能量最突出，這通常是你用起來最自然、也最順手的部分；同時也留意，太熟悉的能量有時會不自覺地過度使用。"
+        )
     if soft and not missing:
-        lines.append(f"相對地，<strong>{_join(soft)}</strong> 的能量在盤中比較少；可以觀察一下，生活裡這些面向是不是比較少出現，或者需要你多一點刻意的練習。")
+        lines.append(
+            f"相對地，<strong>{_join(soft)}</strong> 的能量在盤中比較少；可以觀察一下，生活裡這些面向是不是比較少出現，或者需要你多一點刻意的練習。"
+        )
     if day_wuxing:
         if day_count >= 2:
-            lines.append(f"你的日主 <strong>{_text(day_wuxing)}</strong> 在盤中有不少同類能量支撐，自我感比較穩——不容易被環境或他人輕易帶走。下一步值得看看季節與大運怎麼牽動這股力量。")
+            lines.append(
+                f"你的日主 <strong>{_text(day_wuxing)}</strong> 在盤中有不少同類能量支撐，自我感比較穩——不容易被環境或他人輕易帶走。下一步值得看看季節與大運怎麼牽動這股力量。"
+            )
         else:
-            lines.append(f"你的日主 <strong>{_text(day_wuxing)}</strong> 在盤中同類支援比較少，這表示你的核心能量可能需要多一點照顧——好好休息、待在對的環境、與合適的人在一起，都有幫助。如果長期感到疲憊或壓力過大，也建議尋求專業的支持。")
+            lines.append(
+                f"你的日主 <strong>{_text(day_wuxing)}</strong> 在盤中同類支援比較少，這表示你的核心能量可能需要多一點照顧——好好休息、待在對的環境、與合適的人在一起，都有幫助。如果長期感到疲憊或壓力過大，也建議尋求專業的支持。"
+            )
     return lines
 
 
@@ -311,7 +401,12 @@ def explain_bazi(data: dict, detail: DetailLevel = "teaser") -> str:
             f"你的日主是 <strong>{_text(day_yinyang)}{_text(day_wuxing)}（{_text(day_master)}）</strong>，"
             f"整張盤都以它為核心來讀。"
         ),
-        _line(DAY_MASTER_GUIDE.get(day_master, WUXING_GUIDE.get(day_wuxing, "日主描述你最自然的能量運作方式，是解讀整張命盤的起點。"))),
+        _line(
+            DAY_MASTER_GUIDE.get(
+                day_master,
+                WUXING_GUIDE.get(day_wuxing, "日主描述你最自然的能量運作方式，是解讀整張命盤的起點。"),
+            )
+        ),
         _section("四柱一覽"),
     ]
 
@@ -324,21 +419,35 @@ def explain_bazi(data: dict, detail: DetailLevel = "teaser") -> str:
     if counts:
         parts.append(_section("五行能量分布"))
         count_display = _join([f"{name} {count} 個" for name, count in counts.items()])
-        parts.append(_line(f"這張盤裡的五行分布：{count_display}。五行代表木、火、土、金、水五種能量，不同組合讓每個人的底色都不一樣。"))
+        parts.append(
+            _line(
+                f"這張盤裡的五行分布：{count_display}。五行代表木、火、土、金、水五種能量，不同組合讓每個人的底色都不一樣。"
+            )
+        )
         for line in _wuxing_balance_lines(counts, day_wuxing):
             parts.append(_line(line))
 
     if detail == "full":
-        parts.extend([
-            _section("想看更深一層？"),
-            _line("五行只是地基。下一層可以看月令（出生月份的季節力量）、十神（命盤裡每個字和日主的關係），以及大運流年——這樣才能看出哪些時段對你比較順、哪些需要多留意。"),
-            _line("如果你正在思考某個具體問題——工作方向、關係模式、財務節奏——帶著問題去問老師，會比泛泛看整張盤更有收穫。"),
-            _line("八字不是用來把人定型的，它更像一張描述「你在不同環境下如何被啟動」的地圖。同一張盤，在不同大環境下也會呈現不同的面向。"),
-        ])
-    parts.append(_line(
-        "<small>本解讀以傳統命理象徵作為自我觀察的參考，不是醫療、心理診斷，也不是對未來的保證。"
-        "你完全可以依照自己的感受、現實條件與專業建議，選擇最適合自己的下一步。</small>"
-    ))
+        parts.extend(
+            [
+                _section("想看更深一層？"),
+                _line(
+                    "五行只是地基。下一層可以看月令（出生月份的季節力量）、十神（命盤裡每個字和日主的關係），以及大運流年——這樣才能看出哪些時段對你比較順、哪些需要多留意。"
+                ),
+                _line(
+                    "如果你正在思考某個具體問題——工作方向、關係模式、財務節奏——帶著問題去問老師，會比泛泛看整張盤更有收穫。"
+                ),
+                _line(
+                    "八字不是用來把人定型的，它更像一張描述「你在不同環境下如何被啟動」的地圖。同一張盤，在不同大環境下也會呈現不同的面向。"
+                ),
+            ]
+        )
+    parts.append(
+        _line(
+            "<small>本解讀以傳統命理象徵作為自我觀察的參考，不是醫療、心理診斷，也不是對未來的保證。"
+            "你完全可以依照自己的感受、現實條件與專業建議，選擇最適合自己的下一步。</small>"
+        )
+    )
     return _wrap(parts, detail)
 
 
@@ -365,11 +474,17 @@ def explain_ziwei(data: dict, detail: DetailLevel = "teaser") -> str:
                 break
 
     parts = [
-        _line(f"你的紫微命盤以 <strong>{_text(five, '五行局')}</strong> 為結構背景，命主 <strong>{_text(soul)}</strong>、身主 <strong>{_text(body)}</strong>。"),
-        _line(f"命宮位置：<strong>{_text(ming_name, '命宮')}</strong>，代表你面對人生舞台時最主要的展現方式。"),
+        _line(
+            f"你的紫微命盤以 <strong>{_text(five, '五行局')}</strong> 為結構背景，命主 <strong>{_text(soul)}</strong>、身主 <strong>{_text(body)}</strong>。"
+        ),
+        _line(
+            f"命宮位置：<strong>{_text(ming_name, '命宮')}</strong>，代表你面對人生舞台時最主要的展現方式。"
+        ),
     ]
     if ming_stars:
-        parts.append(_line(f"命宮主要星曜：<strong>{_join(_star_name(star) for star in ming_stars)}</strong>。"))
+        parts.append(
+            _line(f"命宮主要星曜：<strong>{_join(_star_name(star) for star in ming_stars)}</strong>。")
+        )
 
     def palace_line(target: str, topic: str) -> str | None:
         if not isinstance(palaces, list):
@@ -391,14 +506,26 @@ def explain_ziwei(data: dict, detail: DetailLevel = "teaser") -> str:
         if line:
             parts.append(_line(line))
 
-    parts.append(_line("紫微不是一次把全部宮位背起來，而是先抓命宮主軸，再挑一個最有感的生活問題深看。老師解盤的價值，就在於把對宮、三方四正與流年一起合參。"))
+    parts.append(
+        _line(
+            "紫微不是一次把全部宮位背起來，而是先抓命宮主軸，再挑一個最有感的生活問題深看。老師解盤的價值，就在於把對宮、三方四正與流年一起合參。"
+        )
+    )
 
     if detail == "full":
         for palace in palaces[:12]:
             stars = palace.get("majorStarNames") or palace.get("majorStars") or []
             star_text = _join(_star_name(star) for star in stars) or "無主星"
-            parts.append(_line(f"<strong>{_text(palace.get('name'))}</strong>：{_text(palace.get('heavenlyStem'))}{_text(palace.get('earthlyBranch'))}，主星 {star_text}。"))
-        parts.append(_line("正式諮詢時，建議把命宮、身宮、財帛、官祿、夫妻與遷移宮串成一條人生敘事，而不是逐宮孤立解讀。"))
+            parts.append(
+                _line(
+                    f"<strong>{_text(palace.get('name'))}</strong>：{_text(palace.get('heavenlyStem'))}{_text(palace.get('earthlyBranch'))}，主星 {star_text}。"
+                )
+            )
+        parts.append(
+            _line(
+                "正式諮詢時，建議把命宮、身宮、財帛、官祿、夫妻與遷移宮串成一條人生敘事，而不是逐宮孤立解讀。"
+            )
+        )
     return _wrap(parts, detail)
 
 
@@ -451,18 +578,28 @@ def explain_astro(data: dict, detail: DetailLevel = "teaser") -> str:
     asc_gift, asc_shadow = _astro_member_reading(asc_text)
 
     parts = [
-        _line(f"太陽 <strong>{sun_text}</strong>：你想活出的方向通常{_text(sun_gift)}；卡住時{_text(sun_shadow)}。"),
-        _line(f"月亮 <strong>{moon_text}</strong>：你真正需要的安全感通常{_text(moon_gift)}；壓力下{_text(moon_shadow)}。"),
-        _line(f"上升 <strong>{asc_text}</strong>：別人第一眼接收到的你，常帶著「{_text(asc_gift)}」的氣質；但也可能{_text(asc_shadow)}。"),
+        _line(
+            f"太陽 <strong>{sun_text}</strong>：你想活出的方向通常{_text(sun_gift)}；卡住時{_text(sun_shadow)}。"
+        ),
+        _line(
+            f"月亮 <strong>{moon_text}</strong>：你真正需要的安全感通常{_text(moon_gift)}；壓力下{_text(moon_shadow)}。"
+        ),
+        _line(
+            f"上升 <strong>{asc_text}</strong>：別人第一眼接收到的你，常帶著「{_text(asc_gift)}」的氣質；但也可能{_text(asc_shadow)}。"
+        ),
         _line(f"天頂：<strong>{_sign_text(mc)}</strong>，代表事業形象、成就方向與社會角色。"),
-        _line("如果你覺得自己內在需要、外在表現與人生方向不一致，這就很適合帶著星盤問老師，因為答案通常在宮位與相位的交叉處。"),
+        _line(
+            "如果你覺得自己內在需要、外在表現與人生方向不一致，這就很適合帶著星盤問老師，因為答案通常在宮位與相位的交叉處。"
+        ),
     ]
     if detail == "full":
-        parts.extend([
-            _section("深度解讀方向"),
-            _line("下一層建議加入宮位與主要相位，確認一個人的內在需求如何落到工作、關係與生活場景。"),
-            _line("若作為正式諮詢，請特別說明出生時間精準度，因為上升與宮位對時間非常敏感。"),
-        ])
+        parts.extend(
+            [
+                _section("深度解讀方向"),
+                _line("下一層建議加入宮位與主要相位，確認一個人的內在需求如何落到工作、關係與生活場景。"),
+                _line("若作為正式諮詢，請特別說明出生時間精準度，因為上升與宮位對時間非常敏感。"),
+            ]
+        )
     return _wrap(parts, detail)
 
 
@@ -614,30 +751,48 @@ def explain_humandesign(data: dict, detail: DetailLevel = "teaser") -> str:
     strategy_label = _hd_label(strategy_raw, HD_STRATEGY_LABELS)
 
     parts = [
-        _line(f"你的類型是 <strong>{_text(type_label)}</strong>，策略是 <strong>{_text(strategy_label)}</strong>。"),
-        _line(HD_TYPE_GUIDE.get(str(type_raw), "類型說明你和世界交換能量的方式，重點是把它落實到日常決策，而不是只記名稱。")),
-        _line(f"內在權威：<strong>{_text(authority_label)}</strong>。{HD_AUTHORITY_GUIDE.get(str(authority_raw), '這是做重要決定時最需要信任的身體訊號。')}"),
-        _line(f"人生角色 Profile：<strong>{_text(data.get('profile'))}</strong>，描述你學習、互動與被他人看見的方式。"),
+        _line(
+            f"你的類型是 <strong>{_text(type_label)}</strong>，策略是 <strong>{_text(strategy_label)}</strong>。"
+        ),
+        _line(
+            HD_TYPE_GUIDE.get(
+                str(type_raw), "類型說明你和世界交換能量的方式，重點是把它落實到日常決策，而不是只記名稱。"
+            )
+        ),
+        _line(
+            f"內在權威：<strong>{_text(authority_label)}</strong>。{HD_AUTHORITY_GUIDE.get(str(authority_raw), '這是做重要決定時最需要信任的身體訊號。')}"
+        ),
+        _line(
+            f"人生角色 Profile：<strong>{_text(data.get('profile'))}</strong>，描述你學習、互動與被他人看見的方式。"
+        ),
     ]
     if defined:
         center_names = [_hd_center_label(center) for center in defined]
-        parts.append(_line(f"已定義中心：<strong>{_join(center_names)}</strong>，代表較穩定、可持續輸出的能量。"))
+        parts.append(
+            _line(f"已定義中心：<strong>{_join(center_names)}</strong>，代表較穩定、可持續輸出的能量。")
+        )
     if channels:
         parts.append(_line(f"已定義通道：<strong>{_join(channels)}</strong>，可視為你較固定的天賦迴路。"))
     if gates:
         parts.append(_section("啟動閘門重點"))
         for raw_gate in gates[:8]:
             gate = _safe_int(raw_gate.get("gate") if isinstance(raw_gate, dict) else raw_gate)
-            title, copy = GATE_MEANINGS.get(gate, ("能量主題", "這個閘門描述一種被啟動的能量，需放回你的類型、策略與權威下理解。"))
+            title, copy = GATE_MEANINGS.get(
+                gate, ("能量主題", "這個閘門描述一種被啟動的能量，需放回你的類型、策略與權威下理解。")
+            )
             parts.append(_line(f"<strong>第 {gate} 閘門｜{_text(title)}</strong>：{_text(copy)}"))
 
     if detail == "full":
-        parts.extend([
-            _section("深度解讀方向"),
-            _line("人類圖最重要的是把策略與權威落實到生活決策，而不是只記住類型名稱。"),
-            _line("下一層可針對未定義中心說明容易受環境放大的主題，協助使用者分辨什麼是自己、什麼是場域影響。"),
-            _line("閘門不是單獨下結論用的，它需要和所在中心、通道、行星位置與人格/設計層一起閱讀。"),
-        ])
+        parts.extend(
+            [
+                _section("深度解讀方向"),
+                _line("人類圖最重要的是把策略與權威落實到生活決策，而不是只記住類型名稱。"),
+                _line(
+                    "下一層可針對未定義中心說明容易受環境放大的主題，協助使用者分辨什麼是自己、什麼是場域影響。"
+                ),
+                _line("閘門不是單獨下結論用的，它需要和所在中心、通道、行星位置與人格/設計層一起閱讀。"),
+            ]
+        )
     return _wrap(parts, detail)
 
 
@@ -645,7 +800,11 @@ def explain_tarot(data: dict, detail: DetailLevel = "teaser") -> str:
     cards = data.get("cards") or []
     parts = [_section("牌陣重點")]
     reversed_count = sum(1 for draw in cards if draw.get("position") == "reversed")
-    parts.append(_line(f"本次抽出 {len(cards)} 張牌，其中 {reversed_count} 張逆位。請同時看牌名、位置與正逆位，不要只看單張牌。"))
+    parts.append(
+        _line(
+            f"本次抽出 {len(cards)} 張牌，其中 {reversed_count} 張逆位。請同時看牌名、位置與正逆位，不要只看單張牌。"
+        )
+    )
 
     for index, draw in enumerate(cards, start=1):
         card = draw.get("card") or {}
@@ -655,14 +814,22 @@ def explain_tarot(data: dict, detail: DetailLevel = "teaser") -> str:
         if not meaning:
             meaning_source = card.get("reversed") if position == "逆位" else card.get("upright")
             meaning = (meaning_source or {}).get("text")
-        parts.append(_line(f"<strong>{index}. {_text(name)} / {position}</strong>：{_text(meaning, '這張牌指出當下需要被看見的主題。')}"))
+        parts.append(
+            _line(
+                f"<strong>{index}. {_text(name)} / {position}</strong>：{_text(meaning, '這張牌指出當下需要被看見的主題。')}"
+            )
+        )
 
     if detail == "full":
-        parts.extend([
-            _section("深度解牌方向"),
-            _line("三張牌建議讀成一段時間線：過去如何形成現在，現在如何推動未來。"),
-            _line("若是關係或職涯問題，建議補問：我能控制的是什麼？我需要放下的是什麼？下一步最小行動是什麼？"),
-        ])
+        parts.extend(
+            [
+                _section("深度解牌方向"),
+                _line("三張牌建議讀成一段時間線：過去如何形成現在，現在如何推動未來。"),
+                _line(
+                    "若是關係或職涯問題，建議補問：我能控制的是什麼？我需要放下的是什麼？下一步最小行動是什麼？"
+                ),
+            ]
+        )
     return _wrap(parts, detail)
 
 
@@ -671,7 +838,9 @@ def explain_runes(data: dict, detail: DetailLevel = "teaser") -> str:
     material = (data.get("meta") or {}).get("material")
     parts = [
         _section("盧恩訊息"),
-        _line(f"你本次抽出 {len(runes)} 顆符文{f'，材質為 {_text(material)}' if material else ''}。盧恩適合讀成提醒、阻力與下一步。"),
+        _line(
+            f"你本次抽出 {len(runes)} 顆符文{f'，材質為 {_text(material)}' if material else ''}。盧恩適合讀成提醒、阻力與下一步。"
+        ),
     ]
 
     for index, draw in enumerate(runes, start=1):
@@ -682,12 +851,18 @@ def explain_runes(data: dict, detail: DetailLevel = "teaser") -> str:
         if not meaning:
             meaning_source = rune.get("reversed") if position == "逆位" else rune.get("upright")
             meaning = (meaning_source or {}).get("text")
-        parts.append(_line(f"<strong>{_text(rune.get('glyph'))} {_text(name)} / {position}</strong>：{_text(meaning, '這顆符文提醒你留意當下事件背後的能量。')}"))
+        parts.append(
+            _line(
+                f"<strong>{_text(rune.get('glyph'))} {_text(name)} / {position}</strong>：{_text(meaning, '這顆符文提醒你留意當下事件背後的能量。')}"
+            )
+        )
 
     if detail == "full":
-        parts.extend([
-            _section("深度解讀方向"),
-            _line("若抽到逆位，不必視為壞事，它通常指出能量被卡住、延遲或需要重新校準。"),
-            _line("建議把符文訊息轉成一個具體行動：今天要避免什麼、練習什麼、完成什麼。"),
-        ])
+        parts.extend(
+            [
+                _section("深度解讀方向"),
+                _line("若抽到逆位，不必視為壞事，它通常指出能量被卡住、延遲或需要重新校準。"),
+                _line("建議把符文訊息轉成一個具體行動：今天要避免什麼、練習什麼、完成什麼。"),
+            ]
+        )
     return _wrap(parts, detail)

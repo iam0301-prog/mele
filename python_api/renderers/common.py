@@ -6,11 +6,11 @@ PALETTE = {
     "accent": "#C9A227",
     "accent_light": "#E8C547",
     "accent_dim": "rgba(201,162,39,0.3)",
-    "wuxing_mu": "#2D6A4F",   # 木
+    "wuxing_mu": "#2D6A4F",  # 木
     "wuxing_huo": "#C53030",  # 火
-    "wuxing_tu": "#B7791F",   # 土
+    "wuxing_tu": "#B7791F",  # 土
     "wuxing_jin": "#718096",  # 金
-    "wuxing_shui": "#2C5282", # 水
+    "wuxing_shui": "#2C5282",  # 水
 }
 
 # 共用動畫 keyframes 給 SVG 內嵌
@@ -35,8 +35,8 @@ def oracle_backdrop(width: int | float, height: int | float, title: str = "", su
     title_svg = ""
     if title:
         title_svg = f"""
-  <text x="{width/2}" y="42" text-anchor="middle" font-size="20" fill="{PALETTE['accent_light']}" letter-spacing="5">{title}</text>
-  <text x="{width/2}" y="60" text-anchor="middle" font-size="9" fill="rgba(244,234,210,0.55)" letter-spacing="3">{subtitle}</text>"""
+  <text x="{width / 2}" y="42" text-anchor="middle" font-size="20" fill="{PALETTE["accent_light"]}" letter-spacing="5">{title}</text>
+  <text x="{width / 2}" y="60" text-anchor="middle" font-size="9" fill="rgba(244,234,210,0.55)" letter-spacing="3">{subtitle}</text>"""
 
     return f"""
 <defs>
@@ -56,16 +56,16 @@ def oracle_backdrop(width: int | float, height: int | float, title: str = "", su
   </filter>
 </defs>
 <rect x="0" y="0" width="{width}" height="{height}" rx="18" fill="url(#oracle-bg)"/>
-<path d="M24 24 H{width-24} V{height-24} H24 Z" fill="none" stroke="rgba(201,162,39,0.52)" stroke-width="1.4"/>
-<path d="M38 38 H{width-38} V{height-38} H38 Z" fill="none" stroke="rgba(244,234,210,0.18)" stroke-width="1"/>
-<path d="M54 22 C70 40 70 56 54 74 M{width-54} 22 C{width-70} 40 {width-70} 56 {width-54} 74 M54 {height-22} C70 {height-40} 70 {height-56} 54 {height-74} M{width-54} {height-22} C{width-70} {height-40} {width-70} {height-56} {width-54} {height-74}" fill="none" stroke="rgba(201,162,39,0.42)" stroke-width="1.2"/>
+<path d="M24 24 H{width - 24} V{height - 24} H24 Z" fill="none" stroke="rgba(201,162,39,0.52)" stroke-width="1.4"/>
+<path d="M38 38 H{width - 38} V{height - 38} H38 Z" fill="none" stroke="rgba(244,234,210,0.18)" stroke-width="1"/>
+<path d="M54 22 C70 40 70 56 54 74 M{width - 54} 22 C{width - 70} 40 {width - 70} 56 {width - 54} 74 M54 {height - 22} C70 {height - 40} 70 {height - 56} 54 {height - 74} M{width - 54} {height - 22} C{width - 70} {height - 40} {width - 70} {height - 56} {width - 54} {height - 74}" fill="none" stroke="rgba(201,162,39,0.42)" stroke-width="1.2"/>
 <g opacity="0.72">
   <circle cx="76" cy="82" r="1.3" fill="#E8C547"/>
-  <circle cx="{width-82}" cy="86" r="1.2" fill="#E8C547"/>
-  <circle cx="{width*0.22}" cy="{height-70}" r="1.1" fill="#F4EAD2"/>
-  <circle cx="{width*0.72}" cy="{height-88}" r="1.3" fill="#F4EAD2"/>
-  <path d="M{width/2-14} 25 H{width/2+14} M{width/2} 11 V39" stroke="#C9A227" stroke-width="1"/>
-  <circle cx="{width/2}" cy="25" r="7" fill="none" stroke="#C9A227" stroke-width="1"/>
+  <circle cx="{width - 82}" cy="86" r="1.2" fill="#E8C547"/>
+  <circle cx="{width * 0.22}" cy="{height - 70}" r="1.1" fill="#F4EAD2"/>
+  <circle cx="{width * 0.72}" cy="{height - 88}" r="1.3" fill="#F4EAD2"/>
+  <path d="M{width / 2 - 14} 25 H{width / 2 + 14} M{width / 2} 11 V39" stroke="#C9A227" stroke-width="1"/>
+  <circle cx="{width / 2}" cy="25" r="7" fill="none" stroke="#C9A227" stroke-width="1"/>
 </g>
 {title_svg}
 """

@@ -39,20 +39,20 @@ def render(data: dict) -> dict:
   {master_badge}
 </g>
 <g class="fadein" style="animation-delay:.4s">
-  <text x="300" y="286" text-anchor="middle" font-size="22" fill="{PALETTE['accent']}" letter-spacing="3">{escape(archetype['name'])}</text>
+  <text x="300" y="286" text-anchor="middle" font-size="22" fill="{PALETTE["accent"]}" letter-spacing="3">{escape(archetype["name"])}</text>
   <foreignObject x="62" y="302" width="476" height="72">
     <div xmlns="http://www.w3.org/1999/xhtml" style="font-family:'Noto Sans TC';font-size:13px;color:rgba(255,255,255,0.86);text-align:center;line-height:1.8">
-      {escape(archetype['desc'])}
+      {escape(archetype["desc"])}
     </div>
   </foreignObject>
 </g>
 <g class="fadein" style="animation-delay:.8s">
-  <line x1="92" y1="392" x2="508" y2="392" stroke="{PALETTE['accent_dim']}" stroke-dasharray="3,3"/>
+  <line x1="92" y1="392" x2="508" y2="392" stroke="{PALETTE["accent_dim"]}" stroke-dasharray="3,3"/>
   <text x="300" y="420" text-anchor="middle" font-size="13" fill="rgba(255,255,255,0.68)" letter-spacing="1">
-    年 {breakdown['yearReduced']} + 月 {breakdown['monthReduced']} + 日 {breakdown['dayReduced']} = {breakdown['total']} -> {escape(life_path_display)}
+    年 {breakdown["yearReduced"]} + 月 {breakdown["monthReduced"]} + 日 {breakdown["dayReduced"]} = {breakdown["total"]} -> {escape(life_path_display)}
   </text>
-  <circle cx="120" cy="438" r="14" fill="rgba(255,255,255,0.05)" stroke="{PALETTE['accent_dim']}"/>
-  <text x="120" y="443" text-anchor="middle" font-size="11" fill="{PALETTE['accent']}">{escape(birth_day_display)}</text>
+  <circle cx="120" cy="438" r="14" fill="rgba(255,255,255,0.05)" stroke="{PALETTE["accent_dim"]}"/>
+  <text x="120" y="443" text-anchor="middle" font-size="11" fill="{PALETTE["accent"]}">{escape(birth_day_display)}</text>
   <text x="168" y="443" text-anchor="start" font-size="11" fill="rgba(255,255,255,0.58)">生日數</text>
   <text x="300" y="448" text-anchor="middle" font-size="10" fill="rgba(255,255,255,0.52)">{escape(note)}</text>
 </g>

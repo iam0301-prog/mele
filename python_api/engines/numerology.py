@@ -40,7 +40,10 @@ MEANINGS = {
     7: ("研究者", "需要理解事情背後的原因，適合深度學習、觀察與建立自己的答案。"),
     8: ("管理者", "關心成就、資源與現實結果，適合練習權力、金錢與責任的平衡。"),
     9: ("整合者", "看重意義、包容與完成，人生常在學習放下、整理與服務更大的方向。"),
-    11: ("靈感型協調者", "11 是 2 的高敏感版本：直覺強、感受細，容易接收到很多靈感，也更需要穩定情緒與界線。"),
+    11: (
+        "靈感型協調者",
+        "11 是 2 的高敏感版本：直覺強、感受細，容易接收到很多靈感，也更需要穩定情緒與界線。",
+    ),
     22: ("實踐型建造者", "22 是 4 的放大版本：有把願景落地的能力，但要避免把所有責任都扛在自己身上。"),
     33: ("療癒型守護者", "33 是 6 的放大版本：很適合陪伴、教學與照顧，但要先學會不犧牲自己。"),
 }
@@ -73,9 +76,7 @@ def calculate(year: int, month: int, day: int) -> dict:
         "baseNumber": life_path_reduced,
         "calculationMethod": "保留大師數派：11 / 22 / 33 會保留，同時標示最後化簡的底色。",
         "calculationNote": (
-            f"你的主數以 {display_number(life_path)} 呈現。"
-            if is_master
-            else f"你的主數是 {life_path}。"
+            f"你的主數以 {display_number(life_path)} 呈現。" if is_master else f"你的主數是 {life_path}。"
         ),
         "breakdown": {
             "yearReduced": year_reduced,

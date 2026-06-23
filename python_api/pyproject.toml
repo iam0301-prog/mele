@@ -15,12 +15,15 @@ extend-exclude = ["venv", "__pycache__", "data", ".pytest_cache"]
 select = ["E", "W", "F", "I", "B", "UP", "SIM", "N", "RUF", "ASYNC", "S"]
 # 演算法引擎含許多領域變數命名（甲乙丙丁等中文 / 西方占星縮寫），不強制 N803/N806
 # S101 assert 在測試中允許；S311 random 在塔羅/盧恩抽卡是合理用途
-ignore = ["N802", "N803", "N806", "S101", "S311", "B008", "SIM108"]
+# RUF001/002/003: 中文全形標點（，：（）等）在中文專案屬正常用途，非可疑英文標點，一律豁免
+ignore = ["N802", "N803", "N806", "S101", "S311", "B008", "SIM108", "RUF001", "RUF002", "RUF003"]
 
 [tool.ruff.lint.per-file-ignores]
-"tests/**" = ["S", "F401", "F811"]
+"tests/**" = ["S", "F401", "F811", "E501"]  # 驗證腳本 print 字串難切；E402 由 noqa 個別標記
 "engines/explanations.py" = ["E501"]  # 大量解釋文字
+"engines/numerology.py" = ["E501"]  # 命盤解釋文字難切
 "renderers/*.py" = ["E501"]  # SVG/HTML 字串難切
+"main.py" = ["E501"]  # HTML inline style 字串難切
 
 [tool.ruff.format]
 quote-style = "double"

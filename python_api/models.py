@@ -8,7 +8,7 @@ implementation details.
 """
 
 from datetime import datetime
-from typing import Any, Literal, Optional
+from typing import Any, Literal
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from pydantic import BaseModel, Field, field_validator, model_validator
@@ -135,7 +135,7 @@ def _coerce_birth_fields(data: Any, *, include_time: bool = False) -> Any:
     if include_time:
         birth_time = next_data.get("birth_time") or next_data.get("time")
         if birth_time and "hour" not in next_data:
-            hour, minute, *_ = str(birth_time).split(":") + ["0"]
+            hour, minute, *_ = [*str(birth_time).split(":"), "0"]
             next_data.setdefault("hour", int(hour))
             next_data.setdefault("minute", int(minute))
 
@@ -151,11 +151,11 @@ def _coerce_birth_fields(data: Any, *, include_time: bool = False) -> Any:
 class RenderBundle(BaseModel):
     """Visual and narrative render data for web, mobile, and AR clients."""
 
-    svg: Optional[str] = Field(None, description="Inline SVG for result display.")
-    html: Optional[str] = Field(None, description="Readable HTML explanation.")
+    svg: str | None = Field(None, description="Inline SVG for result display.")
+    html: str | None = Field(None, description="Readable HTML explanation.")
     palette: list[str] = Field(default_factory=list, description="Recommended colors for AR/native clients.")
     animations: list[dict] = Field(default_factory=list, description="Animation hints for AR/native clients.")
-    speech: Optional[str] = Field(None, description="Short spoken summary for TTS or AR narration.")
+    speech: str | None = Field(None, description="Short spoken summary for TTS or AR narration.")
 
 
 class CalcResponse(BaseModel):
@@ -197,7 +197,7 @@ class BaziRequest(BaseModel):
     hour: int = Field(..., ge=0, le=23)
     minute: int = Field(0, ge=0, le=59)
     sect: Literal[1, 2] = 2
-    longitude: Optional[float] = None
+    longitude: float | None = None
 
     @model_validator(mode="before")
     @classmethod
@@ -243,9 +243,9 @@ class TarotRequest(BaseModel):
     count: int = Field(3, ge=1, le=10)
     reversed_enabled: bool = Field(True, alias="reversed")
     spread: str = "three_card"
-    seed: Optional[int] = None
-    question: Optional[str] = None
-    tarot_style: Optional[Literal["forest_athena", "ocean_poseidon", "ancient_pharaoh"]] = "ocean_poseidon"
+    seed: int | None = None
+    question: str | None = None
+    tarot_style: Literal["forest_athena", "ocean_poseidon", "ancient_pharaoh"] | None = "ocean_poseidon"
 
 
 class RunesRequest(BaseModel):
@@ -253,10 +253,10 @@ class RunesRequest(BaseModel):
 
     count: int = Field(3, ge=1, le=24)
     reversed_enabled: bool = Field(True, alias="reversed")
-    spread: Optional[str] = None
-    material: Optional[str] = "stone"
-    seed: Optional[int] = None
-    question: Optional[str] = None
+    spread: str | None = None
+    material: str | None = "stone"
+    seed: int | None = None
+    question: str | None = None
 
 
 class AstroRequest(BaseModel):

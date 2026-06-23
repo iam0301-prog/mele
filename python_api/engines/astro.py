@@ -9,20 +9,26 @@
 
 精度等同 Astro.com 業界標準（Moshier 內建演算法、太陽月亮 ~10 arc-sec）
 """
+
 import json
-import subprocess
 import os
+import subprocess
 from pathlib import Path
-from typing import Optional
 
 HELPER = str(Path(__file__).resolve().parents[1] / "_sweph_helper.cjs")
 
 
-def calculate(year: int, month: int, day: int, hour: int, minute: int = 0,
-              timezone: float = 8.0,
-              latitude: Optional[float] = None,
-              longitude: Optional[float] = None,
-              house_system: str = "P") -> dict:
+def calculate(
+    year: int,
+    month: int,
+    day: int,
+    hour: int,
+    minute: int = 0,
+    timezone: float = 8.0,
+    latitude: float | None = None,
+    longitude: float | None = None,
+    house_system: str = "P",
+) -> dict:
     """
     西洋占星本命盤
 
@@ -39,8 +45,11 @@ def calculate(year: int, month: int, day: int, hour: int, minute: int = 0,
 
     args = {
         "tool": "astro",
-        "year": year, "month": month, "day": day,
-        "hour": hour, "minute": minute,
+        "year": year,
+        "month": month,
+        "day": day,
+        "hour": hour,
+        "minute": minute,
         "timezone": timezone,
         "house": house_system,
     }
@@ -50,25 +59,25 @@ def calculate(year: int, month: int, day: int, hour: int, minute: int = 0,
         args["lon"] = longitude
 
     try:
-        result = subprocess.run(
-            ["node", HELPER, json.dumps(args)],
+        result = subprocess.run(  # noqa: S603
+            ["node", HELPER, json.dumps(args)],  # noqa: S607
             capture_output=True,
             text=True,
             encoding="utf-8",
             timeout=15,
             check=False,
         )
-    except FileNotFoundError:
-        raise RuntimeError("Node.js 未安裝或不在 PATH。占星計算需要 Node.js。")
+    except FileNotFoundError as e:
+        raise RuntimeError("Node.js 未安裝或不在 PATH。占星計算需要 Node.js。") from e
 
     if result.returncode != 0:
         try:
             err = json.loads(result.stderr)
             raise RuntimeError(f"占星計算錯誤：{err.get('error', result.stderr)}")
-        except json.JSONDecodeError:
-            raise RuntimeError(f"sweph helper 失敗：{result.stderr or result.stdout}")
+        except json.JSONDecodeError as je:
+            raise RuntimeError(f"sweph helper 失敗：{result.stderr or result.stdout}") from je
 
     try:
         return json.loads(result.stdout)
     except json.JSONDecodeError as e:
-        raise RuntimeError(f"無法解析 sweph 輸出：{e}\n前 500 字：{result.stdout[:500]}")
+        raise RuntimeError(f"無法解析 sweph 輸出：{e}\n前 500 字：{result.stdout[:500]}") from e

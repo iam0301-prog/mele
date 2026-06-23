@@ -1,6 +1,6 @@
 """瑪雅視覺：旋轉的銀河印記 + 神諭板"""
-from .common import COMMON_KEYFRAMES, PALETTE, oracle_backdrop
 
+from .common import COMMON_KEYFRAMES, PALETTE, oracle_backdrop
 
 SEAL_COLOR_MAP = {
     "red": ("#c94a3f", "#ffd1c9"),
@@ -180,9 +180,9 @@ def render(data: dict) -> dict:
         return f"""
         <g class="fadein">
           <rect x="{x}" y="{y}" width="104" height="92" rx="14" fill="{bg}" stroke="{stroke}" stroke-width="{2 if is_self else 1}"/>
-          <text x="{x+52}" y="{y+17}" text-anchor="middle" font-size="9" fill="rgba(255,255,255,0.74)" letter-spacing="2">{role}</text>
-          {seal_glyph(k_info['seal'], x + 52, y + 48, 0.42)}
-          <text x="{x+52}" y="{y+84}" text-anchor="middle" font-size="16" fill="{PALETTE['accent']}" font-weight="700">Kin {k_info['kin']}</text>
+          <text x="{x + 52}" y="{y + 17}" text-anchor="middle" font-size="9" fill="rgba(255,255,255,0.74)" letter-spacing="2">{role}</text>
+          {seal_glyph(k_info["seal"], x + 52, y + 48, 0.42)}
+          <text x="{x + 52}" y="{y + 84}" text-anchor="middle" font-size="16" fill="{PALETTE["accent"]}" font-weight="700">Kin {k_info["kin"]}</text>
         </g>"""
 
     crosscheck_rows = [
@@ -214,30 +214,30 @@ def render(data: dict) -> dict:
 
 <!-- 旋轉外環（13 音調等分） -->
 <g style="transform-origin: 300px 130px; animation: spin 80s linear infinite;">
-  {''.join(f'<line x1="300" y1="{40+i}" x2="300" y2="{50+i}" stroke="{PALETTE["accent"]}" stroke-width="2" transform="rotate({i*360/13} 300 130)"/>' for i in range(13))}
+  {"".join(f'<line x1="300" y1="{40 + i}" x2="300" y2="{50 + i}" stroke="{PALETTE["accent"]}" stroke-width="2" transform="rotate({i * 360 / 13} 300 130)"/>' for i in range(13))}
 </g>
 
 <!-- 中央 Kin 球 -->
 <circle cx="300" cy="130" r="80" fill="url(#kinGrad)" class="glow"/>
 {seal_glyph(seal, 300, 130, 1.04, hero=True)}
 <text x="300" y="120" text-anchor="middle" font-size="36" fill="white" font-weight="600">Kin {kin}</text>
-<text x="300" y="148" text-anchor="middle" font-size="14" fill="white" letter-spacing="2">{tone['zh']} {seal['zh']}</text>
+<text x="300" y="148" text-anchor="middle" font-size="14" fill="white" letter-spacing="2">{tone["zh"]} {seal["zh"]}</text>
 
-<text x="300" y="245" text-anchor="middle" font-size="14" fill="{PALETTE['accent']}" letter-spacing="3">命運神諭板</text>
+<text x="300" y="245" text-anchor="middle" font-size="14" fill="{PALETTE["accent"]}" letter-spacing="3">命運神諭板</text>
 <text x="300" y="263" text-anchor="middle" font-size="9" fill="rgba(255,255,255,0.5)" letter-spacing="3">ORACLE BOARD</text>
 
 <!-- 神諭板：上=指引、右=支持、左=挑戰、下=隱藏推動力、中=本命 -->
 <!-- 採對稱 20px 縫的十字佈局；五格大小完全一致 (100×80)、距中心皆 100px -->
 <!-- 中心點 (300, 380)；20px 間距形成完美十字 -->
-{cell(250, 280, '指引', oracle.get('guide'))}
-{cell(130, 380, '挑戰', oracle.get('antipode'))}
-{cell(250, 380, '本命', oracle.get('self'), is_self=True)}
-{cell(370, 380, '支持', oracle.get('analog'))}
-{cell(250, 480, '隱藏推動力', oracle.get('occult'))}
+{cell(250, 280, "指引", oracle.get("guide"))}
+{cell(130, 380, "挑戰", oracle.get("antipode"))}
+{cell(250, 380, "本命", oracle.get("self"), is_self=True)}
+{cell(370, 380, "支持", oracle.get("analog"))}
+{cell(250, 480, "隱藏推動力", oracle.get("occult"))}
 
 <g class="fadein">
-  <rect x="58" y="575" width="484" height="145" rx="14" fill="rgba(0,0,0,0.22)" stroke="{PALETTE['accent_dim']}" stroke-width="1"/>
-  <text x="300" y="596" text-anchor="middle" font-size="12" fill="{PALETTE['accent']}" letter-spacing="3">STARROOT 對照欄位</text>
+  <rect x="58" y="575" width="484" height="145" rx="14" fill="rgba(0,0,0,0.22)" stroke="{PALETTE["accent_dim"]}" stroke-width="1"/>
+  <text x="300" y="596" text-anchor="middle" font-size="12" fill="{PALETTE["accent"]}" letter-spacing="3">STARROOT 對照欄位</text>
   {crosscheck_svg}
 </g>
 </svg>"""
@@ -248,6 +248,10 @@ def render(data: dict) -> dict:
         f"傳統馬雅曆對照為 Tzolkin {classic.get('label', '未提供')}、"
         f"Haab {haab.get('label', '未提供')}、Long Count {long_count.get('starrootLabel') or long_count.get('label', '未提供')}。"
     )
-    return {"svg": svg, "html": None,
-            "palette": [main_color, PALETTE["accent"]],
-            "animations": [], "speech": speech}
+    return {
+        "svg": svg,
+        "html": None,
+        "palette": [main_color, PALETTE["accent"]],
+        "animations": [],
+        "speech": speech,
+    }

@@ -12,10 +12,10 @@ import asyncio
 import os
 import traceback
 from copy import deepcopy
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from functools import lru_cache
 from time import monotonic
-from typing import Literal, Optional
+from typing import Literal
 
 from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -44,7 +44,6 @@ from renderers import (
     tarot_render,
     ziwei_render,
 )
-
 
 API_VERSION = "1.0.0"
 ENGINES = ["numerology", "maya", "bazi", "ziwei", "tarot", "runes", "astro", "humandesign"]
@@ -148,7 +147,9 @@ EXPLAINER = {
 }
 
 
-def wrap(tool: str, request_input: dict, data: dict, render_bundle: dict, detail: str = "teaser") -> CalcResponse:
+def wrap(
+    tool: str, request_input: dict, data: dict, render_bundle: dict, detail: str = "teaser"
+) -> CalcResponse:
     """Normalize every calculator result into the public API response shell."""
 
     if tool in EXPLAINER and not render_bundle.get("html"):
@@ -164,7 +165,7 @@ def wrap(tool: str, request_input: dict, data: dict, render_bundle: dict, detail
     return CalcResponse(
         tool=tool,
         version=API_VERSION,
-        computed_at=datetime.now(timezone.utc),
+        computed_at=datetime.now(UTC),
         input=request_input,
         data=data,
         render=RenderBundle(**render_bundle),
@@ -199,7 +200,7 @@ def _cached_bazi(
     hour: int,
     minute: int,
     sect: int,
-    longitude: Optional[float],
+    longitude: float | None,
 ) -> dict:
     return bazi.calculate(year, month, day, hour, minute, sect, longitude)
 
@@ -309,7 +310,9 @@ async def calc_bazi(req: BaziRequest, detail: DetailQuery = Query("teaser")):
 async def calc_ziwei(req: ZiweiRequest, detail: DetailQuery = Query("teaser")):
     """紫微斗數：十二宮、主星與命盤結構。"""
 
-    data = await run_calc("ziwei", _cached_ziwei, req.year, req.month, req.day, req.hour, req.minute, req.gender)
+    data = await run_calc(
+        "ziwei", _cached_ziwei, req.year, req.month, req.day, req.hour, req.minute, req.gender
+    )
     return wrap("ziwei", req.model_dump(), data, ziwei_render.render(data), detail=detail)
 
 
@@ -317,15 +320,25 @@ async def calc_ziwei(req: ZiweiRequest, detail: DetailQuery = Query("teaser")):
 async def calc_tarot(req: TarotRequest, detail: DetailQuery = Query("teaser")):
     """塔羅：抽牌、正逆位與牌陣位置。"""
 
-    data = await run_calc("tarot", tarot.draw, req.count, req.reversed_enabled, req.spread, req.seed, req.tarot_style)
-    return wrap("tarot", req.model_dump(), data, tarot_render.render(data, data.get("meta", {}).get("tarot_style")), detail=detail)
+    data = await run_calc(
+        "tarot", tarot.draw, req.count, req.reversed_enabled, req.spread, req.seed, req.tarot_style
+    )
+    return wrap(
+        "tarot",
+        req.model_dump(),
+        data,
+        tarot_render.render(data, data.get("meta", {}).get("tarot_style")),
+        detail=detail,
+    )
 
 
 @app.post("/api/v1/calc/runes", response_model=CalcResponse, tags=["Calc"])
 async def calc_runes(req: RunesRequest, detail: DetailQuery = Query("teaser")):
     """盧恩：Elder Futhark 抽石與材質呈現。"""
 
-    data = await run_calc("runes", runes.draw, req.count, req.reversed_enabled, req.seed, req.spread, req.material or "stone")
+    data = await run_calc(
+        "runes", runes.draw, req.count, req.reversed_enabled, req.seed, req.spread, req.material or "stone"
+    )
     return wrap("runes", req.model_dump(), data, runes_render.render(data), detail=detail)
 
 
@@ -414,4 +427,4 @@ async def ready():
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=8000)  # noqa: S104
