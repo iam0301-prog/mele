@@ -39,10 +39,14 @@ function TeachersInner() {
           setTeachers(rows);
           setDemoMode(false);
         } else {
+          const sortByRating = (list: typeof DEMO_TEACHERS) =>
+            [...list].sort((a, b) => Number(b.rating ?? 0) - Number(a.rating ?? 0));
           setTeachers(
-            filter && filter !== '全部'
-              ? DEMO_TEACHERS.filter((teacher) => (teacher.specialties || []).includes(filter))
-              : DEMO_TEACHERS,
+            sortByRating(
+              filter && filter !== '全部'
+                ? DEMO_TEACHERS.filter((teacher) => (teacher.specialties || []).includes(filter))
+                : DEMO_TEACHERS,
+            ),
           );
           setDemoMode(true);
         }
@@ -99,7 +103,8 @@ function TeachersInner() {
         {!loading && teachers.length === 0 && (
           <div className="py-16 text-center text-white/60">
             <div className="mb-3 text-4xl text-accent opacity-50">MELE</div>
-            {copy.directory.emptyTitle}
+            <p className="mb-2">{copy.directory.emptyTitle}</p>
+            <p className="mx-auto mb-4 max-w-sm text-sm leading-relaxed text-white/50">{copy.directory.emptyBody}</p>
             <div className="mt-4">
               <Link href={localizePath('/teachers/apply', locale)} className="text-accent text-xs tracking-widest hover:opacity-80">
                 {copy.directory.emptyAction}
@@ -123,12 +128,18 @@ function TeachersInner() {
 function TeacherCard({ teacher }: { teacher: Teacher }) {
   const locale = useProvidedLocale();
   const copy = getTeacherCopy(locale);
-  const displayTeacher = teacher.id.startsWith('demo-') ? localizeDemoTeacher(teacher, locale) : teacher;
+  const isDemo = teacher.id.startsWith('demo-');
+  const displayTeacher = isDemo ? localizeDemoTeacher(teacher, locale) : teacher;
   return (
     <Link
       href={localizePath(`/teachers/${teacher.id}`, locale)}
-      className="block rounded-2xl border border-accent-dim bg-white/[0.03] p-6 transition-all hover:-translate-y-1 hover:border-accent hover:shadow-gold-soft"
+      className="relative block rounded-2xl border border-accent-dim bg-white/[0.03] p-6 transition-all hover:-translate-y-1 hover:border-accent hover:shadow-gold-soft"
     >
+      {isDemo && (
+        <div className="absolute right-3 top-3 rounded-full border border-accent-dim bg-black/50 px-2 py-0.5 text-[10px] tracking-wide text-white/50">
+          {copy.directory.demoBadge}
+        </div>
+      )}
       <div className="mx-auto mb-3 flex h-20 w-20 items-center justify-center rounded-full bg-mele-gold font-serif text-3xl font-bold text-primary">
         {displayTeacher.display_name.charAt(0)}
       </div>

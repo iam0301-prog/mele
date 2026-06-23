@@ -392,7 +392,7 @@ export default function MobilePage() {
                         onClick={() => updateAnswer('budget', item.value)}
                       >
                         <strong>{item.label}</strong>
-                        <small>依可預約服務價格比對</small>
+                        <small>依服務時長類型篩選</small>
                       </button>
                     ))}
                   </div>
@@ -490,7 +490,7 @@ export default function MobilePage() {
                       {result.service && (
                         <div className="mobile-match-card__service">
                           <span>{result.service.name}</span>
-                          <strong>NT$ {result.service.price_ntd.toLocaleString('zh-TW')} / {result.service.duration_minutes} 分鐘</strong>
+                          <strong>公測期免費 / {result.service.duration_minutes} 分鐘</strong>
                         </div>
                       )}
                       <div className="mobile-match-card__actions">
@@ -536,7 +536,7 @@ export default function MobilePage() {
             <div className="mobile-hero mobile-hero--compact">
               <div className="ritual-kicker">CONSULTATION MARKET</div>
               <h1>老師中心</h1>
-              <p>想直接看所有老師、服務價格與評價，可以進入完整老師列表。若你不確定該找誰，建議先回到「引導」完成建議清單。</p>
+              <p>想直接看所有老師、服務介紹與評價，可以進入完整老師列表。若你不確定該找誰，建議先回到「引導」完成建議清單。</p>
             </div>
             <Link href="/teachers" className="mele-btn-primary">查看所有老師</Link>
             <Link href="/teachers/apply" className="mele-btn-secondary">申請成為老師</Link>

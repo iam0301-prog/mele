@@ -350,7 +350,7 @@ export function LocalizedLoginClient({ locale }: { locale: Locale }) {
       : 'Email 可用；Google / LINE 會依 Supabase 設定顯示';
 
   const flowSteps = mode === 'signin'
-    ? ['登入帳號', '領每日 200 點', '回到封測任務']
+    ? ['登入帳號', '完成每日儀式', '回到封測任務']
     : ['建立帳號', '驗證 Email', '開始每日儀式'];
 
   return (
@@ -372,12 +372,12 @@ export function LocalizedLoginClient({ locale }: { locale: Locale }) {
 
           <div className="auth-beta-status" aria-label="封測登入狀態">
             <div>
-              <span>每日點數</span>
-              <strong>200</strong>
+              <span>每日儀式</span>
+              <strong>塔羅 / 盧恩</strong>
             </div>
             <div>
-              <span>深度解鎖</span>
-              <strong>100 點</strong>
+              <span>延伸解讀</span>
+              <strong>流日 / 流月</strong>
             </div>
             <div>
               <span>OAuth</span>

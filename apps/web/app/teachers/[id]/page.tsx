@@ -137,7 +137,7 @@ export default async function TeacherDetailPage({ params }: PageProps) {
                   </div>
                 </div>
                 <div className="text-center">
-                  <div className="font-serif text-2xl text-accent">NT$ {service.price_ntd.toLocaleString(localeTag)}</div>
+                  <div className="font-serif text-base text-success">{copy.detail.betaFreeLabel ?? '公測期免費'}</div>
                   {isDemo ? (
                     <Link href={localizePath('/mobile', locale)} className="mele-btn-secondary mt-2 !px-5 !py-2 !text-xs">
                       {copy.detail.guideBack}

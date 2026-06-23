@@ -11,6 +11,10 @@
   --accent: #C9A227;
   --accent-light: #E8C547;
   --accent-dim: rgba(201, 162, 39, 0.3);
+  /* P0 視覺美編：暖珊瑚輔色，讓整站溫暖可親 */
+  --warm: #E8935A;
+  --warm-light: #F0B07A;
+  --warm-dim: rgba(232, 147, 90, 0.25);
   --reverse: #B8001F;
   --success: #2D6A4F;
   --warning: #F4A261;
@@ -72,18 +76,28 @@ body::before {
   }
 
   .mele-section-title {
-    @apply font-serif text-accent text-xl tracking-[0.25em] mb-2;
+    /* P0 字距修正：標題字距收到 0.08em，保留東方美感但不妨礙閱讀 */
+    @apply font-serif text-accent text-xl tracking-[0.08em] mb-2;
   }
 
   .mele-section-subtitle {
-    @apply text-white/60 text-xs tracking-[0.25em] mb-6 uppercase;
+    /* P0 字距修正：小標籤維持 0.2em 以保留設計感（全大寫英文字距可稍寬） */
+    @apply text-white/60 text-xs tracking-[0.2em] mb-6 uppercase;
   }
 
   .mele-btn-primary {
+    /* P0 視覺美編：改用暖珊瑚色 #E8935A，讓 CTA 從「冷金」變「溫暖可親」 */
     @apply inline-flex items-center justify-center px-9 py-3.5 rounded-full
-           bg-mele-gold text-primary font-bold tracking-[0.25em] text-sm
-           hover:-translate-y-0.5 hover:shadow-gold transition-all duration-300
+           font-bold tracking-[0.12em] text-sm
+           hover:-translate-y-0.5 transition-all duration-300
            disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none;
+    background: linear-gradient(135deg, #F0B07A, #E8935A);
+    color: #0D1B2A; /* 深藍字，對比度 7.25:1，通過 WCAG AA */
+    box-shadow: 0 6px 22px rgba(232, 147, 90, 0.38);
+  }
+  .mele-btn-primary:hover:not(:disabled) {
+    box-shadow: 0 10px 30px rgba(232, 147, 90, 0.5);
+    background: linear-gradient(135deg, #F5BC8A, #EC9E6A);
   }
 
   .mele-btn-secondary {
@@ -118,7 +132,8 @@ body::before {
   }
 
   .mele-h1 {
-    @apply font-serif font-semibold text-4xl md:text-5xl mb-3 tracking-[0.25em]
+    /* P0 字距修正：大標題 0.25em → 0.1em，大字本身已有視覺重量不需拉太開 */
+    @apply font-serif font-semibold text-4xl md:text-5xl mb-3 tracking-[0.1em]
            bg-mele-text bg-clip-text text-transparent;
   }
 

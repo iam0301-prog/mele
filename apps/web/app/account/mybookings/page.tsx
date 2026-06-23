@@ -1,10 +1,11 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import { useToast } from '@/components/ToastProvider';
+import { getLocaleFromPathname, localizePath } from '@/lib/i18n/config';
 
 type BookingTab = 'upcoming' | 'past' | 'cancelled';
 
@@ -23,13 +24,14 @@ interface Booking {
 }
 
 const STATUS_LABEL: Record<string, string> = {
-  pending: '待付款', paid: '已付款', confirmed: '已確認', in_progress: '進行中',
+  pending: '待確認', paid: '已確認', confirmed: '已確認', in_progress: '進行中',
   completed: '已完成', cancelled_customer: '客戶取消',
-  cancelled_teacher: '老師取消', refunded: '已退款', no_show: '未出席',
+  cancelled_teacher: '老師取消', refunded: '已取消', no_show: '未出席',
 };
 
 export default function MyBookingsPage() {
   const router = useRouter();
+  const pathname = usePathname();
   const toast = useToast();
   const [tab, setTab] = useState<BookingTab>('upcoming');
   const [bookings, setBookings] = useState<Booking[]>([]);
@@ -41,7 +43,12 @@ export default function MyBookingsPage() {
     setLoading(true);
     const supabase = createClient();
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) { router.push('/account/login?return=/account/mybookings'); return; }
+    if (!user) {
+      const locale = getLocaleFromPathname(pathname ?? '/');
+      const returnTo = encodeURIComponent(pathname ?? '/account/mybookings');
+      router.push(localizePath(`/account/login?return=${returnTo}`, locale));
+      return;
+    }
     const now = new Date().toISOString();
     let q = supabase
       .from('bookings')
@@ -61,14 +68,13 @@ export default function MyBookingsPage() {
       setReviewedSet(new Set());
     }
     setLoading(false);
-  }, [tab, router]);
+  }, [tab, router, pathname]);
 
   useEffect(() => { load(); }, [load]);
 
   const cancel = async (b: Booking) => {
-    const hours = (new Date(b.scheduled_at).getTime() - Date.now()) / 3600000;
-    const refund = hours >= 24 ? '全額退款' : hours > 0 ? '退 50%' : '無法退款';
-    if (!confirm(`確定取消？預計：${refund}`)) return;
+    // PAYMENT_GATE: 公測期間無費用，取消說明不涉退款。待開收費時可補退款邏輯。
+    if (!confirm('確定取消這筆預約？公測期間取消不涉及任何費用。')) return;
     const supabase = createClient();
     const { error } = await supabase.rpc('cancel_booking', { p_booking_id: b.id, p_reason: '客戶自行取消' });
     if (error) {
@@ -117,7 +123,15 @@ export default function MyBookingsPage() {
         {!loading && bookings.length === 0 && (
           <div className="text-center py-12 text-white/60">
             <div className="text-4xl text-accent opacity-50 mb-3">○</div>
-            沒有紀錄
+            <p className="mb-2">
+              {tab === 'upcoming' ? '還沒有即將進行的諮詢' : tab === 'past' ? '還沒有完成的諮詢紀錄' : '沒有取消的預約'}
+            </p>
+            {tab === 'upcoming' && (
+              <p className="text-sm text-white/45 mb-4">可以先瀏覽老師，找到感興趣的再預約。</p>
+            )}
+            {tab === 'upcoming' && (
+              <Link href="/teachers" className="text-accent text-xs tracking-widest hover:opacity-80">→ 前往老師列表</Link>
+            )}
           </div>
         )}
         {!loading && bookings.map((b) => (
@@ -137,7 +151,7 @@ export default function MyBookingsPage() {
                     'bg-info/30 text-info'
                   }`}>{STATUS_LABEL[b.status] || b.status}</span>
                   {b.payment_provider === 'free_test' && (
-                    <span className="ml-2 rounded-md bg-success/20 px-2 py-0.5 text-[10px] text-success">測試期免費</span>
+                    <span className="ml-2 rounded-md bg-success/20 px-2 py-0.5 text-[10px] text-success">公測期免費</span>
                   )}
                 </div>
                 {b.customer_question && (
@@ -145,7 +159,9 @@ export default function MyBookingsPage() {
                 )}
               </div>
               <div className="flex gap-2 flex-wrap">
-                {b.status === 'pending' && b.payment_provider !== 'free_test' && (
+                {/* PAYMENT_GATE: 公測期間付款入口停用。
+                    待開收費時：移除 false &&，恢復付款連結顯示。 */}
+                {false && b.status === 'pending' && b.payment_provider !== 'free_test' && (
                   <Link href={`/account/payment/${b.id}`} className="mele-btn-primary !px-4 !py-2 !text-xs">前往付款</Link>
                 )}
                 {(b.status === 'paid' || b.status === 'confirmed') && (

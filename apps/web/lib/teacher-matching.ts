@@ -39,9 +39,9 @@ export const MATCH_STYLES: Array<{ value: MatchStyle; label: string; keywords: s
 ];
 
 export const MATCH_BUDGETS: Array<{ value: MatchBudget; label: string; min: number; max: number }> = [
-  { value: 'under_1000', label: 'NT$1000 以下', min: 0, max: 1000 },
-  { value: '1000_2000', label: 'NT$1000-2000', min: 1000, max: 2000 },
-  { value: 'over_2000', label: 'NT$2000 以上', min: 2000, max: 999999 },
+  { value: 'under_1000', label: '較短時段', min: 0, max: 1000 },
+  { value: '1000_2000', label: '標準時段', min: 1000, max: 2000 },
+  { value: 'over_2000', label: '深度時段', min: 2000, max: 999999 },
 ];
 
 export const MATCH_DURATIONS = [30, 60, 90] as const;

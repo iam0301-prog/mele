@@ -63,12 +63,12 @@ export function MobileHeaderMenu({
   }, [open]);
 
   const primaryLinks = labels?.primaryLinks ?? [
+    { href: '/tools', label: '全部工具' },
     { href: '/daily', label: '每日儀式' },
-    { href: '/mobile', label: '手機版' },
-    { href: '/ar', label: 'AR 體驗' },
     { href: '/teachers', label: '諮詢老師' },
     { href: '/legal/disclaimer', label: '免責聲明' },
   ];
+  // 已隱藏：/mobile, /ar（路由保留，暫不在導覽顯示）
   const guestLinks = labels?.guestLinks ?? [
     { href: '/account/login', label: '登入' },
     { href: '/teachers/apply', label: '老師申請' },

@@ -42,7 +42,7 @@ const copy = {
     sections: [
       {
         title: '1. 你剛剛在哪裡？',
-        body: '例如：首頁、每日儀式、塔羅結果、生命靈數、登入、點數解鎖、老師頁。',
+        body: '例如：首頁、每日儀式、塔羅結果、生命靈數、登入、老師頁、工具結果。',
       },
       {
         title: '2. 發生什麼事？',
@@ -50,7 +50,7 @@ const copy = {
       },
       {
         title: '3. 你原本期待看到什麼？',
-        body: '例如：我以為會先看到免費結果；我想知道 100 點會解鎖什麼；我需要一個更明確的下一步。',
+        body: '例如：我以為會先看到完整結果；我不確定怎麼繼續；我需要一個更明確的下一步。',
       },
       {
         title: '4. 有截圖最好，沒有也可以',
@@ -67,7 +67,7 @@ const copy = {
       '截圖：有 / 無',
     ],
     noteTitle: '公開測試處理原則',
-    noteBody: '付款、登入、資料保存異常優先處理；文字不清楚與手機版擁擠第二優先；個人解讀內容是否有感會累積成下一輪內容修正。',
+    noteBody: '登入、資料保存異常優先處理；文字不清楚與手機版擁擠第二優先；個人解讀內容是否有感會累積成下一輪內容修正。',
   },
   en: {
     eyebrow: 'PUBLIC BETA FEEDBACK',
@@ -77,15 +77,15 @@ const copy = {
     secondary: 'Back to public beta',
     tertiary: 'Keep testing tools',
     sections: [
-      { title: '1. Where were you?', body: 'Home, daily ritual, tarot result, numerology, login, point unlock, guide page, etc.' },
+      { title: '1. Where were you?', body: 'Home, daily ritual, tarot result, numerology, login, guide page, tool result, etc.' },
       { title: '2. What happened?', body: 'Confusing copy, unclear button, cramped mobile layout, generic result, login redirect issue, etc.' },
-      { title: '3. What did you expect?', body: 'A free result first, clearer 100-point unlock details, or a more obvious next step.' },
+      { title: '3. What did you expect?', body: 'A complete result first, a clearer next step, or a simpler flow.' },
       { title: '4. Screenshots help, but are optional', body: 'Include phone model, browser, page URL, and time. Do not send ID cards, credit cards, or sensitive data.' },
     ],
     templateTitle: 'Suggested feedback format',
     template: ['I was on:', 'I wanted to:', 'What felt stuck / untrustworthy:', 'I expected:', 'Phone / browser:', 'Screenshot: yes / no'],
     noteTitle: 'How beta feedback is handled',
-    noteBody: 'Payment, login, and saved-data issues are first priority. Unclear copy and cramped mobile screens are second. Reading quality feedback will shape the next content pass.',
+    noteBody: 'Login and saved-data issues are first priority. Unclear copy and cramped mobile screens are second. Reading quality feedback will shape the next content pass.',
   },
 } as const;
 
