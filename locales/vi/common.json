@@ -95,6 +95,11 @@
     "finalKicker": "SẴN SÀNG THỬ NGHIỆM",
     "finalTitle": "Thử nghiệm, làm rõ, rồi dần hoàn thiện",
     "finalBody": "Nền tảng đa ngôn ngữ giữ nguyên tính năng hiện có và đưa nội dung công khai vào JSON dễ bảo trì.",
+    "philosophy": {
+      "kicker": "OUR APPROACH",
+      "title": "Điều chúng tôi đang xây dựng thực ra rất đơn giản",
+      "body": "Chúng tôi không đưa ra kết luận thay bạn — chúng tôi chỉ cho bạn thêm một góc nhìn về bản thân. Kết quả công cụ là tham khảo, không phải phán xét; chuyên gia là tùy chọn, không phải bắt buộc."
+    },
     "proof": [
       "Route đa ngôn ngữ",
       "Đổi ngôn ngữ giữ đường dẫn",
@@ -175,6 +180,9 @@
         "action": "Mở checklist"
       }
     ]
+  },
+  "tool": {
+    "disclaimer": "Kết quả công cụ chỉ dành cho mục đích khám phá bản thân và không cấu thành bất kỳ chẩn đoán, điều trị, hoặc tư vấn y tế hay sức khỏe tâm thần chuyên nghiệp nào."
   },
   "markets": {
     "items": [

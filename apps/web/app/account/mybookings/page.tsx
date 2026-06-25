@@ -151,7 +151,7 @@ export default function MyBookingsPage() {
                     'bg-info/30 text-info'
                   }`}>{STATUS_LABEL[b.status] || b.status}</span>
                   {b.payment_provider === 'free_test' && (
-                    <span className="ml-2 rounded-md bg-success/20 px-2 py-0.5 text-[10px] text-success">公測期免費</span>
+                    <span className="ml-2 rounded-md bg-success/20 px-2 py-0.5 text-[10px] text-success">測試期免費</span>
                   )}
                 </div>
                 {b.customer_question && (

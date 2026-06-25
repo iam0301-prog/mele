@@ -547,6 +547,7 @@ function HumanDesignPlanarPreview({ result }: { result?: CalcResponse | null }) 
   );
 }
 
+// VISUAL RESULT STAGE — renders 2D previews (AR / 3D 尚未開放，目前採用穩定 2D 展示)
 function VisualPreview({
   kind,
   result,

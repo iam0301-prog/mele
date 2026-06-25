@@ -95,6 +95,11 @@
     "finalKicker": "READY FOR PUBLIC BETA",
     "finalTitle": "Test real user flow before paid launch",
     "finalBody": "The public homepage focuses on free trials, daily ritual return, extended readings, and clear feedback instead of pretending the product is already final.",
+    "philosophy": {
+      "kicker": "OUR APPROACH",
+      "title": "What we are building is actually simple",
+      "body": "We do not draw conclusions for you — we just give you another angle to look at yourself. Tool results are reference points, not verdicts; guides are optional, not mandatory. You can always use just the tools without booking a guide. Guide ranking is determined by objective criteria such as ratings and availability, following public rules — the platform does not favor any individual guide."
+    },
     "proof": [
       "Localized routes",
       "Path-preserving language switcher",
@@ -175,6 +180,9 @@
         "action": "Open launch checklist"
       }
     ]
+  },
+  "tool": {
+    "disclaimer": "Tool results are for self-exploration only and do not constitute any diagnosis, treatment, medical, or mental health professional advice. If you are experiencing physical or mental distress, please seek professional medical or psychological support."
   },
   "markets": {
     "items": [

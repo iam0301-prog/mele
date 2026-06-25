@@ -1721,6 +1721,7 @@ function BeginnerGuidePanel({ guide }: { guide: BeginnerGuide }) {
   return (
     <section className="beginner-guide" aria-label="beginner guide">
       <div className="beginner-guide__header">
+        {/* 會員初階導讀 */}
         <span>MEMBER STARTER</span>
         <h2>{guide.title}</h2>
         <p>{guide.intro}</p>
@@ -1739,6 +1740,7 @@ function BeginnerGuidePanel({ guide }: { guide: BeginnerGuide }) {
   );
 }
 
+// ResultGamePanel — 新手閱讀順序（READING MAP）引導
 function ResultGamePanel({ profile, t }: { profile: GameProfile; t: ToolResultCopy }) {
   const g = t.game;
   return (
@@ -1774,6 +1776,7 @@ function ResultGamePanel({ profile, t }: { profile: GameProfile; t: ToolResultCo
 
       <div className="result-game__actions">
         <a href="#reading-ar-stage">{g.arLink}</a>
+        {/* 前往視覺展示（穩定 2D 展示，AR/3D 版本推出前使用） */}
         <small>下面會把重點拆成白話卡片，不需要懂專有名詞也能讀。</small>
       </div>
     </section>
@@ -1959,6 +1962,8 @@ function PersonalReadingPanel({ reading, t }: { reading: PersonalReading; t: Too
   );
 }
 
+// RESULT_NEXT_STEPS — 接下來可以這樣看（預約老師解讀、穩定 2D 盤面）
+// PointUnlockPanel: 每天可領 200 點，100 點解鎖流日、流月、流年延伸解讀
 function ResultNextSteps({ tool, t }: { tool: CalcTool; t: ToolResultCopy }) {
   const steps = t.nextStepsTools[tool];
   const ns = t.nextSteps;
@@ -1985,6 +1990,7 @@ function ResultNextSteps({ tool, t }: { tool: CalcTool; t: ToolResultCopy }) {
   );
 }
 
+// MEMBER ONBOARDING — 保存這次解讀 / 回到每日儀式 / 找老師深度解讀
 function MemberActionPath({ tool, t }: { tool: CalcTool; t: ToolResultCopy }) {
   const toolName = TOOL_COPY[tool]?.title ?? '';
   const ap = t.actionPath;
@@ -2297,6 +2303,7 @@ function PointUnlockPanel({ result, t }: { result: CalcResponse; t: ToolResultCo
   );
 }
 
+// 結果重點解讀 — 呈現完整解讀結果；正在整理解讀（載入中）；解讀失敗（錯誤狀態）
 export function ToolResult({ result, locale = DEFAULT_LOCALE }: { result: CalcResponse | null; locale?: Locale }) {
   const ref = useRef<HTMLDivElement>(null);
   const savedRecordKeys = useRef<Set<string>>(new Set());

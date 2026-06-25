@@ -63,9 +63,9 @@ def test_analog_symmetric():
     """Analog 應該對稱：analog(analog(k)) = k"""
     for seal in range(1, 21):
         partner = ANALOG_TABLE[seal]
-        assert ANALOG_TABLE[partner] == seal, (
-            f"Asymmetric pair: {seal} -> {partner} -> {ANALOG_TABLE[partner]}"
-        )
+        assert (
+            ANALOG_TABLE[partner] == seal
+        ), f"Asymmetric pair: {seal} -> {partner} -> {ANALOG_TABLE[partner]}"
 
 
 def test_guide_for_magnetic_tone_is_self():
@@ -83,9 +83,9 @@ def test_guide_same_color_family():
         self_color = ((kin - 1) % 20) % 4  # 0..3
         guide_seal = ((o["guide"] - 1) % 20) + 1
         guide_color = (guide_seal - 1) % 4
-        assert self_color == guide_color, (
-            f"Kin {kin}: guide color mismatch (self {self_color}, guide {guide_color})"
-        )
+        assert (
+            self_color == guide_color
+        ), f"Kin {kin}: guide color mismatch (self {self_color}, guide {guide_color})"
 
 
 def test_guide_oracle_known_kins():

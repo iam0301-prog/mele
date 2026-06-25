@@ -103,6 +103,13 @@ const homeCopy = {
     philosophyBody: '我們不替你下結論，只是多給你一個看自己的角度。工具結果是參考，不是替你下定論；老師是選項，不是必須。你隨時可以只用工具、不找老師。平台上的老師誰排在前面，由評價與上線狀態等客觀條件決定，排序依公開規則呈現，平台不偏袒特定老師。',
     finalTitle: '準備好就從最短路線開始',
     finalBody: '建議先跑「每日儀式 → 一個工具 → 有感就繼續看」這條線。給自己五分鐘，試試看。',
+    // PUBLIC BETA · 公開測試中 — 公開測試流程：每日可領 200 測試點，100 點解鎖深度解讀
+    // 老師諮詢仍是選項，不是強迫購買
+    betaCenter: 'PUBLIC BETA · 公開測試中',
+    betaFlow: '公開測試流程',
+    betaDailyPoints: '每日可領 200 測試點',
+    betaUnlockCost: '100 點解鎖深度解讀',
+    betaTeacherNote: '老師諮詢仍是選項，不是強迫購買',
   },
   en: {
     reportIssue: 'Report issue',

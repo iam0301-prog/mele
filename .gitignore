@@ -9,6 +9,7 @@ python_api/venv/
 .env
 .env.*
 !.env.example
+!apps/web/.env.local.example
 *.pem
 *.key
 *.p8

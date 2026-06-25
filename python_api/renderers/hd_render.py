@@ -277,6 +277,7 @@ def _fmt_line(value) -> str:
 
 
 def _render_gate_cards(active_gates: list[int], records: dict[int, list[dict]]) -> str:
+    """Render gate cards with copy pattern: 第 {gate} 閘門｜{gate_title}"""
     if not active_gates:
         return ""
 

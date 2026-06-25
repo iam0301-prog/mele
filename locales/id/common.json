@@ -95,6 +95,11 @@
     "finalKicker": "READY FOR CLOSED BETA",
     "finalTitle": "Uji, jelaskan, dan bawa member kembali sebelum paid launch",
     "finalBody": "Fondasi multibahasa menjaga fitur yang ada dan memindahkan konten publik ke JSON yang mudah dirawat.",
+    "philosophy": {
+      "kicker": "OUR APPROACH",
+      "title": "Apa yang kami bangun sebenarnya sangat sederhana",
+      "body": "Kami tidak menarik kesimpulan untuk Anda — kami hanya memberi Anda sudut pandang lain tentang diri sendiri. Hasil alat adalah referensi, bukan vonis; pemandu adalah pilihan, bukan kewajiban."
+    },
     "proof": [
       "Route multibahasa",
       "Switcher menjaga path",
@@ -175,6 +180,9 @@
         "action": "Buka checklist"
       }
     ]
+  },
+  "tool": {
+    "disclaimer": "Hasil alat hanya untuk eksplorasi diri dan tidak merupakan diagnosis, perawatan, atau saran medis atau kesehatan mental profesional apa pun."
   },
   "markets": {
     "items": [

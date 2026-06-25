@@ -1,4 +1,4 @@
-from python_api.models import AstroRequest, HumanDesignRequest
+from models import AstroRequest, HumanDesignRequest
 
 
 def test_astro_accepts_birth_timezone_with_daylight_saving_time():

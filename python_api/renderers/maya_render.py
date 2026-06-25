@@ -230,10 +230,10 @@ def render(data: dict) -> dict:
 <!-- 採對稱 20px 縫的十字佈局；五格大小完全一致 (100×80)、距中心皆 100px -->
 <!-- 中心點 (300, 380)；20px 間距形成完美十字 -->
 {cell(250, 280, "指引", oracle.get("guide"))}
-{cell(130, 380, "挑戰", oracle.get("antipode"))}
+{cell(130, 380, '挑戰', oracle.get('antipode'))}
 {cell(250, 380, "本命", oracle.get("self"), is_self=True)}
 {cell(370, 380, "支持", oracle.get("analog"))}
-{cell(250, 480, "隱藏推動力", oracle.get("occult"))}
+{cell(250, 480, '隱藏推動力', oracle.get('occult'))}
 
 <g class="fadein">
   <rect x="58" y="575" width="484" height="145" rx="14" fill="rgba(0,0,0,0.22)" stroke="{PALETTE["accent_dim"]}" stroke-width="1"/>
