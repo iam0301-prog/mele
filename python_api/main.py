@@ -62,10 +62,11 @@ app = FastAPI(
 )
 
 
-# Defaults cover local development plus the first closed-beta Vercel domain.
-# Production can still override with
-# MELE_ALLOWED_ORIGINS="https://example.com,https://www.example.com".
-_default_origins = [
+# These origins are always allowed regardless of the MELE_ALLOWED_ORIGINS env var.
+# They cover local development plus the production Vercel domain so that the
+# Vercel frontend can always reach the Render backend, even when the env var is
+# set to a restricted list (e.g. in CI).
+_base_origins = [
     "https://mele-chi.vercel.app",
     "http://localhost:3000",
     "http://localhost:3001",
@@ -75,12 +76,10 @@ _default_origins = [
     "http://127.0.0.1:3006",
     "http://127.0.0.1:3007",
 ]
+# MELE_ALLOWED_ORIGINS adds extra origins on top of the base list (not a replacement).
 _env_origins = os.environ.get("MELE_ALLOWED_ORIGINS", "").strip()
-allowed_origins = (
-    [origin.strip() for origin in _env_origins.split(",") if origin.strip()]
-    if _env_origins
-    else _default_origins
-)
+_extra_origins = [origin.strip() for origin in _env_origins.split(",") if origin.strip()]
+allowed_origins = list(dict.fromkeys(_base_origins + _extra_origins))
 
 app.add_middleware(
     CORSMiddleware,
