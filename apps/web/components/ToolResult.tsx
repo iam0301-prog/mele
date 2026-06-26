@@ -1746,7 +1746,7 @@ function BaziDetailPanel({ result }: { result: CalcResponse }) {
         <div className="bazi-detail__dayun">
           <h3>
             大運
-            {daYun.startAge && (
+            {(daYun.startAge != null) && (
               <span className="bazi-detail__dayun-start">
                 {cleanText(daYun.startAge)}歲{cleanText(daYun.startMonth)}個月起運
                 · {daYun.isForward ? '順行' : '逆行'}

@@ -10,6 +10,23 @@ lunar-python 是 6tail 的 lunar-javascript 同源 Python 移植，
 GAN = ["甲", "乙", "丙", "丁", "戊", "己", "庚", "辛", "壬", "癸"]
 ZHI = ["子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"]
 
+# 各地支藏干的本氣（正氣/司令），用於穩定判定藏干主次
+# 本氣：代表地支本身五行的天干，影響力最強
+ZHI_BENCI = {
+    "子": "癸",  # 子屬水，本氣癸（子只藏癸一干）
+    "丑": "己",  # 丑屬土，本氣己
+    "寅": "甲",  # 寅屬木，本氣甲
+    "卯": "乙",  # 卯屬木，本氣乙
+    "辰": "戊",  # 辰屬土，本氣戊
+    "巳": "丙",  # 巳屬火，本氣丙
+    "午": "丁",  # 午屬火，本氣丁
+    "未": "己",  # 未屬土，本氣己
+    "申": "庚",  # 申屬金，本氣庚
+    "酉": "辛",  # 酉屬金，本氣辛
+    "戌": "戊",  # 戌屬土，本氣戊
+    "亥": "壬",  # 亥屬水，本氣壬
+}
+
 WUXING_GAN = {
     "甲": "木",
     "乙": "木",
@@ -328,32 +345,47 @@ def _compute_shensha(day_gan: str, year_zhi: str, day_zhi: str, all_zhi: list[st
             "desc": "貴人扶助力較強，重要時刻易遇到關鍵助緣。"
         })
 
-    # 桃花（先用年支，若年支不中則查日支）
-    taohua_zhi = TAOHUA.get(year_zhi)
-    taohua_base = "年支"
-    if taohua_zhi not in zhi_set:
-        taohua_zhi = TAOHUA.get(day_zhi)
-        taohua_base = "日支"
-    if taohua_zhi and taohua_zhi in zhi_set:
+    # 桃花：年支與日支各自查，命中的都報（非互斥）
+    # 同一目標地支若同時由年支和日支推算，合併來源標籤
+    taohua_hits: list[str] = []
+    taohua_hit_bases: dict[str, list[str]] = {}  # 目標地支 -> [來源標籤]
+    for base_zhi, base_label in ((year_zhi, "年支"), (day_zhi, "日支")):
+        target = TAOHUA.get(base_zhi)
+        if target and target in zhi_set:
+            if target not in taohua_hit_bases:
+                taohua_hits.append(target)
+                taohua_hit_bases[target] = []
+            taohua_hit_bases[target].append(base_label)
+    if taohua_hits:
+        bases_str = "、".join(
+            "、".join(taohua_hit_bases[t]) for t in taohua_hits
+        )
         result.append({
             "name": "桃花",
             "hit": True,
-            "zhi": [taohua_zhi],
-            "desc": f"命盤含桃花（{taohua_base}推）：人際魅力強，感情易有機緣，需留意情感的分寸。"
+            "zhi": taohua_hits,
+            "desc": f"命盤含桃花（{bases_str}推）：人際魅力強，感情易有機緣，需留意情感的分寸。"
         })
 
-    # 驛馬（先用年支，若年支不中則查日支）
-    yima_zhi = YIMA.get(year_zhi)
-    yima_base = "年支"
-    if yima_zhi not in zhi_set:
-        yima_zhi = YIMA.get(day_zhi)
-        yima_base = "日支"
-    if yima_zhi and yima_zhi in zhi_set:
+    # 驛馬：年支與日支各自查，命中的都報（非互斥）
+    yima_hits: list[str] = []
+    yima_hit_bases: dict[str, list[str]] = {}
+    for base_zhi, base_label in ((year_zhi, "年支"), (day_zhi, "日支")):
+        target = YIMA.get(base_zhi)
+        if target and target in zhi_set:
+            if target not in yima_hit_bases:
+                yima_hits.append(target)
+                yima_hit_bases[target] = []
+            yima_hit_bases[target].append(base_label)
+    if yima_hits:
+        bases_str = "、".join(
+            "、".join(yima_hit_bases[t]) for t in yima_hits
+        )
         result.append({
             "name": "驛馬",
             "hit": True,
-            "zhi": [yima_zhi],
-            "desc": f"命盤含驛馬（{yima_base}推）：善於移動、遷徙、出差，生涯中變動機率較高。"
+            "zhi": yima_hits,
+            "desc": f"命盤含驛馬（{bases_str}推）：善於移動、遷徙、出差，生涯中變動機率較高。"
         })
 
     # 華蓋（以年支推）
@@ -396,13 +428,18 @@ def _assess_strength(day_wuxing: str, month_zhi: str, gan_list: list[str], zhi_l
     }
     support_set = SHENG_FU.get(day_wuxing, set())
 
-    # 克洩日主的五行：官殺（克）+ 食傷（洩）+ 財（耗）
+    # 克洩日主的五行：官殺（克我）+ 食傷（我生/洩）+ 財（我克/耗）
+    # 木：金克木（官殺）、火為木生（食傷）、土為木克（財）
+    # 火：水克火（官殺）、土為火生（食傷）、金為火克（財）
+    # 土：木克土（官殺）、金為土生（食傷）、水為土克（財）
+    # 金：火克金（官殺）、水為金生（食傷）、木為金克（財）
+    # 水：土克水（官殺）、木為水生（食傷）、火為水克（財）
     KEMU = {
-        "木": {"金", "土", "火"},
-        "火": {"水", "木", "土"},
-        "土": {"木", "水", "金"},
-        "金": {"火", "土", "水"},
-        "水": {"土", "金", "木"},
+        "木": {"金", "火", "土"},
+        "火": {"水", "土", "金"},
+        "土": {"木", "金", "水"},
+        "金": {"火", "水", "木"},
+        "水": {"土", "木", "火"},
     }
     drain_set = KEMU.get(day_wuxing, set())
 
@@ -431,16 +468,16 @@ def _assess_strength(day_wuxing: str, month_zhi: str, gan_list: list[str], zhi_l
     # 綜合判斷
     if de_ling and (de_di or de_shi):
         strength = "身強"
-        strength_desc = f"日主得月令（{month_state}），且盤中生扶力充足，屬身強格。用神宜選洩秀（食傷）或財官。"
+        strength_desc = f"日主得月令（{month_state}），且盤中生扶力較充足，初步傾向身強。用神方向可考慮洩秀（食傷）或財官，需合參全局確認。"
     elif de_ling:
         strength = "中和偏強"
-        strength_desc = f"日主得月令（{month_state}），整體偏強。可用食傷洩秀或財星為用神。"
+        strength_desc = f"日主得月令（{month_state}），整體初步傾向偏強。可考慮食傷洩秀或財星，仍需觀察三合刑衝。"
     elif not de_ling and not de_di and not de_shi:
         strength = "身弱"
-        strength_desc = f"日主失令（{month_state}），盤中生扶不足，屬身弱格。用神宜選印星或比劫扶身。"
+        strength_desc = f"日主失令（{month_state}），盤中生扶不足，初步傾向身弱。用神方向可考慮印星或比劫扶身，需合參全局確認。"
     else:
         strength = "中和偏弱"
-        strength_desc = f"日主失令（{month_state}），但仍有部分生扶。整體偏弱，用神以印比為主。"
+        strength_desc = f"日主失令（{month_state}），但仍有部分生扶。初步傾向偏弱，用神以印比為參考，仍需觀察月令與大運。"
 
     return {
         "monthState": month_state,
@@ -494,9 +531,9 @@ def _determine_pattern(
 
     # 用神建議（基於身強弱）
     if "強" in strength:
-        yong_shen_hint = "身強宜洩（食傷）、克（官殺）或耗（財），不宜再生扶。"
+        yong_shen_hint = "初步傾向：身強宜洩（食傷）、制（官殺）或耗（財），需合參全局再定用神。"
     else:
-        yong_shen_hint = "身弱宜生（印）或扶（比劫），避官殺財之重壓。"
+        yong_shen_hint = "初步傾向：身弱宜生（印）或扶（比劫），避官殺財之重壓，仍需合參月令與三合確認。"
 
     return {
         "name": pattern_name,
@@ -595,14 +632,28 @@ def calculate(
     ]:
         cang = get_cang()  # list of str
         ss = get_ss_zhi()  # list of str
-        # 組合成 [{gan, shishen}, ...]（本氣/中氣/餘氣順序）
+        # 組合成 [{gan, shishen, role}, ...]
+        # 本氣由 ZHI_BENCI 查表決定（不依賴 library 回傳順序），其餘依序為中氣/餘氣
+        zhi_char = pillars[key][1]
+        benci_gan = ZHI_BENCI.get(zhi_char, "")
         pairs = []
+        role_counter = 0  # 追蹤非本氣的計數
+        benci_assigned = False
         for i, g in enumerate(cang):
+            if g == benci_gan and not benci_assigned:
+                role = "本氣"
+                benci_assigned = True
+            else:
+                role_counter += 1
+                role = "中氣" if role_counter == 1 else "餘氣"
             pairs.append({
                 "gan": g,
                 "shishen": ss[i] if i < len(ss) else "",
-                "role": ["本氣", "中氣", "餘氣"][i] if i < 3 else "餘氣",
+                "role": role,
             })
+        # 若本氣未命中（理論上不應發生），退回按順序分配
+        if not benci_assigned and pairs:
+            pairs[0]["role"] = "本氣"
         hidden_stems[key] = pairs
         shishen_zhi[key] = ss
 

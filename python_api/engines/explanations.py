@@ -405,8 +405,8 @@ SHISHEN_CHAR_DESC = {
     "劫財": "助身（積極、財帛起伏）",
     "食神": "洩秀（才藝、享受、創作）",
     "傷官": "洩秀（才華外露、官緣需留意）",
-    "偏財": "克我所勋（財活靈活、善開拓）",
-    "正財": "克我所勋（踏實、重穩定收入）",
+    "偏財": "我克（財活靈活、善開拓）",
+    "正財": "我克（踏實、重穩定收入）",
     "七殺": "克我（魄力、壓力、競爭）",
     "正官": "克我（規範、責任、名譽）",
     "偏印": "生我（思維獨特、靈感直覺）",
@@ -427,10 +427,11 @@ CHANG_SHENG_MEANING = {
     "絕": "斷而再生，適合澈底更新",
     "胎": "潛伏醞釀，蓄勢待發",
     "養": "滋養成長，根基穩固後再動",
-    # 簡體（lunar-python 回傳格式）
+    # 簡體（lunar-python 部分版本回傳格式）
     "长生": "蓬勃初生，能量漸入佳境",
     "冠带": "精力充沛，積極表現欲強",
     "临官": "能力到位，事業運勢加強",
+    "帝旺": "強盛旺極，但旺極易衰需留意過猛",
     "养": "滋養成長，根基穩固後再動",
     "绝": "斷而再生，適合澈底更新",
     "胎": "潛伏醞釀，蓄勢待發",
@@ -494,9 +495,12 @@ def explain_bazi(data: dict, detail: DetailLevel = "teaser") -> str:
         ss = _bazi_shishen_label(_text(shishen_gan.get(key, ""))) if key != "day" else "日主"
         cs = _text(chang_sheng.get(key, ""))
         cs_meaning = CHANG_SHENG_MEANING.get(cs, "")
-        # 繁化十二長生名稱
-        CS_TRAD = {"长生": "長生", "冠带": "冠帶", "临官": "臨官", "帝旺": "帝旺",
-                   "养": "養", "绝": "絕"}
+        # 繁化十二長生名稱（lunar-python 回傳簡體，統一轉繁體）
+        CS_TRAD = {
+            "长生": "長生", "沐浴": "沐浴", "冠带": "冠帶", "临官": "臨官",
+            "帝旺": "帝旺", "衰": "衰", "病": "病", "死": "死",
+            "墓": "墓", "绝": "絕", "胎": "胎", "养": "養",
+        }
         cs_display = CS_TRAD.get(cs, cs)
         ss_char = f"【{ss}】" if ss else ""
         cs_char = f"長生：{cs_display}（{cs_meaning}）" if cs and cs_meaning else (f"長生：{cs_display}" if cs_display else "")
@@ -554,12 +558,13 @@ def explain_bazi(data: dict, detail: DetailLevel = "teaser") -> str:
         # ── 大運 ──
         steps = da_yun.get("steps") or []
         if steps:
-            start_age = da_yun.get("startAge", "")
+            start_age = da_yun.get("startAge")
             start_month_yun = da_yun.get("startMonth", "")
             direction = "順行" if da_yun.get("isForward") else "逆行"
             parts.append(_section("大運走勢"))
+            age_str = str(start_age) if start_age is not None else "?"
             parts.append(_line(
-                f"起運：{start_age}歲{start_month_yun}個月，{direction}。"
+                f"起運：{age_str}歲{start_month_yun}個月，{direction}。"
                 f"大運每10年換一步，天干影響上半段，地支影響下半段。"
             ))
             for step in steps[:6]:
