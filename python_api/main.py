@@ -200,8 +200,9 @@ def _cached_bazi(
     minute: int,
     sect: int,
     longitude: float | None,
+    is_male: bool,
 ) -> dict:
-    return bazi.calculate(year, month, day, hour, minute, sect, longitude)
+    return bazi.calculate(year, month, day, hour, minute, sect, longitude, is_male=is_male)
 
 
 @lru_cache(maxsize=2048)
@@ -301,6 +302,7 @@ async def calc_bazi(req: BaziRequest, detail: DetailQuery = Query("teaser")):
         req.minute,
         req.sect,
         req.longitude,
+        req.is_male,
     )
     return wrap("bazi", req.model_dump(), data, bazi_render.render(data), detail=detail)
 

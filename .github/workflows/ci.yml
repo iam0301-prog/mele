@@ -123,7 +123,7 @@ jobs:
           MELE_API_URL: http://127.0.0.1:8015
 
       - name: Run Playwright tests
-        run: npm --prefix apps/web exec playwright test
+        run: cd apps/web && npx playwright test
         env:
           CI: 'true'
           PLAYWRIGHT_USE_BUILD: 'true'

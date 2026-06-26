@@ -238,10 +238,272 @@ SHISHEN = {
     },
 }
 
+# 神煞查表（以年支或日支推）
+# 桃花：看年支或日支所在三合局的敗地
+TAOHUA = {
+    "子": "酉", "丑": "午", "寅": "卯", "卯": "子",
+    "辰": "酉", "巳": "午", "午": "卯", "未": "子",
+    "申": "酉", "酉": "午", "戌": "卯", "亥": "子",
+}
+# 驛馬：寅申巳亥互換，子午卯酉各推
+YIMA = {
+    "寅": "申", "午": "申", "戌": "申",
+    "申": "寅", "子": "寅", "辰": "寅",
+    "巳": "亥", "酉": "亥", "丑": "亥",
+    "亥": "巳", "卯": "巳", "未": "巳",
+}
+# 天乙貴人：以日干查（陽貴在上、陰貴在下，共兩地支）
+TIANYI = {
+    "甲": ["丑", "未"], "戊": ["丑", "未"], "庚": ["丑", "未"],
+    "乙": ["子", "申"], "己": ["子", "申"],
+    "丙": ["亥", "酉"], "丁": ["亥", "酉"],
+    "壬": ["卯", "巳"], "癸": ["卯", "巳"],
+    "辛": ["午", "寅"],
+}
+# 華蓋：以年支推
+HUAGAI = {
+    "子": "辰", "丑": "丑", "寅": "戌", "卯": "未",
+    "辰": "辰", "巳": "丑", "午": "戌", "未": "未",
+    "申": "辰", "酉": "丑", "戌": "戌", "亥": "未",
+}
+# 將星：以年支推（三合局的帝旺之地）
+JIANGXING = {
+    "子": "子", "午": "午", "卯": "卯", "酉": "酉",
+    "寅": "午", "午_2": "午", "戌": "午",
+    "申": "子", "子_2": "子", "辰": "子",
+    "亥": "卯", "卯_2": "卯", "未": "卯",
+    "巳": "酉", "酉_2": "酉", "丑": "酉",
+}
+
+# 五行旺衰：日主五行在各月令的旺相休囚死
+# 月支 -> 日主五行 -> 旺衰狀態
+WANG_XIANG_TABLE = {
+    "寅": {"木": "旺", "火": "相", "土": "死", "金": "囚", "水": "休"},
+    "卯": {"木": "旺", "火": "相", "土": "死", "金": "囚", "水": "休"},
+    "辰": {"木": "相", "火": "死", "土": "旺", "金": "休", "水": "囚"},
+    "巳": {"木": "死", "火": "旺", "土": "相", "金": "囚", "水": "休"},
+    "午": {"木": "死", "火": "旺", "土": "相", "金": "囚", "水": "休"},
+    "未": {"木": "死", "火": "相", "土": "旺", "金": "休", "水": "囚"},
+    "申": {"木": "囚", "火": "死", "土": "休", "金": "旺", "水": "相"},
+    "酉": {"木": "囚", "火": "死", "土": "休", "金": "旺", "水": "相"},
+    "戌": {"木": "囚", "火": "休", "土": "旺", "金": "相", "水": "死"},
+    "亥": {"木": "相", "火": "囚", "土": "死", "金": "休", "水": "旺"},
+    "子": {"木": "相", "火": "囚", "土": "死", "金": "休", "水": "旺"},
+    "丑": {"木": "囚", "火": "休", "土": "旺", "金": "相", "水": "死"},
+}
+
+# 十神格局意義（給解讀用）
+SHISHEN_PATTERN_MEANING = {
+    "正官": "循規有序，適合體制內或有規範架構的工作，重視名聲與責任",
+    "七殺": "有魄力、抗壓強，適合競爭環境，需注意壓力過大時的衝動反應",
+    "正印": "有學習力與庇護緣，適合教育、研究，但需注意過度依賴",
+    "偏印": "思維獨特、直覺強，適合創意或靈性領域，需留意孤立傾向",
+    "正財": "踏實務實，重視穩定收入，適合長期積累，但對風險較保守",
+    "偏財": "財運靈活，善於開拓機會，適合業務或理財，但消費模式波動",
+    "食神": "才藝豐富、有口福，善於創作與表達，生活享受感強",
+    "傷官": "才華外露、個性鮮明，有創新力，與權威的關係需要刻意經營",
+    "比肩": "獨立自主，有主見，喜自力完成，需留意與同輩的競爭",
+    "劫財": "行動力強、善於資源整合，但對金錢的得失較大起大落",
+}
+
 
 def true_solar_offset_minutes(longitude: float, standard_meridian: float = 120.0) -> float:
     """每 15 度經度差 = 1 小時時差"""
     return (longitude - standard_meridian) * 4.0
+
+
+def _compute_shensha(day_gan: str, year_zhi: str, day_zhi: str, all_zhi: list[str]) -> list[dict]:
+    """計算常見神煞：天乙貴人、桃花、驛馬、華蓋"""
+    zhi_set = set(all_zhi)
+    result = []
+
+    # 天乙貴人（以日干查，看四柱地支是否命中）
+    tianyi_zhis = TIANYI.get(day_gan, [])
+    hit_tianyi = [z for z in tianyi_zhis if z in zhi_set]
+    if hit_tianyi:
+        result.append({
+            "name": "天乙貴人",
+            "hit": True,
+            "zhi": hit_tianyi,
+            "desc": "貴人扶助力較強，重要時刻易遇到關鍵助緣。"
+        })
+
+    # 桃花（先用年支，若年支不中則查日支）
+    taohua_zhi = TAOHUA.get(year_zhi)
+    taohua_base = "年支"
+    if taohua_zhi not in zhi_set:
+        taohua_zhi = TAOHUA.get(day_zhi)
+        taohua_base = "日支"
+    if taohua_zhi and taohua_zhi in zhi_set:
+        result.append({
+            "name": "桃花",
+            "hit": True,
+            "zhi": [taohua_zhi],
+            "desc": f"命盤含桃花（{taohua_base}推）：人際魅力強，感情易有機緣，需留意情感的分寸。"
+        })
+
+    # 驛馬（先用年支，若年支不中則查日支）
+    yima_zhi = YIMA.get(year_zhi)
+    yima_base = "年支"
+    if yima_zhi not in zhi_set:
+        yima_zhi = YIMA.get(day_zhi)
+        yima_base = "日支"
+    if yima_zhi and yima_zhi in zhi_set:
+        result.append({
+            "name": "驛馬",
+            "hit": True,
+            "zhi": [yima_zhi],
+            "desc": f"命盤含驛馬（{yima_base}推）：善於移動、遷徙、出差，生涯中變動機率較高。"
+        })
+
+    # 華蓋（以年支推）
+    huagai_zhi = HUAGAI.get(year_zhi)
+    if huagai_zhi and huagai_zhi in zhi_set:
+        result.append({
+            "name": "華蓋",
+            "hit": True,
+            "zhi": [huagai_zhi],
+            "desc": "命盤含華蓋：藝術、靈性傾向明顯，適合創作或研究型工作，孤獨感也相對較強。"
+        })
+
+    return result
+
+
+def _assess_strength(day_wuxing: str, month_zhi: str, gan_list: list[str], zhi_list: list[str]) -> dict:
+    """
+    評估日主強弱（得令 + 得地 + 得勢）
+
+    得令：月支五行生扶日主
+    得地：日支（坐支）五行生扶日主
+    得勢：四柱中生扶日主的干支數量佔多數
+
+    強弱標準：
+      旺/相 = 得令；囚/休/死 = 失令
+      生扶數 >= 3 = 偏強；<= 1 = 偏弱
+    """
+    month_state = WANG_XIANG_TABLE.get(month_zhi, {}).get(day_wuxing, "")
+
+    # 得令判斷
+    de_ling = month_state in ("旺", "相")
+
+    # 生扶日主的五行：比劫（同）+ 印星（生）
+    SHENG_FU = {
+        "木": {"木", "水"},  # 水生木，木比木
+        "火": {"火", "木"},
+        "土": {"土", "火"},
+        "金": {"金", "土"},
+        "水": {"水", "金"},
+    }
+    support_set = SHENG_FU.get(day_wuxing, set())
+
+    # 克洩日主的五行：官殺（克）+ 食傷（洩）+ 財（耗）
+    KEMU = {
+        "木": {"金", "土", "火"},
+        "火": {"水", "木", "土"},
+        "土": {"木", "水", "金"},
+        "金": {"火", "土", "水"},
+        "水": {"土", "金", "木"},
+    }
+    drain_set = KEMU.get(day_wuxing, set())
+
+    support_count = 0
+    drain_count = 0
+    for g in gan_list:
+        wx = WUXING_GAN.get(g, "")
+        if wx in support_set:
+            support_count += 1
+        elif wx in drain_set:
+            drain_count += 1
+    for z in zhi_list:
+        wx = WUXING_ZHI.get(z, "")
+        if wx in support_set:
+            support_count += 1
+        elif wx in drain_set:
+            drain_count += 1
+
+    # 得地：日支是否生扶日主
+    day_zhi_wx = WUXING_ZHI.get(zhi_list[2], "") if len(zhi_list) > 2 else ""
+    de_di = day_zhi_wx in support_set
+
+    # 得勢：全盤生扶多於克洩
+    de_shi = support_count > drain_count
+
+    # 綜合判斷
+    if de_ling and (de_di or de_shi):
+        strength = "身強"
+        strength_desc = f"日主得月令（{month_state}），且盤中生扶力充足，屬身強格。用神宜選洩秀（食傷）或財官。"
+    elif de_ling:
+        strength = "中和偏強"
+        strength_desc = f"日主得月令（{month_state}），整體偏強。可用食傷洩秀或財星為用神。"
+    elif not de_ling and not de_di and not de_shi:
+        strength = "身弱"
+        strength_desc = f"日主失令（{month_state}），盤中生扶不足，屬身弱格。用神宜選印星或比劫扶身。"
+    else:
+        strength = "中和偏弱"
+        strength_desc = f"日主失令（{month_state}），但仍有部分生扶。整體偏弱，用神以印比為主。"
+
+    return {
+        "monthState": month_state,
+        "deLing": de_ling,
+        "deDi": de_di,
+        "deShiScore": {"support": support_count, "drain": drain_count},
+        "strength": strength,
+        "desc": strength_desc,
+    }
+
+
+def _determine_pattern(
+    day_master: str,
+    day_wuxing: str,
+    month_hidden_ss: list[str],  # 月支藏干十神（本氣在前）
+    strength: str,
+) -> dict:
+    """
+    傳統八字取格：以月支藏干本氣的十神為格，本氣不透天干時看中氣。
+
+    傳統格局八格：
+      正官格、七殺格（偏官格）、正印格、偏印格（梟印格）、
+      正財格、偏財格、食神格、傷官格
+    比劫在月支時稱建祿格或月劫格（非普通格）。
+    """
+    # 過濾掉空值，取月支藏干十神
+    valid_ss = [ss for ss in month_hidden_ss if ss]
+    dominant = valid_ss[0] if valid_ss else ""  # 本氣優先
+
+    # 繁體統一
+    TRAD = {
+        "劫财": "劫財", "伤官": "傷官", "偏财": "偏財",
+        "正财": "正財", "七杀": "七殺",
+    }
+    dominant = TRAD.get(dominant, dominant)
+
+    pattern_map = {
+        "正官": "正官格",
+        "七殺": "七殺格（偏官格）",
+        "正印": "正印格",
+        "偏印": "偏印格（梟印格）",
+        "正財": "正財格",
+        "偏財": "偏財格",
+        "食神": "食神格",
+        "傷官": "傷官格",
+        "比肩": "建祿格（月令比肩）",
+        "劫財": "月劫格（月令劫財）",
+    }
+    pattern_name = pattern_map.get(dominant, f"{dominant}格" if dominant else "待定")
+    meaning = SHISHEN_PATTERN_MEANING.get(dominant, "")
+
+    # 用神建議（基於身強弱）
+    if "強" in strength:
+        yong_shen_hint = "身強宜洩（食傷）、克（官殺）或耗（財），不宜再生扶。"
+    else:
+        yong_shen_hint = "身弱宜生（印）或扶（比劫），避官殺財之重壓。"
+
+    return {
+        "name": pattern_name,
+        "dominant_shishen": dominant,
+        "meaning": meaning,
+        "yongShenHint": yong_shen_hint,
+    }
 
 
 def calculate(
@@ -253,6 +515,7 @@ def calculate(
     sect: int = 2,
     longitude: float | None = None,
     standard_meridian: float | None = None,
+    is_male: bool | None = None,
 ) -> dict:
     """
     八字計算（用 lunar-python，無需 C++ 編譯）
@@ -271,7 +534,6 @@ def calculate(
 
     # 真太陽時校正
     if longitude is not None:
-        # 自動推算當地標準時區子午線：每 15° 一個時區
         if standard_meridian is None:
             standard_meridian = round(longitude / 15) * 15
         offset = true_solar_offset_minutes(longitude, standard_meridian)
@@ -299,7 +561,7 @@ def calculate(
         "time": [ec.getTimeGan(), ec.getTimeZhi()],
     }
 
-    # 五行統計
+    # ── 五行統計（天干 + 地支）──
     counts = {"木": 0, "火": 0, "土": 0, "金": 0, "水": 0}
     for g, z in pillars.values():
         counts[WUXING_GAN[g]] += 1
@@ -313,24 +575,117 @@ def calculate(
     }
 
     day_master = pillars["day"][0]
-    shishen = {
-        "year": SHISHEN[day_master].get(pillars["year"][0]),
-        "month": SHISHEN[day_master].get(pillars["month"][0]),
-        "time": SHISHEN[day_master].get(pillars["time"][0]),
+    day_wuxing = WUXING_GAN[day_master]
+
+    # ── 天干十神 ──
+    shishen_gan = {
+        "year": ec.getYearShiShenGan(),
+        "month": ec.getMonthShiShenGan(),
+        "time": ec.getTimeShiShenGan(),
     }
+
+    # ── 地支藏干 + 藏干十神 ──
+    hidden_stems = {}
+    shishen_zhi = {}
+    for key, get_cang, get_ss_zhi in [
+        ("year", ec.getYearHideGan, ec.getYearShiShenZhi),
+        ("month", ec.getMonthHideGan, ec.getMonthShiShenZhi),
+        ("day", ec.getDayHideGan, ec.getDayShiShenZhi),
+        ("time", ec.getTimeHideGan, ec.getTimeShiShenZhi),
+    ]:
+        cang = get_cang()  # list of str
+        ss = get_ss_zhi()  # list of str
+        # 組合成 [{gan, shishen}, ...]（本氣/中氣/餘氣順序）
+        pairs = []
+        for i, g in enumerate(cang):
+            pairs.append({
+                "gan": g,
+                "shishen": ss[i] if i < len(ss) else "",
+                "role": ["本氣", "中氣", "餘氣"][i] if i < 3 else "餘氣",
+            })
+        hidden_stems[key] = pairs
+        shishen_zhi[key] = ss
+
+    # ── 十二長生 ──
+    chang_sheng = {
+        "year": ec.getYearDiShi(),
+        "month": ec.getMonthDiShi(),
+        "day": ec.getDayDiShi(),
+        "time": ec.getTimeDiShi(),
+    }
+
+    # ── 大運 ──
+    yun_data = None
+    # is_male：預設按年干陰陽判斷（陽年男命、陰年女命常見順逆）
+    # 若呼叫者沒指定，API 不知道性別，給男命預設
+    _is_male = True if is_male is None else is_male
+    try:
+        yun = ec.getYun(_is_male, sect)
+        start_year = yun.getStartYear()
+        start_month = yun.getStartMonth()
+        is_forward = yun.isForward()
+        da_yun_list = yun.getDaYun()
+
+        steps = []
+        for dy in da_yun_list[1:9]:  # 跳過幼年空白格，取前8步
+            gz = dy.getGanZhi()
+            if not gz:
+                continue
+            gan = gz[0] if len(gz) >= 1 else ""
+            zhi = gz[1] if len(gz) >= 2 else ""
+            steps.append({
+                "ganZhi": gz,
+                "gan": gan,
+                "zhi": zhi,
+                "shishenGan": SHISHEN.get(day_master, {}).get(gan, ""),
+                "startAge": dy.getStartAge(),
+                "endAge": dy.getEndAge(),
+                "startYear": dy.getStartYear(),
+                "endYear": dy.getEndYear(),
+            })
+
+        yun_data = {
+            "startAge": start_year,
+            "startMonth": start_month,
+            "isForward": is_forward,
+            "steps": steps,
+        }
+    except Exception:
+        yun_data = None
+
+    # ── 神煞 ──
+    all_zhi = [pillars["year"][1], pillars["month"][1], pillars["day"][1], pillars["time"][1]]
+    shensha = _compute_shensha(day_master, pillars["year"][1], pillars["day"][1], all_zhi)
+
+    # ── 日主強弱 ──
+    all_gan = [pillars["year"][0], pillars["month"][0], pillars["day"][0], pillars["time"][0]]
+    month_zhi = pillars["month"][1]
+    strength_data = _assess_strength(day_wuxing, month_zhi, all_gan, all_zhi)
+
+    # ── 格局 ──
+    # 傳統取格：月支藏干本氣十神為主（本氣在 hidden_stems["month"][0]）
+    month_hidden_ss = [s.get("shishen", "") for s in hidden_stems.get("month", [])]
+    pattern_data = _determine_pattern(day_master, day_wuxing, month_hidden_ss, strength_data["strength"])
 
     return {
         "pillars": pillars,
         "dayMaster": day_master,
         "dayMasterYinYang": YIN_YANG_GAN[day_master],
-        "dayMasterWuxing": WUXING_GAN[day_master],
+        "dayMasterWuxing": day_wuxing,
         "wuxing": {
             "counts": counts,
             "missing": [k for k, v in counts.items() if v == 0],
             "strongest": max(counts, key=lambda k: counts[k]),
         },
         "nayin": nayin,
-        "shishen": shishen,
+        "shishen": shishen_gan,
+        "hiddenStems": hidden_stems,
+        "shishenZhi": shishen_zhi,
+        "changSheng": chang_sheng,
+        "daYun": yun_data,
+        "shensha": shensha,
+        "strength": strength_data,
+        "pattern": pattern_data,
         "additional": {
             "mingGong": ec.getMingGong(),
             "shenGong": ec.getShenGong(),
@@ -346,5 +701,6 @@ def calculate(
         "meta": {
             "sect": sect,
             "longitudeAdjusted": longitude is not None,
+            "isMale": _is_male,
         },
     }

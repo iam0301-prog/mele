@@ -2354,6 +2354,265 @@ body::before {
   overflow-wrap: anywhere;
 }
 
+/* ── 八字排盤詳情面板 ── */
+.bazi-detail {
+  position: relative;
+  z-index: 1;
+  margin-top: 18px;
+  padding: 18px;
+  border: 1px solid rgba(201, 162, 39, 0.22);
+  border-radius: 10px;
+  background:
+    radial-gradient(circle at 90% 8%, rgba(201, 162, 39, 0.09), transparent 32%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.04), rgba(40, 50, 70, 0.06)),
+    rgba(3, 4, 6, 0.44);
+}
+
+.bazi-detail__header {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.bazi-detail__strength,
+.bazi-detail__pattern {
+  flex: 1 1 200px;
+  border: 1px solid rgba(201, 162, 39, 0.18);
+  border-radius: 8px;
+  padding: 12px 14px;
+  background: rgba(5, 10, 18, 0.48);
+}
+
+.bazi-detail__strength > span,
+.bazi-detail__pattern > span {
+  display: block;
+  color: rgba(232, 197, 71, 0.78);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  margin-bottom: 6px;
+}
+
+.bazi-detail__strength > strong,
+.bazi-detail__pattern > strong {
+  display: block;
+  color: #f4ead2;
+  font-size: 17px;
+  font-family: "Noto Serif TC", "Noto Sans TC", serif;
+  margin-bottom: 6px;
+}
+
+.bazi-detail__strength > p,
+.bazi-detail__pattern > p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.68);
+  font-size: 13px;
+  line-height: 1.75;
+}
+
+.bazi-detail__pillars h3,
+.bazi-detail__shensha h3,
+.bazi-detail__dayun h3 {
+  color: rgba(201, 162, 39, 0.85);
+  font-size: 12px;
+  letter-spacing: 0.2em;
+  margin: 0 0 12px;
+  font-weight: 500;
+}
+
+.bazi-detail__pillar-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+@media (max-width: 640px) {
+  .bazi-detail__pillar-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.bazi-detail__pillar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  border: 1px solid rgba(201, 162, 39, 0.18);
+  border-radius: 8px;
+  padding: 12px 8px;
+  background: rgba(5, 10, 18, 0.48);
+  gap: 4px;
+}
+
+.bazi-detail__pillar.is-day {
+  border-color: rgba(201, 162, 39, 0.55);
+  background: rgba(15, 22, 38, 0.65);
+}
+
+.bazi-detail__pillar-label {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.48);
+  letter-spacing: 0.12em;
+  margin-bottom: 2px;
+}
+
+.bazi-detail__pillar-ganzhi {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.bazi-detail__gan {
+  font-size: 32px;
+  color: #e8c547;
+  font-family: "Noto Serif TC", serif;
+  line-height: 1;
+}
+
+.bazi-detail__zhi {
+  font-size: 26px;
+  color: #f4ead2;
+  font-family: "Noto Serif TC", serif;
+  line-height: 1;
+}
+
+.bazi-detail__ss-gan {
+  font-size: 11px;
+  color: #f4a261;
+  letter-spacing: 0.05em;
+}
+
+.bazi-detail__nayin {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.38);
+}
+
+.bazi-detail__changsheng {
+  font-size: 10px;
+  color: rgba(150, 255, 180, 0.62);
+}
+
+.bazi-detail__hidden-stems {
+  list-style: none;
+  padding: 0;
+  margin: 4px 0 0;
+  width: 100%;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding-top: 6px;
+}
+
+.bazi-detail__hidden-stems li {
+  display: flex;
+  justify-content: center;
+  align-items: baseline;
+  gap: 3px;
+  font-size: 11px;
+  line-height: 1.65;
+}
+
+.bazi-detail__hidden-stems li > span {
+  color: rgba(232, 197, 71, 0.85);
+  font-family: "Noto Serif TC", serif;
+}
+
+.bazi-detail__hidden-stems li > em {
+  font-style: normal;
+  color: rgba(180, 210, 255, 0.8);
+  font-size: 10px;
+}
+
+.bazi-detail__hidden-stems li > small {
+  color: rgba(255, 255, 255, 0.32);
+  font-size: 9px;
+}
+
+/* 神煞 */
+.bazi-detail__shensha {
+  margin-bottom: 16px;
+}
+
+.bazi-detail__shensha ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.bazi-detail__shensha li {
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+  padding: 10px 12px;
+  border: 1px solid rgba(201, 162, 39, 0.14);
+  border-radius: 7px;
+  background: rgba(5, 10, 18, 0.44);
+}
+
+.bazi-detail__shensha li > strong {
+  flex-shrink: 0;
+  color: #e8c547;
+  font-size: 13px;
+  min-width: 60px;
+}
+
+.bazi-detail__shensha li > span {
+  color: rgba(255, 255, 255, 0.68);
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+/* 大運 */
+.bazi-detail__dayun {
+  margin-top: 16px;
+}
+
+.bazi-detail__dayun-start {
+  margin-left: 10px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.52);
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+.bazi-detail__dayun-steps {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 8px;
+}
+
+.bazi-detail__dayun-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 3px;
+  padding: 10px 8px;
+  border: 1px solid rgba(201, 162, 39, 0.16);
+  border-radius: 7px;
+  background: rgba(5, 10, 18, 0.44);
+}
+
+.bazi-detail__dayun-step > strong {
+  font-size: 18px;
+  color: #e8c547;
+  font-family: "Noto Serif TC", serif;
+}
+
+.bazi-detail__dayun-step > span {
+  font-size: 11px;
+  color: #f4a261;
+}
+
+.bazi-detail__dayun-step > small {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.42);
+  line-height: 1.4;
+}
+
 .result-backend-explanation {
   margin-top: 24px;
   overflow-x: auto;

@@ -327,6 +327,12 @@ const KEY_LABELS: Record<string, string> = {
   dayMasterWuxing: '日主五行',
   wuxing: '五行分布',
   nayin: '納音',
+  hiddenStems: '地支藏干',
+  changSheng: '十二長生',
+  daYun: '大運',
+  shensha: '神煞',
+  strength: '日主強弱',
+  pattern: '格局',
   mingGong: '命宮',
   shenGong: '身宮',
   fiveElementsClass: '五行局',
@@ -1622,6 +1628,155 @@ function palaceStars(palace: Dict) {
   return stars.slice(0, 4);
 }
 
+// ── 八字專屬詳細排盤面板 ──
+const BAZI_PILLAR_LABELS: Record<string, string> = {
+  year: '年柱', month: '月柱', day: '日柱', time: '時柱',
+};
+const BAZI_SHISHEN_TRAD: Record<string, string> = {
+  '劫财': '劫財', '伤官': '傷官', '偏财': '偏財',
+  '正财': '正財', '七杀': '七殺',
+};
+function baziSs(text: string): string {
+  return BAZI_SHISHEN_TRAD[text] ?? text;
+}
+
+function BaziDetailPanel({ result }: { result: CalcResponse }) {
+  if (result.tool !== 'bazi') return null;
+  const data = result.data ?? {};
+  const pillars = asDict(data.pillars);
+  const hiddenStems = asDict(data.hiddenStems);
+  const changSheng = asDict(data.changSheng);
+  const shishenGan = asDict(data.shishen);
+  const nayin = asDict(data.nayin);
+  const shensha = asArray(data.shensha);
+  const strengthData = asDict(data.strength);
+  const patternData = asDict(data.pattern);
+  const daYun = asDict(data.daYun);
+  const daYunSteps = asArray(daYun.steps);
+
+  const pillarKeys = ['year', 'month', 'day', 'time'] as const;
+
+  return (
+    <section className="bazi-detail" aria-label="八字排盤詳情">
+      {/* ── 強弱 + 格局 ── */}
+      {(strengthData.strength || patternData.name) && (
+        <div className="bazi-detail__header">
+          {strengthData.strength && (
+            <div className="bazi-detail__strength">
+              <span>日主強弱</span>
+              <strong>{cleanText(strengthData.strength)}</strong>
+              <p>{cleanText(strengthData.desc)}</p>
+            </div>
+          )}
+          {patternData.name && (
+            <div className="bazi-detail__pattern">
+              <span>格局</span>
+              <strong>{cleanText(patternData.name)}</strong>
+              <p>{cleanText(patternData.yongShenHint)}</p>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ── 四柱藏干表格 ── */}
+      <div className="bazi-detail__pillars">
+        <h3>四柱 · 藏干 · 十神</h3>
+        <div className="bazi-detail__pillar-grid">
+          {pillarKeys.map((key) => {
+            const pillar = asArray(pillars[key]);
+            const gan = cleanText(pillar[0]);
+            const zhi = cleanText(pillar[1]);
+            const ssGan = key !== 'day' ? baziSs(cleanText(shishenGan[key])) : '日主';
+            const cs = cleanText(changSheng[key]);
+            const ny = cleanText(nayin[key]);
+            const stems = asArray(hiddenStems[key]);
+            return (
+              <article key={key} className={`bazi-detail__pillar${key === 'day' ? ' is-day' : ''}`}>
+                <span className="bazi-detail__pillar-label">{BAZI_PILLAR_LABELS[key]}</span>
+                <div className="bazi-detail__pillar-ganzhi">
+                  <strong className="bazi-detail__gan">{gan}</strong>
+                  <span className="bazi-detail__zhi">{zhi}</span>
+                </div>
+                {ssGan && <span className="bazi-detail__ss-gan">{ssGan}</span>}
+                {ny && <span className="bazi-detail__nayin">{ny}</span>}
+                {cs && <span className="bazi-detail__changsheng">{cs}</span>}
+                {stems.length > 0 && (
+                  <ul className="bazi-detail__hidden-stems">
+                    {stems.slice(0, 3).map((stem, i) => {
+                      const s = asDict(stem);
+                      const stemGan = cleanText(s.gan);
+                      const stemSs = baziSs(cleanText(s.shishen));
+                      const stemRole = cleanText(s.role);
+                      return stemGan ? (
+                        <li key={i}>
+                          <span>{stemGan}</span>
+                          {stemSs && <em>{stemSs}</em>}
+                          {stemRole && <small>{stemRole}</small>}
+                        </li>
+                      ) : null;
+                    })}
+                  </ul>
+                )}
+              </article>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* ── 神煞 ── */}
+      {shensha.length > 0 && (
+        <div className="bazi-detail__shensha">
+          <h3>神煞</h3>
+          <ul>
+            {shensha.map((item, i) => {
+              const ss = asDict(item);
+              return (
+                <li key={i}>
+                  <strong>{cleanText(ss.name)}</strong>
+                  <span>{cleanText(ss.desc)}</span>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      )}
+
+      {/* ── 大運 ── */}
+      {daYunSteps.length > 0 && (
+        <div className="bazi-detail__dayun">
+          <h3>
+            大運
+            {daYun.startAge && (
+              <span className="bazi-detail__dayun-start">
+                {cleanText(daYun.startAge)}歲{cleanText(daYun.startMonth)}個月起運
+                · {daYun.isForward ? '順行' : '逆行'}
+              </span>
+            )}
+          </h3>
+          <div className="bazi-detail__dayun-steps">
+            {daYunSteps.slice(0, 6).map((step, i) => {
+              const s = asDict(step);
+              const gz = cleanText(s.ganZhi);
+              const ssG = baziSs(cleanText(s.shishenGan));
+              const startAge = cleanText(s.startAge);
+              const endAge = cleanText(s.endAge);
+              const startYear = cleanText(s.startYear);
+              return gz ? (
+                <article key={i} className="bazi-detail__dayun-step">
+                  <strong>{gz}</strong>
+                  {ssG && <span>{ssG}</span>}
+                  <small>{startAge}—{endAge}歲</small>
+                  <small>{startYear}年起</small>
+                </article>
+              ) : null;
+            })}
+          </div>
+        </div>
+      )}
+    </section>
+  );
+}
+
 function ZiweiPlainGuide({ result, t }: { result: CalcResponse; t: ToolResultCopy }) {
   if (result.tool !== 'ziwei') return null;
 
@@ -2370,6 +2525,7 @@ export function ToolResult({ result, locale = DEFAULT_LOCALE }: { result: CalcRe
 
       <MemberResonancePanel resonance={memberResonance} t={t} />
       {result.tool !== 'maya' && <ResultInsightPanel insight={insight} speech={result.tool === 'tarot' ? undefined : speech} t={t} />}
+      <BaziDetailPanel result={result} />
       <ZiweiPlainGuide result={result} t={t} />
       {result.tool !== 'tarot' && <PersonalReadingPanel reading={personalReading} t={t} />}
       <PointUnlockPanel result={result} t={t} />

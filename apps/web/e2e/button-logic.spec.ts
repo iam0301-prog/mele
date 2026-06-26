@@ -187,13 +187,21 @@ test.describe('Button and link logic', () => {
     for (const locale of locales) {
       await page.goto(`/${locale}`, { waitUntil: 'domcontentloaded' });
 
+      // home-hero__actions 有主要 CTA（/daily 和 /tools）
+      for (const href of [
+        `/${locale}/daily`,
+        `/${locale}/tools`,
+      ]) {
+        await expect(page.locator(`.home-hero__actions a[href="${href}"]`), `${locale} hero ${href}`).toBeVisible();
+      }
+
+      // home-route-links nav 有次要入口
       for (const href of [
         `/${locale}/beta`,
-        `/${locale}/daily`,
         `/${locale}/tools/tarot`,
         `/${locale}/teachers`,
       ]) {
-        await expect(page.locator(`.home-hero__actions a[href="${href}"]`), `${locale} hero ${href}`).toBeVisible();
+        await expect(page.locator(`.home-route-links a[href="${href}"]`), `${locale} nav ${href}`).toBeVisible();
       }
 
       const menuButton = page.locator('button[aria-controls="mobile-header-menu"]');
@@ -202,12 +210,10 @@ test.describe('Button and link logic', () => {
       const menu = page.locator('#mobile-header-menu');
       await expect(menu).toBeVisible();
 
+      // 導覽列已移除 /beta, /mobile, /ar（路由保留，暫不在 menu 顯示）
       for (const href of [
-        `/${locale}/beta`,
         `/${locale}/tools`,
         `/${locale}/daily`,
-        `/${locale}/mobile`,
-        `/${locale}/ar`,
         `/${locale}/teachers`,
         `/${locale}/legal/disclaimer`,
         `/${locale}/account/login`,

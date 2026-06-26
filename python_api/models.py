@@ -198,6 +198,7 @@ class BaziRequest(BaseModel):
     minute: int = Field(0, ge=0, le=59)
     sect: Literal[1, 2] = 2
     longitude: float | None = None
+    is_male: bool = True  # 大運順逆取決於性別，預設男命
 
     @model_validator(mode="before")
     @classmethod

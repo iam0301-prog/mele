@@ -388,19 +388,74 @@ def _wuxing_balance_lines(counts: dict, day_wuxing: object) -> list[str]:
     return lines
 
 
+def _bazi_shishen_label(ss: str) -> str:
+    """十神名稱標準化（處理 lunar-python 回傳的簡體）"""
+    mapping = {
+        "比肩": "比肩", "劫财": "劫財", "食神": "食神", "伤官": "傷官",
+        "偏财": "偏財", "正财": "正財", "七杀": "七殺", "正官": "正官",
+        "偏印": "偏印", "正印": "正印",
+        # 已是繁體直接過
+        "劫財": "劫財", "傷官": "傷官", "偏財": "偏財", "正財": "正財", "七殺": "七殺",
+    }
+    return mapping.get(ss, ss)
+
+
+SHISHEN_CHAR_DESC = {
+    "比肩": "助身（獨立、平輩競合）",
+    "劫財": "助身（積極、財帛起伏）",
+    "食神": "洩秀（才藝、享受、創作）",
+    "傷官": "洩秀（才華外露、官緣需留意）",
+    "偏財": "克我所勋（財活靈活、善開拓）",
+    "正財": "克我所勋（踏實、重穩定收入）",
+    "七殺": "克我（魄力、壓力、競爭）",
+    "正官": "克我（規範、責任、名譽）",
+    "偏印": "生我（思維獨特、靈感直覺）",
+    "正印": "生我（學習力、庇蔭緣）",
+}
+
+CHANG_SHENG_MEANING = {
+    # 繁體
+    "長生": "蓬勃初生，能量漸入佳境",
+    "沐浴": "敏感活潑，需要在多樣化中找定位",
+    "冠帶": "精力充沛，積極表現欲強",
+    "臨官": "能力到位，事業運勢加強",
+    "帝旺": "強盛旺極，但旺極易衰需留意過猛",
+    "衰": "開始轉淡，適合收斂整頓",
+    "病": "能量較弱，需謹慎保守",
+    "死": "此處能量靜止，重在轉化而非衝刺",
+    "墓": "收藏沉積，有時藏而後發",
+    "絕": "斷而再生，適合澈底更新",
+    "胎": "潛伏醞釀，蓄勢待發",
+    "養": "滋養成長，根基穩固後再動",
+    # 簡體（lunar-python 回傳格式）
+    "长生": "蓬勃初生，能量漸入佳境",
+    "冠带": "精力充沛，積極表現欲強",
+    "临官": "能力到位，事業運勢加強",
+    "养": "滋養成長，根基穩固後再動",
+    "绝": "斷而再生，適合澈底更新",
+    "胎": "潛伏醞釀，蓄勢待發",
+}
+
+
 def explain_bazi(data: dict, detail: DetailLevel = "teaser") -> str:
     pillars = data.get("pillars") or {}
     counts = (data.get("wuxing") or {}).get("counts") or {}
     day_master = data.get("dayMaster")
     day_wuxing = data.get("dayMasterWuxing")
     day_yinyang = data.get("dayMasterYinYang")
+    hidden_stems = data.get("hiddenStems") or {}
+    shishen_gan = data.get("shishen") or {}
+    chang_sheng = data.get("changSheng") or {}
+    da_yun = data.get("daYun") or {}
+    shensha = data.get("shensha") or []
+    strength = data.get("strength") or {}
+    pattern = data.get("pattern") or {}
 
+    # ── 日主核心 ──
     parts = [
         _line(
-            f"八字用出生的年、月、日、時，排出四組干支——也就是四柱八個字。"
-            f"其中「日柱天干（代表你自己的那個字）」稱為日主，"
             f"你的日主是 <strong>{_text(day_yinyang)}{_text(day_wuxing)}（{_text(day_master)}）</strong>，"
-            f"整張盤都以它為核心來讀。"
+            f"整張盤以日主為核心展開解讀。"
         ),
         _line(
             DAY_MASTER_GUIDE.get(
@@ -408,45 +463,131 @@ def explain_bazi(data: dict, detail: DetailLevel = "teaser") -> str:
                 WUXING_GUIDE.get(day_wuxing, "日主描述你最自然的能量運作方式，是解讀整張命盤的起點。"),
             )
         ),
-        _section("四柱一覽"),
     ]
 
+    # ── 日主強弱 ──
+    strength_val = _text(strength.get("strength"))
+    strength_desc = _text(strength.get("desc"))
+    month_state = _text(strength.get("monthState"))
+    if strength_val and strength_desc:
+        parts.append(_section("日主強弱"))
+        parts.append(_line(f"<strong>{strength_val}</strong>：{strength_desc}"))
+
+    # ── 格局 ──
+    pat_name = _text(pattern.get("name"))
+    pat_meaning = _text(pattern.get("meaning"))
+    yong_hint = _text(pattern.get("yongShenHint"))
+    if pat_name:
+        parts.append(_section("格局與用神傾向"))
+        parts.append(_line(f"命盤以 <strong>{pat_name}</strong> 為主格。{pat_meaning}"))
+        if yong_hint:
+            parts.append(_line(f"用神方向：{yong_hint}"))
+
+    # ── 四柱 + 天干十神 ──
+    parts.append(_section("四柱天干十神"))
     for key in ("year", "month", "day", "time"):
         label, role = PILLAR_ROLES[key]
         pillar = pillars.get(key) or []
-        if pillar:
-            parts.append(_line(f"<strong>{label}</strong>：{_join(pillar, '')}　→　{role}。"))
-
-    if counts:
-        parts.append(_section("五行能量分布"))
-        count_display = _join([f"{name} {count} 個" for name, count in counts.items()])
+        if not pillar:
+            continue
+        gan, zhi = pillar[0], pillar[1]
+        ss = _bazi_shishen_label(_text(shishen_gan.get(key, ""))) if key != "day" else "日主"
+        cs = _text(chang_sheng.get(key, ""))
+        cs_meaning = CHANG_SHENG_MEANING.get(cs, "")
+        # 繁化十二長生名稱
+        CS_TRAD = {"长生": "長生", "冠带": "冠帶", "临官": "臨官", "帝旺": "帝旺",
+                   "养": "養", "绝": "絕"}
+        cs_display = CS_TRAD.get(cs, cs)
+        ss_char = f"【{ss}】" if ss else ""
+        cs_char = f"長生：{cs_display}（{cs_meaning}）" if cs and cs_meaning else (f"長生：{cs_display}" if cs_display else "")
         parts.append(
             _line(
-                f"這張盤裡的五行分布：{count_display}。五行代表木、火、土、金、水五種能量，不同組合讓每個人的底色都不一樣。"
+                f"<strong>{label} {gan}{zhi}</strong> {ss_char}"
+                f"{'　' if cs_char else ''}{cs_char}"
+                f"　→ {role}。"
             )
         )
+
+    # ── 地支藏干十神 ──
+    parts.append(_section("地支藏干與藏干十神"))
+    parts.append(_line(
+        "地支內藏多個天干（稱藏干），藏干對應的十神是解盤的關鍵——"
+        "尤其月支藏干反映「月令」的力量，決定日主是否得令。"
+    ))
+    for key in ("year", "month", "day", "time"):
+        label = PILLAR_ROLES[key][0]
+        pillar = pillars.get(key) or []
+        zhi = pillar[1] if len(pillar) > 1 else ""
+        stems = hidden_stems.get(key) or []
+        if not stems:
+            continue
+        stem_parts = []
+        for s in stems:
+            g = _text(s.get("gan"))
+            ss = _bazi_shishen_label(_text(s.get("shishen")))
+            role_tag = _text(s.get("role"))
+            if g and ss:
+                stem_parts.append(f"{g}（{ss}·{role_tag}）")
+        if stem_parts:
+            parts.append(_line(f"<strong>{label}支 {zhi}</strong>：{' / '.join(stem_parts)}"))
+
+    # ── 五行分布 ──
+    if counts:
+        parts.append(_section("五行分布"))
+        count_display = _join([f"{name} {count}" for name, count in counts.items()])
+        parts.append(_line(f"木火土金水：{count_display}（天干＋地支各計1）"))
         for line in _wuxing_balance_lines(counts, day_wuxing):
             parts.append(_line(line))
 
+    # ── 神煞 ──
+    if shensha:
+        parts.append(_section("神煞"))
+        for ss_item in shensha:
+            name = _text(ss_item.get("name"))
+            desc = _text(ss_item.get("desc"))
+            zhi_hit = ss_item.get("zhi") or []
+            zhi_str = "、".join(zhi_hit) if zhi_hit else ""
+            if name and desc:
+                parts.append(_line(f"<strong>{name}</strong>{'（命中地支：' + zhi_str + '）' if zhi_str else ''}：{desc}"))
+
     if detail == "full":
-        parts.extend(
-            [
-                _section("想看更深一層？"),
-                _line(
-                    "五行只是地基。下一層可以看月令（出生月份的季節力量）、十神（命盤裡每個字和日主的關係），以及大運流年——這樣才能看出哪些時段對你比較順、哪些需要多留意。"
-                ),
-                _line(
-                    "如果你正在思考某個具體問題——工作方向、關係模式、財務節奏——帶著問題去問老師，會比泛泛看整張盤更有收穫。"
-                ),
-                _line(
-                    "八字不是用來把人定型的，它更像一張描述「你在不同環境下如何被啟動」的地圖。同一張盤，在不同大環境下也會呈現不同的面向。"
-                ),
-            ]
-        )
+        # ── 大運 ──
+        steps = da_yun.get("steps") or []
+        if steps:
+            start_age = da_yun.get("startAge", "")
+            start_month_yun = da_yun.get("startMonth", "")
+            direction = "順行" if da_yun.get("isForward") else "逆行"
+            parts.append(_section("大運走勢"))
+            parts.append(_line(
+                f"起運：{start_age}歲{start_month_yun}個月，{direction}。"
+                f"大運每10年換一步，天干影響上半段，地支影響下半段。"
+            ))
+            for step in steps[:6]:
+                gz = _text(step.get("ganZhi"))
+                ss_gan = _bazi_shishen_label(_text(step.get("shishenGan")))
+                s_age = step.get("startAge", "")
+                e_age = step.get("endAge", "")
+                s_year = step.get("startYear", "")
+                if gz:
+                    ss_str = f"（{ss_gan}）" if ss_gan else ""
+                    parts.append(_line(
+                        f"<strong>{gz}</strong>{ss_str}　{s_age}—{e_age}歲　西元{s_year}年起"
+                    ))
+
+        parts.extend([
+            _section("解讀提醒"),
+            _line(
+                "格局與用神需合參月令、三合、六合、刑衝破害才能確定。"
+                "大運流年的力量遠大於靜盤，同一張命盤在不同大運下表現差異很大。"
+            ),
+            _line(
+                "八字呈現的是傾向與課題，不是宿命。帶著真實問題去諮詢，比泛泛解盤更有價值。"
+            ),
+        ])
+
     parts.append(
         _line(
-            "<small>本解讀以傳統命理象徵作為自我觀察的參考，不是醫療、心理診斷，也不是對未來的保證。"
-            "你完全可以依照自己的感受、現實條件與專業建議，選擇最適合自己的下一步。</small>"
+            "<small>本解讀以傳統命理象徵作為自我觀察的參考框架，不是醫療或心理診斷，也不構成對未來事件的預測或保證。</small>"
         )
     )
     return _wrap(parts, detail)
