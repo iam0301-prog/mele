@@ -64,7 +64,7 @@ const AR_STAGE_ENABLED: Record<CalcTool, boolean> = {
   ziwei: false,       // 純 CSS 裝飾盤，半成品
   astro: false,       // 純 CSS 裝飾盤，半成品
   runes: false,       // 純 CSS 材質裝飾，沒有真實圖片
-  maya: false,        // 已由 kind !== 'maya' 過濾，此處雙重確認
+  maya: true,         // 瑪雅有真實圖騰印記（MayaTotemGlyph），恢復顯示
 };
 
 export function ToolResultSection({
@@ -80,7 +80,7 @@ export function ToolResultSection({
   arFirst?: boolean;
   locale?: Locale;
 }) {
-  const shouldRenderVisualStage = showAr && kind !== 'maya' && AR_STAGE_ENABLED[kind];
+  const shouldRenderVisualStage = showAr && AR_STAGE_ENABLED[kind];
   const ReadingArStage = READING_AR_STAGES[locale] ?? READING_AR_STAGES[DEFAULT_LOCALE];
   const arStage = shouldRenderVisualStage ? <ReadingArStage kind={kind} result={result} /> : null;
   const shouldShowArFirst = arFirst || kind !== 'tarot';
