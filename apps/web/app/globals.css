@@ -2354,6 +2354,79 @@ body::before {
   overflow-wrap: anywhere;
 }
 
+/* ── 生年四化區塊 ── */
+.ziwei-guide__four-changes {
+  margin-bottom: 14px;
+}
+
+.ziwei-guide__four-changes h3 {
+  margin: 0 0 10px;
+  color: rgba(232, 197, 71, 0.9);
+  font-size: 13px;
+  letter-spacing: 0.14em;
+  font-weight: 600;
+}
+
+.ziwei-guide__four-changes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 8px;
+}
+
+.ziwei-guide__four-changes-grid article {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 8px;
+  border-radius: 8px;
+  border: 1px solid rgba(232, 197, 71, 0.22);
+  background: rgba(5, 10, 18, 0.6);
+  text-align: center;
+}
+
+.ziwei-guide__four-changes-grid article[data-mutagen="祿"] {
+  border-color: rgba(80, 220, 130, 0.36);
+}
+.ziwei-guide__four-changes-grid article[data-mutagen="權"] {
+  border-color: rgba(232, 100, 80, 0.36);
+}
+.ziwei-guide__four-changes-grid article[data-mutagen="科"] {
+  border-color: rgba(100, 160, 255, 0.36);
+}
+.ziwei-guide__four-changes-grid article[data-mutagen="忌"] {
+  border-color: rgba(180, 100, 220, 0.36);
+}
+
+.ziwei-guide__four-changes-grid article span {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: rgba(232, 197, 71, 0.9);
+}
+
+.ziwei-guide__four-changes-grid article strong {
+  font-size: 15px;
+  color: #f4ead2;
+  font-weight: 600;
+}
+
+.ziwei-guide__four-changes-grid article em {
+  font-size: 11px;
+  font-style: normal;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+/* 宮位卡片上的四化標籤 */
+.ziwei-guide__palace-mutagen {
+  display: inline-block;
+  margin-left: 6px;
+  font-size: 11px;
+  color: rgba(232, 197, 71, 0.85);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+}
+
 /* ── 占星排盤詳情面板 ── */
 .astro-detail {
   margin-top: 18px;

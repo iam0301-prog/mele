@@ -667,6 +667,76 @@ def _star_name(star: object) -> str:
     return _text(star)
 
 
+# 十二宮對應的人生領域
+_PALACE_DOMAINS: dict[str, str] = {
+    "命宮": "個性主軸、面對世界的方式",
+    "兄弟": "手足資源、平輩往來",
+    "夫妻": "感情模式、伴侶特質",
+    "子女": "子女緣、創造力與桃花",
+    "財帛": "財富來源、金錢流動",
+    "疾厄": "身心健康、壓力模式",
+    "遷移": "外出運、異地發展",
+    "僕役": "人際資源、朋友部屬",
+    "交友": "人際資源、朋友部屬",
+    "官祿": "事業方向、職涯定位",
+    "田宅": "家庭環境、不動產運",
+    "福德": "精神生活、享受福氣",
+    "父母": "父母緣、上位者互動",
+}
+
+# 生年四化含義（祿權科忌）
+_MUTAGEN_MEANINGS: dict[str, str] = {
+    "祿": "資源活水，財氣與人緣在此宮順暢流動",
+    "權": "主導力強，掌控欲與野心在此宮明顯",
+    "科": "名聲貴人，文書考試與社會評價在此宮得利",
+    "忌": "執著課題，暗耗與阻礙的核心壓力在此宮",
+}
+
+# 主星廟旺利陷簡述（星曜強弱指標）
+_BRIGHTNESS_DESC: dict[str, str] = {
+    "廟": "廟",
+    "旺": "旺",
+    "得": "得地",
+    "利": "利",
+    "平": "平",
+    "不": "不利",
+    "陷": "落陷",
+}
+
+# 十四正曜一句話簡述（用於十二宮一覽）
+_STAR_BRIEF: dict[str, str] = {
+    "紫微": "主導格局，尊貴不從眾",
+    "天機": "謀略靈動，善分析規畫",
+    "太陽": "主動外放，帶動名氣人際",
+    "武曲": "果斷行動，主財務決策",
+    "天同": "平和享受，重生活品質",
+    "廉貞": "行政決斷，主交際競爭",
+    "天府": "穩健斂財，資源保守累積",
+    "太陰": "細膩感性，財與家庭關係深",
+    "貪狼": "多才多欲，桃花興趣廣博",
+    "巨門": "深思好辯，口才溝通見長",
+    "天相": "協調輔佐，重制度人際",
+    "天梁": "清高蔭庇，善化解危機",
+    "七殺": "衝勁強悍，開創行動力旺",
+    "破軍": "求變破舊，耗散中創新",
+}
+
+
+def _star_display(star: object) -> str:
+    """格式化主星名稱 + 廟旺陷標示（可選四化）"""
+    if isinstance(star, dict):
+        name = _text(star.get("name") or star.get("nameZh") or star.get("label"))
+        brightness = _text(star.get("brightness", ""))
+        mutagen = _text(star.get("mutagen", ""))
+        parts: list[str] = [name]
+        if brightness:
+            parts.append(f"[{_BRIGHTNESS_DESC.get(brightness, brightness)}]")
+        if mutagen:
+            parts.append(f"（化{mutagen}）")
+        return "".join(parts)
+    return _text(star)
+
+
 def explain_ziwei(data: dict, detail: DetailLevel = "teaser") -> str:
     ming = data.get("mingGong") or {}
     palaces = data.get("palaces") or []
@@ -674,68 +744,108 @@ def explain_ziwei(data: dict, detail: DetailLevel = "teaser") -> str:
     body = data.get("body")
     five = data.get("fiveElementsClass")
 
+    # 命宮資訊
     ming_name = ming.get("name") or ming.get("earthlyBranch") or ""
-    ming_stars = ming.get("majorStarNames") or ming.get("majorStars") or []
-    if not ming_stars and isinstance(palaces, list):
+    ming_stars: list = ming.get("majorStarNames") or ming.get("majorStars") or []
+    ming_branch = ""
+    if isinstance(palaces, list):
         for palace in palaces:
             if palace.get("name") == "命宮":
-                ming_stars = palace.get("majorStarNames") or palace.get("majorStars") or []
-                ming_name = ming_name or palace.get("earthlyBranch") or palace.get("name")
+                if not ming_stars:
+                    ming_stars = palace.get("majorStarNames") or palace.get("majorStars") or []
+                ming_branch = _text(palace.get("earthlyBranch"))
+                ming_name = ming_name or ming_branch or "命宮"
                 break
 
+    # 提取四化（優先從 API 回傳的 fourChanges，退而從 palaces.majorStars.mutagen 萃取）
+    four_changes: list[dict] = data.get("fourChanges") or []  # type: ignore[assignment]
+    if not four_changes and isinstance(palaces, list):
+        for palace in palaces:
+            for star in palace.get("majorStars") or []:
+                if isinstance(star, dict) and star.get("mutagen"):
+                    four_changes.append({
+                        "mutagen": star["mutagen"],
+                        "star": star.get("name", ""),
+                        "palace": palace.get("name", ""),
+                    })
+            for star in palace.get("minorStars") or []:
+                if isinstance(star, dict) and star.get("mutagen"):
+                    four_changes.append({
+                        "mutagen": star["mutagen"],
+                        "star": star.get("name", ""),
+                        "palace": palace.get("name", ""),
+                    })
+
+    # ── 命盤基本資訊 ──
     parts = [
         _line(
-            f"你的紫微命盤以 <strong>{_text(five, '五行局')}</strong> 為結構背景，命主 <strong>{_text(soul)}</strong>、身主 <strong>{_text(body)}</strong>。"
+            f"命盤結構：<strong>{_text(five, '五行局')}</strong>，命主 <strong>{_text(soul)}</strong>、身主 <strong>{_text(body)}</strong>。"
         ),
         _line(
-            f"命宮位置：<strong>{_text(ming_name, '命宮')}</strong>，代表你面對人生舞台時最主要的展現方式。"
+            f"命宮（{_text(ming_branch or ming_name, '命宮')}）主星："
+            f"<strong>{_join(_star_name(s) for s in ming_stars) or '空宮（看對宮與三方）'}</strong>。"
+            "命宮是整張盤的主軸，先確認這裡的星曜特質，再延伸讀其他宮位。"
         ),
     ]
-    if ming_stars:
-        parts.append(
-            _line(f"命宮主要星曜：<strong>{_join(_star_name(star) for star in ming_stars)}</strong>。")
-        )
 
-    def palace_line(target: str, topic: str) -> str | None:
-        if not isinstance(palaces, list):
-            return None
-        for palace in palaces:
-            if palace.get("name") == target:
-                stars = palace.get("majorStarNames") or palace.get("majorStars") or []
-                star_text = _join(_star_name(star) for star in stars) or "暫無主星，需看對宮與三方四正"
-                branch = _text(palace.get("earthlyBranch"))
-                return f"{target}（{branch}）：{star_text}。這裡先看「{topic}」，如果這題最近很有感，就比泛泛看整張盤更值得先問。"
-        return None
+    # ── 生年四化（核心）──
+    if four_changes:
+        parts.append(_section("生年四化"))
+        # 依祿→權→科→忌排序
+        _order = {"祿": 0, "權": 1, "科": 2, "忌": 3}
+        sorted_fc = sorted(four_changes, key=lambda x: _order.get(x.get("mutagen", ""), 9))
+        for fc in sorted_fc:
+            m = _text(fc.get("mutagen", ""))
+            star = _text(fc.get("star", ""))
+            palace = _text(fc.get("palace", ""))
+            meaning = _MUTAGEN_MEANINGS.get(m, "")
+            domain = _PALACE_DOMAINS.get(palace, "")
+            parts.append(_line(
+                f"<strong>化{m}：{star}星，落{palace}</strong>"
+                f"{'（' + domain + '）' if domain else ''}。"
+                f"{meaning}。"
+            ))
+        parts.append(_line(
+            "四化是紫微判斷核心：落宮決定這股能量在哪個生活領域最活躍，是讀盤的第一入口。"
+        ))
 
-    parts.append(_section("先挑一個真的想問的題目"))
-    for line in [
-        palace_line("官祿", "工作定位、職涯方向與投入方式"),
-        palace_line("夫妻", "關係模式、親密安全感與伴侶互動"),
-        palace_line("財帛", "賺錢方式、資源流動與金錢壓力"),
-    ]:
-        if line:
-            parts.append(_line(line))
-
-    parts.append(
-        _line(
-            "紫微不是一次把全部宮位背起來，而是先抓命宮主軸，再挑一個最有感的生活問題深看。老師解盤的價值，就在於把對宮、三方四正與流年一起合參。"
-        )
-    )
+    # ── 十二宮完整列表 ──
+    if isinstance(palaces, list) and palaces:
+        parts.append(_section("十二宮一覽"))
+        for palace in palaces[:12]:
+            p_name = _text(palace.get("name"))
+            branch = _text(palace.get("earthlyBranch"))
+            stem = _text(palace.get("heavenlyStem"))
+            stars = palace.get("majorStars") or []
+            star_display = _join(_star_display(s) for s in stars) or "空宮"
+            domain = _PALACE_DOMAINS.get(p_name, "")
+            # 四化標記
+            fc_tags = [
+                f"化{fc['mutagen']}" for fc in four_changes
+                if fc.get("palace") == p_name and fc.get("mutagen")
+            ]
+            fc_str = "".join(f"<em>【{tag}】</em>" for tag in fc_tags)
+            # 主星一句話
+            star_names = [_star_name(s) for s in stars[:2] if _star_name(s)]
+            star_briefs = [_STAR_BRIEF[n] for n in star_names if n in _STAR_BRIEF]
+            note_str = "　→　" + "；".join(star_briefs) if star_briefs else ("　→　空宮，留意對宮借星" if not stars else "")
+            parts.append(_line(
+                f"<strong>{p_name}</strong>（{stem}{branch}）{fc_str}"
+                f"　{star_display}{note_str}"
+                + (f"　<small>{domain}</small>" if domain else "")
+            ))
 
     if detail == "full":
-        for palace in palaces[:12]:
-            stars = palace.get("majorStarNames") or palace.get("majorStars") or []
-            star_text = _join(_star_name(star) for star in stars) or "無主星"
-            parts.append(
-                _line(
-                    f"<strong>{_text(palace.get('name'))}</strong>：{_text(palace.get('heavenlyStem'))}{_text(palace.get('earthlyBranch'))}，主星 {star_text}。"
-                )
-            )
-        parts.append(
-            _line(
-                "正式諮詢時，建議把命宮、身宮、財帛、官祿、夫妻與遷移宮串成一條人生敘事，而不是逐宮孤立解讀。"
-            )
-        )
+        parts.append(_line(
+            "正式解盤建議把命宮、身宮、財帛、官祿、夫妻、遷移六宮串成人生主敘事，"
+            "再以四化落宮確認各領域的能量強弱，流年則看大限與流曜的疊合。"
+        ))
+
+    parts.append(_line(
+        "<small>本解讀以紫微斗數星曜象徵作為自我觀察的參考框架，不構成對未來的預測或保證，"
+        "不提供醫療、法律或財務建議。</small>"
+    ))
+
     return _wrap(parts, detail)
 
 

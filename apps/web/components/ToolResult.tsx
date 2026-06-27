@@ -1981,6 +1981,12 @@ function ZiweiPlainGuide({ result, t }: { result: CalcResponse; t: ToolResultCop
   const wuxing = firstValue(data, ['fiveElementsClass'], '五行局');
   const palaces = palaceListFrom(data).slice(0, 12);
   const g = t.ziweiGuide;
+  // 生年四化（依祿→權→科→忌排序）
+  const _fcOrder: Record<string, number> = { 祿: 0, 權: 1, 科: 2, 忌: 3 };
+  const fourChangesList = asArray(data.fourChanges)
+    .map(asDict)
+    .filter((fc) => fc.mutagen)
+    .sort((a, b) => (_fcOrder[cleanText(a.mutagen)] ?? 9) - (_fcOrder[cleanText(b.mutagen)] ?? 9));
 
   return (
     <section className="ziwei-guide" aria-label={g.kicker}>
@@ -2018,16 +2024,48 @@ function ZiweiPlainGuide({ result, t }: { result: CalcResponse; t: ToolResultCop
         ))}
       </div>
 
+      {/* ── 生年四化 ── */}
+      {fourChangesList.length > 0 && (
+        <div className="ziwei-guide__four-changes">
+          <h3>生年四化</h3>
+          <div className="ziwei-guide__four-changes-grid">
+            {fourChangesList.map((fc, i) => {
+              const m = cleanText(fc.mutagen);
+              const star = cleanText(fc.star);
+              const palace = cleanText(fc.palace);
+              return (
+                <article key={i} data-mutagen={m}>
+                  <span>化{m}</span>
+                  <strong>{star}</strong>
+                  <em>{palace}</em>
+                </article>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       {palaces.length > 0 && (
         <div className="ziwei-guide__palaces">
           {palaces.map((palace, index) => {
             const title = palaceTitle(palace, `第 ${index + 1} 宮`);
             const branch = palaceBranch(palace);
             const stars = palaceStars(palace);
+            // 標記此宮的四化
+            const palaceMutagens = fourChangesList
+              .filter((fc) => cleanText(fc.palace) === title)
+              .map((fc) => cleanText(fc.mutagen));
             return (
               <article key={`${title}-${index}`}>
                 <span>{branch || String(index + 1).padStart(2, '0')}</span>
-                <h3>{title}</h3>
+                <h3>
+                  {title}
+                  {palaceMutagens.length > 0 && (
+                    <span className="ziwei-guide__palace-mutagen">
+                      {palaceMutagens.map((m) => `化${m}`).join(' ')}
+                    </span>
+                  )}
+                </h3>
                 <p>{stars.length > 0 ? stars.join(' / ') : t.palaceNoStar}</p>
               </article>
             );
