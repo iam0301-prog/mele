@@ -222,6 +222,16 @@ def explain_numerology(data: dict, detail: DetailLevel = "teaser") -> str:
     bd_arche = data.get("birthDayArchetype") or {}
     is_master = data.get("isMaster")
 
+    # 新增欄位
+    personal_year = data.get("personalYear")
+    personal_year_display = data.get("personalYearDisplay") or str(personal_year or "")
+    personal_year_meaning = data.get("personalYearMeaning") or ""
+    personal_year_cal = data.get("personalYearCalendarYear") or ""
+    pinnacles = data.get("pinnacles") or []
+    challenges = data.get("challenges") or []
+    combo_note = data.get("comboNote") or ""
+
+    # ── 生命靈數核心 ──
     parts = [
         _line(
             f"你的生命靈數是 <strong>{_text(lp_display)}</strong>"
@@ -233,26 +243,81 @@ def explain_numerology(data: dict, detail: DetailLevel = "teaser") -> str:
     if is_master and lp_reduced:
         parts.append(
             _line(
-                f"所以如果別的網站把你算成 <strong>{_text(lp_reduced)}</strong>，不是誰錯誰對；"
-                f"那是把大師數繼續化簡。本平台會顯示 <strong>{_text(lp_display)}</strong>，讓兩種派別都看得到。"
+                f"其他平台把你算成 <strong>{_text(lp_reduced)}</strong> 不是誰錯誰對——"
+                f"那是把大師數繼續化簡的做法。本平台保留 <strong>{_text(lp_display)}</strong>，兩種視角都可參考。"
             )
         )
 
+    # ── 生日數 ──
     if bd and bd != lp:
         parts.append(
             _line(
-                f"生日數 <strong>{_text(bd_display)}</strong> 顯示你日常表現出的氣質：{_text(bd_arche.get('name'), '個人特質')}。"
+                f"生日數 <strong>{_text(bd_display)}</strong>（{_text(bd_arche.get('name'), '個人特質')}）："
+                f"{_text(bd_arche.get('desc'), '這是你日常最容易被感受到的能力與反應方式。')}"
             )
         )
+
+    # ── 組合洞察 ──
+    if combo_note:
+        parts.append(_section("主數與生日數的互動"))
+        parts.append(_line(_text(combo_note)))
+
+    # ── 流年數 ──
+    if personal_year and personal_year_meaning:
+        # S5：personal_year_cal 是整數，直接嵌入不需 _text（避免雙 escape）
+        parts.append(_section(f"{personal_year_cal} 個人流年"))
+        parts.append(_line(
+            f"<strong>{_text(personal_year_display)}</strong>：{_text(personal_year_meaning)}"
+        ))
+
+    # ── 四個巔峰數 ──
+    if pinnacles:
+        parts.append(_section("人生四大巔峰（Pinnacles）"))
+        parts.append(_line(
+            "巔峰數描述人生各階段的外部主題，是命運給你的「場域」，不是個人意志。"
+            "第一巔峰結束年齡 = 36 − 生命靈數底色。"
+        ))
+        for p in pinnacles:
+            age_label = _text(p.get("ageLabel"))
+            pnum = _text(p.get("display"))
+            parch = _text(p.get("archetype"))
+            meaning = _text(p.get("meaning"))
+            parts.append(_line(
+                f"第 {p.get('index')} 巔峰 <strong>{pnum}</strong>（{age_label}）"
+                f"{'｜' + parch if parch else ''}：{meaning}"
+            ))
+
+    # ── 四個挑戰數 ──
+    if challenges:
+        parts.append(_section("人生四大挑戰（Challenges）"))
+        parts.append(_line(
+            "挑戰數是巔峰期的內在功課：不是命運打擊，而是這段時期最需要整合的反面能力。"
+        ))
+        for c in challenges:
+            age_label = _text(c.get("ageLabel"))
+            cnum = c.get("number")
+            meaning = _text(c.get("meaning"))
+            parts.append(_line(
+                f"第 {c.get('index')} 挑戰 <strong>{cnum}</strong>（{age_label}）：{meaning}"
+            ))
 
     if detail == "full":
         parts.extend(
             [
-                _section("深度解讀方向"),
-                _line("觀察你在壓力下會如何做決定，能看見生命靈數的陰影面。"),
-                _line("適合把此數字延伸到職涯角色、親密關係、財務模式與年度節奏。"),
+                _section("進階解讀方向"),
+                _line("回想最近一次重大選擇：你是急著掌控、過度配合、逃避表達，還是先退回分析？這比單看數字更能看出生命靈數的陰影面。"),
+                _line("把生命靈數用在職涯、親密關係與財務模式各問一個問題：「這個數字讓我在這裡過度發揮，還是根本沒有用到？」"),
+                _line("流年數每年轉換，搭配生命靈數判斷今年適合「主動推進」（流年 1/3/5/8）還是「整理收斂」（流年 2/4/7/9）。"),
+                _line("巔峰數是外部場域的主題（命運給的環境），挑戰數是內在功課（自己要整合的反面能力），兩者需要一起讀才完整。"),
             ]
         )
+
+    parts.append(
+        _line(
+            "<small>本解讀以畢氏靈數象徵作為自我觀察的參考框架，不構成對未來的預測或保證。</small>"
+        )
+    )
+
     return _wrap(parts, detail)
 
 

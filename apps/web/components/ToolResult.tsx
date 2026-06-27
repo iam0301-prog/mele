@@ -369,6 +369,9 @@ const NUMEROLOGY_FACT_LABELS: Record<string, string> = {
   birthDayDisplay: '生日數',
   calculationMethod: '算法說明',
   calculationNote: '數字說明',
+  personalYearDisplay: '個人流年',
+  personalYearMeaning: '流年含義',
+  comboNote: '主數組合',
 };
 
 const HIDDEN_FACT_KEYS = new Set([
@@ -729,6 +732,65 @@ function gateCards(data: Dict): InsightCard[] {
       tags: asArray(item.keywords).map((entry) => cleanText(entry)).filter(Boolean).slice(0, 4),
     };
   });
+}
+
+function numerologyCards(data: Dict): InsightCard[] {
+  const cards: InsightCard[] = [];
+
+  // 個人流年卡
+  const pyDisplay = cleanText(data.personalYearDisplay);
+  const pyMeaning = cleanText(data.personalYearMeaning);
+  const pyYear = cleanText(data.personalYearCalendarYear);
+  if (pyDisplay && pyMeaning) {
+    cards.push({
+      title: `${pyYear} 個人流年 ${pyDisplay}`,
+      subtitle: '流年數每年轉換，搭配生命靈數看節奏',
+      body: pyMeaning,
+      tags: [`流年 ${pyDisplay}`],
+    });
+  }
+
+  // 四個巔峰數卡
+  const pinnacles = asArray(data.pinnacles);
+  for (const item of pinnacles) {
+    const p = asDict(item);
+    const idx = cleanText(p.index);
+    const pDisplay = cleanText(p.display);
+    const ageLabel = cleanText(p.ageLabel);
+    const archetype = cleanText(p.archetype);
+    const meaning = cleanText(p.meaning);
+    if (!pDisplay) continue;
+    cards.push({
+      title: `第 ${idx} 巔峰｜${pDisplay}`,
+      subtitle: `${ageLabel}${archetype ? '｜' + archetype : ''}`,
+      body: meaning || '這個巔峰描述你在這段時期的人生主題。',
+      tags: [pDisplay, ageLabel].filter(Boolean).slice(0, 2),
+    });
+  }
+
+  // 四個挑戰數卡（合併成一張概覽卡，四期均呈現）
+  const challenges = asArray(data.challenges);
+  if (challenges.length) {
+    const challengeLines = challenges.map((item) => {
+      const c = asDict(item);
+      const cNum = cleanText(c.number);
+      const cAge = cleanText(c.ageLabel);
+      const cMeaning = cleanText(c.meaning);
+      return `第 ${cleanText(c.index)} 挑戰 ${cNum}（${cAge}）：${cMeaning || '—'}`;
+    }).join('\n');
+    const summaryTags = challenges.slice(0, 4).map((item) => {
+      const c = asDict(item);
+      return `C${cleanText(c.index)}=${cleanText(c.number)}`;
+    });
+    cards.push({
+      title: '人生四大挑戰數',
+      subtitle: '挑戰數是各巔峰期最需要整合的內在功課，不是命定弱點',
+      body: challengeLines,
+      tags: summaryTags,
+    });
+  }
+
+  return cards;
 }
 
 function firstQuestion(result: CalcResponse): string {
@@ -1503,7 +1565,7 @@ function buildInsight(result: CalcResponse): ResultInsight {
   const data = result.data ?? {};
   const base = TOOL_COPY[result.tool];
   const keyMap: Record<CalcTool, string[]> = {
-    numerology: ['lifePathDisplay', 'lifePathReduced', 'birthDayDisplay', 'calculationNote', 'lifePathArchetype', 'birthDayArchetype'],
+    numerology: ['lifePathDisplay', 'birthDayDisplay', 'personalYearDisplay', 'comboNote', 'calculationNote', 'lifePathReduced'],
     maya: ['kin', 'label', 'tone', 'seal', 'classicTzolkin', 'starroot'],
     bazi: ['pillars', 'dayMaster', 'dayMasterYinYang', 'dayMasterWuxing', 'wuxing', 'nayin'],
     ziwei: ['mingGong', 'shenGong', 'fiveElementsClass', 'palaces', 'majorStars'],
@@ -1514,6 +1576,7 @@ function buildInsight(result: CalcResponse): ResultInsight {
   };
 
   let cards: InsightCard[] = [];
+  if (result.tool === 'numerology') cards = numerologyCards(data);
   if (result.tool === 'tarot') cards = tarotCards(data);
   if (result.tool === 'runes') cards = runeCards(data);
   if (result.tool === 'maya') cards = mayaCards(data);
@@ -1542,7 +1605,10 @@ function countResultSignals(result: CalcResponse): number {
   }
   if (result.tool === 'maya') return ['kin', 'tone', 'seal', 'guide', 'analog', 'antipode', 'occult'].filter((key) => data[key]).length;
   if (result.tool === 'astro') return ['sun', 'moon', 'ascendant', 'midheaven'].filter((key) => data[key]).length;
-  return ['lifePathDisplay', 'lifePathReduced', 'birthDayDisplay', 'calculationNote', 'lifePathArchetype', 'birthDayArchetype'].filter((key) => data[key]).length;
+  const pinnacleCount = asArray(data.pinnacles).length;
+  const challengeCount = asArray(data.challenges).length;
+  const baseCount = ['lifePathDisplay', 'birthDayDisplay', 'personalYear', 'comboNote'].filter((key) => data[key]).length;
+  return baseCount + pinnacleCount + challengeCount;
 }
 
 function buildGameProfile(result: CalcResponse, insight: ResultInsight, reading: PersonalReading): GameProfile {
