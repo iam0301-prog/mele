@@ -750,6 +750,41 @@ def _sign_text(value: object) -> str:
     return _text(sign or value.get("zh") or value.get("label"))
 
 
+def _astro_sign_zh(planet_or_point: object) -> str:
+    """從行星/宮點 dict 中取出星座中文名稱。"""
+    if not isinstance(planet_or_point, dict):
+        return ""
+    sign = planet_or_point.get("sign") or {}
+    if isinstance(sign, dict):
+        return sign.get("zh") or ""
+    return ""
+
+
+def _astro_deg_str(planet_or_point: object) -> str:
+    """取度數，格式化到小數 1 位。"""
+    if not isinstance(planet_or_point, dict):
+        return ""
+    sign = planet_or_point.get("sign") or {}
+    if isinstance(sign, dict):
+        deg = sign.get("degInSign")
+        if deg is not None:
+            try:
+                return f"{float(deg):.1f}°"
+            except (TypeError, ValueError):
+                pass
+    return ""
+
+
+def _astro_house_str(planet_data: object) -> str:
+    """取宮位號碼，格式化。"""
+    if not isinstance(planet_data, dict):
+        return ""
+    house = planet_data.get("house")
+    if house is not None:
+        return f"第{house}宮"
+    return ""
+
+
 ASTRO_MEMBER_READING = {
     "牡羊": ("需要直接感、行動感與能自己開路的空間", "容易還沒聽完就先衝出去"),
     "金牛": ("需要穩定、身體感與能慢慢累積的安全感", "容易明知道不適合也不想改變"),
@@ -774,42 +809,486 @@ def _astro_member_reading(point: object) -> tuple[str, str]:
     return ("代表一種需要放回生活場景理解的慣用模式", "卡住時可能會過度補償或失去彈性")
 
 
-def explain_astro(data: dict, detail: DetailLevel = "teaser") -> str:
-    planets = data.get("planets") or {}
-    sun = data.get("sun") or planets.get("sun") or {}
-    moon = data.get("moon") or planets.get("moon") or {}
-    asc = data.get("ascendant") or {}
-    mc = data.get("midheaven") or {}
-    sun_text = _sign_text(sun)
-    moon_text = _sign_text(moon)
-    asc_text = _sign_text(asc)
-    sun_gift, sun_shadow = _astro_member_reading(sun_text)
-    moon_gift, moon_shadow = _astro_member_reading(moon_text)
-    asc_gift, asc_shadow = _astro_member_reading(asc_text)
+# ── 太陽星座詳細解讀 ──────────────────────────────────────────
+_SUN_SIGNS: dict[str, dict[str, str]] = {
+    "牡羊": {
+        "teaser_friend": "你有開路的衝勁，先行動後想清楚是你的節奏。卡住時容易衝過頭才回頭找隊友。",
+        "core": "核心動力是第一感、主導權與開創行動；等待讓你耗能。",
+        "shadow": "過度防衛或急於主控時，容易在開始之前就把別人推開。",
+        "relationship": "關係模式：需要對方給空間讓你主導，適合主動提出而非等待靠近。",
+        "growth": "學習在行動後停下來整合，才不會開了頭卻收不了尾。",
+    },
+    "金牛": {
+        "teaser_friend": "你需要穩定與實質感，慢慢累積是你真正的強項。卡住時容易明知不適合也不動。",
+        "core": "核心動力是安全感、美感與踏實累積；急迫讓你失去判斷。",
+        "shadow": "固執或拖延出現時，通常底層是安全感不足。",
+        "relationship": "關係模式：忠誠但需要對方先穩定，才能真正放鬆靠近。",
+        "growth": "學習辨別「這是真正的需要」還是「只是習慣的安全感」。",
+    },
+    "雙子": {
+        "teaser_friend": "你需要理解與交流，說清楚能幫你理清自己。卡住時容易分心，真正的感受被跳過。",
+        "core": "核心動力是資訊交流、多角度思考與連結不同想法；無聊讓你流失能量。",
+        "shadow": "過度分析或避開情感深度時，有時是因為真正的感受太重。",
+        "relationship": "關係模式：需要智識刺激與話語交流，沉默讓你焦慮。",
+        "growth": "學習讓真正重要的感受有出口，而不是一直換話題。",
+    },
+    "巨蟹": {
+        "teaser_friend": "你需要歸屬感與情感安全，照顧他人是你的直覺。卡住時容易把過去帶進現在。",
+        "core": "核心動力是情感連結、家的概念與保護本能；沒有根基讓你沒力氣。",
+        "shadow": "過度保護或情緒化時，通常是界線不清，不是脆弱。",
+        "relationship": "關係模式：需要被接住，也需要確認對方不會消失。",
+        "growth": "學習從過去汲取力量，而不是讓過去定義現在。",
+    },
+    "獅子": {
+        "teaser_friend": "你需要被看見與創造，越真誠越有光。卡住時容易太在意表現，反而不敢自然發揮。",
+        "core": "核心動力是自我表達、創造力與真心投入；被忽略讓你失去活力。",
+        "shadow": "需要認可的執著出現時，底層通常是對自我價值的懷疑。",
+        "relationship": "關係模式：需要被欣賞與尊重，也需要展現真實的自己。",
+        "growth": "學習不透過成就定義自我價值，而是從真實表達中找到光。",
+    },
+    "處女": {
+        "teaser_friend": "你需要把事情整理清楚，能透過細節與服務建立價值。卡住時容易過度挑剔自己，修到不敢開始。",
+        "core": "核心動力是精確、分析與實際服務；混亂讓你消耗能量。",
+        "shadow": "完美主義出現時，有時是不相信「夠好的自己值得被接受」。",
+        "relationship": "關係模式：透過做事表達愛，需要對方注意到細節背後的心意。",
+        "growth": "學習接受「夠好」，把完善的衝動用在真正值得投入的地方。",
+    },
+    "天秤": {
+        "teaser_friend": "你需要平衡與關係品質，和諧對你是真實需要。卡住時容易為了不衝突先放掉自己的立場。",
+        "core": "核心動力是公平、美感與真正的互相理解；失衡讓你無法安定。",
+        "shadow": "優柔寡斷或討好時，通常是還不確定自己真正要什麼。",
+        "relationship": "關係模式：需要對等的付出，一旦感覺不公平就容易退縮。",
+        "growth": "學習在照顧關係平衡的同時，也清楚知道自己站在哪裡。",
+    },
+    "天蠍": {
+        "teaser_friend": "你需要深度與真相，停在表面讓你覺得被騙了。卡住時容易太警戒或太想掌控。",
+        "core": "核心動力是真實連結、深層探索與掌握事情本質；表面讓你不信任。",
+        "shadow": "控制欲或猜疑出現時，底層通常是對再次受傷的保護。",
+        "relationship": "關係模式：需要真正的承諾與透明，一旦信任建立，非常忠誠。",
+        "growth": "學習在保持洞察力的同時，允許自己真正放鬆下來。",
+    },
+    "射手": {
+        "teaser_friend": "你需要意義、遠方與視野擴展。卡住時容易只想離開，卻沒整理真正要追求什麼。",
+        "core": "核心動力是探索、自由與尋求更大的意義框架；限制讓你窒息。",
+        "shadow": "承諾恐懼或過度樂觀出現時，有時是迴避深入一件事的不確定感。",
+        "relationship": "關係模式：需要對方尊重自由，也需要共同的精神方向。",
+        "growth": "學習把探索落地，把視野轉成可以真正走完的路線。",
+    },
+    "摩羯": {
+        "teaser_friend": "你需要長期目標與責任感，一步步建立是你真正的節奏。卡住時容易把自己逼太緊。",
+        "core": "核心動力是務實、責任與長期成就；沒有結構讓你焦慮。",
+        "shadow": "過度工作或情感克制出現時，通常是不確定「放鬆是安全的」。",
+        "relationship": "關係模式：忠誠且可靠，但需要對方理解你用行動表達的愛。",
+        "growth": "學習讓自己享受已經建立的成果，而不是永遠只往下一個目標跑。",
+    },
+    "水瓶": {
+        "teaser_friend": "你需要獨立思考與突破常規。卡住時容易太抽離，知道很多卻不讓人靠近。",
+        "core": "核心動力是創新、系統思考與推動改變；被框住讓你變得疏離。",
+        "shadow": "情感距離或固執己見出現時，有時是不相信情緒本身有價值。",
+        "relationship": "關係模式：需要對等的尊重與思想上的共鳴，而不只是情緒依賴。",
+        "growth": "學習讓心智的清明與真實的情感需求並存。",
+    },
+    "雙魚": {
+        "teaser_friend": "你需要想像力與感受力，允許心柔軟下來。卡住時容易界線模糊，把別人的情緒也攬成自己的。",
+        "core": "核心動力是同理共感、靈性連結與超越現實的想像力；太硬的框架讓你失去流動感。",
+        "shadow": "逃避或犧牲自我出現時，底層通常是不相信自己的需要也值得被照顧。",
+        "relationship": "關係模式：溫柔且深情，但需要清楚的界線保護自己不被吸乾。",
+        "growth": "學習辨別哪些感受是自己的，哪些是接收了別人的。",
+    },
+}
+_SUN_FALLBACK: dict[str, str] = {
+    "teaser_friend": "你的太陽星座代表你想活出的方向與核心意志，需要放回生活場景才會真正有感。",
+    "core": "核心動力藏在你自然感到充實的那些時刻。",
+    "shadow": "過度使用或壓抑這股力量時，容易失去彈性。",
+    "relationship": "關係模式：把這股能量帶進關係，看它如何影響你的表達與需求。",
+    "growth": "學習讓這股力量成熟，而不是只在舒適區使用它。",
+}
 
-    parts = [
-        _line(
-            f"太陽 <strong>{sun_text}</strong>：你想活出的方向通常{_text(sun_gift)}；卡住時{_text(sun_shadow)}。"
-        ),
-        _line(
-            f"月亮 <strong>{moon_text}</strong>：你真正需要的安全感通常{_text(moon_gift)}；壓力下{_text(moon_shadow)}。"
-        ),
-        _line(
-            f"上升 <strong>{asc_text}</strong>：別人第一眼接收到的你，常帶著「{_text(asc_gift)}」的氣質；但也可能{_text(asc_shadow)}。"
-        ),
-        _line(f"天頂：<strong>{_sign_text(mc)}</strong>，代表事業形象、成就方向與社會角色。"),
-        _line(
-            "如果你覺得自己內在需要、外在表現與人生方向不一致，這就很適合帶著星盤問老師，因為答案通常在宮位與相位的交叉處。"
-        ),
-    ]
-    if detail == "full":
-        parts.extend(
-            [
-                _section("深度解讀方向"),
-                _line("下一層建議加入宮位與主要相位，確認一個人的內在需求如何落到工作、關係與生活場景。"),
-                _line("若作為正式諮詢，請特別說明出生時間精準度，因為上升與宮位對時間非常敏感。"),
-            ]
+# ── 月亮星座詳細解讀 ──────────────────────────────────────────
+_MOON_SIGNS: dict[str, dict[str, str]] = {
+    "牡羊": {
+        "teaser": "你的情緒需要即時出口，壓住感受反而讓你更急躁。",
+        "need": "深層需要：當下的回應感與行動後的安全感。",
+        "shadow": "壓力下容易直接反應，事後才意識到話說重了。",
+        "focus": "練習在感受出現的第一秒先深呼吸，再決定怎麼表達。",
+    },
+    "金牛": {
+        "teaser": "你的安全感來自穩定與身體舒適，突然的變化讓你難以承受。",
+        "need": "深層需要：可預期的環境、感官滿足與緩慢移動的節奏。",
+        "shadow": "壓力下容易停滯、過度享用或拒絕承認需要改變。",
+        "focus": "允許自己有緩和的過渡期，變化不必是一刀切。",
+    },
+    "雙子": {
+        "teaser": "你的情感需要語言出口，把感受說清楚反而會讓你好過。",
+        "need": "深層需要：表達空間、思想交流與多面向的情感理解。",
+        "shadow": "壓力下容易理性化情緒，或用說話填滿真正的空洞感。",
+        "focus": "試著找一個真正可以讓你說完的人，而不是只是閒聊。",
+    },
+    "巨蟹": {
+        "teaser": "情緒是核心引擎，你的感受真實且深刻，不是需要被管理的東西。",
+        "need": "深層需要：情感的被接住感、歸屬與清楚的家的概念。",
+        "shadow": "壓力下容易退縮、過度照顧他人或用過去的痛解釋現在。",
+        "focus": "允許自己也被照顧，不是只有照顧別人你才有價值。",
+    },
+    "獅子": {
+        "teaser": "你的情緒需要被看見與表達，壓抑感受讓你失去光芒。",
+        "need": "深層需要：真誠的欣賞、情感上的在場感與被重視。",
+        "shadow": "壓力下容易戲劇化反應或因為沒人注意而沮喪。",
+        "focus": "先對自己真誠，才能讓外在的認可變成加分而非必需。",
+    },
+    "處女": {
+        "teaser": "你的情感需要被理解與具體化，說不清楚讓你焦慮。",
+        "need": "深層需要：事情能被整理清楚、對方能看見細節背後的心意。",
+        "shadow": "壓力下容易批評自己或把情緒轉成待辦清單迴避感受。",
+        "focus": "允許感受就是感受，不必立刻找到原因或解決方案。",
+    },
+    "天秤": {
+        "teaser": "你的情感需要和諧與互相，失衡讓你非常不安。",
+        "need": "深層需要：關係中的對等、美感環境與避免直接衝突的空間。",
+        "shadow": "壓力下容易壓住自己的感受，去配合對方期待。",
+        "focus": "學習讓自己的需要也出現在協調的清單上。",
+    },
+    "天蠍": {
+        "teaser": "你的情感強烈且深層，輕描淡寫讓你感覺被誤解。",
+        "need": "深層需要：真正可信任的連結、清楚的承諾與情感的真實深度。",
+        "shadow": "壓力下容易猜疑、不信任或把感受壓到爆發才出來。",
+        "focus": "允許分批說出感受，不必等到確定對方完全安全才開口。",
+    },
+    "射手": {
+        "teaser": "你的情緒需要空間與樂觀感，悲傷讓你想馬上找出口。",
+        "need": "深層需要：自由感、可以往前看的方向與情感的輕盈。",
+        "shadow": "壓力下容易用幽默或哲理跳過真正需要被處理的感受。",
+        "focus": "允許悲傷或失落停留一下，它不會讓你永遠困住。",
+    },
+    "摩羯": {
+        "teaser": "你習慣把情緒管理好，但有時管理得太緊讓你找不回感受。",
+        "need": "深層需要：被尊重的穩定連結與不需要表演堅強的空間。",
+        "shadow": "壓力下容易情感疏離或用工作迴避感受。",
+        "focus": "讓情感需要也是一種真實需要，和目標一樣值得被認真對待。",
+    },
+    "水瓶": {
+        "teaser": "你習慣理性化情緒，有時不確定自己真正感受到什麼。",
+        "need": "深層需要：被理解而不是被批判、可以保持獨特性的親密。",
+        "shadow": "壓力下容易抽離或從群體角度分析自己的情緒。",
+        "focus": "允許情緒不合邏輯，它本來就不是要被解釋的東西。",
+    },
+    "雙魚": {
+        "teaser": "你對情感極度敏感，很容易感受到別人的狀態，也很難分清楚。",
+        "need": "深層需要：情感上的接住、不必解釋就被理解的空間。",
+        "shadow": "壓力下容易吸收他人情緒，把別人的痛當成自己的責任。",
+        "focus": "先讓自己的感受有出口，再去感受別人的。",
+    },
+}
+_MOON_FALLBACK: dict[str, str] = {
+    "teaser": "月亮代表你的情感本能與真正的安全感需求，需要放回親密關係場景才會有感。",
+    "need": "深層需要：被接住的感覺，以及可以展現真實情緒的空間。",
+    "shadow": "壓力下容易壓抑或過度反應，取決於這份能量如何被使用。",
+    "focus": "先辨認什麼情境讓你最安心，再從那裡延伸去建立情感支持。",
+}
+
+# ── 上升星座詳細解讀 ──────────────────────────────────────────
+_RISING_SIGNS: dict[str, dict[str, str]] = {
+    "牡羊": {
+        "teaser": "第一印象是直接、有能量、不繞彎。你先行動，別人再理解。",
+        "external": "外顯氣質：果敢、直率、快節奏，讓人覺得有話直說。",
+        "mask": "面具底下：其實你也需要被接住，但你不習慣先等。",
+        "adjustment": "讓人看見你有停下來聽的能力，會讓關係更穩固。",
+    },
+    "金牛": {
+        "teaser": "第一印象是穩定、有質感、不急。你讓人覺得可以依靠。",
+        "external": "外顯氣質：可信賴、有品味、腳踏實地，讓人有安全感。",
+        "mask": "面具底下：你對改變其實比外表展現的更敏感。",
+        "adjustment": "偶爾讓人看見你也有彈性，不全是厚重穩定。",
+    },
+    "雙子": {
+        "teaser": "第一印象是靈活、有趣、話多。你很快讓人覺得輕鬆。",
+        "external": "外顯氣質：機智、好奇、善變，容易讓人覺得你總有話說。",
+        "mask": "面具底下：有時候說很多，是因為不確定安靜是安全的。",
+        "adjustment": "讓人看見你停下來真正聽的時候，會讓連結更深。",
+    },
+    "巨蟹": {
+        "teaser": "第一印象是溫暖、有照顧感、讓人想靠近。你讓空間變得舒適。",
+        "external": "外顯氣質：溫柔、細心、有包容力，讓人覺得被照顧。",
+        "mask": "面具底下：你的敏感比外表更強，也更需要被接住。",
+        "adjustment": "允許自己有時候不必是那個照顧別人的人。",
+    },
+    "獅子": {
+        "teaser": "第一印象是有存在感、自信、讓人注意到。你自然帶領空間裡的能量。",
+        "external": "外顯氣質：有光、有溫度、表現力強，讓人覺得鼓舞。",
+        "mask": "面具底下：你對「有沒有被真正看見」比外表更在乎。",
+        "adjustment": "讓別人也感覺到舞台上有他們的位置，會讓你更受歡迎。",
+    },
+    "處女": {
+        "teaser": "第一印象是細心、有條理、踏實。你讓事情變得比較清楚。",
+        "external": "外顯氣質：謹慎、精準、有服務心，讓人覺得可以放心。",
+        "mask": "面具底下：你對自己的批評比別人看到的更嚴格。",
+        "adjustment": "讓人看見你在整理中也有彈性，不全是標準與挑剔。",
+    },
+    "天秤": {
+        "teaser": "第一印象是優雅、好相處、漂亮。你自然讓人覺得跟你在一起很舒服。",
+        "external": "外顯氣質：平衡、有禮、帶美感，讓人覺得與你互動很流暢。",
+        "mask": "面具底下：你其實很清楚自己要什麼，只是不一定說出口。",
+        "adjustment": "讓人看見你的立場，會讓你的和諧感更真實而非只是配合。",
+    },
+    "天蠍": {
+        "teaser": "第一印象是神秘、有深度、目光犀利。你讓人覺得你在看穿他。",
+        "external": "外顯氣質：強烈、專注、不輕易說話，讓人覺得你很有料。",
+        "mask": "面具底下：你其實非常在意信任與連結，只是選擇先觀察。",
+        "adjustment": "偶爾主動靠近，比等對方先解讀你更有效。",
+    },
+    "射手": {
+        "teaser": "第一印象是樂觀、開闊、說話直。你讓人覺得世界還有很多可能。",
+        "external": "外顯氣質：自由、正向、帶遠方感，讓人覺得充電了。",
+        "mask": "面具底下：樂觀背後有時是不想讓別人看見你也有重的地方。",
+        "adjustment": "讓人看見你也能認真停下來，才能建立深度關係。",
+    },
+    "摩羯": {
+        "teaser": "第一印象是可靠、認真、有目標感。你讓人覺得交給你的事不會出問題。",
+        "external": "外顯氣質：穩重、負責、有紀律，讓人覺得你是可以信賴的人。",
+        "mask": "面具底下：你其實也想要輕鬆一點，只是不確定那是被允許的。",
+        "adjustment": "讓別人看見你有放鬆的樣子，比一直可靠更讓人想靠近。",
+    },
+    "水瓶": {
+        "teaser": "第一印象是獨特、有想法、不按牌理出牌。你讓人覺得這個人不一樣。",
+        "external": "外顯氣質：前衛、理性、保持距離，讓人覺得想了解你。",
+        "mask": "面具底下：你其實很在乎找到真正理解你的人，只是不輕易承認。",
+        "adjustment": "讓人看見你也會在乎，才能突破獨特背後的孤立感。",
+    },
+    "雙魚": {
+        "teaser": "第一印象是溫柔、夢幻、有點難捉摸。你讓人覺得你活在另一個世界。",
+        "external": "外顯氣質：柔軟、感受力強、帶靈性感，讓人覺得你懂他們。",
+        "mask": "面具底下：你其實需要很強的界線，才不會被任何人的氣場帶走。",
+        "adjustment": "讓人看見你也有清楚的立場，會讓神秘感變成真正的深度。",
+    },
+}
+_RISING_FALLBACK: dict[str, str] = {
+    "teaser": "上升代表你進入世界的方式，別人常先看到這一層，而不是你真正的內在。",
+    "external": "外顯氣質：這個位置描述你天生帶出的氣場與第一印象。",
+    "mask": "面具底下：上升有時是一種保護色，真正的自我藏在太陽與月亮裡。",
+    "adjustment": "當你讓真實的自己透出上升的濾鏡，反而更有吸引力。",
+}
+
+# ── 行星能量與星座修飾詞 ──────────────────────────────────────
+_PLANET_ROLES: dict[str, str] = {
+    "mercury": "思維溝通的能量",
+    "venus": "愛與美感的能量",
+    "mars": "行動與欲望的能量",
+    "jupiter": "擴展與信念的能量",
+    "saturn": "責任與紀律的能量",
+    "uranus": "突破革新的能量",
+    "neptune": "靈性直覺的能量",
+    "pluto": "深層轉化的能量",
+}
+_PLANET_ZH: dict[str, str] = {
+    "sun": "太陽", "moon": "月亮", "mercury": "水星", "venus": "金星",
+    "mars": "火星", "jupiter": "木星", "saturn": "土星",
+    "uranus": "天王星", "neptune": "海王星", "pluto": "冥王星",
+}
+_SIGN_MODIFIERS: dict[str, str] = {
+    "牡羊": "主動直接地", "金牛": "穩定踏實地", "雙子": "靈活多面地",
+    "巨蟹": "細膩保護地", "獅子": "熱情創造地", "處女": "分析服務地",
+    "天秤": "平衡協調地", "天蠍": "深刻轉化地", "射手": "開放探索地",
+    "摩羯": "務實負責地", "水瓶": "創新獨立地", "雙魚": "直覺感受地",
+}
+_HOUSE_AREAS: dict[int, str] = {
+    1: "自我形象", 2: "資源與價值觀", 3: "溝通與學習",
+    4: "家庭與根基", 5: "創造與愛情", 6: "日常習慣與工作",
+    7: "關係與伴侶", 8: "轉化與深層連結", 9: "信念與遠景",
+    10: "事業與公眾形象", 11: "群體與未來目標", 12: "潛意識與靈性",
+}
+
+# ── 相位類型解讀 ──────────────────────────────────────────────
+_ASPECT_TYPES: dict[str, str] = {
+    "合相":   "兩星能量聚焦同向，高度強化，也需辨清是相輔還是過度融合",
+    "對分相": "兩星能量形成對立軸，需要在兩極間找到整合與平衡",
+    "三分相": "能量流動順暢，天生的協同資源或才能",
+    "四分相": "兩星能量產生摩擦張力，是成長的壓力點也是推動力",
+    "六分相": "能量互補，透過主動投入可發揮協同效果",
+}
+
+# 特定行星對的補充說明（用已排序的 tuple 作為 key）
+_ASPECT_PAIR_NOTES: dict[tuple[str, str], str] = {
+    ("moon", "sun"):     "個人意志與情感本能的互動，直接影響內外一致性",
+    ("mercury", "sun"):  "思維方式與自我表達高度融合，適合用語言傳遞自我",
+    ("sun", "venus"):    "愛與美感跟自我認同的連結，影響如何吸引與被欣賞",
+    ("mars", "sun"):     "意志力與行動衝動的配合程度，強則果決，張力大則易過衝",
+    ("jupiter", "sun"):  "個人信念與成長方向的擴展力，樂觀有時過頭",
+    ("saturn", "sun"):   "自我實現與責任限制之間的張力，是長期成熟的關鍵",
+    ("moon", "venus"):   "情感需求與親密關係模式的連結，影響如何給愛與接受愛",
+    ("mars", "moon"):    "情緒衝動與行動反應的互動，壓力下容易直接引爆",
+    ("moon", "saturn"):  "情感安全感與自我要求的拉扯，情感可能過度克制",
+    ("mars", "venus"):   "愛欲能量的互動，影響吸引力與關係主動性",
+    ("mars", "saturn"):  "行動力與限制之間的張力，耐力型或容易受阻",
+    ("jupiter", "saturn"): "擴展與收斂的節奏平衡，影響長期規劃的節奏",
+    ("mercury", "saturn"): "思維與自我要求結合，細膩嚴謹但可能過度審查自己",
+    ("jupiter", "mercury"): "想法擴張且樂觀，溝通廣但需注意落地執行",
+    ("neptune", "sun"):  "靈性理想與自我認同的交織，需辨清現實與投射",
+    ("pluto", "sun"):    "深層轉化驅力與意志力的強烈融合，能量強大且難以忽視",
+    ("sun", "uranus"):   "獨立突破的衝動與自我定義的張力",
+    ("moon", "neptune"): "情感敏感與直覺力高度融合，界線容易模糊",
+    ("moon", "pluto"):   "情感深層且強烈，轉化常從最親密的連結開始",
+}
+
+
+def _planet_in_sign_desc(key: str, sign_zh: str, house: int | None) -> str:
+    """生成行星在星座+宮位的簡短描述。"""
+    role = _PLANET_ROLES.get(key, "此星的能量")
+    modifier = _SIGN_MODIFIERS.get(sign_zh, "以此星座特有的方式")
+    area = _HOUSE_AREAS.get(house, "") if house else ""
+    if area:
+        return f"{modifier}展現{role}，落在{area}的生活場域"
+    return f"{modifier}展現{role}"
+
+
+def explain_astro(data: dict, detail: DetailLevel = "teaser", **kwargs) -> str:  # noqa: ARG001
+    """
+    西洋占星完整解讀。
+    kwargs 接受 voice 等擴充參數（目前保留不用）。
+    """
+    planets_raw = data.get("planets") or {}
+    sun_data = data.get("sun") or planets_raw.get("sun") or {}
+    moon_data = data.get("moon") or planets_raw.get("moon") or {}
+    asc_data = data.get("ascendant") or {}
+    mc_data = data.get("midheaven") or {}
+    aspects_raw: list[dict] = data.get("aspects") or []
+    houses_raw: list[dict] = data.get("houses") or []
+
+    sun_sign = _astro_sign_zh(sun_data)
+    moon_sign = _astro_sign_zh(moon_data)
+    asc_sign = _astro_sign_zh(asc_data)
+
+    sun_info = _SUN_SIGNS.get(sun_sign, _SUN_FALLBACK)
+    moon_info = _MOON_SIGNS.get(moon_sign, _MOON_FALLBACK)
+    asc_info = _RISING_SIGNS.get(asc_sign, _RISING_FALLBACK)
+
+    sun_deg = _astro_deg_str(sun_data)
+    moon_deg = _astro_deg_str(moon_data)
+    asc_deg = _astro_deg_str(asc_data)
+    sun_house = _astro_house_str(sun_data)
+    moon_house = _astro_house_str(moon_data)
+
+    parts: list[str] = []
+
+    # ── 太陽 ──
+    if detail == "teaser":
+        parts.append(_line(
+            f"太陽 <strong>{sun_sign or '—'} {sun_deg}{sun_house}</strong>：{_text(sun_info.get('teaser_friend'))}"
+        ))
+    else:
+        parts.append(_section("太陽：核心意志"))
+        parts.append(_line(f"<strong>{sun_sign or '—'} {sun_deg}{sun_house}</strong>"))
+        parts.append(_line(_text(sun_info.get("core"))))
+        parts.append(_line(_text(sun_info.get("shadow"))))
+        parts.append(_section("關係模式"))
+        parts.append(_line(_text(sun_info.get("relationship"))))
+        parts.append(_line(_text(sun_info.get("growth"))))
+
+    # ── 月亮 ──
+    if detail == "teaser":
+        parts.append(_line(
+            f"月亮 <strong>{moon_sign or '—'} {moon_deg}{moon_house}</strong>：{_text(moon_info.get('teaser'))}"
+        ))
+    else:
+        parts.append(_section("月亮：情感本能"))
+        parts.append(_line(f"<strong>{moon_sign or '—'} {moon_deg}{moon_house}</strong>"))
+        parts.append(_line(_text(moon_info.get("teaser"))))
+        parts.append(_section("深層需要"))
+        parts.append(_line(_text(moon_info.get("need"))))
+        parts.append(_line(_text(moon_info.get("shadow"))))
+        parts.append(_line(_text(moon_info.get("focus"))))
+
+    # ── 上升 ──
+    if detail == "teaser":
+        parts.append(_line(
+            f"上升 <strong>{asc_sign or '—'} {asc_deg}</strong>：{_text(asc_info.get('teaser'))}"
+        ))
+    else:
+        parts.append(_section("上升：第一印象"))
+        parts.append(_line(f"<strong>{asc_sign or '—'} {asc_deg}</strong>"))
+        parts.append(_line(_text(asc_info.get("teaser"))))
+        parts.append(_section("外顯氣質"))
+        parts.append(_line(_text(asc_info.get("external"))))
+        parts.append(_line(_text(asc_info.get("mask"))))  # 包含「面具底下」
+        parts.append(_line(_text(asc_info.get("adjustment"))))
+
+    # ── 天頂 ──
+    mc_text = _sign_text(mc_data)
+    if mc_text:
+        parts.append(_line(f"天頂 <strong>{mc_text}</strong>：事業形象、公眾成就與社會角色的方向。"))
+
+    # ── 其他行星位置 ──
+    _OTHER_PLANETS = ["mercury", "venus", "mars", "jupiter", "saturn", "uranus", "neptune", "pluto"]
+    show_planets = _OTHER_PLANETS[:3] if detail == "teaser" else _OTHER_PLANETS
+    planet_lines: list[str] = []
+    for key in show_planets:
+        p = planets_raw.get(key) or {}
+        if not p:
+            continue
+        p_sign = _astro_sign_zh(p)
+        p_deg = _astro_deg_str(p)
+        p_house = _astro_house_str(p)
+        p_zh = _text(p.get("zh")) or _PLANET_ZH.get(key, key)
+        p_sym = _text(p.get("symbol"))
+        retro = "℞ " if p.get("retrograde") else ""
+        desc = _planet_in_sign_desc(key, p_sign, p.get("house"))
+        planet_lines.append(_line(
+            f"{p_sym} <strong>{p_zh}{' ' + retro if retro else ''}</strong>"
+            f" {p_sign} {p_deg}{p_house}：{desc}。"
+        ))
+    if planet_lines:
+        parts.append(_section("其他行星位置"))
+        parts.extend(planet_lines)
+
+    # ── 主要相位 ──
+    _PERSONAL = {"sun", "moon", "mercury", "venus", "mars"}
+    important = [
+        a for a in aspects_raw
+        if isinstance(a, dict) and (
+            a.get("planet1") in _PERSONAL or a.get("planet2") in _PERSONAL
         )
+    ]
+    limit = 5 if detail == "teaser" else 15
+    if important:
+        parts.append(_section("主要相位"))
+        for asp in important[:limit]:
+            p1_key = asp.get("planet1", "")
+            p2_key = asp.get("planet2", "")
+            p1_zh = _text(asp.get("planet1Zh")) or _PLANET_ZH.get(p1_key, p1_key)
+            p2_zh = _text(asp.get("planet2Zh")) or _PLANET_ZH.get(p2_key, p2_key)
+            asp_type = _text(asp.get("type"))
+            orb = asp.get("orb")
+            try:
+                orb_str = f"{float(orb):.1f}°" if orb is not None else ""
+            except (TypeError, ValueError):
+                orb_str = ""
+            pair_key = tuple(sorted([p1_key, p2_key]))
+            note = _ASPECT_PAIR_NOTES.get(pair_key, "") or _ASPECT_TYPES.get(asp_type, "")
+            parts.append(_line(
+                f"<strong>{p1_zh} {asp_type} {p2_zh}</strong>"
+                f"{'（容許度 ' + orb_str + '）' if orb_str else ''}：{_text(note)}"
+            ))
+
+    # ── Full：宮位概覽 ──
+    if detail == "full" and houses_raw:
+        parts.append(_section("十二宮位星座"))
+        for h in houses_raw[:12]:
+            if not isinstance(h, dict):
+                continue
+            hnum = h.get("house")
+            hsign = _astro_sign_zh(h)
+            hsym = (h.get("sign") or {}).get("symbol", "") if isinstance(h.get("sign"), dict) else ""
+            area = _HOUSE_AREAS.get(hnum, "")
+            parts.append(_line(
+                f"第 <strong>{hnum}</strong> 宮 {hsym}{hsign}"
+                f"{'（' + area + '）' if area else ''}"
+            ))
+
+    # ── 合規聲明 ──
+    parts.append(_line(
+        "<small>以上解讀以星盤象徵作為自我觀察的參考框架，不構成預測、醫療診斷或任何形式的保證。"
+        "出生時間精準度直接影響上升與宮位準確性。</small>"
+    ))
+
     return _wrap(parts, detail)
 
 

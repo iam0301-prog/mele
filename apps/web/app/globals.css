@@ -2354,6 +2354,100 @@ body::before {
   overflow-wrap: anywhere;
 }
 
+/* ── 占星排盤詳情面板 ── */
+.astro-detail {
+  margin-top: 18px;
+  padding: 18px;
+  border: 1px solid rgba(100, 160, 255, 0.18);
+  border-radius: 10px;
+  background:
+    radial-gradient(circle at 90% 8%, rgba(80, 120, 220, 0.09), transparent 32%),
+    rgba(3, 4, 6, 0.44);
+}
+.astro-detail h3 {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(140, 180, 255, 0.7);
+  margin: 0 0 10px;
+}
+.astro-detail__planets { margin-bottom: 20px; }
+.astro-detail__planet-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.astro-detail__planet-table th {
+  text-align: left;
+  padding: 4px 8px;
+  font-size: 11px;
+  color: rgba(255,255,255,0.35);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.astro-detail__planet-table td {
+  padding: 5px 8px;
+  color: rgba(255,255,255,0.82);
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  vertical-align: middle;
+}
+.astro-detail__symbol { opacity: 0.7; margin-right: 2px; }
+.astro-detail__aspects { margin-bottom: 20px; }
+.astro-detail__aspect-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.astro-detail__aspect-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 6px;
+  font-size: 12px;
+  color: rgba(255,255,255,0.78);
+}
+.astro-detail__aspect-item em {
+  font-style: normal;
+  color: rgba(140,180,255,0.85);
+  font-size: 11px;
+}
+.astro-detail__aspect-item small {
+  color: rgba(255,255,255,0.35);
+  font-size: 10px;
+}
+.astro-detail__house-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+@media (max-width: 480px) {
+  .astro-detail__house-grid { grid-template-columns: repeat(3, 1fr); }
+}
+.astro-detail__house-item {
+  display: flex;
+  flex-direction: column;
+  padding: 6px 8px;
+  background: rgba(255,255,255,0.04);
+  border-radius: 6px;
+  font-size: 12px;
+}
+.astro-detail__house-num {
+  font-size: 10px;
+  color: rgba(140,180,255,0.6);
+  font-weight: 700;
+}
+.astro-detail__house-sign { color: rgba(255,255,255,0.82); }
+.astro-detail__house-item small {
+  font-size: 10px;
+  color: rgba(255,255,255,0.35);
+  margin-top: 2px;
+}
+
 /* ── 八字排盤詳情面板 ── */
 .bazi-detail {
   position: relative;

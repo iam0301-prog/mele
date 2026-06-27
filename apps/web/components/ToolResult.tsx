@@ -1694,6 +1694,119 @@ function palaceStars(palace: Dict) {
   return stars.slice(0, 4);
 }
 
+// ── 占星專屬詳細排盤面板 ──
+const ASTRO_PLANET_ORDER = ['sun', 'moon', 'mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune', 'pluto'] as const;
+const ASTRO_PLANET_ZH: Record<string, string> = {
+  sun: '太陽', moon: '月亮', mercury: '水星', venus: '金星', mars: '火星',
+  jupiter: '木星', saturn: '土星', uranus: '天王星', neptune: '海王星', pluto: '冥王星',
+};
+const ASTRO_HOUSE_AREAS: Record<number, string> = {
+  1: '自我', 2: '資源', 3: '溝通', 4: '家庭', 5: '創造', 6: '健康',
+  7: '關係', 8: '轉化', 9: '遠景', 10: '事業', 11: '群體', 12: '靈性',
+};
+
+function AstroDetailPanel({ result }: { result: CalcResponse }) {
+  if (result.tool !== 'astro') return null;
+  const data = result.data ?? {};
+  const planets = asDict(data.planets);
+  const aspects = asArray(data.aspects);
+  const houses = asArray(data.houses);
+  const hasPlanets = ASTRO_PLANET_ORDER.some((k) => planets[k]);
+
+  return (
+    <section className="astro-detail" aria-label="占星排盤詳情">
+
+      {/* ── 十行星表 ── */}
+      {hasPlanets && (
+        <div className="astro-detail__planets">
+          <h3>十顆行星位置</h3>
+          <table className="astro-detail__planet-table">
+            <thead>
+              <tr>
+                <th>行星</th>
+                <th>星座</th>
+                <th>度數</th>
+                <th>宮位</th>
+              </tr>
+            </thead>
+            <tbody>
+              {ASTRO_PLANET_ORDER.map((key) => {
+                const p = asDict(planets[key]);
+                if (!p || !p.sign) return null;
+                const sign = asDict(p.sign);
+                const symbol = cleanText(p.symbol);
+                const zh = cleanText(p.zh) || ASTRO_PLANET_ZH[key];
+                const signSymbol = cleanText(sign.symbol);
+                const signZh = cleanText(sign.zh);
+                const deg = Number(sign.degInSign);
+                const house = Number(p.house);
+                const retro = p.retrograde ? ' ℞' : '';
+                return (
+                  <tr key={key}>
+                    <td><span className="astro-detail__symbol">{symbol}</span> {zh}{retro}</td>
+                    <td>{signSymbol} {signZh}</td>
+                    <td>{Number.isFinite(deg) ? `${deg.toFixed(1)}°` : '—'}</td>
+                    <td>{Number.isFinite(house) && house > 0 ? `第${house}宮` : '—'}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {/* ── 相位 ── */}
+      {aspects.length > 0 && (
+        <div className="astro-detail__aspects">
+          <h3>主要相位</h3>
+          <ul className="astro-detail__aspect-list">
+            {aspects.slice(0, 18).map((item, i) => {
+              const asp = asDict(item);
+              const p1 = cleanText(asp.planet1Zh);
+              const p2 = cleanText(asp.planet2Zh);
+              const type = cleanText(asp.type);
+              const orb = Number(asp.orb);
+              if (!p1 || !p2 || !type) return null;
+              return (
+                <li key={i} className="astro-detail__aspect-item">
+                  <strong>{p1}</strong>
+                  <em>{type}</em>
+                  <strong>{p2}</strong>
+                  {Number.isFinite(orb) && <small>{orb.toFixed(1)}°</small>}
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      )}
+
+      {/* ── 十二宮 ── */}
+      {houses.length > 0 && (
+        <div className="astro-detail__houses">
+          <h3>十二宮位</h3>
+          <div className="astro-detail__house-grid">
+            {houses.slice(0, 12).map((item, i) => {
+              const h = asDict(item);
+              const hNum = Number(h.house);
+              const sign = asDict(h.sign);
+              const signZh = cleanText(sign.zh);
+              const signSym = cleanText(sign.symbol);
+              const area = Number.isFinite(hNum) ? ASTRO_HOUSE_AREAS[hNum] : '';
+              return (
+                <div key={Number.isFinite(hNum) ? hNum : i} className="astro-detail__house-item">
+                  <span className="astro-detail__house-num">{hNum}</span>
+                  <span className="astro-detail__house-sign">{signSym} {signZh}</span>
+                  {area && <small>{area}</small>}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+    </section>
+  );
+}
+
 // ── 八字專屬詳細排盤面板 ──
 const BAZI_PILLAR_LABELS: Record<string, string> = {
   year: '年柱', month: '月柱', day: '日柱', time: '時柱',
@@ -2607,6 +2720,7 @@ export function ToolResult({ result, locale = DEFAULT_LOCALE }: { result: CalcRe
 
       <MemberResonancePanel resonance={memberResonance} t={t} />
       {result.tool !== 'maya' && <ResultInsightPanel insight={insight} speech={result.tool === 'tarot' ? undefined : speech} t={t} />}
+      <AstroDetailPanel result={result} />
       <BaziDetailPanel result={result} />
       <ZiweiPlainGuide result={result} t={t} />
       {result.tool !== 'tarot' && <PersonalReadingPanel reading={personalReading} t={t} />}
