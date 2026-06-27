@@ -1636,8 +1636,24 @@ const BAZI_SHISHEN_TRAD: Record<string, string> = {
   '劫财': '劫財', '伤官': '傷官', '偏财': '偏財',
   '正财': '正財', '七杀': '七殺',
 };
+const BAZI_CS_TRAD: Record<string, string> = {
+  '长生': '長生', '冠带': '冠帶', '临官': '臨官', '养': '養', '绝': '絕',
+};
+const BAZI_NAYIN_TRAD: Record<string, string> = {
+  '杨柳木': '楊柳木', '白蜡金': '白臘金',
+  '剑锋金': '劍鋒金', '山头火': '山頭火', '涧下水': '澗下水',
+  '炉中火': '爐中火', '覆灯火': '覆燈火', '钗钏金': '釵釧金',
+  '长流水': '長流水', '霹雳火': '霹靂火', '大驿土': '大驛土',
+  '城头土': '城牆土',
+};
 function baziSs(text: string): string {
   return BAZI_SHISHEN_TRAD[text] ?? text;
+}
+function baziCs(text: string): string {
+  return BAZI_CS_TRAD[text] ?? text;
+}
+function baziNayin(text: string): string {
+  return BAZI_NAYIN_TRAD[text] ?? text;
 }
 
 function BaziDetailPanel({ result }: { result: CalcResponse }) {
@@ -1698,8 +1714,8 @@ function BaziDetailPanel({ result }: { result: CalcResponse }) {
                   <span className="bazi-detail__zhi">{zhi}</span>
                 </div>
                 {ssGan && <span className="bazi-detail__ss-gan">{ssGan}</span>}
-                {ny && <span className="bazi-detail__nayin">{ny}</span>}
-                {cs && <span className="bazi-detail__changsheng">{cs}</span>}
+                {ny && <span className="bazi-detail__nayin">{baziNayin(ny)}</span>}
+                {cs && <span className="bazi-detail__changsheng">{baziCs(cs)}</span>}
                 {stems.length > 0 && (
                   <ul className="bazi-detail__hidden-stems">
                     {stems.slice(0, 3).map((stem, i) => {

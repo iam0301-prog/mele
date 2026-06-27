@@ -309,6 +309,29 @@ WANG_XIANG_TABLE = {
     "丑": {"木": "囚", "火": "休", "土": "旺", "金": "相", "水": "死"},
 }
 
+# 簡繁轉換對照（lunar-python 部分 API 回傳簡體字）
+_SIMP_TO_TRAD: dict[str, str] = {
+    # 十神
+    "劫财": "劫財", "伤官": "傷官", "偏财": "偏財",
+    "正财": "正財", "七杀": "七殺",
+    # 十二長生
+    "长生": "長生", "冠带": "冠帶", "临官": "臨官",
+    "养": "養", "绝": "絕",
+    # 納音（60 甲子 30 種音，12 種含簡體字，統一用 NAYIN_TABLE 的名稱）
+    "杨柳木": "楊柳木", "白蜡金": "白臘金",
+    "剑锋金": "劍鋒金", "山头火": "山頭火", "涧下水": "澗下水",
+    "炉中火": "爐中火", "覆灯火": "覆燈火", "钗钏金": "釵釧金",
+    "长流水": "長流水", "霹雳火": "霹靂火", "大驿土": "大驛土",
+    "城头土": "城牆土",   # lunar-python 用城頭土，NAYIN_TABLE 用城牆土，統一後者
+}
+
+
+def _to_trad(s: object) -> str:
+    """将 lunar-python 回傳的簡體字轉為繁體，未命中者原字回傳。"""
+    text = str(s) if s is not None else ""
+    return _SIMP_TO_TRAD.get(text, text)
+
+
 # 十神格局意義（給解讀用）
 SHISHEN_PATTERN_MEANING = {
     "正官": "循規有序，適合體制內或有規範架構的工作，重視名聲與責任",
@@ -604,11 +627,10 @@ def calculate(
         counts[WUXING_GAN[g]] += 1
         counts[WUXING_ZHI[z]] += 1
 
+    # 納音：直接查本地 NAYIN_TABLE（全繁體，不依賴 lunar-python 的簡體回傳）
     nayin = {
-        "year": ec.getYearNaYin(),
-        "month": ec.getMonthNaYin(),
-        "day": ec.getDayNaYin(),
-        "time": ec.getTimeNaYin(),
+        key: NAYIN_TABLE.get(pillars[key][0] + pillars[key][1], "")
+        for key in ("year", "month", "day", "time")
     }
 
     day_master = pillars["day"][0]
@@ -717,6 +739,18 @@ def calculate(
     # 傳統取格：月支藏干本氣十神為主（本氣在 hidden_stems["month"][0]）
     month_hidden_ss = [s.get("shishen", "") for s in hidden_stems.get("month", [])]
     pattern_data = _determine_pattern(day_master, day_wuxing, month_hidden_ss, strength_data["strength"])
+
+    # ── 簡繁轉換（lunar-python 部分回傳簡體，統一轉繁體後再回傳）──
+    nayin = {k: _to_trad(v) for k, v in nayin.items()}
+    chang_sheng = {k: _to_trad(v) for k, v in chang_sheng.items()}
+    shishen_gan = {k: _to_trad(v) for k, v in shishen_gan.items()}
+    shishen_zhi = {k: [_to_trad(s) for s in v] for k, v in shishen_zhi.items()}
+    for _key in hidden_stems:
+        for _stem in hidden_stems[_key]:
+            _stem["shishen"] = _to_trad(_stem["shishen"])
+    if yun_data:
+        for _step in yun_data.get("steps", []):
+            _step["shishenGan"] = _to_trad(_step["shishenGan"])
 
     return {
         "pillars": pillars,
