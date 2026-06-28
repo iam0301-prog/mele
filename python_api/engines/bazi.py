@@ -258,38 +258,80 @@ SHISHEN = {
 # 神煞查表（以年支或日支推）
 # 桃花：看年支或日支所在三合局的敗地
 TAOHUA = {
-    "子": "酉", "丑": "午", "寅": "卯", "卯": "子",
-    "辰": "酉", "巳": "午", "午": "卯", "未": "子",
-    "申": "酉", "酉": "午", "戌": "卯", "亥": "子",
+    "子": "酉",
+    "丑": "午",
+    "寅": "卯",
+    "卯": "子",
+    "辰": "酉",
+    "巳": "午",
+    "午": "卯",
+    "未": "子",
+    "申": "酉",
+    "酉": "午",
+    "戌": "卯",
+    "亥": "子",
 }
 # 驛馬：寅申巳亥互換，子午卯酉各推
 YIMA = {
-    "寅": "申", "午": "申", "戌": "申",
-    "申": "寅", "子": "寅", "辰": "寅",
-    "巳": "亥", "酉": "亥", "丑": "亥",
-    "亥": "巳", "卯": "巳", "未": "巳",
+    "寅": "申",
+    "午": "申",
+    "戌": "申",
+    "申": "寅",
+    "子": "寅",
+    "辰": "寅",
+    "巳": "亥",
+    "酉": "亥",
+    "丑": "亥",
+    "亥": "巳",
+    "卯": "巳",
+    "未": "巳",
 }
 # 天乙貴人：以日干查（陽貴在上、陰貴在下，共兩地支）
 TIANYI = {
-    "甲": ["丑", "未"], "戊": ["丑", "未"], "庚": ["丑", "未"],
-    "乙": ["子", "申"], "己": ["子", "申"],
-    "丙": ["亥", "酉"], "丁": ["亥", "酉"],
-    "壬": ["卯", "巳"], "癸": ["卯", "巳"],
+    "甲": ["丑", "未"],
+    "戊": ["丑", "未"],
+    "庚": ["丑", "未"],
+    "乙": ["子", "申"],
+    "己": ["子", "申"],
+    "丙": ["亥", "酉"],
+    "丁": ["亥", "酉"],
+    "壬": ["卯", "巳"],
+    "癸": ["卯", "巳"],
     "辛": ["午", "寅"],
 }
 # 華蓋：以年支推
 HUAGAI = {
-    "子": "辰", "丑": "丑", "寅": "戌", "卯": "未",
-    "辰": "辰", "巳": "丑", "午": "戌", "未": "未",
-    "申": "辰", "酉": "丑", "戌": "戌", "亥": "未",
+    "子": "辰",
+    "丑": "丑",
+    "寅": "戌",
+    "卯": "未",
+    "辰": "辰",
+    "巳": "丑",
+    "午": "戌",
+    "未": "未",
+    "申": "辰",
+    "酉": "丑",
+    "戌": "戌",
+    "亥": "未",
 }
 # 將星：以年支推（三合局的帝旺之地）
 JIANGXING = {
-    "子": "子", "午": "午", "卯": "卯", "酉": "酉",
-    "寅": "午", "午_2": "午", "戌": "午",
-    "申": "子", "子_2": "子", "辰": "子",
-    "亥": "卯", "卯_2": "卯", "未": "卯",
-    "巳": "酉", "酉_2": "酉", "丑": "酉",
+    "子": "子",
+    "午": "午",
+    "卯": "卯",
+    "酉": "酉",
+    "寅": "午",
+    "午_2": "午",
+    "戌": "午",
+    "申": "子",
+    "子_2": "子",
+    "辰": "子",
+    "亥": "卯",
+    "卯_2": "卯",
+    "未": "卯",
+    "巳": "酉",
+    "酉_2": "酉",
+    "丑": "酉",
 }
 
 # 五行旺衰：日主五行在各月令的旺相休囚死
@@ -312,17 +354,30 @@ WANG_XIANG_TABLE = {
 # 簡繁轉換對照（lunar-python 部分 API 回傳簡體字）
 _SIMP_TO_TRAD: dict[str, str] = {
     # 十神
-    "劫财": "劫財", "伤官": "傷官", "偏财": "偏財",
-    "正财": "正財", "七杀": "七殺",
+    "劫财": "劫財",
+    "伤官": "傷官",
+    "偏财": "偏財",
+    "正财": "正財",
+    "七杀": "七殺",
     # 十二長生
-    "长生": "長生", "冠带": "冠帶", "临官": "臨官",
-    "养": "養", "绝": "絕",
+    "长生": "長生",
+    "冠带": "冠帶",
+    "临官": "臨官",
+    "养": "養",
+    "绝": "絕",
     # 納音（60 甲子 30 種音，12 種含簡體字，統一用 NAYIN_TABLE 的名稱）
-    "杨柳木": "楊柳木", "白蜡金": "白臘金",
-    "剑锋金": "劍鋒金", "山头火": "山頭火", "涧下水": "澗下水",
-    "炉中火": "爐中火", "覆灯火": "覆燈火", "钗钏金": "釵釧金",
-    "长流水": "長流水", "霹雳火": "霹靂火", "大驿土": "大驛土",
-    "城头土": "城牆土",   # lunar-python 用城頭土，NAYIN_TABLE 用城牆土，統一後者
+    "杨柳木": "楊柳木",
+    "白蜡金": "白臘金",
+    "剑锋金": "劍鋒金",
+    "山头火": "山頭火",
+    "涧下水": "澗下水",
+    "炉中火": "爐中火",
+    "覆灯火": "覆燈火",
+    "钗钏金": "釵釧金",
+    "长流水": "長流水",
+    "霹雳火": "霹靂火",
+    "大驿土": "大驛土",
+    "城头土": "城牆土",  # lunar-python 用城頭土，NAYIN_TABLE 用城牆土，統一後者
 }
 
 
@@ -361,12 +416,14 @@ def _compute_shensha(day_gan: str, year_zhi: str, day_zhi: str, all_zhi: list[st
     tianyi_zhis = TIANYI.get(day_gan, [])
     hit_tianyi = [z for z in tianyi_zhis if z in zhi_set]
     if hit_tianyi:
-        result.append({
-            "name": "天乙貴人",
-            "hit": True,
-            "zhi": hit_tianyi,
-            "desc": "貴人扶助力較強，重要時刻易遇到關鍵助緣。"
-        })
+        result.append(
+            {
+                "name": "天乙貴人",
+                "hit": True,
+                "zhi": hit_tianyi,
+                "desc": "貴人扶助力較強，重要時刻易遇到關鍵助緣。",
+            }
+        )
 
     # 桃花：年支與日支各自查，命中的都報（非互斥）
     # 同一目標地支若同時由年支和日支推算，合併來源標籤
@@ -380,15 +437,15 @@ def _compute_shensha(day_gan: str, year_zhi: str, day_zhi: str, all_zhi: list[st
                 taohua_hit_bases[target] = []
             taohua_hit_bases[target].append(base_label)
     if taohua_hits:
-        bases_str = "、".join(
-            "、".join(taohua_hit_bases[t]) for t in taohua_hits
+        bases_str = "、".join("、".join(taohua_hit_bases[t]) for t in taohua_hits)
+        result.append(
+            {
+                "name": "桃花",
+                "hit": True,
+                "zhi": taohua_hits,
+                "desc": f"命盤含桃花（{bases_str}推）：人際魅力強，感情易有機緣，需留意情感的分寸。",
+            }
         )
-        result.append({
-            "name": "桃花",
-            "hit": True,
-            "zhi": taohua_hits,
-            "desc": f"命盤含桃花（{bases_str}推）：人際魅力強，感情易有機緣，需留意情感的分寸。"
-        })
 
     # 驛馬：年支與日支各自查，命中的都報（非互斥）
     yima_hits: list[str] = []
@@ -401,25 +458,27 @@ def _compute_shensha(day_gan: str, year_zhi: str, day_zhi: str, all_zhi: list[st
                 yima_hit_bases[target] = []
             yima_hit_bases[target].append(base_label)
     if yima_hits:
-        bases_str = "、".join(
-            "、".join(yima_hit_bases[t]) for t in yima_hits
+        bases_str = "、".join("、".join(yima_hit_bases[t]) for t in yima_hits)
+        result.append(
+            {
+                "name": "驛馬",
+                "hit": True,
+                "zhi": yima_hits,
+                "desc": f"命盤含驛馬（{bases_str}推）：善於移動、遷徙、出差，生涯中變動機率較高。",
+            }
         )
-        result.append({
-            "name": "驛馬",
-            "hit": True,
-            "zhi": yima_hits,
-            "desc": f"命盤含驛馬（{bases_str}推）：善於移動、遷徙、出差，生涯中變動機率較高。"
-        })
 
     # 華蓋（以年支推）
     huagai_zhi = HUAGAI.get(year_zhi)
     if huagai_zhi and huagai_zhi in zhi_set:
-        result.append({
-            "name": "華蓋",
-            "hit": True,
-            "zhi": [huagai_zhi],
-            "desc": "命盤含華蓋：藝術、靈性傾向明顯，適合創作或研究型工作，孤獨感也相對較強。"
-        })
+        result.append(
+            {
+                "name": "華蓋",
+                "hit": True,
+                "zhi": [huagai_zhi],
+                "desc": "命盤含華蓋：藝術、靈性傾向明顯，適合創作或研究型工作，孤獨感也相對較強。",
+            }
+        )
 
     return result
 
@@ -494,13 +553,17 @@ def _assess_strength(day_wuxing: str, month_zhi: str, gan_list: list[str], zhi_l
         strength_desc = f"日主得月令（{month_state}），且盤中生扶力較充足，初步傾向身強。用神方向可考慮洩秀（食傷）或財官，需合參全局確認。"
     elif de_ling:
         strength = "中和偏強"
-        strength_desc = f"日主得月令（{month_state}），整體初步傾向偏強。可考慮食傷洩秀或財星，仍需觀察三合刑衝。"
+        strength_desc = (
+            f"日主得月令（{month_state}），整體初步傾向偏強。可考慮食傷洩秀或財星，仍需觀察三合刑衝。"
+        )
     elif not de_ling and not de_di and not de_shi:
         strength = "身弱"
         strength_desc = f"日主失令（{month_state}），盤中生扶不足，初步傾向身弱。用神方向可考慮印星或比劫扶身，需合參全局確認。"
     else:
         strength = "中和偏弱"
-        strength_desc = f"日主失令（{month_state}），但仍有部分生扶。初步傾向偏弱，用神以印比為參考，仍需觀察月令與大運。"
+        strength_desc = (
+            f"日主失令（{month_state}），但仍有部分生扶。初步傾向偏弱，用神以印比為參考，仍需觀察月令與大運。"
+        )
 
     return {
         "monthState": month_state,
@@ -532,8 +595,11 @@ def _determine_pattern(
 
     # 繁體統一
     TRAD = {
-        "劫财": "劫財", "伤官": "傷官", "偏财": "偏財",
-        "正财": "正財", "七杀": "七殺",
+        "劫财": "劫財",
+        "伤官": "傷官",
+        "偏财": "偏財",
+        "正财": "正財",
+        "七杀": "七殺",
     }
     dominant = TRAD.get(dominant, dominant)
 
@@ -668,11 +734,13 @@ def calculate(
             else:
                 role_counter += 1
                 role = "中氣" if role_counter == 1 else "餘氣"
-            pairs.append({
-                "gan": g,
-                "shishen": ss[i] if i < len(ss) else "",
-                "role": role,
-            })
+            pairs.append(
+                {
+                    "gan": g,
+                    "shishen": ss[i] if i < len(ss) else "",
+                    "role": role,
+                }
+            )
         # 若本氣未命中（理論上不應發生），退回按順序分配
         if not benci_assigned and pairs:
             pairs[0]["role"] = "本氣"
@@ -706,16 +774,18 @@ def calculate(
                 continue
             gan = gz[0] if len(gz) >= 1 else ""
             zhi = gz[1] if len(gz) >= 2 else ""
-            steps.append({
-                "ganZhi": gz,
-                "gan": gan,
-                "zhi": zhi,
-                "shishenGan": SHISHEN.get(day_master, {}).get(gan, ""),
-                "startAge": dy.getStartAge(),
-                "endAge": dy.getEndAge(),
-                "startYear": dy.getStartYear(),
-                "endYear": dy.getEndYear(),
-            })
+            steps.append(
+                {
+                    "ganZhi": gz,
+                    "gan": gan,
+                    "zhi": zhi,
+                    "shishenGan": SHISHEN.get(day_master, {}).get(gan, ""),
+                    "startAge": dy.getStartAge(),
+                    "endAge": dy.getEndAge(),
+                    "startYear": dy.getStartYear(),
+                    "endYear": dy.getEndYear(),
+                }
+            )
 
         yun_data = {
             "startAge": start_year,

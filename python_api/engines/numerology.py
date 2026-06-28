@@ -172,32 +172,36 @@ def calculate(year: int, month: int, day: int) -> dict:
     pinnacle_numbers = _calc_pinnacles(month_reduced, day_reduced, year_reduced)
     age_ranges = _pinnacle_age_ranges(life_path_reduced)
     pinnacles = []
-    for i, (pnum, ages) in enumerate(zip(pinnacle_numbers, age_ranges)):
+    for i, (pnum, ages) in enumerate(zip(pinnacle_numbers, age_ranges, strict=False)):
         pname, pdesc = MEANINGS.get(pnum, ("", ""))
         end_str = str(ages["endAge"]) if ages["endAge"] is not None else "之後"
-        pinnacles.append({
-            "index": i + 1,
-            "number": pnum,
-            "display": display_number(pnum),
-            "archetype": pname,
-            "startAge": ages["startAge"],
-            "endAge": ages["endAge"],
-            "ageLabel": f"{ages['startAge']}–{end_str} 歲",
-            "meaning": PINNACLE_MEANINGS.get(pnum, pdesc),
-        })
+        pinnacles.append(
+            {
+                "index": i + 1,
+                "number": pnum,
+                "display": display_number(pnum),
+                "archetype": pname,
+                "startAge": ages["startAge"],
+                "endAge": ages["endAge"],
+                "ageLabel": f"{ages['startAge']}–{end_str} 歲",
+                "meaning": PINNACLE_MEANINGS.get(pnum, pdesc),
+            }
+        )
 
     # ── 四個挑戰數 ──
     challenge_numbers = _calc_challenges(month, day, year)
     # 挑戰數年齡區間同巔峰數
     challenges = []
-    for i, (cnum, ages) in enumerate(zip(challenge_numbers, age_ranges)):
+    for i, (cnum, ages) in enumerate(zip(challenge_numbers, age_ranges, strict=False)):
         end_str = str(ages["endAge"]) if ages["endAge"] is not None else "之後"
-        challenges.append({
-            "index": i + 1,
-            "number": cnum,
-            "ageLabel": f"{ages['startAge']}–{end_str} 歲",
-            "meaning": CHALLENGE_MEANINGS.get(cnum, ""),
-        })
+        challenges.append(
+            {
+                "index": i + 1,
+                "number": cnum,
+                "ageLabel": f"{ages['startAge']}–{end_str} 歲",
+                "meaning": CHALLENGE_MEANINGS.get(cnum, ""),
+            }
+        )
 
     # ── 組合洞察：生命靈數 × 生日數 ──
     lp_base = life_path_reduced

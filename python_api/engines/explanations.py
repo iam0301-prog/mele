@@ -266,56 +266,62 @@ def explain_numerology(data: dict, detail: DetailLevel = "teaser") -> str:
     if personal_year and personal_year_meaning:
         # S5：personal_year_cal 是整數，直接嵌入不需 _text（避免雙 escape）
         parts.append(_section(f"{personal_year_cal} 個人流年"))
-        parts.append(_line(
-            f"<strong>{_text(personal_year_display)}</strong>：{_text(personal_year_meaning)}"
-        ))
+        parts.append(
+            _line(f"<strong>{_text(personal_year_display)}</strong>：{_text(personal_year_meaning)}")
+        )
 
     # ── 四個巔峰數 ──
     if pinnacles:
         parts.append(_section("人生四大巔峰（Pinnacles）"))
-        parts.append(_line(
-            "巔峰數描述人生各階段的外部主題，是命運給你的「場域」，不是個人意志。"
-            "第一巔峰結束年齡 = 36 − 生命靈數底色。"
-        ))
+        parts.append(
+            _line(
+                "巔峰數描述人生各階段的外部主題，是命運給你的「場域」，不是個人意志。"
+                "第一巔峰結束年齡 = 36 − 生命靈數底色。"
+            )
+        )
         for p in pinnacles:
             age_label = _text(p.get("ageLabel"))
             pnum = _text(p.get("display"))
             parch = _text(p.get("archetype"))
             meaning = _text(p.get("meaning"))
-            parts.append(_line(
-                f"第 {p.get('index')} 巔峰 <strong>{pnum}</strong>（{age_label}）"
-                f"{'｜' + parch if parch else ''}：{meaning}"
-            ))
+            parts.append(
+                _line(
+                    f"第 {p.get('index')} 巔峰 <strong>{pnum}</strong>（{age_label}）"
+                    f"{'｜' + parch if parch else ''}：{meaning}"
+                )
+            )
 
     # ── 四個挑戰數 ──
     if challenges:
         parts.append(_section("人生四大挑戰（Challenges）"))
-        parts.append(_line(
-            "挑戰數是巔峰期的內在功課：不是命運打擊，而是這段時期最需要整合的反面能力。"
-        ))
+        parts.append(_line("挑戰數是巔峰期的內在功課：不是命運打擊，而是這段時期最需要整合的反面能力。"))
         for c in challenges:
             age_label = _text(c.get("ageLabel"))
             cnum = c.get("number")
             meaning = _text(c.get("meaning"))
-            parts.append(_line(
-                f"第 {c.get('index')} 挑戰 <strong>{cnum}</strong>（{age_label}）：{meaning}"
-            ))
+            parts.append(_line(f"第 {c.get('index')} 挑戰 <strong>{cnum}</strong>（{age_label}）：{meaning}"))
 
     if detail == "full":
         parts.extend(
             [
                 _section("進階解讀方向"),
-                _line("回想最近一次重大選擇：你是急著掌控、過度配合、逃避表達，還是先退回分析？這比單看數字更能看出生命靈數的陰影面。"),
-                _line("把生命靈數用在職涯、親密關係與財務模式各問一個問題：「這個數字讓我在這裡過度發揮，還是根本沒有用到？」"),
-                _line("流年數每年轉換，搭配生命靈數判斷今年適合「主動推進」（流年 1/3/5/8）還是「整理收斂」（流年 2/4/7/9）。"),
-                _line("巔峰數是外部場域的主題（命運給的環境），挑戰數是內在功課（自己要整合的反面能力），兩者需要一起讀才完整。"),
+                _line(
+                    "回想最近一次重大選擇：你是急著掌控、過度配合、逃避表達，還是先退回分析？這比單看數字更能看出生命靈數的陰影面。"
+                ),
+                _line(
+                    "把生命靈數用在職涯、親密關係與財務模式各問一個問題：「這個數字讓我在這裡過度發揮，還是根本沒有用到？」"
+                ),
+                _line(
+                    "流年數每年轉換，搭配生命靈數判斷今年適合「主動推進」（流年 1/3/5/8）還是「整理收斂」（流年 2/4/7/9）。"
+                ),
+                _line(
+                    "巔峰數是外部場域的主題（命運給的環境），挑戰數是內在功課（自己要整合的反面能力），兩者需要一起讀才完整。"
+                ),
             ]
         )
 
     parts.append(
-        _line(
-            "<small>本解讀以畢氏靈數象徵作為自我觀察的參考框架，不構成對未來的預測或保證。</small>"
-        )
+        _line("<small>本解讀以畢氏靈數象徵作為自我觀察的參考框架，不構成對未來的預測或保證。</small>")
     )
 
     return _wrap(parts, detail)
@@ -425,16 +431,12 @@ def _wuxing_balance_lines(counts: dict, day_wuxing: object) -> list[str]:
 
     lines = []
     if missing:
-        lines.append(
-            f"盤中無 <strong>{_join(missing)}</strong>：對應十神在天干地支皆缺，需靠大運流年補足。"
-        )
+        lines.append(f"盤中無 <strong>{_join(missing)}</strong>：對應十神在天干地支皆缺，需靠大運流年補足。")
     else:
         lines.append("五行齊全，重點看強弱偏差。")
 
     if strong:
-        lines.append(
-            f"<strong>{_join(strong)}</strong> 能量最旺（{max_count} 個），對應十神取用最易發揮。"
-        )
+        lines.append(f"<strong>{_join(strong)}</strong> 能量最旺（{max_count} 個），對應十神取用最易發揮。")
     if soft and not missing:
         lines.append(
             f"<strong>{_join(soft)}</strong> 相對偏弱（{min_count} 個），對應十神取用需靠大運或外環境補充。"
@@ -454,11 +456,22 @@ def _wuxing_balance_lines(counts: dict, day_wuxing: object) -> list[str]:
 def _bazi_shishen_label(ss: str) -> str:
     """十神名稱標準化（處理 lunar-python 回傳的簡體）"""
     mapping = {
-        "比肩": "比肩", "劫财": "劫財", "食神": "食神", "伤官": "傷官",
-        "偏财": "偏財", "正财": "正財", "七杀": "七殺", "正官": "正官",
-        "偏印": "偏印", "正印": "正印",
+        "比肩": "比肩",
+        "劫财": "劫財",
+        "食神": "食神",
+        "伤官": "傷官",
+        "偏财": "偏財",
+        "正财": "正財",
+        "七杀": "七殺",
+        "正官": "正官",
+        "偏印": "偏印",
+        "正印": "正印",
         # 已是繁體直接過
-        "劫財": "劫財", "傷官": "傷官", "偏財": "偏財", "正財": "正財", "七殺": "七殺",
+        "劫財": "劫財",
+        "傷官": "傷官",
+        "偏財": "偏財",
+        "正財": "正財",
+        "七殺": "七殺",
     }
     return mapping.get(ss, ss)
 
@@ -494,10 +507,8 @@ CHANG_SHENG_MEANING = {
     "长生": "蓬勃初生，能量漸入佳境",
     "冠带": "精力充沛，積極表現欲強",
     "临官": "能力到位，事業運勢加強",
-    "帝旺": "強盛旺極，但旺極易衰需留意過猛",
     "养": "滋養成長，根基穩固後再動",
     "绝": "斷而再生，適合澈底更新",
-    "胎": "潛伏醞釀，蓄勢待發",
 }
 
 
@@ -532,7 +543,6 @@ def explain_bazi(data: dict, detail: DetailLevel = "teaser") -> str:
     # ── 日主強弱 ──
     strength_val = _text(strength.get("strength"))
     strength_desc = _text(strength.get("desc"))
-    month_state = _text(strength.get("monthState"))
     if strength_val and strength_desc:
         parts.append(_section("日主強弱"))
         parts.append(_line(f"<strong>{strength_val}</strong>：{strength_desc}"))
@@ -560,13 +570,26 @@ def explain_bazi(data: dict, detail: DetailLevel = "teaser") -> str:
         cs_meaning = CHANG_SHENG_MEANING.get(cs, "")
         # 繁化十二長生名稱（lunar-python 回傳簡體，統一轉繁體）
         CS_TRAD = {
-            "长生": "長生", "沐浴": "沐浴", "冠带": "冠帶", "临官": "臨官",
-            "帝旺": "帝旺", "衰": "衰", "病": "病", "死": "死",
-            "墓": "墓", "绝": "絕", "胎": "胎", "养": "養",
+            "长生": "長生",
+            "沐浴": "沐浴",
+            "冠带": "冠帶",
+            "临官": "臨官",
+            "帝旺": "帝旺",
+            "衰": "衰",
+            "病": "病",
+            "死": "死",
+            "墓": "墓",
+            "绝": "絕",
+            "胎": "胎",
+            "养": "養",
         }
         cs_display = CS_TRAD.get(cs, cs)
         ss_char = f"【{ss}】" if ss else ""
-        cs_char = f"長生：{cs_display}（{cs_meaning}）" if cs and cs_meaning else (f"長生：{cs_display}" if cs_display else "")
+        cs_char = (
+            f"長生：{cs_display}（{cs_meaning}）"
+            if cs and cs_meaning
+            else (f"長生：{cs_display}" if cs_display else "")
+        )
         parts.append(
             _line(
                 f"<strong>{label} {gan}{zhi}</strong> {ss_char}"
@@ -577,10 +600,12 @@ def explain_bazi(data: dict, detail: DetailLevel = "teaser") -> str:
 
     # ── 地支藏干十神 ──
     parts.append(_section("地支藏干與藏干十神"))
-    parts.append(_line(
-        "地支內藏多個天干（稱藏干），藏干對應的十神是解盤的關鍵——"
-        "尤其月支藏干反映「月令」的力量，決定日主是否得令。"
-    ))
+    parts.append(
+        _line(
+            "地支內藏多個天干（稱藏干），藏干對應的十神是解盤的關鍵——"
+            "尤其月支藏干反映「月令」的力量，決定日主是否得令。"
+        )
+    )
     for key in ("year", "month", "day", "time"):
         label = PILLAR_ROLES[key][0]
         pillar = pillars.get(key) or []
@@ -615,7 +640,11 @@ def explain_bazi(data: dict, detail: DetailLevel = "teaser") -> str:
             zhi_hit = ss_item.get("zhi") or []
             zhi_str = "、".join(zhi_hit) if zhi_hit else ""
             if name and desc:
-                parts.append(_line(f"<strong>{name}</strong>{'（命中地支：' + zhi_str + '）' if zhi_str else ''}：{desc}"))
+                parts.append(
+                    _line(
+                        f"<strong>{name}</strong>{'（命中地支：' + zhi_str + '）' if zhi_str else ''}：{desc}"
+                    )
+                )
 
     if detail == "full":
         # ── 大運 ──
@@ -626,10 +655,12 @@ def explain_bazi(data: dict, detail: DetailLevel = "teaser") -> str:
             direction = "順行" if da_yun.get("isForward") else "逆行"
             parts.append(_section("大運走勢"))
             age_str = str(start_age) if start_age is not None else "?"
-            parts.append(_line(
-                f"起運：{age_str}歲{start_month_yun}個月，{direction}。"
-                f"大運每10年換一步，天干影響上半段，地支影響下半段。"
-            ))
+            parts.append(
+                _line(
+                    f"起運：{age_str}歲{start_month_yun}個月，{direction}。"
+                    f"大運每10年換一步，天干影響上半段，地支影響下半段。"
+                )
+            )
             for step in steps[:6]:
                 gz = _text(step.get("ganZhi"))
                 ss_gan = _bazi_shishen_label(_text(step.get("shishenGan")))
@@ -638,20 +669,18 @@ def explain_bazi(data: dict, detail: DetailLevel = "teaser") -> str:
                 s_year = step.get("startYear", "")
                 if gz:
                     ss_str = f"（{ss_gan}）" if ss_gan else ""
-                    parts.append(_line(
-                        f"<strong>{gz}</strong>{ss_str}　{s_age}—{e_age}歲　西元{s_year}年起"
-                    ))
+                    parts.append(_line(f"<strong>{gz}</strong>{ss_str}　{s_age}—{e_age}歲　西元{s_year}年起"))
 
-        parts.extend([
-            _section("解讀提醒"),
-            _line(
-                "格局與用神需合參月令、三合、六合、刑衝破害才能確定。"
-                "大運流年的力量遠大於靜盤，同一張命盤在不同大運下表現差異很大。"
-            ),
-            _line(
-                "八字呈現的是傾向與課題，不是宿命。帶著真實問題去諮詢，比泛泛解盤更有價值。"
-            ),
-        ])
+        parts.extend(
+            [
+                _section("解讀提醒"),
+                _line(
+                    "格局與用神需合參月令、三合、六合、刑衝破害才能確定。"
+                    "大運流年的力量遠大於靜盤，同一張命盤在不同大運下表現差異很大。"
+                ),
+                _line("八字呈現的是傾向與課題，不是宿命。帶著真實問題去諮詢，比泛泛解盤更有價值。"),
+            ]
+        )
 
     parts.append(
         _line(
@@ -763,18 +792,22 @@ def explain_ziwei(data: dict, detail: DetailLevel = "teaser") -> str:
         for palace in palaces:
             for star in palace.get("majorStars") or []:
                 if isinstance(star, dict) and star.get("mutagen"):
-                    four_changes.append({
-                        "mutagen": star["mutagen"],
-                        "star": star.get("name", ""),
-                        "palace": palace.get("name", ""),
-                    })
+                    four_changes.append(
+                        {
+                            "mutagen": star["mutagen"],
+                            "star": star.get("name", ""),
+                            "palace": palace.get("name", ""),
+                        }
+                    )
             for star in palace.get("minorStars") or []:
                 if isinstance(star, dict) and star.get("mutagen"):
-                    four_changes.append({
-                        "mutagen": star["mutagen"],
-                        "star": star.get("name", ""),
-                        "palace": palace.get("name", ""),
-                    })
+                    four_changes.append(
+                        {
+                            "mutagen": star["mutagen"],
+                            "star": star.get("name", ""),
+                            "palace": palace.get("name", ""),
+                        }
+                    )
 
     # ── 命盤基本資訊 ──
     parts = [
@@ -800,14 +833,14 @@ def explain_ziwei(data: dict, detail: DetailLevel = "teaser") -> str:
             palace = _text(fc.get("palace", ""))
             meaning = _MUTAGEN_MEANINGS.get(m, "")
             domain = _PALACE_DOMAINS.get(palace, "")
-            parts.append(_line(
-                f"<strong>化{m}：{star}星，落{palace}</strong>"
-                f"{'（' + domain + '）' if domain else ''}。"
-                f"{meaning}。"
-            ))
-        parts.append(_line(
-            "四化是紫微判斷核心：落宮決定這股能量在哪個生活領域最活躍，是讀盤的第一入口。"
-        ))
+            parts.append(
+                _line(
+                    f"<strong>化{m}：{star}星，落{palace}</strong>"
+                    f"{'（' + domain + '）' if domain else ''}。"
+                    f"{meaning}。"
+                )
+            )
+        parts.append(_line("四化是紫微判斷核心：落宮決定這股能量在哪個生活領域最活躍，是讀盤的第一入口。"))
 
     # ── 十二宮完整列表 ──
     if isinstance(palaces, list) and palaces:
@@ -821,30 +854,40 @@ def explain_ziwei(data: dict, detail: DetailLevel = "teaser") -> str:
             domain = _PALACE_DOMAINS.get(p_name, "")
             # 四化標記
             fc_tags = [
-                f"化{fc['mutagen']}" for fc in four_changes
+                f"化{fc['mutagen']}"
+                for fc in four_changes
                 if fc.get("palace") == p_name and fc.get("mutagen")
             ]
             fc_str = "".join(f"<em>【{tag}】</em>" for tag in fc_tags)
             # 主星一句話
             star_names = [_star_name(s) for s in stars[:2] if _star_name(s)]
             star_briefs = [_STAR_BRIEF[n] for n in star_names if n in _STAR_BRIEF]
-            note_str = "　→　" + "；".join(star_briefs) if star_briefs else ("　→　空宮，留意對宮借星" if not stars else "")
-            parts.append(_line(
-                f"<strong>{p_name}</strong>（{stem}{branch}）{fc_str}"
-                f"　{star_display}{note_str}"
-                + (f"　<small>{domain}</small>" if domain else "")
-            ))
+            note_str = (
+                "　→　" + "；".join(star_briefs)
+                if star_briefs
+                else ("　→　空宮，留意對宮借星" if not stars else "")
+            )
+            parts.append(
+                _line(
+                    f"<strong>{p_name}</strong>（{stem}{branch}）{fc_str}"
+                    f"　{star_display}{note_str}" + (f"　<small>{domain}</small>" if domain else "")
+                )
+            )
 
     if detail == "full":
-        parts.append(_line(
-            "正式解盤建議把命宮、身宮、財帛、官祿、夫妻、遷移六宮串成人生主敘事，"
-            "再以四化落宮確認各領域的能量強弱，流年則看大限與流曜的疊合。"
-        ))
+        parts.append(
+            _line(
+                "正式解盤建議把命宮、身宮、財帛、官祿、夫妻、遷移六宮串成人生主敘事，"
+                "再以四化落宮確認各領域的能量強弱，流年則看大限與流曜的疊合。"
+            )
+        )
 
-    parts.append(_line(
-        "<small>本解讀以紫微斗數星曜象徵作為自我觀察的參考框架，不構成對未來的預測或保證，"
-        "不提供醫療、法律或財務建議。</small>"
-    ))
+    parts.append(
+        _line(
+            "<small>本解讀以紫微斗數星曜象徵作為自我觀察的參考框架，不構成對未來的預測或保證，"
+            "不提供醫療、法律或財務建議。</small>"
+        )
+    )
 
     return _wrap(parts, detail)
 
@@ -1190,26 +1233,49 @@ _PLANET_ROLES: dict[str, str] = {
     "pluto": "深層轉化的能量",
 }
 _PLANET_ZH: dict[str, str] = {
-    "sun": "太陽", "moon": "月亮", "mercury": "水星", "venus": "金星",
-    "mars": "火星", "jupiter": "木星", "saturn": "土星",
-    "uranus": "天王星", "neptune": "海王星", "pluto": "冥王星",
+    "sun": "太陽",
+    "moon": "月亮",
+    "mercury": "水星",
+    "venus": "金星",
+    "mars": "火星",
+    "jupiter": "木星",
+    "saturn": "土星",
+    "uranus": "天王星",
+    "neptune": "海王星",
+    "pluto": "冥王星",
 }
 _SIGN_MODIFIERS: dict[str, str] = {
-    "牡羊": "主動直接地", "金牛": "穩定踏實地", "雙子": "靈活多面地",
-    "巨蟹": "細膩保護地", "獅子": "熱情創造地", "處女": "分析服務地",
-    "天秤": "平衡協調地", "天蠍": "深刻轉化地", "射手": "開放探索地",
-    "摩羯": "務實負責地", "水瓶": "創新獨立地", "雙魚": "直覺感受地",
+    "牡羊": "主動直接地",
+    "金牛": "穩定踏實地",
+    "雙子": "靈活多面地",
+    "巨蟹": "細膩保護地",
+    "獅子": "熱情創造地",
+    "處女": "分析服務地",
+    "天秤": "平衡協調地",
+    "天蠍": "深刻轉化地",
+    "射手": "開放探索地",
+    "摩羯": "務實負責地",
+    "水瓶": "創新獨立地",
+    "雙魚": "直覺感受地",
 }
 _HOUSE_AREAS: dict[int, str] = {
-    1: "自我形象", 2: "資源與價值觀", 3: "溝通與學習",
-    4: "家庭與根基", 5: "創造與愛情", 6: "日常習慣與工作",
-    7: "關係與伴侶", 8: "轉化與深層連結", 9: "信念與遠景",
-    10: "事業與公眾形象", 11: "群體與未來目標", 12: "潛意識與靈性",
+    1: "自我形象",
+    2: "資源與價值觀",
+    3: "溝通與學習",
+    4: "家庭與根基",
+    5: "創造與愛情",
+    6: "日常習慣與工作",
+    7: "關係與伴侶",
+    8: "轉化與深層連結",
+    9: "信念與遠景",
+    10: "事業與公眾形象",
+    11: "群體與未來目標",
+    12: "潛意識與靈性",
 }
 
 # ── 相位類型解讀 ──────────────────────────────────────────────
 _ASPECT_TYPES: dict[str, str] = {
-    "合相":   "兩星能量聚焦同向，高度強化，也需辨清是相輔還是過度融合",
+    "合相": "兩星能量聚焦同向，高度強化，也需辨清是相輔還是過度融合",
     "對分相": "兩星能量形成對立軸，需要在兩極間找到整合與平衡",
     "三分相": "能量流動順暢，天生的協同資源或才能",
     "四分相": "兩星能量產生摩擦張力，是成長的壓力點也是推動力",
@@ -1218,25 +1284,25 @@ _ASPECT_TYPES: dict[str, str] = {
 
 # 特定行星對的補充說明（用已排序的 tuple 作為 key）
 _ASPECT_PAIR_NOTES: dict[tuple[str, str], str] = {
-    ("moon", "sun"):     "個人意志與情感本能的互動，直接影響內外一致性",
-    ("mercury", "sun"):  "思維方式與自我表達高度融合，適合用語言傳遞自我",
-    ("sun", "venus"):    "愛與美感跟自我認同的連結，影響如何吸引與被欣賞",
-    ("mars", "sun"):     "意志力與行動衝動的配合程度，強則果決，張力大則易過衝",
-    ("jupiter", "sun"):  "個人信念與成長方向的擴展力，樂觀有時過頭",
-    ("saturn", "sun"):   "自我實現與責任限制之間的張力，是長期成熟的關鍵",
-    ("moon", "venus"):   "情感需求與親密關係模式的連結，影響如何給愛與接受愛",
-    ("mars", "moon"):    "情緒衝動與行動反應的互動，壓力下容易直接引爆",
-    ("moon", "saturn"):  "情感安全感與自我要求的拉扯，情感可能過度克制",
-    ("mars", "venus"):   "愛欲能量的互動，影響吸引力與關係主動性",
-    ("mars", "saturn"):  "行動力與限制之間的張力，耐力型或容易受阻",
+    ("moon", "sun"): "個人意志與情感本能的互動，直接影響內外一致性",
+    ("mercury", "sun"): "思維方式與自我表達高度融合，適合用語言傳遞自我",
+    ("sun", "venus"): "愛與美感跟自我認同的連結，影響如何吸引與被欣賞",
+    ("mars", "sun"): "意志力與行動衝動的配合程度，強則果決，張力大則易過衝",
+    ("jupiter", "sun"): "個人信念與成長方向的擴展力，樂觀有時過頭",
+    ("saturn", "sun"): "自我實現與責任限制之間的張力，是長期成熟的關鍵",
+    ("moon", "venus"): "情感需求與親密關係模式的連結，影響如何給愛與接受愛",
+    ("mars", "moon"): "情緒衝動與行動反應的互動，壓力下容易直接引爆",
+    ("moon", "saturn"): "情感安全感與自我要求的拉扯，情感可能過度克制",
+    ("mars", "venus"): "愛欲能量的互動，影響吸引力與關係主動性",
+    ("mars", "saturn"): "行動力與限制之間的張力，耐力型或容易受阻",
     ("jupiter", "saturn"): "擴展與收斂的節奏平衡，影響長期規劃的節奏",
     ("mercury", "saturn"): "思維與自我要求結合，細膩嚴謹但可能過度審查自己",
     ("jupiter", "mercury"): "想法擴張且樂觀，溝通廣但需注意落地執行",
-    ("neptune", "sun"):  "靈性理想與自我認同的交織，需辨清現實與投射",
-    ("pluto", "sun"):    "深層轉化驅力與意志力的強烈融合，能量強大且難以忽視",
-    ("sun", "uranus"):   "獨立突破的衝動與自我定義的張力",
+    ("neptune", "sun"): "靈性理想與自我認同的交織，需辨清現實與投射",
+    ("pluto", "sun"): "深層轉化驅力與意志力的強烈融合，能量強大且難以忽視",
+    ("sun", "uranus"): "獨立突破的衝動與自我定義的張力",
     ("moon", "neptune"): "情感敏感與直覺力高度融合，界線容易模糊",
-    ("moon", "pluto"):   "情感深層且強烈，轉化常從最親密的連結開始",
+    ("moon", "pluto"): "情感深層且強烈，轉化常從最親密的連結開始",
 }
 
 
@@ -1250,7 +1316,7 @@ def _planet_in_sign_desc(key: str, sign_zh: str, house: int | None) -> str:
     return f"{modifier}展現{role}"
 
 
-def explain_astro(data: dict, detail: DetailLevel = "teaser", **kwargs) -> str:  # noqa: ARG001
+def explain_astro(data: dict, detail: DetailLevel = "teaser", **kwargs) -> str:
     """
     西洋占星完整解讀。
     kwargs 接受 voice 等擴充參數（目前保留不用）。
@@ -1281,9 +1347,11 @@ def explain_astro(data: dict, detail: DetailLevel = "teaser", **kwargs) -> str: 
 
     # ── 太陽 ──
     if detail == "teaser":
-        parts.append(_line(
-            f"太陽 <strong>{sun_sign or '—'} {sun_deg}{sun_house}</strong>：{_text(sun_info.get('teaser_friend'))}"
-        ))
+        parts.append(
+            _line(
+                f"太陽 <strong>{sun_sign or '—'} {sun_deg}{sun_house}</strong>：{_text(sun_info.get('teaser_friend'))}"
+            )
+        )
     else:
         parts.append(_section("太陽：核心意志"))
         parts.append(_line(f"<strong>{sun_sign or '—'} {sun_deg}{sun_house}</strong>"))
@@ -1295,9 +1363,11 @@ def explain_astro(data: dict, detail: DetailLevel = "teaser", **kwargs) -> str: 
 
     # ── 月亮 ──
     if detail == "teaser":
-        parts.append(_line(
-            f"月亮 <strong>{moon_sign or '—'} {moon_deg}{moon_house}</strong>：{_text(moon_info.get('teaser'))}"
-        ))
+        parts.append(
+            _line(
+                f"月亮 <strong>{moon_sign or '—'} {moon_deg}{moon_house}</strong>：{_text(moon_info.get('teaser'))}"
+            )
+        )
     else:
         parts.append(_section("月亮：情感本能"))
         parts.append(_line(f"<strong>{moon_sign or '—'} {moon_deg}{moon_house}</strong>"))
@@ -1309,9 +1379,9 @@ def explain_astro(data: dict, detail: DetailLevel = "teaser", **kwargs) -> str: 
 
     # ── 上升 ──
     if detail == "teaser":
-        parts.append(_line(
-            f"上升 <strong>{asc_sign or '—'} {asc_deg}</strong>：{_text(asc_info.get('teaser'))}"
-        ))
+        parts.append(
+            _line(f"上升 <strong>{asc_sign or '—'} {asc_deg}</strong>：{_text(asc_info.get('teaser'))}")
+        )
     else:
         parts.append(_section("上升：第一印象"))
         parts.append(_line(f"<strong>{asc_sign or '—'} {asc_deg}</strong>"))
@@ -1341,10 +1411,12 @@ def explain_astro(data: dict, detail: DetailLevel = "teaser", **kwargs) -> str: 
         p_sym = _text(p.get("symbol"))
         retro = "℞ " if p.get("retrograde") else ""
         desc = _planet_in_sign_desc(key, p_sign, p.get("house"))
-        planet_lines.append(_line(
-            f"{p_sym} <strong>{p_zh}{' ' + retro if retro else ''}</strong>"
-            f" {p_sign} {p_deg}{p_house}：{desc}。"
-        ))
+        planet_lines.append(
+            _line(
+                f"{p_sym} <strong>{p_zh}{' ' + retro if retro else ''}</strong>"
+                f" {p_sign} {p_deg}{p_house}：{desc}。"
+            )
+        )
     if planet_lines:
         parts.append(_section("其他行星位置"))
         parts.extend(planet_lines)
@@ -1352,10 +1424,9 @@ def explain_astro(data: dict, detail: DetailLevel = "teaser", **kwargs) -> str: 
     # ── 主要相位 ──
     _PERSONAL = {"sun", "moon", "mercury", "venus", "mars"}
     important = [
-        a for a in aspects_raw
-        if isinstance(a, dict) and (
-            a.get("planet1") in _PERSONAL or a.get("planet2") in _PERSONAL
-        )
+        a
+        for a in aspects_raw
+        if isinstance(a, dict) and (a.get("planet1") in _PERSONAL or a.get("planet2") in _PERSONAL)
     ]
     limit = 5 if detail == "teaser" else 15
     if important:
@@ -1373,10 +1444,12 @@ def explain_astro(data: dict, detail: DetailLevel = "teaser", **kwargs) -> str: 
                 orb_str = ""
             pair_key = tuple(sorted([p1_key, p2_key]))
             note = _ASPECT_PAIR_NOTES.get(pair_key, "") or _ASPECT_TYPES.get(asp_type, "")
-            parts.append(_line(
-                f"<strong>{p1_zh} {asp_type} {p2_zh}</strong>"
-                f"{'（容許度 ' + orb_str + '）' if orb_str else ''}：{_text(note)}"
-            ))
+            parts.append(
+                _line(
+                    f"<strong>{p1_zh} {asp_type} {p2_zh}</strong>"
+                    f"{'（容許度 ' + orb_str + '）' if orb_str else ''}：{_text(note)}"
+                )
+            )
 
     # ── Full：宮位概覽 ──
     if detail == "full" and houses_raw:
@@ -1388,16 +1461,17 @@ def explain_astro(data: dict, detail: DetailLevel = "teaser", **kwargs) -> str: 
             hsign = _astro_sign_zh(h)
             hsym = (h.get("sign") or {}).get("symbol", "") if isinstance(h.get("sign"), dict) else ""
             area = _HOUSE_AREAS.get(hnum, "")
-            parts.append(_line(
-                f"第 <strong>{hnum}</strong> 宮 {hsym}{hsign}"
-                f"{'（' + area + '）' if area else ''}"
-            ))
+            parts.append(
+                _line(f"第 <strong>{hnum}</strong> 宮 {hsym}{hsign}" f"{'（' + area + '）' if area else ''}")
+            )
 
     # ── 合規聲明 ──
-    parts.append(_line(
-        "<small>以上解讀以星盤象徵作為自我觀察的參考框架，不構成預測、醫療診斷或任何形式的保證。"
-        "出生時間精準度直接影響上升與宮位準確性。</small>"
-    ))
+    parts.append(
+        _line(
+            "<small>以上解讀以星盤象徵作為自我觀察的參考框架，不構成預測、醫療診斷或任何形式的保證。"
+            "出生時間精準度直接影響上升與宮位準確性。</small>"
+        )
+    )
 
     return _wrap(parts, detail)
 

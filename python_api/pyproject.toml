@@ -21,6 +21,7 @@ ignore = ["N802", "N803", "N806", "S101", "S311", "B008", "SIM108", "RUF001", "R
 [tool.ruff.lint.per-file-ignores]
 "tests/**" = ["S", "F401", "F811", "E501"]  # 驗證腳本 print 字串難切；E402 由 noqa 個別標記
 "engines/explanations.py" = ["E501"]  # 大量解釋文字
+"engines/bazi.py" = ["E501"]  # 強弱/格局解讀字串難切
 "engines/numerology.py" = ["E501"]  # 命盤解釋文字難切
 "renderers/*.py" = ["E501"]  # SVG/HTML 字串難切
 "main.py" = ["E501"]  # HTML inline style 字串難切
