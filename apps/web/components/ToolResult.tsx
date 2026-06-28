@@ -1854,16 +1854,16 @@ function BaziDetailPanel({ result }: { result: CalcResponse }) {
   return (
     <section className="bazi-detail" aria-label="八字排盤詳情">
       {/* ── 強弱 + 格局 ── */}
-      {(strengthData.strength || patternData.name) && (
+      {(cleanText(strengthData.strength) || cleanText(patternData.name)) && (
         <div className="bazi-detail__header">
-          {strengthData.strength && (
+          {cleanText(strengthData.strength) && (
             <div className="bazi-detail__strength">
               <span>日主強弱</span>
               <strong>{cleanText(strengthData.strength)}</strong>
               <p>{cleanText(strengthData.desc)}</p>
             </div>
           )}
-          {patternData.name && (
+          {cleanText(patternData.name) && (
             <div className="bazi-detail__pattern">
               <span>格局</span>
               <strong>{cleanText(patternData.name)}</strong>
