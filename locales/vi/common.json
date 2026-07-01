@@ -30,7 +30,7 @@
     "dataRights": "Quyền dữ liệu",
     "admin": "Quản trị",
     "signOut": "Đăng xuất",
-    "beta": "Tham gia beta"
+    "beta": "Khám phá"
   },
   "footer": {
     "privacy": "Quyền riêng tư",
@@ -92,9 +92,9 @@
     "roleKicker": "VAI TRÒ",
     "roleTitle": "Hành trình rõ ràng cho thành viên và chuyên gia",
     "roleBody": "Thành viên bắt đầu bằng công cụ tương tác đơn giản; chuyên gia chỉ xuất hiện khi ai đó muốn trò chuyện sâu hơn.",
-    "finalKicker": "SẴN SÀNG THỬ NGHIỆM",
-    "finalTitle": "Thử nghiệm, làm rõ, rồi dần hoàn thiện",
-    "finalBody": "Nền tảng đa ngôn ngữ giữ nguyên tính năng hiện có và đưa nội dung công khai vào JSON dễ bảo trì.",
+    "finalKicker": "MELE",
+    "finalTitle": "Bắt đầu hôm nay. Khám phá theo tốc độ của bạn.",
+    "finalBody": "Công cụ miễn phí, nghi thức hằng ngày và bài đọc chuyên sâu đều sẵn sàng. Dùng những gì có ích, đặt lịch chuyên gia khi bạn muốn hỗ trợ sâu hơn.",
     "philosophy": {
       "kicker": "OUR APPROACH",
       "title": "Điều chúng tôi đang xây dựng thực ra rất đơn giản",
@@ -254,23 +254,23 @@
     "current": "Ngôn ngữ hiện tại"
   },
   "beta": {
-    "seoTitle": "Closed Beta | MELE",
-    "seoDescription": "Tham gia bản thử nghiệm MELE để dùng công cụ miễn phí, nghi thức hằng ngày và nội dung mở rộng trước khi ra mắt chính thức.",
-    "badge": "CLOSED BETA INVITATION",
+    "seoTitle": "Khám phá miễn phí | MELE",
+    "seoDescription": "Dùng các công cụ miễn phí của MELE: nghi thức hằng ngày, nội dung mở rộng và tư vấn khi bạn sẵn sàng.",
+    "badge": "FREE TO EXPLORE",
     "title": "Hiểu bản thân trước, rồi chọn lựa rõ ràng hơn",
-    "description": "Trang này dành cho người thử nghiệm sớm. Hãy bắt đầu bằng công cụ miễn phí, hoàn thành nghi thức hằng ngày, xem nội dung mở rộng và gửi phản hồi cho chúng tôi.",
-    "primaryCta": "Tham gia beta",
+    "description": "Bắt đầu với công cụ miễn phí, hoàn thành nghi thức hằng ngày và xem nội dung mở rộng khi sẵn sàng. Guide có mặt khi bạn cần trò chuyện sâu hơn.",
+    "primaryCta": "Bắt đầu ngay",
     "secondaryCta": "Xem công cụ",
     "dailyCta": "Nghi thức hôm nay",
     "inviteNote": "Mã mời sẽ tự động đi cùng trang đăng ký. Nếu đã có tài khoản, bạn có thể đăng nhập để xem lại hồ sơ.",
-    "panelLabel": "BETA TASK BOARD",
+    "panelLabel": "TODAY'S JOURNEY",
     "panelTitle": "Hôm nay hãy thử ba việc này",
     "panelItems": [
       "Làm một bài thử miễn phí và xem kết quả có dễ hiểu không.",
       "Hoàn thành nghi thức hằng ngày và xem một nội dung mở rộng.",
       "Báo lại điều khó hiểu, lỗi, hoặc điểm bạn thấy hữu ích."
     ],
-    "rulesTitle": "Hướng dẫn beta",
+    "rulesTitle": "Cách sử dụng",
     "rules": [
       {
         "label": "Nghi thức hằng ngày",
@@ -293,7 +293,7 @@
         "body": "Người mới nên biết cần làm gì trong ba phút."
       }
     ],
-    "questsTitle": "Lộ trình thử nghiệm",
+    "questsTitle": "Lộ trình khám phá",
     "questsBody": "Không cần thử hết mọi thứ. Đi theo lộ trình này để cảm nhận vòng lặp chính.",
     "quests": [
       {
@@ -304,7 +304,7 @@
       },
       {
         "title": "Bước 2: Nhịp hằng ngày",
-        "body": "Thử rút hằng ngày, nghi thức hằng ngày và lý do quay lại.",
+        "body": "Hoàn thành rút hằng ngày và nghi thức hằng ngày. Tìm lý do để quay lại.",
         "href": "/daily",
         "action": "Bắt đầu"
       },

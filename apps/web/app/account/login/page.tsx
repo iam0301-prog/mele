@@ -402,7 +402,7 @@ function LoginInner() {
         )}
         {inviteCode && (
           <div className="mb-4 rounded-lg border border-cyan-300/40 bg-cyan-300/[0.08] p-3 text-sm leading-loose text-cyan-100">
-            你正在使用封測邀請碼 <strong className="text-white">{inviteCode}</strong>。完成註冊後，後台會自動把你標記為封測測試者。
+            你正在使用邀請碼 <strong className="text-white">{inviteCode}</strong>。完成註冊後即可正常使用平台。
           </div>
         )}
         <div className="mb-6 flex border-b border-accent-dim">

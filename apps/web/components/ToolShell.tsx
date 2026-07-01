@@ -34,17 +34,17 @@ export function ToolShell({
         <p className="mt-5 text-white/70 text-sm leading-loose max-w-xl mx-auto">{description}</p>
       </header>
 
-      <section className="tool-beta-note" aria-label={locale === 'en' ? 'Public beta note' : '公開測試提醒'}>
+      <section className="tool-beta-note" aria-label={locale === 'en' ? 'Feedback invitation' : '意見回報'}>
         <div>
-          <span>{locale === 'en' ? 'PUBLIC BETA' : '公開測試中'}</span>
+          <span>{locale === 'en' ? 'YOUR FEEDBACK' : '歡迎回饋'}</span>
           <p>
             {locale === 'en'
-              ? 'Please test whether this result is readable, useful, and clear enough to guide your next step.'
-              : '請幫忙測試這份結果是否看得懂、有沒有感、下一步是否清楚。'}
+              ? 'Was this result clear and useful? Let us know what resonated or what could improve.'
+              : '這份結果對你有幫助嗎？歡迎告訴我們哪裡有感、哪裡還可以更好。'}
           </p>
         </div>
         <Link href={localizePath('/feedback', locale)}>
-          {locale === 'en' ? 'Report friction' : '回報卡住處'}
+          {locale === 'en' ? 'Share feedback' : '分享意見'}
         </Link>
       </section>
 

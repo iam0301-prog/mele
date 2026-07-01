@@ -196,7 +196,7 @@ export default function ChartsPage() {
         <h1 className="font-serif text-3xl tracking-widest mb-2">會員解讀庫</h1>
         <div className="mele-subtitle">MEMBER ORACLE ARCHIVE</div>
         <p className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-white/68">
-          公測期間，深入解釋、流日、流月與流年均可直接查看完整內容。已查看的紀錄會留在這裡，方便回看，也方便日後與老師諮詢銜接。
+          深入解釋、流日、流月與流年均可直接查看完整內容。已查看的紀錄會留在這裡，方便回看，也方便日後與老師諮詢銜接。
         </p>
       </header>
 
@@ -242,11 +242,11 @@ export default function ChartsPage() {
         </div>
       </section>
 
-      <section className="member-vault-beta" aria-label="公測說明">
+      <section className="member-vault-beta" aria-label="免費體驗說明">
         <div className="rounded-xl border border-success/30 bg-success/10 p-4 text-sm leading-relaxed">
-          <span className="text-xs tracking-widest text-success">OPEN BETA</span>
-          <h2 className="mt-1 font-serif text-lg text-accent">公測期免費體驗</h2>
-          <p className="mt-2 text-white/70">公測期間深入解讀、流日、流月、流年均可直接查看完整內容，無需任何操作。正式收費規則將在公測結束後另行公告。</p>
+          <span className="text-xs tracking-widest text-success">FREE ACCESS</span>
+          <h2 className="mt-1 font-serif text-lg text-accent">免費解鎖體驗</h2>
+          <p className="mt-2 text-white/70">深入解讀、流日、流月、流年均可直接查看完整內容，無需任何操作。</p>
           <Link href="/account/profile" className="mt-3 inline-block text-accent underline text-xs">補齊出生資料，讓解讀更準確</Link>
         </div>
       </section>

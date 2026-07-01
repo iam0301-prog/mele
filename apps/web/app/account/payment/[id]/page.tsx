@@ -120,8 +120,8 @@ export default function PaymentPage() {
 
       {/* PAYMENT_GATE: 公測期間此頁無需進入，保留程式碼供正式收費時使用。 */}
       <div className="mt-6 rounded-xl border border-success/30 bg-success/10 p-4 text-sm text-success leading-relaxed">
-        <strong>公測期免費體驗</strong>
-        <p className="mt-1 text-white/70">目前平台處於公測期，所有諮詢預約均為免費體驗，無需付款。你的預約已確認，請前往「我的諮詢」查看狀態。</p>
+        <strong>目前免費體驗</strong>
+        <p className="mt-1 text-white/70">目前所有諮詢預約均為免費體驗，無需付款。你的預約已確認，請前往「我的諮詢」查看狀態。</p>
         <Link href="/account/mybookings" className="mt-3 inline-block text-accent underline text-xs">前往我的諮詢</Link>
       </div>
 
@@ -142,8 +142,8 @@ export default function PaymentPage() {
 
         {!loading && booking && isFreeTestBooking && (
           <div className="launch-alert launch-alert--ok mt-6">
-            <strong>測試期免費</strong>
-            <p>目前網站測試期不收費，這筆預約不會送出 ECPay 付款表單。</p>
+            <strong>目前免費</strong>
+            <p>目前不收費，這筆預約不會送出 ECPay 付款表單。</p>
           </div>
         )}
 

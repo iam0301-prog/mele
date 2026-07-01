@@ -74,7 +74,7 @@ export default function MyBookingsPage() {
 
   const cancel = async (b: Booking) => {
     // PAYMENT_GATE: 公測期間無費用，取消說明不涉退款。待開收費時可補退款邏輯。
-    if (!confirm('確定取消這筆預約？公測期間取消不涉及任何費用。')) return;
+    if (!confirm('確定取消這筆預約？取消不涉及任何費用。')) return;
     const supabase = createClient();
     const { error } = await supabase.rpc('cancel_booking', { p_booking_id: b.id, p_reason: '客戶自行取消' });
     if (error) {
@@ -151,7 +151,7 @@ export default function MyBookingsPage() {
                     'bg-info/30 text-info'
                   }`}>{STATUS_LABEL[b.status] || b.status}</span>
                   {b.payment_provider === 'free_test' && (
-                    <span className="ml-2 rounded-md bg-success/20 px-2 py-0.5 text-[10px] text-success">測試期免費</span>
+                    <span className="ml-2 rounded-md bg-success/20 px-2 py-0.5 text-[10px] text-success">免費</span>
                   )}
                 </div>
                 {b.customer_question && (

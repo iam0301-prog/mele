@@ -119,18 +119,18 @@ const en: ReleaseCopy = {
   mobile: {
     kicker: 'MOBILE COMPANION',
     title: 'A simple daily companion for self-discovery',
-    body: 'The mobile experience helps testers return daily, draw one card or rune, review saved readings, and move to a guide only when they need deeper support.',
+    body: 'The mobile experience is built for daily return: draw one card or rune, review saved readings, and move to a guide only when deeper support is needed.',
     primary: 'Start daily ritual',
     secondary: 'Explore tools',
     panels: [
-      { title: 'Daily return loop', body: 'One daily choice, a daily ritual, and extended readings keep the beta simple.', href: '/daily', action: 'Open ritual' },
-      { title: 'Self-discovery tools', body: 'Numerology, Human Design, tarot, runes, Maya, Bazi, Zi Wei, and astrology stay available as first-layer tests.', href: '/tools', action: 'Open tools' },
+      { title: 'Daily return loop', body: 'One daily choice, a daily ritual, and extended readings to keep your exploration simple and consistent.', href: '/daily', action: 'Open ritual' },
+      { title: 'Self-discovery tools', body: 'Numerology, Human Design, tarot, runes, Maya, Bazi, Zi Wei, and astrology — all free to explore.', href: '/tools', action: 'Open tools' },
       { title: 'Guide handoff', body: 'Guides appear after users understand their own context, not before.', href: '/teachers', action: 'Find guidance' },
     ],
   },
   login: {
     kicker: 'ACCOUNT PORTAL',
-    title: 'Log in or create your beta account',
+    title: 'Log in or create your account',
     body: 'Save readings, access extended views, and prepare context before meeting a guide.',
     signIn: 'Log in',
     signUp: 'Sign up',
@@ -167,7 +167,7 @@ const en: ReleaseCopy = {
   ar: {
     kicker: 'VISUAL EXPERIENCE',
     title: 'Stable 2D result views first',
-    body: 'The closed beta prioritizes clear 2D visual readings. Full AR models can return after the assets are stable enough for public testing.',
+    body: 'The current focus is clear 2D visual readings. Full AR models will return after the assets reach production quality.',
     primary: 'Try tarot',
     secondary: 'Open daily ritual',
     sections: [
@@ -197,7 +197,7 @@ const en: ReleaseCopy = {
       secondary: 'Back home',
       sections: [
         { title: 'Use respectfully', body: 'Do not misuse the platform, scrape private data, or impersonate another person.' },
-        { title: 'Closed beta', body: 'Some features may change while the product is being tested.' },
+        { title: 'Ongoing improvements', body: 'Some features may continue to evolve as the platform grows.' },
         { title: 'Guide services', body: 'Guide sessions should be handled with clear scope, consent, and respectful communication.' },
       ],
     },
@@ -205,7 +205,7 @@ const en: ReleaseCopy = {
       kicker: 'DISCLAIMER',
       title: 'Reflection, not certainty',
       body: 'MELE readings help users organize thoughts and notice choices. They should not be treated as guaranteed predictions.',
-      primary: 'Start free test',
+      primary: 'Start exploring free',
       secondary: 'Find guidance',
       sections: [
         { title: 'No professional replacement', body: 'Readings do not replace professional medical, legal, financial, or psychological support.' },
@@ -239,18 +239,18 @@ const zh: ReleaseCopy = {
   mobile: {
     kicker: '手機版',
     title: '把自我理解放進每日節奏',
-    body: '手機版先服務封測者的日常回訪：每日抽牌、保存紀錄、完成每日儀式，當需要更深支持時再交給老師。',
+    body: '手機版為日常回訪而設計：每日抽牌、保存紀錄、完成每日儀式，當需要更深支持時再交給老師。',
     primary: '開始每日儀式',
     secondary: '查看全部工具',
     panels: [
-      { title: '每日回訪', body: '每日一次選擇、完成儀式、查看延伸解讀，讓封測流程簡單可驗證。', href: '/daily', action: '開啟儀式' },
+      { title: '每日回訪', body: '每日一次選擇、完成儀式、查看延伸解讀，讓探索節奏簡單可持續。', href: '/daily', action: '開啟儀式' },
       { title: '多元工具', body: '生命靈數、人類圖、塔羅、盧恩、瑪雅、八字、紫微與占星，都可先做初階理解。', href: '/tools', action: '查看工具' },
       { title: '老師銜接', body: '老師媒合應該出現在使用者理解自己之後，協助他把問題帶進諮詢。', href: '/teachers', action: '尋找老師' },
     ],
   },
   login: {
     kicker: '會員入口',
-    title: '登入或建立封測帳號',
+    title: '登入或建立帳號',
     body: '保存解讀、查看延伸內容，也能在諮詢前整理好自己的問題與命盤脈絡。',
     signIn: '登入',
     signUp: '註冊',
@@ -287,7 +287,7 @@ const zh: ReleaseCopy = {
   ar: {
     kicker: '視覺體驗',
     title: '先把 2D 結果做到穩定精緻',
-    body: '封測版以清楚、好讀、可互動的 2D 解讀為主。AR 等沉浸式模型會在資產與效能穩定後再開放。',
+    body: '目前以清楚、好讀、可互動的 2D 解讀為主。AR 等沉浸式模型會在資產與效能穩定後再開放。',
     primary: '試抽塔羅',
     secondary: '開啟每日儀式',
     sections: [
@@ -317,7 +317,7 @@ const zh: ReleaseCopy = {
       secondary: '回首頁',
       sections: [
         { title: '尊重使用', body: '請勿濫用平台、擷取私人資料，或冒用他人身分。' },
-        { title: '封測階段', body: '產品測試期間，部分功能與內容可能持續調整。' },
+        { title: '持續優化', body: '平台上線後，部分功能與內容仍會持續調整改善。' },
         { title: '老師服務', body: '老師諮詢需維持清楚範圍、同意與尊重溝通。' },
       ],
     },
@@ -325,7 +325,7 @@ const zh: ReleaseCopy = {
       kicker: '免責聲明',
       title: '這是映照，不是定論',
       body: 'MELE 的解讀協助使用者整理狀態與看見選擇，不應被視為必然預言。',
-      primary: '開始免費測驗',
+      primary: '開始免費探索',
       secondary: '尋找老師',
       sections: [
         { title: '不取代專業', body: '解讀不可取代醫療、法律、財務或心理專業協助。' },
@@ -406,7 +406,7 @@ const releaseCopy: Record<Locale, ReleaseCopy> = {
     },
     login: {
       kicker: 'TÀI KHOẢN',
-      title: 'Đăng nhập hoặc tạo tài khoản beta',
+      title: 'Đăng nhập hoặc tạo tài khoản',
       body: 'Lưu kết quả, xem nội dung mở rộng và chuẩn bị bối cảnh trước khi gặp chuyên gia.',
       signIn: 'Đăng nhập',
       signUp: 'Đăng ký',
@@ -423,7 +423,7 @@ const releaseCopy: Record<Locale, ReleaseCopy> = {
     ar: {
       kicker: 'TRẢI NGHIỆM HÌNH ẢNH',
       title: 'Ưu tiên kết quả 2D rõ ràng',
-      body: 'Beta tập trung vào phần đọc 2D dễ hiểu. AR sẽ mở sau khi tài sản và hiệu năng ổn định.',
+      body: 'Tập trung vào phần đọc 2D rõ ràng và dễ hiểu. AR sẽ mở sau khi tài sản và hiệu năng ổn định.',
       primary: 'Thử tarot',
       secondary: 'Mở nghi thức ngày',
     },
@@ -455,7 +455,7 @@ const releaseCopy: Record<Locale, ReleaseCopy> = {
     },
     login: {
       kicker: 'PORTAL AKUN',
-      title: 'Masuk atau buat akun beta',
+      title: 'Masuk atau buat akun',
       body: 'Simpan bacaan, akses tampilan mendalam, dan siapkan konteks sebelum bertemu pembimbing.',
       signIn: 'Masuk',
       signUp: 'Daftar',
@@ -472,7 +472,7 @@ const releaseCopy: Record<Locale, ReleaseCopy> = {
     ar: {
       kicker: 'PENGALAMAN VISUAL',
       title: 'Mulai dari tampilan 2D yang stabil',
-      body: 'Beta tertutup memprioritaskan bacaan 2D yang jelas. AR penuh dibuka setelah aset dan performa stabil.',
+      body: 'Fokus pada bacaan 2D yang jelas dan mudah dipahami. AR penuh dibuka setelah aset dan performa stabil.',
       primary: 'Coba tarot',
       secondary: 'Buka ritual harian',
     },

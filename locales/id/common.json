@@ -30,7 +30,7 @@
     "dataRights": "Hak data",
     "admin": "Admin",
     "signOut": "Keluar",
-    "beta": "Ikut beta"
+    "beta": "Jelajahi"
   },
   "footer": {
     "privacy": "Privasi",
@@ -40,7 +40,7 @@
     "copyright": "MELE | SELF DISCOVERY HUB"
   },
   "home": {
-    "badge": "Closed Beta | ALAT MEMAHAMI DIRI",
+    "badge": "MELE | ALAT MEMAHAMI DIRI",
     "title": "MELE",
     "subtitle": "Ruang alat memahami diri",
     "description": "Ruang alat multibahasa agar orang dapat memahami dirinya lebih dulu: tes gratis, alat reflektif, ritual harian, dan bacaan mendalam saat siap.",
@@ -50,8 +50,8 @@
       "teachers": "Cari panduan"
     },
     "console": {
-      "ariaLabel": "Papan tugas beta",
-      "label": "Papan tugas beta",
+      "ariaLabel": "Papan perjalanan mandiri",
+      "label": "Papan perjalanan mandiri",
       "title": "Perjalanan memahami diri sudah siap",
       "tarotAlt": "Kartu tarot Ocean Poseidon",
       "mayaAlt": "Totem Maya Yellow Human",
@@ -92,9 +92,9 @@
     "roleKicker": "ALUR PERAN",
     "roleTitle": "Alur jelas untuk member, pemandu, dan operator",
     "roleBody": "Member mulai dari alat interaktif sederhana; pemandu hadir hanya saat dibutuhkan untuk pembicaraan lebih dalam.",
-    "finalKicker": "READY FOR CLOSED BETA",
-    "finalTitle": "Uji, jelaskan, dan bawa member kembali sebelum paid launch",
-    "finalBody": "Fondasi multibahasa menjaga fitur yang ada dan memindahkan konten publik ke JSON yang mudah dirawat.",
+    "finalKicker": "MELE",
+    "finalTitle": "Mulai hari ini. Jelajahi dengan langkah Anda sendiri.",
+    "finalBody": "Alat gratis, ritual harian, dan bacaan mendalam sudah siap. Gunakan apa yang membantu, pesan panduan saat Anda ingin dukungan lebih dalam.",
     "philosophy": {
       "kicker": "OUR APPROACH",
       "title": "Apa yang kami bangun sebenarnya sangat sederhana",
@@ -254,23 +254,23 @@
     "current": "Bahasa saat ini"
   },
   "beta": {
-    "seoTitle": "Closed Beta | MELE",
-    "seoDescription": "Ikuti beta MELE untuk mencoba alat gratis, ritual harian, dan bacaan lanjutan sebelum peluncuran resmi.",
-    "badge": "CLOSED BETA INVITATION",
+    "seoTitle": "Jelajahi Gratis | MELE",
+    "seoDescription": "Coba alat MELE secara gratis: ritual harian, bacaan mendalam, dan panduan saat kamu siap.",
+    "badge": "FREE TO EXPLORE",
     "title": "Kenali diri dulu, lalu memilih dengan lebih jernih",
-    "description": "Halaman ini untuk penguji awal. Mulai dari alat gratis, selesaikan ritual harian, buka bacaan lanjutan, lalu beri tahu kami bagian yang jelas atau membingungkan.",
-    "primaryCta": "Ikut beta",
+    "description": "Mulai dari alat gratis, selesaikan ritual harian, dan buka bacaan lanjutan kapan pun kamu siap. Guide ada saat kamu butuh percakapan lebih dalam.",
+    "primaryCta": "Mulai sekarang",
     "secondaryCta": "Lihat alat",
     "dailyCta": "Ritual harian",
     "inviteNote": "Kode undangan akan otomatis masuk ke halaman daftar. Anggota lama bisa langsung login dan kembali ke arsip chart.",
-    "panelLabel": "BETA TASK BOARD",
+    "panelLabel": "TODAY'S JOURNEY",
     "panelTitle": "Coba tiga hal ini hari ini",
     "panelItems": [
       "Jalankan satu tes gratis dan cek apakah hasilnya mudah dibaca.",
       "Selesaikan ritual harian dan buka satu bacaan lanjutan.",
       "Laporkan hal yang membingungkan, rusak, atau terasa berguna."
     ],
-    "rulesTitle": "Panduan beta",
+    "rulesTitle": "Cara menggunakan",
     "rules": [
       {
         "label": "Ritual harian",
@@ -288,13 +288,13 @@
         "body": "Pilih tarot atau rune sekali per hari."
       },
       {
-        "label": "Target tes",
+        "label": "Titik awal",
         "value": "3 menit",
         "body": "Pengunjung baru harus tahu harus melakukan apa dalam tiga menit."
       }
     ],
-    "questsTitle": "Rute tes yang disarankan",
-    "questsBody": "Tidak perlu mencoba semuanya sekaligus. Rute ini menunjukkan inti produk.",
+    "questsTitle": "Jalur eksplorasi",
+    "questsBody": "Tidak perlu mencoba semuanya sekaligus. Ikuti jalur ini sesuai ritme kamu.",
     "quests": [
       {
         "title": "Langkah 1: Kenali diri gratis",
@@ -304,7 +304,7 @@
       },
       {
         "title": "Langkah 2: Ritme harian",
-        "body": "Coba tarikan harian, ritual harian, dan alasan untuk kembali.",
+        "body": "Selesaikan tarikan harian dan ritual harian. Temukan alasan untuk kembali.",
         "href": "/daily",
         "action": "Mulai ritual"
       },
@@ -322,7 +322,7 @@
       "Ritual harian",
       "Bacaan lanjutan kapan pun siap",
       "Guide opsional",
-      "Tes mobile-first"
+      "Desain mobile-first"
     ]
   }
 }

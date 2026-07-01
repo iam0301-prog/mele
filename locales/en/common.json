@@ -30,7 +30,7 @@
     "dataRights": "Data rights",
     "admin": "Admin",
     "signOut": "Sign out",
-    "beta": "Public beta"
+    "beta": "Explore"
   },
   "footer": {
     "privacy": "Privacy",
@@ -40,7 +40,7 @@
     "copyright": "MELE | SELF DISCOVERY HUB"
   },
   "home": {
-    "badge": "Public Beta | SELF DISCOVERY TOOLS",
+    "badge": "MELE | SELF DISCOVERY TOOLS",
     "title": "MELE",
     "subtitle": "Self-discovery tool space",
     "description": "A multilingual tool space for people to understand themselves first: free tests, divination tools, daily rituals, and extended readings when they are ready.",
@@ -50,8 +50,8 @@
       "teachers": "Find guidance"
     },
     "console": {
-      "ariaLabel": "Closed beta task board",
-      "label": "Closed beta task board",
+      "ariaLabel": "Self-discovery task board",
+      "label": "Self-discovery task board",
       "title": "Self-discovery journeys are ready",
       "tarotAlt": "Ocean Poseidon tarot card artwork",
       "mayaAlt": "Maya Yellow Human totem",
@@ -92,9 +92,9 @@
     "roleKicker": "ROLE FLOW",
     "roleTitle": "Clear journeys for members, guides, and operators",
     "roleBody": "Members start with simple interactive tools; guides only step in when someone wants a deeper conversation.",
-    "finalKicker": "READY FOR PUBLIC BETA",
-    "finalTitle": "Test real user flow before paid launch",
-    "finalBody": "The public homepage focuses on free trials, daily ritual return, extended readings, and clear feedback instead of pretending the product is already final.",
+    "finalKicker": "MELE",
+    "finalTitle": "Start here. Explore at your own pace.",
+    "finalBody": "Free tools, daily rituals, and extended readings are ready. Use what helps, book a guide when you want deeper support.",
     "philosophy": {
       "kicker": "OUR APPROACH",
       "title": "What we are building is actually simple",
@@ -254,23 +254,23 @@
     "current": "Current language"
   },
   "beta": {
-    "seoTitle": "Public Beta | MELE",
-    "seoDescription": "Join the MELE public beta and test free self-discovery tools, daily rituals, and extended readings before launch.",
-    "badge": "PUBLIC BETA TESTING",
-    "title": "Public beta: run the shortest useful loop first",
-    "description": "This is MELE’s public testing entrance before launch. Start with free tools, complete the daily ritual, view one extended reading, and report anything confusing, broken, or worth keeping.",
-    "primaryCta": "Start public beta",
+    "seoTitle": "Start Exploring | MELE",
+    "seoDescription": "Explore MELE’s free self-discovery tools, daily rituals, and extended readings. Start now.",
+    "badge": "FREE TO EXPLORE",
+    "title": "Start here. Explore at your own pace.",
+    "description": "Use free tools to understand yourself, complete your daily ritual, and open extended readings when you are ready. Guides are available for deeper conversations.",
+    "primaryCta": "Start now",
     "secondaryCta": "Explore tools",
     "dailyCta": "Daily ritual",
-    "inviteNote": "Public beta is open for testing. If signup still carries an invite code, it only helps us track tester sources and does not block use.",
-    "panelLabel": "BETA TASK BOARD",
-    "panelTitle": "Please test these three things today",
+    "inviteNote": "If your signup includes an invite code, it is used for source tracking only and does not restrict your access.",
+    "panelLabel": "TODAY’S JOURNEY",
+    "panelTitle": "Start with these three things today",
     "panelItems": [
-      "Run one free test and check whether the result is readable.",
+      "Try one free tool and see whether the result resonates.",
       "Complete your daily ritual and view one extended reading.",
-      "Report anything confusing, broken, or surprisingly useful."
+      "Let us know if anything feels unclear or off."
     ],
-    "rulesTitle": "Public beta rules",
+    "rulesTitle": "How it works",
     "rules": [
       {
         "label": "Daily ritual",
@@ -288,13 +288,13 @@
         "body": "Choose tarot or runes once per day."
       },
       {
-        "label": "Test target",
+        "label": "Starting point",
         "value": "3 min",
-        "body": "New visitors should know what to do within three minutes."
+        "body": "New visitors should know where to begin within three minutes."
       }
     ],
-    "questsTitle": "Public testing path",
-    "questsBody": "You do not need to test everything at once. Use this path to reveal real user friction.",
+    "questsTitle": "Exploration path",
+    "questsBody": "No need to do everything at once. Follow this path at your own pace.",
     "quests": [
       {
         "title": "Step 1: Free self-discovery",
@@ -304,7 +304,7 @@
       },
       {
         "title": "Step 2: Daily rhythm",
-        "body": "Test daily draw, daily ritual, and the reason to return.",
+        "body": "Complete your daily draw and ritual. Find your reason to return.",
         "href": "/daily",
         "action": "Start daily ritual"
       },
@@ -315,14 +315,14 @@
         "action": "Open chart archive"
       }
     ],
-    "feedbackTitle": "What public beta testers should report",
-    "feedbackBody": "Confusing copy, unclear buttons, cramped mobile screens, login or saved-record friction, strong readings, and weak readings are all valuable before launch.",
+    "feedbackTitle": "Share your experience",
+    "feedbackBody": "Confusing copy, unclear buttons, cramped mobile screens, login or saved-record friction, strong readings, and weak readings — all feedback helps.",
     "proof": [
-      "Free tools first",
+      "Completely free",
       "Daily ritual",
       "Extended readings on demand",
       "Guides are optional",
-      "Mobile-first testing"
+      "Mobile-first design"
     ]
   }
 }

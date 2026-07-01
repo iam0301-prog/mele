@@ -30,7 +30,7 @@
     "dataRights": "データ権利",
     "admin": "管理",
     "signOut": "ログアウト",
-    "beta": "ベータ参加"
+    "beta": "探索する"
   },
   "footer": {
     "privacy": "プライバシー",
@@ -40,7 +40,7 @@
     "copyright": "MELE | SELF DISCOVERY HUB"
   },
   "home": {
-    "badge": "Closed Beta | SELF DISCOVERY TOOLS",
+    "badge": "MELE | SELF DISCOVERY TOOLS",
     "title": "MELE",
     "subtitle": "多彩な自己理解ツール",
     "description": "自分を知り、状態を整理し、次の選択を見つけるためのツール空間です。無料診断、毎日の儀式、深い解説を通じて、まず自分を理解し、必要なときだけ相談へ進めます。",
@@ -50,8 +50,8 @@
       "teachers": "必要なとき相談する"
     },
     "console": {
-      "ariaLabel": "ベータ任務ボード",
-      "label": "ベータ任務ボード",
+      "ariaLabel": "自己探索タスクボード",
+      "label": "自己探索タスクボード",
       "title": "自己探索の流れは準備できています",
       "tarotAlt": "Ocean Poseidon タロットカード",
       "mayaAlt": "マヤ暦 Yellow Human トーテム",
@@ -92,9 +92,9 @@
     "roleKicker": "役割の流れ",
     "roleTitle": "会員、ガイド、プラットフォームの関係を明確に",
     "roleBody": "会員は簡単な説明とインタラクティブなツールから始め、ガイドは深い対話を望むときだけ支えます。",
-    "finalKicker": "READY FOR CLOSED BETA",
-    "finalTitle": "測れる、分かる、戻ってくる状態から有料化へ",
-    "finalBody": "多言語基盤は既存機能を保ちながら、公開コンテンツを管理しやすい JSON に移します。",
+    "finalKicker": "MELE",
+    "finalTitle": "今日から始めて、少しずつ深めていく",
+    "finalBody": "無料ツール、デイリーリチュアル、詳細なリーディングが揃っています。役立つものを使い、深いサポートが必要なときはガイドを予約してください。",
     "philosophy": {
       "kicker": "OUR APPROACH",
       "title": "私たちが作っているものは、実はシンプルです",
@@ -254,23 +254,23 @@
     "current": "現在の言語"
   },
   "beta": {
-    "seoTitle": "クローズドベータ | MELE",
-    "seoDescription": "MELEのベータに参加し、無料の自己理解ツール、毎日の儀式、拡張解説を正式リリース前に体験できます。",
-    "badge": "CLOSED BETA INVITATION",
+    "seoTitle": "無料で探索 | MELE",
+    "seoDescription": "MELEの無料ツール、毎日の儀式、拡張解説を今すぐ体験できます。",
+    "badge": "FREE TO EXPLORE",
     "title": "まず自分を知り、選択を澄ませる",
-    "description": "ここは初期テスト用の入口です。無料ツールから始め、毎日の儀式を完了し、拡張解説を開けて、わかりにくい点や響いた点を共有してください。",
-    "primaryCta": "ベータ参加",
+    "description": "無料ツールから始め、毎日の儀式を完了し、拡張解説を開けましょう。もっと深く話したいときだけガイドへ進めます。",
+    "primaryCta": "今すぐ始める",
     "secondaryCta": "ツールを見る",
     "dailyCta": "毎日の儀式",
     "inviteNote": "招待コードは登録フローに自動で引き継がれます。すでにアカウントがある場合は、ログイン後に命盤記録へ戻れます。",
-    "panelLabel": "BETA TASK BOARD",
+    "panelLabel": "TODAY'S JOURNEY",
     "panelTitle": "今日はこの三つを試してください",
     "panelItems": [
       "無料ツールを一つ完了し、結果が読みやすいか確認する。",
       "毎日の儀式を完了し、拡張解説をひとつ開ける。",
       "わかりにくい点、不具合、または印象に残った点を知らせる。"
     ],
-    "rulesTitle": "ベータ案内",
+    "rulesTitle": "使い方",
     "rules": [
       {
         "label": "毎日の儀式",
