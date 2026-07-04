@@ -874,6 +874,15 @@ def explain_ziwei(data: dict, detail: DetailLevel = "teaser") -> str:
                 )
             )
 
+    # ── 閱讀引導 ──
+    parts.append(
+        _line(
+            "先挑一個真的想問的題目，確認你對哪個宮位最有感覺，再往三方四正延伸閱讀，"
+            "會比一次看完十二宮更容易找到答案。"
+            "有想深入的方向，帶著問題諮詢老師最有效率。"
+        )
+    )
+
     if detail == "full":
         parts.append(
             _line(
@@ -1377,6 +1386,9 @@ def explain_astro(data: dict, detail: DetailLevel = "teaser", **kwargs) -> str:
         parts.append(_line(_text(moon_info.get("shadow"))))
         parts.append(_line(_text(moon_info.get("focus"))))
 
+    # 月亮的安全感提示在 teaser/full 均顯示
+    parts.append(_line("月亮說的是你真正需要的安全感——情感底色穩了，其他選擇才能真正看清楚。"))
+
     # ── 上升 ──
     if detail == "teaser":
         parts.append(
@@ -1464,6 +1476,11 @@ def explain_astro(data: dict, detail: DetailLevel = "teaser", **kwargs) -> str:
             parts.append(
                 _line(f"第 <strong>{hnum}</strong> 宮 {hsym}{hsign}" f"{'（' + area + '）' if area else ''}")
             )
+
+    # ── 諮詢引導 ──
+    parts.append(
+        _line("帶著星盤問老師，把你看到有感的部分說出來；" "一場好的諮詢能讓抽象符號變成真正可以行動的地圖。")
+    )
 
     # ── 合規聲明 ──
     parts.append(
