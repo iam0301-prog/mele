@@ -414,10 +414,10 @@ for (const token of [
 console.log('\n=== Browser e2e coverage ===\n');
 
 for (const token of [
-  '公開測試首頁',
-  '每日可領 200 測試點',
-  '100 點解鎖深度解讀',
-  '老師諮詢仍是選項，不是強迫購買',
+  'MELE 首頁',
+  '八種命理工具，免費直接用',
+  '每日儀式，保留一點儀式感',
+  '老師是選項，不是必須',
   '/account/charts',
   '/teacher-portal',
   '每日儀式中心',

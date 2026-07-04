@@ -107,9 +107,9 @@ test.describe('Public beta premium flows', () => {
     await page.goto('/zh-TW');
 
     await expect(page.getByRole('heading', { name: 'MELE' })).toBeVisible();
-    await expect(page.getByLabel('公開測試首頁')).toBeVisible();
-    await expect(page.getByText('八種命理入口可直接開始')).toBeVisible();
-    await expect(page.getByText('每日儀式保留一點儀式感')).toBeVisible();
+    await expect(page.getByLabel('MELE 首頁')).toBeVisible();
+    await expect(page.getByText('八種命理工具，免費直接用')).toBeVisible();
+    await expect(page.getByText('每日儀式，保留一點儀式感')).toBeVisible();
     await expect(page.getByText('老師是選項，不是必須')).toBeVisible();
     await expect(page.getByAltText('大海波賽頓塔羅卡面')).toBeVisible();
     await expect(page.getByAltText('瑪雅黃色人圖騰')).toBeVisible();
@@ -129,7 +129,7 @@ test.describe('Public beta premium flows', () => {
     await page.getByRole('button', { name: '使用本機測試帳號' }).click();
     await expect(page).toHaveURL(/\/zh-TW\/account\/charts$/);
     await expect(page.getByRole('heading', { name: '會員解讀庫' })).toBeVisible({ timeout: 15_000 });
-    await expect(page.getByText('公測期免費體驗')).toBeVisible();
+    await expect(page.getByText('免費解鎖體驗')).toBeVisible();
     await expect(page.getByText(/流日、流月、流年均可直接查看/).first()).toBeVisible();
 
     await page.goto('/zh-TW/teacher-portal');
