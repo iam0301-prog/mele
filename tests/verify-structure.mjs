@@ -460,8 +460,8 @@ for (const [file, rpc] of rpcChecks) {
 const localizedHome = readFileSync('apps/web/app/[locale]/page.tsx', 'utf8');
 log(
   'home page distinguishes primary CTA from secondary route links',
-  localizedHome.includes('home-route-links') &&
-    localizedHome.includes('home-trust-list') &&
+  localizedHome.includes('mag-cta--ghost') &&
+    localizedHome.includes('mag-trust') &&
     localizedHome.includes('aria-label={copy.secondaryRoutesLabel}'),
 );
 const adminApplications = readFileSync('apps/web/app/admin/applications/page.tsx', 'utf8');
@@ -748,17 +748,16 @@ log(
   ].every((token) => homePage.includes(token) || zhCommon.includes(token)) &&
   ['測試點', '點解鎖', 'PUBLIC BETA'].every((token) => !homePage.includes(token)) &&
   [
-    'beta2-hero',
-    'beta2-phone',
-    "from 'next/image'",
-    '/tarot/cards/ocean_poseidon/19.webp',
-    '/maya/totems/yellow-human.png',
+    'mag-home',
+    'mag-hero',
+    'mag-toc',
+    'mag-cta',
   ].every((token) => homePage.includes(token)) &&
     [
-      '.beta2-hero',
-      '.beta2-phone',
-      '.beta2-public-panel',
-      '.beta2-final-cta',
+      '.mag-home',
+      '.mag-hero',
+      '.mag-toc',
+      '.mag-cta',
     ].every((token) => homeGlobalCss.includes(token)),
 );
 

@@ -103,16 +103,25 @@ test.describe('Smoke: home and tools index', () => {
 });
 
 test.describe('Public beta premium flows', () => {
-  test('homepage exposes the public beta task board, points economy, and visual assets', async ({ page }) => {
+  test('homepage exposes the magazine layout, policy trust lines, and tools directory', async ({ page }) => {
     await page.goto('/zh-TW');
 
     await expect(page.getByRole('heading', { name: 'MELE' })).toBeVisible();
     await expect(page.getByLabel('MELE 首頁')).toBeVisible();
     await expect(page.getByText('八種命理工具，免費直接用')).toBeVisible();
     await expect(page.getByText('每日儀式，保留一點儀式感')).toBeVisible();
-    await expect(page.getByText('老師是選項，不是必須')).toBeVisible();
-    await expect(page.getByAltText('大海波賽頓塔羅卡面')).toBeVisible();
-    await expect(page.getByAltText('瑪雅黃色人圖騰')).toBeVisible();
+    await expect(page.getByText('老師是選項，不是必須').first()).toBeVisible();
+    await expect(page.getByText('目錄——八種入口')).toBeVisible();
+    await expect(page.getByRole('link', { name: '塔羅牌' })).toBeVisible();
+  });
+
+  test('homepage primary CTA leads the golden path to tarot', async ({ page }) => {
+    test.setTimeout(60_000);
+    await page.goto('/zh-TW');
+
+    await page.getByRole('link', { name: '一鍵玩塔羅' }).first().click();
+    await page.waitForURL(/\/zh-TW\/tools\/tarot$/, { timeout: 30_000 });
+    await expect(page.getByRole('heading', { name: '塔羅牌解讀' })).toBeVisible();
   });
 
   test('local beta auth opens the member archive and teacher portal', async ({ page }, testInfo) => {

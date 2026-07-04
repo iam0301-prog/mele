@@ -1,12 +1,12 @@
-import Image from 'next/image';
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import {
   LOCALES,
+  getDictionary,
   isLocale,
   localizePath,
   type Locale,
-} from '@/lib/i18n/config';
+} from '@/lib/i18n';
 
 type PageProps = {
   params: Promise<{ locale: string }>;
@@ -57,23 +57,26 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
+// 冷冽紙感精品雜誌首頁文案。改任何 key 都要六語言一起補齊。
 const homeCopy = {
   'zh-TW': {
     reportIssue: '意見回饋',
-    eyebrow: '免費自我探索工具',
+    kicker: '免費自我探索工具',
+    verticalLabel: '自我理解的入口',
     title: '先整理自己，再決定下一步。',
     body: '一個讓你先整理自己、再決定下一步的工具平台。從每日儀式、命理探索到深入解讀，陪你多一個看自己的角度。需要的時候，再找老師深聊。',
-    primary: '開始每日儀式',
-    secondary: '看全部工具',
-    tarot: '試抽塔羅',
-    teacher: '需要時找老師',
+    tarotCta: '一鍵玩塔羅',
+    dailyLabel: '每日儀式',
+    toolsLabel: '看全部工具',
+    teacherLabel: '需要時找老師',
     secondaryRoutesLabel: '其他入口',
     points: '八種命理工具，免費直接用',
     unlock: '每日儀式，保留一點儀式感',
     teacherNote: '老師是選項，不是必須',
-    previewTitle: '三步開始認識自己',
-    previewSubtitle: '不需要先搞懂，做一遍就有感',
-    steps: ['選一個工具，看看說什麼', '開啟延伸解讀，多一個角度', '有共鳴，再往下探索'],
+    tocKicker: 'CONTENTS',
+    tocTitle: '目錄——八種入口',
+    quote: '工具給你一個角度，答案還是你自己的。',
+    quoteCite: 'MELE 編輯室',
     promiseTitle: '三個理由從這裡開始',
     promises: [
       {
@@ -98,24 +101,26 @@ const homeCopy = {
     philosophyTitle: '我們在做的事，其實很簡單',
     philosophyBody: '我們不替你下結論，只是多給你一個看自己的角度。工具結果是參考，不是替你下定論；老師是選項，不是必須。你隨時可以只用工具、不找老師。平台上的老師誰排在前面，由評價與上線狀態等客觀條件決定，排序依公開規則呈現，平台不偏袒特定老師。',
     finalTitle: '準備好就從最短路線開始',
-    finalBody: '建議先跑「每日儀式 → 一個工具 → 有感就繼續看」這條線。給自己五分鐘，試試看。',
+    finalBody: '建議先抽一次塔羅，看看此刻的自己。有感就再往下看延伸解讀，或找老師深聊。',
   },
   en: {
     reportIssue: 'Feedback',
-    eyebrow: 'Free self-discovery tools',
+    kicker: 'Free self-discovery tools',
+    verticalLabel: 'A doorway to self-understanding',
     title: 'Understand yourself first. Then decide what comes next.',
     body: 'A platform for self-discovery before your next move. From daily rituals and astrology to in-depth readings — one more angle on yourself. Find a guide when you need one.',
-    primary: 'Start daily ritual',
-    secondary: 'See all tools',
-    tarot: 'Try tarot',
-    teacher: 'Find a guide if needed',
+    tarotCta: 'One-tap tarot',
+    dailyLabel: 'Daily ritual',
+    toolsLabel: 'See all tools',
+    teacherLabel: 'Find a guide if needed',
     secondaryRoutesLabel: 'Other entry points',
     points: 'Eight self-discovery tools, free to use',
     unlock: 'Daily ritual — a moment of intention each day',
     teacherNote: 'Guides are optional, never forced',
-    previewTitle: 'Three steps to know yourself',
-    previewSubtitle: 'No need to understand everything — just try one loop',
-    steps: ['Pick a tool and see what it says', 'Open the extended reading for more depth', 'Explore further when something resonates'],
+    tocKicker: 'CONTENTS',
+    tocTitle: 'Contents — eight ways in',
+    quote: 'Tools give you an angle. The answer is still yours.',
+    quoteCite: 'The MELE editors',
     promiseTitle: 'Three reasons to start here',
     promises: [
       {
@@ -137,24 +142,26 @@ const homeCopy = {
     noticeTitle: 'How to use MELE',
     noticeBody: 'MELE is for self-discovery and entertainment. It does not replace medical, legal, investment, or therapy advice. Tool results are for personal reflection only and do not constitute any medical recommendation. If you have physical or mental health concerns, please seek professional help.',
     finalTitle: 'Ready? Start with the shortest path.',
-    finalBody: 'Try the daily ritual → one tool → keep exploring if something resonates. Five minutes is enough to start.',
+    finalBody: 'Draw one tarot card and see where you are right now. If something resonates, keep exploring — or talk to a guide.',
   },
   vi: {
     reportIssue: 'Phản hồi',
-    eyebrow: 'Công cụ tự khám phá bản thân miễn phí',
+    kicker: 'Công cụ tự khám phá bản thân miễn phí',
+    verticalLabel: 'Lối vào để hiểu chính mình',
     title: 'Hiểu bản thân trước, rồi quyết định bước tiếp theo.',
     body: 'Một nền tảng công cụ giúp bạn sắp xếp lại bản thân trước khi đưa ra quyết định. Từ nghi thức hằng ngày, khám phá bản đồ năng lượng đến giải thích chuyên sâu — thêm một góc nhìn về chính mình. Khi cần, hãy tìm chuyên gia để trò chuyện sâu hơn.',
-    primary: 'Bắt đầu nghi thức hằng ngày',
-    secondary: 'Xem tất cả công cụ',
-    tarot: 'Thử rút tarot',
-    teacher: 'Tìm chuyên gia khi cần',
+    tarotCta: 'Bói tarot 1 chạm',
+    dailyLabel: 'Nghi thức hằng ngày',
+    toolsLabel: 'Xem tất cả công cụ',
+    teacherLabel: 'Tìm chuyên gia khi cần',
     secondaryRoutesLabel: 'Lối vào khác',
     points: 'Tám công cụ tự khám phá, dùng ngay miễn phí',
     unlock: 'Nghi thức hằng ngày — một chút ý nghĩa mỗi ngày',
     teacherNote: 'Chuyên gia là lựa chọn, không phải bắt buộc',
-    previewTitle: 'Ba bước để hiểu bản thân',
-    previewSubtitle: 'Không cần hiểu hết — chỉ cần thử một vòng',
-    steps: ['Chọn một công cụ, xem nó nói gì', 'Mở giải thích mở rộng để có thêm góc nhìn', 'Tiếp tục khám phá khi có điều gì đó chạm đến bạn'],
+    tocKicker: 'CONTENTS',
+    tocTitle: 'Mục lục — tám lối vào',
+    quote: 'Công cụ cho bạn một góc nhìn, còn câu trả lời vẫn là của bạn.',
+    quoteCite: 'Ban biên tập MELE',
     promiseTitle: 'Ba lý do để bắt đầu từ đây',
     promises: [
       {
@@ -179,24 +186,26 @@ const homeCopy = {
     philosophyTitle: 'Điều chúng tôi đang làm, thật ra rất đơn giản',
     philosophyBody: 'Chúng tôi không kết luận thay bạn, chỉ cung cấp thêm một góc nhìn về chính mình. Kết quả công cụ là tham khảo, không phải phán quyết; chuyên gia là lựa chọn, không phải bắt buộc. Bạn luôn có thể chỉ dùng công cụ mà không cần tìm chuyên gia. Thứ hạng của chuyên gia trên nền tảng do đánh giá và trạng thái hoạt động quyết định — xếp hạng theo quy tắc công khai, nền tảng không thiên vị bất kỳ chuyên gia nào.',
     finalTitle: 'Sẵn sàng thì bắt đầu từ con đường ngắn nhất',
-    finalBody: 'Gợi ý chạy theo lộ trình: nghi thức hằng ngày → một công cụ → nếu có cảm xúc thì tiếp tục xem. Cho mình năm phút, thử xem sao.',
+    finalBody: 'Hãy rút một lá tarot để xem con người bạn lúc này. Nếu có điều gì chạm đến bạn, tiếp tục xem giải thích chuyên sâu hoặc tìm chuyên gia.',
   },
   id: {
     reportIssue: 'Beri masukan',
-    eyebrow: 'Alat eksplorasi diri gratis',
+    kicker: 'Alat eksplorasi diri gratis',
+    verticalLabel: 'Pintu untuk memahami diri',
     title: 'Kenali dirimu dulu, lalu putuskan langkah berikutnya.',
     body: 'Platform alat yang membantumu merapikan diri sebelum mengambil keputusan. Dari ritual harian, eksplorasi diri, hingga pembacaan mendalam — satu sudut pandang tambahan tentang dirimu. Ketika perlu, cari pemandu untuk ngobrol lebih dalam.',
-    primary: 'Mulai ritual harian',
-    secondary: 'Lihat semua alat',
-    tarot: 'Coba tarot',
-    teacher: 'Cari pemandu jika perlu',
+    tarotCta: 'Tarot sekali klik',
+    dailyLabel: 'Ritual harian',
+    toolsLabel: 'Lihat semua alat',
+    teacherLabel: 'Cari pemandu jika perlu',
     secondaryRoutesLabel: 'Pintu masuk lain',
     points: 'Delapan alat eksplorasi diri, langsung mulai gratis',
     unlock: 'Ritual harian — momen kecil yang berarti setiap hari',
     teacherNote: 'Pemandu adalah pilihan, bukan keharusan',
-    previewTitle: 'Tiga langkah mengenal diri',
-    previewSubtitle: 'Tidak perlu memahami segalanya — coba satu putaran dulu',
-    steps: ['Pilih satu alat, lihat apa yang dikatakan', 'Buka bacaan lanjutan untuk sudut pandang lebih', 'Telusuri lebih jauh jika ada yang beresonansi'],
+    tocKicker: 'CONTENTS',
+    tocTitle: 'Daftar isi — delapan pintu masuk',
+    quote: 'Alat memberimu sudut pandang, jawabannya tetap milikmu.',
+    quoteCite: 'Redaksi MELE',
     promiseTitle: 'Tiga alasan untuk mulai di sini',
     promises: [
       {
@@ -221,24 +230,26 @@ const homeCopy = {
     philosophyTitle: 'Yang kami lakukan, sebenarnya sangat sederhana',
     philosophyBody: 'Kami tidak menyimpulkan untukmu, hanya memberi satu sudut pandang tambahan tentang dirimu. Hasil alat adalah referensi, bukan vonis; pemandu adalah pilihan, bukan keharusan. Kamu bisa kapan saja hanya memakai alat tanpa mencari pemandu. Peringkat pemandu di platform ditentukan oleh ulasan dan status aktif — urutan berdasarkan aturan yang transparan, platform tidak memihak pemandu mana pun.',
     finalTitle: 'Siap? Mulai dari jalur terpendek',
-    finalBody: 'Disarankan mengikuti alur: ritual harian → satu alat → jika ada resonansi, lanjutkan. Beri dirimu lima menit, coba dulu.',
+    finalBody: 'Coba tarik satu kartu tarot untuk melihat dirimu saat ini. Jika ada yang beresonansi, lanjutkan bacaan mendalam atau temui pemandu.',
   },
   ja: {
     reportIssue: 'フィードバック',
-    eyebrow: '無料の自己探索ツール',
+    kicker: '無料の自己探索ツール',
+    verticalLabel: '自分を理解する入口',
     title: 'まず自分を整理して、それから次の一歩を決める。',
     body: '自分を整理してから次のステップを決めるためのツールプラットフォームです。毎日の儀式、自己探索、深い解説まで——自分をもう一つの角度から見るきっかけになります。必要なときは、ガイドに深く話しかけてみてください。',
-    primary: '毎日の儀式を始める',
-    secondary: 'すべてのツールを見る',
-    tarot: 'タロットを試す',
-    teacher: '必要なときにガイドを探す',
+    tarotCta: 'ワンタップでタロット',
+    dailyLabel: '毎日の儀式',
+    toolsLabel: 'すべてのツールを見る',
+    teacherLabel: '必要なときにガイドを探す',
     secondaryRoutesLabel: 'その他の入口',
     points: '8つの自己探索ツール、無料ですぐに使える',
     unlock: '毎日の儀式——小さな節目を作る',
     teacherNote: 'ガイドは選択肢であり、必須ではありません',
-    previewTitle: '自分を知る3ステップ',
-    previewSubtitle: 'すべてを理解しなくていい——まず一周してみよう',
-    steps: ['ひとつのツールを選んで何を言うか見る', '詳細解説を開いてもう一つの角度を得る', '気になることがあれば、さらに探ってみる'],
+    tocKicker: 'CONTENTS',
+    tocTitle: '目次——8つの入口',
+    quote: 'ツールが視点をくれる。答えは、やっぱり自分の中にある。',
+    quoteCite: 'MELE編集部',
     promiseTitle: 'ここから始める3つの理由',
     promises: [
       {
@@ -263,24 +274,26 @@ const homeCopy = {
     philosophyTitle: '私たちがやっていること、実はとてもシンプルです',
     philosophyBody: '私たちはあなたの代わりに結論を出しません。ただ、自分を見るもう一つの角度を提供するだけです。ツールの結果は参考であり、判断ではありません。ガイドは選択肢であり、必須ではありません。いつでもツールだけ使って、ガイドを探さなくてもかまいません。プラットフォーム上のガイドの順位は、評価やオンライン状態などの客観的な条件によって決まります。順位は公開ルールに基づいており、特定のガイドを優遇することはありません。',
     finalTitle: '準備ができたら、最短ルートから始めましょう',
-    finalBody: '「毎日の儀式 → ひとつのツール → 気になったら続けて見る」というルートから試すことをお勧めします。5分間、試してみてください。',
+    finalBody: 'まずは一枚タロットを引いて、今の自分を見てみましょう。気になったら詳細解説へ、またはガイドに相談を。',
   },
   ko: {
     reportIssue: '피드백 보내기',
-    eyebrow: '무료 자기 탐색 도구',
+    kicker: '무료 자기 탐색 도구',
+    verticalLabel: '나를 이해하는 입구',
     title: '먼저 자신을 정리하고, 그 다음 방향을 결정하세요.',
     body: '나를 먼저 정리한 후 다음 선택을 결정하기 위한 도구 플랫폼입니다. 매일 리추얼, 자기 탐색부터 심층 해석까지 — 나를 바라보는 하나의 시각을 더해드립니다. 필요할 때 가이드를 찾아 깊이 대화해 보세요.',
-    primary: '데일리 리추얼 시작하기',
-    secondary: '모든 도구 보기',
-    tarot: '타로 뽑아보기',
-    teacher: '필요할 때 가이드 찾기',
+    tarotCta: '원탭 타로',
+    dailyLabel: '데일리 리추얼',
+    toolsLabel: '모든 도구 보기',
+    teacherLabel: '필요할 때 가이드 찾기',
     secondaryRoutesLabel: '다른 입구',
     points: '여덟 가지 자기 탐색 도구, 무료로 바로 시작',
     unlock: '매일 리추얼 — 하루의 작은 의식',
     teacherNote: '가이드는 선택지이지, 필수가 아닙니다',
-    previewTitle: '나를 알아가는 세 단계',
-    previewSubtitle: '모두 이해하지 않아도 돼요 — 한 번 돌아보면 충분해요',
-    steps: ['도구 하나를 골라 무엇을 말하는지 확인', '심층 해석을 열어 또 다른 시각 얻기', '공감되는 부분이 있으면 더 탐색해 보기'],
+    tocKicker: 'CONTENTS',
+    tocTitle: '목차 — 여덟 개의 입구',
+    quote: '도구는 시각을 주고, 답은 여전히 당신의 것입니다.',
+    quoteCite: 'MELE 편집부',
     promiseTitle: '여기서 시작해야 할 세 가지 이유',
     promises: [
       {
@@ -305,9 +318,11 @@ const homeCopy = {
     philosophyTitle: '우리가 하는 일, 사실 아주 단순해요',
     philosophyBody: '우리는 당신 대신 결론을 내리지 않아요. 그저 자신을 바라보는 하나의 시각을 더해드릴 뿐입니다. 도구 결과는 참고이지 판단이 아니고, 가이드는 선택지이지 필수가 아닙니다. 언제든지 도구만 사용하고 가이드를 찾지 않아도 됩니다. 플랫폼 내 가이드 순위는 평가와 활동 상태 등 객관적인 조건에 의해 결정되며, 공개 규칙에 따라 표시됩니다. 특정 가이드를 편애하지 않습니다.',
     finalTitle: '준비가 되었다면 가장 짧은 경로에서 시작하세요',
-    finalBody: '「매일 리추얼 → 도구 하나 → 공감되면 계속 보기」 이 흐름으로 먼저 시작해 보세요. 5분만 내어 한번 해보세요.',
+    finalBody: '타로 카드를 한 장 뽑아 지금의 나를 살펴보세요. 공감되면 심층 해석을 보거나 가이드와 상담해 보세요.',
   },
 } as const;
+
+const CN_NUMERALS = ['一', '二', '三', '四', '五', '六', '七', '八'];
 
 function getHomeCopy(locale: Locale) {
   if (locale in homeCopy) {
@@ -319,110 +334,104 @@ function getHomeCopy(locale: Locale) {
 export default async function LocalizedHomePage({ params }: PageProps) {
   const locale = await resolveLocale(params);
   const copy = getHomeCopy(locale);
+  const dictionary = await getDictionary(locale);
+  const tools = dictionary.home.tools;
 
   return (
-    <main className="beta2-home">
-      <section className="beta2-hero" aria-label="MELE 首頁">
-        <div className="beta2-hero__copy">
-          <p className="beta2-eyebrow">{copy.eyebrow}</p>
-          <h1>MELE</h1>
-          <h2>{copy.title}</h2>
-          <p>{copy.body}</p>
+    <main className="mag-home">
+      <section className="mag-hero" aria-label="MELE 首頁">
+        <div className="mag-vertical" aria-hidden="true">{copy.verticalLabel}</div>
+        <div className="mag-hero__copy">
+          <h1 className="sr-only">MELE</h1>
+          <p className="mag-label">{copy.kicker}</p>
+          <h2 className="mag-hero__title">{copy.title}</h2>
+          <p className="mag-hero__body">{copy.body}</p>
 
-          <div className="beta2-actions home-hero__actions">
-            <Link href={localizePath('/daily', locale)} className="beta2-primary">
-              {copy.primary}
+          <div className="mag-actions">
+            <Link href={localizePath('/tools/tarot', locale)} className="mag-cta">
+              {copy.tarotCta}
             </Link>
-            <Link href={localizePath('/tools', locale)} className="beta2-secondary">
-              {copy.secondary}
+            <Link href={localizePath('/daily', locale)} className="mag-cta mag-cta--ghost">
+              {copy.dailyLabel}
+            </Link>
+            <Link href={localizePath('/tools', locale)} className="mag-cta mag-cta--ghost">
+              {copy.toolsLabel}
             </Link>
           </div>
 
-          <nav className="home-route-links" aria-label={copy.secondaryRoutesLabel}>
-            <Link href={localizePath('/tools/tarot', locale)}>
-              {copy.tarot}
-            </Link>
-            <Link href={localizePath('/teachers', locale)}>
-              {copy.teacher}
-            </Link>
-          </nav>
-
-          <div className="beta2-trust home-trust-list" aria-label="平台特色">
+          <nav className="mag-trust" aria-label={copy.secondaryRoutesLabel}>
             <span>{copy.points}</span>
             <span>{copy.unlock}</span>
             <span>{copy.teacherNote}</span>
-          </div>
-        </div>
-
-        <div className="beta2-visual" aria-label="首頁主要視覺">
-          <div className="beta2-card-stack" aria-hidden="true">
-            <Image
-              src="/tarot/cards/ocean_poseidon/19.webp"
-              alt="大海波賽頓塔羅卡面"
-              width={260}
-              height={390}
-              priority
-              className="beta2-tarot"
-            />
-            <Image
-              src="/maya/totems/yellow-human.png"
-              alt="瑪雅黃色人圖騰"
-              width={112}
-              height={112}
-              className="beta2-glyph"
-            />
-          </div>
-
-          <div className="beta2-phone" aria-label={copy.previewTitle}>
-            <div className="beta2-phone__top">
-              <span>{copy.previewTitle}</span>
-            </div>
-            <p>{copy.previewSubtitle}</p>
-            <ol>
-              {copy.steps.map((step) => (
-                <li key={step}>{step}</li>
-              ))}
-            </ol>
-          </div>
+          </nav>
         </div>
       </section>
 
-      <section className="beta2-path" aria-label={copy.promiseTitle}>
+      <section className="mag-toc" aria-label={copy.tocTitle}>
+        <div className="mag-toc__head">
+          <h2>{copy.tocTitle}</h2>
+          <span className="mag-label">{copy.tocKicker}</span>
+        </div>
+        <ol>
+          {tools.map((tool, index) => (
+            <li key={tool.slug}>
+              <Link href={localizePath(`/tools/${tool.slug}`, locale)}>
+                <span className="mag-toc__no" aria-hidden="true">
+                  {locale === 'zh-TW' ? CN_NUMERALS[index] ?? String(index + 1) : String(index + 1).padStart(2, '0')}
+                </span>
+                <span>
+                  <b>{tool.name}</b>
+                  <small>{tool.desc}</small>
+                </span>
+              </Link>
+            </li>
+          ))}
+        </ol>
+      </section>
+
+      <section className="mag-pull" aria-label={copy.quote}>
+        <blockquote>{copy.quote}</blockquote>
+        <cite>{copy.quoteCite}</cite>
+      </section>
+
+      <section className="mag-promises" aria-label={copy.promiseTitle}>
         {copy.promises.map((promise, index) => (
           <article key={promise.title}>
-            <span>{String(index + 1).padStart(2, '0')}</span>
+            <span className="mag-promises__no">{String(index + 1).padStart(2, '0')}</span>
             <h3>{promise.title}</h3>
             <p>{promise.body}</p>
-            <span className="beta2-path-note">{promise.label}</span>
+            <span className="mag-label mag-promises__label">{promise.label}</span>
           </article>
         ))}
       </section>
 
       {locale !== 'en' && 'philosophyTitle' in copy && (
-        <section className="beta2-path" aria-label={copy.philosophyTitle}>
-          <article>
-            <span className="beta2-path-note">{copy.philosophyKicker}</span>
-            <h3>{copy.philosophyTitle}</h3>
-            <p>{copy.philosophyBody}</p>
-          </article>
+        <section className="mag-manifesto" aria-label={copy.philosophyTitle}>
+          <span className="mag-label">{copy.philosophyKicker}</span>
+          <h2>{copy.philosophyTitle}</h2>
+          <p>{copy.philosophyBody}</p>
         </section>
       )}
 
-      <section className="beta2-notice" aria-label={copy.noticeTitle}>
+      <section className="mag-teacher-line" aria-label={copy.teacherLabel}>
+        <Link href={localizePath('/teachers', locale)}>{copy.teacherLabel}</Link>
+      </section>
+
+      <section className="mag-notice" aria-label={copy.noticeTitle}>
         <div>
-          <span>{copy.noticeTitle}</span>
+          <span className="mag-label">{copy.noticeTitle}</span>
           <p>{copy.noticeBody}</p>
         </div>
         <Link href={localizePath('/feedback', locale)}>{copy.reportIssue}</Link>
       </section>
 
-      <section className="beta2-final-cta" aria-label={copy.finalTitle}>
+      <section className="mag-final" aria-label={copy.finalTitle}>
         <div>
           <h2>{copy.finalTitle}</h2>
           <p>{copy.finalBody}</p>
         </div>
-        <Link href={localizePath('/daily', locale)} className="beta2-primary">
-          {copy.primary}
+        <Link href={localizePath('/tools/tarot', locale)} className="mag-cta">
+          {copy.tarotCta}
         </Link>
       </section>
     </main>
