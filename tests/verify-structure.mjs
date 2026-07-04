@@ -740,15 +740,13 @@ log(
     !zhCommon.includes('老師' + '媒合'),
 );
 log(
-  'localized home presents public-beta command center',
+  'localized home presents formal free positioning without points wording',
   [
-    'PUBLIC BETA · 公開測試中',
-    '每日可領 200 測試點',
-    '100 點解鎖深度解讀',
-    '老師諮詢仍是選項，不是強迫購買',
-    '公開測試流程',
-    '今天請你幫忙測這 4 件事',
+    '免費自我探索工具',
+    '八種命理工具，免費直接用',
+    '老師是選項，不是必須',
   ].every((token) => homePage.includes(token) || zhCommon.includes(token)) &&
+  ['測試點', '點解鎖', 'PUBLIC BETA'].every((token) => !homePage.includes(token)) &&
   [
     'beta2-hero',
     'beta2-phone',
@@ -786,7 +784,7 @@ log('teacher portal keeps booking table mobile readable', teacherPortal.includes
 log(
   'teacher portal includes actionable readiness checklist',
   ['TeacherPortalReadiness', 'copy.readiness.items.profile', 'copy.readiness.items.services', 'copy.readiness.items.testMode'].every((token) => teacherPortal.includes(token)) &&
-    ['後台準備度', '公開頁完整度', '服務項目已設定', '測試模式提醒'].every((token) => teacherCopy.includes(token)),
+    ['後台準備度', '公開頁完整度', '服務項目已設定', '費用說明'].every((token) => teacherCopy.includes(token)),
 );
 
 const myBookingsPage = readFileSync('apps/web/app/account/mybookings/page.tsx', 'utf8');
@@ -808,7 +806,7 @@ log(
   'my bookings shows free test bookings without payment CTA',
   myBookingsPage.includes('payment_provider') &&
     myBookingsPage.includes('free_test') &&
-    myBookingsPage.includes('測試期免費'),
+    myBookingsPage.includes('免費'),
 );
 
 const bookingExperiencePage = readFileSync('apps/web/app/account/book/page.tsx', 'utf8');
@@ -832,7 +830,7 @@ log(
     bookingExperiencePage.includes("rpc('create_booking_request'") &&
     bookingExperiencePage.includes('p_free_test_mode') &&
     bookingExperiencePage.includes('/account/mybookings') &&
-    bookingExperiencePage.includes('測試期免費') &&
+    bookingExperiencePage.includes('目前免費') &&
     !bookingExperiencePage.includes(".from('bookings').insert("),
 );
 
@@ -1148,7 +1146,7 @@ log(
   paymentPage.includes('NEXT_PUBLIC_ENABLE_FREE_BOOKING_TEST_MODE') &&
     paymentPage.includes('free_test') &&
     paymentPage.includes("bookingData.status === 'pending'") &&
-    paymentPage.includes('測試期免費'),
+    paymentPage.includes('目前免費體驗'),
 );
 const paymentResultPage = readFileSync('apps/web/app/account/payment/result/page.tsx', 'utf8');
 log('payment result page shows booking state and recovery actions', ['付款已收到', '付款狀態確認中', '查看我的預約', 'ClientBackURL'].every((token) => paymentResultPage.includes(token)));
