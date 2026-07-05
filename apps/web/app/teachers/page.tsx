@@ -60,12 +60,13 @@ function TeachersInner() {
   }, [filter]);
 
   return (
-    <main className="container mx-auto max-w-6xl px-5 py-12">
+    <main className="mag-teachers-page">
+    <div className="container mx-auto max-w-6xl px-5 py-12">
       <header className="pb-8 text-center">
-        <div className="text-accent mb-4 text-base tracking-[0.5em] opacity-70">{copy.directory.kicker}</div>
-        <h1 className="font-serif text-4xl tracking-widest">{copy.directory.title}</h1>
-        <div className="mele-subtitle mt-2">{copy.directory.subtitle}</div>
-        <p className="mx-auto mt-5 max-w-2xl text-sm leading-relaxed text-white/70">
+        <div className="mag-teachers-page__kicker mag-label mb-4 text-base tracking-[0.5em] opacity-70">{copy.directory.kicker}</div>
+        <h1 className="mag-teachers-page__title text-4xl tracking-widest">{copy.directory.title}</h1>
+        <div className="mag-teachers-page__subtitle mele-subtitle mt-2">{copy.directory.subtitle}</div>
+        <p className="mag-teachers-page__body mx-auto mt-5 max-w-2xl text-sm leading-relaxed">
           {copy.directory.body}
         </p>
         <div className="mt-5 flex flex-wrap justify-center gap-3">
@@ -74,17 +75,15 @@ function TeachersInner() {
         </div>
       </header>
 
-      <section className="mele-card">
+      <section className="mag-teachers-page__panel mele-card">
         <div className="mb-6 flex flex-wrap gap-2">
           {copy.specialties.map((specialty) => (
             <button
               key={specialty.value}
               type="button"
               onClick={() => setFilter(specialty.value)}
-              className={`rounded-full border px-4 py-2 text-sm transition-all ${
-                filter === specialty.value
-                  ? 'border-accent bg-accent text-primary font-semibold'
-                  : 'border-accent-dim bg-white/5 hover:border-accent'
+              className={`mag-teachers-page__filter-chip px-4 py-2 text-sm transition-all ${
+                filter === specialty.value ? 'is-active' : ''
               }`}
             >
               {specialty.label}
@@ -92,21 +91,21 @@ function TeachersInner() {
           ))}
         </div>
 
-        {loading && <div className="py-12 text-center text-white/60">{copy.directory.loading}</div>}
+        {loading && <div className="mag-teachers-page__subtitle py-12 text-center">{copy.directory.loading}</div>}
 
         {!loading && demoMode && teachers.length > 0 && (
-          <div className="mb-5 rounded-xl border border-accent-dim bg-black/25 p-4 text-sm leading-relaxed text-white/70">
+          <div className="mag-teachers-page__notice mb-5 rounded-xl p-4 text-sm leading-relaxed">
             {copy.directory.demoNotice}
           </div>
         )}
 
         {!loading && teachers.length === 0 && (
-          <div className="py-16 text-center text-white/60">
-            <div className="mb-3 text-4xl text-accent opacity-50">MELE</div>
-            <p className="mb-2">{copy.directory.emptyTitle}</p>
-            <p className="mx-auto mb-4 max-w-sm text-sm leading-relaxed text-white/50">{copy.directory.emptyBody}</p>
+          <div className="mag-teachers-page__subtitle py-16 text-center">
+            <div className="mag-teachers-page__kicker mb-3 text-4xl opacity-50">MELE</div>
+            <p className="mag-teachers-page__title mb-2">{copy.directory.emptyTitle}</p>
+            <p className="mag-teachers-page__body mx-auto mb-4 max-w-sm text-sm leading-relaxed">{copy.directory.emptyBody}</p>
             <div className="mt-4">
-              <Link href={localizePath('/teachers/apply', locale)} className="text-accent text-xs tracking-widest hover:opacity-80">
+              <Link href={localizePath('/teachers/apply', locale)} className="mag-teachers-page__kicker text-xs tracking-widest hover:opacity-80">
                 {copy.directory.emptyAction}
               </Link>
             </div>
@@ -121,6 +120,7 @@ function TeachersInner() {
           </div>
         )}
       </section>
+    </div>
     </main>
   );
 }
@@ -133,31 +133,31 @@ function TeacherCard({ teacher }: { teacher: Teacher }) {
   return (
     <Link
       href={localizePath(`/teachers/${teacher.id}`, locale)}
-      className="relative block rounded-2xl border border-accent-dim bg-white/[0.03] p-6 transition-all hover:-translate-y-1 hover:border-accent hover:shadow-gold-soft"
+      className="mag-author-card"
     >
       {isDemo && (
-        <div className="absolute right-3 top-3 rounded-full border border-accent-dim bg-black/50 px-2 py-0.5 text-[10px] tracking-wide text-white/50">
+        <div className="mag-author-card__badge">
           {copy.directory.demoBadge}
         </div>
       )}
-      <div className="mx-auto mb-3 flex h-20 w-20 items-center justify-center rounded-full bg-mele-gold font-serif text-3xl font-bold text-primary">
+      <div className="mag-author-card__avatar">
         {displayTeacher.display_name.charAt(0)}
       </div>
-      <div className="text-center font-serif text-xl text-accent">{displayTeacher.display_name}</div>
-      <div className="mt-1 text-center text-xs text-white/60">{displayTeacher.title || copy.directory.fallbackTitle}</div>
-      <div className="mt-3 text-center text-sm text-yellow-400">
+      <div className="mag-author-card__name">{displayTeacher.display_name}</div>
+      <div className="mag-author-card__title mt-1 text-xs">{displayTeacher.title || copy.directory.fallbackTitle}</div>
+      <div className="mag-author-card__rating mt-3 text-sm">
         {Number(teacher.rating || 0).toFixed(1)} {copy.directory.ratingUnit}
-        <span className="text-white/50">（{teacher.total_reviews || 0} {copy.directory.reviewsUnit}） · {teacher.cases_count || 0} {copy.directory.casesUnit}</span>
+        <span className="mag-author-card__title">（{teacher.total_reviews || 0} {copy.directory.reviewsUnit}） · {teacher.cases_count || 0} {copy.directory.casesUnit}</span>
       </div>
-      <div className="mt-3 flex flex-wrap justify-center gap-1.5">
+      <div className="mag-author-card__tags mt-3">
         {(teacher.specialties || []).slice(0, 4).map((specialty) => (
-          <span key={specialty} className="rounded-md border border-accent-dim px-2 py-0.5 text-[11px]">{specialtyLabel(locale, specialty)}</span>
+          <span key={specialty} className="mag-author-card__tag">{specialtyLabel(locale, specialty)}</span>
         ))}
       </div>
-      <div className="mt-3 min-h-[44px] text-center text-xs leading-relaxed text-white/70">
+      <div className="mag-author-card__quote mt-3 min-h-[44px] text-xs leading-relaxed">
         {displayTeacher.quote || displayTeacher.intro_short || copy.directory.fallbackBody}
       </div>
-      <div className="mt-4 border-t border-accent-dim pt-3 text-center text-xs tracking-widest text-accent">
+      <div className="mag-author-card__action mt-4 pt-3 text-xs tracking-widest">
         {copy.directory.detailAction}
       </div>
     </Link>

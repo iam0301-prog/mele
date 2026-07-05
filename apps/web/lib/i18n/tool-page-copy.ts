@@ -70,6 +70,10 @@ type ToolLocaleCopy = {
   shell: {
     backLabel: string;
     eyebrow: string;
+    feedbackAriaLabel: string;
+    feedbackKicker: string;
+    feedbackBody: string;
+    feedbackAction: string;
   };
   consult: {
     title: string;
@@ -364,7 +368,14 @@ const enTools: Record<ToolPageSlug, ToolPageCopy> = {
 
 const localeCopies: Record<Locale, ToolLocaleCopy> = {
   'zh-TW': {
-    shell: { backLabel: '回到工具入口', eyebrow: '解讀工具實驗室' },
+    shell: {
+      backLabel: '回到工具入口',
+      eyebrow: '解讀工具實驗室',
+      feedbackAriaLabel: '意見回報',
+      feedbackKicker: '歡迎回饋',
+      feedbackBody: '這份結果對你有幫助嗎？歡迎告訴我們哪裡有感、哪裡還可以更好。',
+      feedbackAction: '分享意見',
+    },
     consult: {
       title: '想更深入了解自己？',
       body: '工具結果是一個參考起點。如果你想在感情、工作或人生方向上聊得更深，平台老師是一個選項，不是必須。',
@@ -386,7 +397,14 @@ const localeCopies: Record<Locale, ToolLocaleCopy> = {
     tools: zhTools,
   },
   en: {
-    shell: { backLabel: 'Back to tools hub', eyebrow: 'ORACLE TOOL LAB' },
+    shell: {
+      backLabel: 'Back to tools hub',
+      eyebrow: 'ORACLE TOOL LAB',
+      feedbackAriaLabel: 'Feedback invitation',
+      feedbackKicker: 'YOUR FEEDBACK',
+      feedbackBody: 'Was this result clear and useful? Let us know what resonated or what could improve.',
+      feedbackAction: 'Share feedback',
+    },
     consult: {
       title: 'Want to explore further?',
       body: 'This result is a starting point for reflection. If you want a deeper conversation about your question, a platform guide is one option — not a requirement.',
@@ -408,7 +426,14 @@ const localeCopies: Record<Locale, ToolLocaleCopy> = {
     tools: enTools,
   },
   vi: {
-    shell: { backLabel: 'Về cổng tâm linh', eyebrow: 'PHÒNG THỬ CÔNG CỤ' },
+    shell: {
+      backLabel: 'Về cổng tâm linh',
+      eyebrow: 'PHÒNG THỬ CÔNG CỤ',
+      feedbackAriaLabel: 'Mời góp ý',
+      feedbackKicker: 'GÓP Ý CỦA BẠN',
+      feedbackBody: 'Kết quả này có rõ ràng và hữu ích không? Hãy cho chúng tôi biết điều gì đúng hoặc cần cải thiện.',
+      feedbackAction: 'Gửi góp ý',
+    },
     consult: {
       title: 'Muốn khám phá sâu hơn?',
       body: 'Kết quả này là một điểm khởi đầu để suy ngẫm. Nếu bạn muốn trò chuyện sâu hơn, guide trên nền tảng là một lựa chọn — không bắt buộc.',
@@ -440,7 +465,14 @@ const localeCopies: Record<Locale, ToolLocaleCopy> = {
     },
   },
   id: {
-    shell: { backLabel: 'Kembali ke hub alat', eyebrow: 'LAB ALAT ORAKEL' },
+    shell: {
+      backLabel: 'Kembali ke hub alat',
+      eyebrow: 'LAB ALAT ORAKEL',
+      feedbackAriaLabel: 'Undangan masukan',
+      feedbackKicker: 'MASUKAN ANDA',
+      feedbackBody: 'Apakah hasil ini jelas dan bermanfaat? Beri tahu kami bagian mana yang berkesan atau bisa diperbaiki.',
+      feedbackAction: 'Bagikan masukan',
+    },
     consult: {
       title: 'Ingin mengeksplorasi lebih jauh?',
       body: 'Hasil ini adalah titik awal untuk refleksi. Jika ingin percakapan lebih mendalam, guide di platform adalah salah satu pilihan — bukan keharusan.',
@@ -472,7 +504,14 @@ const localeCopies: Record<Locale, ToolLocaleCopy> = {
     },
   },
   ja: {
-    shell: { backLabel: 'スピリチュアル入口へ戻る', eyebrow: 'オラクルツールラボ' },
+    shell: {
+      backLabel: 'スピリチュアル入口へ戻る',
+      eyebrow: 'オラクルツールラボ',
+      feedbackAriaLabel: 'フィードバックのお願い',
+      feedbackKicker: 'ご意見をお聞かせください',
+      feedbackBody: 'この結果はわかりやすく役に立ちましたか？共感した点や改善できる点をぜひ教えてください。',
+      feedbackAction: 'フィードバックを送る',
+    },
     consult: {
       title: 'もっと深く自分を知りたいですか？',
       body: 'この結果は振り返りのスタートポイントです。もっと深く話したい場合は、プラットフォームのガイドがひとつの選択肢です——必須ではありません。',
@@ -504,7 +543,14 @@ const localeCopies: Record<Locale, ToolLocaleCopy> = {
     },
   },
   ko: {
-    shell: { backLabel: '영성 허브로 돌아가기', eyebrow: '오라클 도구 실험실' },
+    shell: {
+      backLabel: '영성 허브로 돌아가기',
+      eyebrow: '오라클 도구 실험실',
+      feedbackAriaLabel: '피드백 요청',
+      feedbackKicker: '여러분의 의견',
+      feedbackBody: '이 결과가 명확하고 도움이 되었나요? 공감된 부분이나 개선할 점을 알려주세요.',
+      feedbackAction: '의견 남기기',
+    },
     consult: {
       title: '더 깊이 탐색하고 싶으신가요?',
       body: '이 결과는 성찰의 출발점입니다. 더 깊이 대화하고 싶다면 플랫폼 가이드가 하나의 선택지입니다——필수는 아닙니다.',

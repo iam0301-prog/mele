@@ -3157,6 +3157,16 @@ body::before {
   transform: translateY(-1px);
 }
 
+/* .mag-tool-page 底下同 class/element 特異度的基底規則有 !important（見上方 11946 行一帶），
+   !important 不看先後順序一律蓋過沒有 !important 的宣告，導致 is-active 選中態的
+   border/background 被蓋回未選中樣式。這裡補 !important 讓選中態在紙感工具頁也保留可見。 */
+.mag-tool-page .tarot-style-grid button.is-active,
+.mag-tool-page .rune-material-grid button.is-active {
+  border-color: var(--mag-accent) !important;
+  background: var(--mag-wash) !important;
+  transform: translateY(-1px);
+}
+
 .tarot-style-grid strong,
 .rune-material-grid strong {
   color: #f4ead2;
@@ -11515,23 +11525,16 @@ footer {
   color: var(--mag-accent);
 }
 
-/* ---- A3 工具頁共用外框：ToolShell / ConsultCTA / ResultNextSteps ---- */
+/* ---- A3 工具頁共用外框：ToolShell / ConsultCTA / ResultNextSteps ----
+   階段 3 更新：原本這裡有一段「就地深色 token 過渡機制」，是階段 2 只有塔羅／生命靈數
+   兩頁整頁換紙感、其餘六頁 body 仍固定深藍夜空底時的權宜寫法（`.mag-tool-shell` 本身
+   就地覆寫成深色字面值，只有 `.mag-tool-page .mag-tool-shell` 才蓋回隨系統深淺切換的版本）。
+   階段 3 已把其餘六個工具頁全部改成 `themed`（八個工具頁都套 `.mag-tool-page`），
+   `ToolShell`／`ConsultCTA` 只會在工具頁使用、且一定被 `.mag-tool-page` 包住（已用
+   Grep 確認全站沒有其他頁面單獨引用 `.mag-tool-shell`），過渡機制已無存在必要，
+   直接讓 `.mag-tool-shell` 使用隨系統淺/深色切換的正常 token 值。 */
 .mag-tool-shell {
   font-family: var(--mag-font-sans);
-  /* 其餘六個工具頁的 body 目前仍是固定深藍夜空底（未整頁換色，留階段 3）。
-     這裡把 chrome 用到的 --mag-* token 就地覆寫成深色版數值（不隨系統淺色模式變白），
-     避免墨色字/茜紅在深藍底上讀不到。塔羅／生命靈數（.mag-tool-page 包住的整頁換色版）
-     在下面用更高特異度規則蓋回正常會隨系統深淺切換的版本。 */
-  --mag-paper: #17171B;
-  --mag-ink: #ECEAE3;
-  --mag-ink-soft: #A7A5A0;
-  --mag-hair: #37363E;
-  --mag-accent: #D8654F;
-  --mag-accent-deep: #E58B77;
-  --mag-wash: #1F1F25;
-}
-
-.mag-tool-page .mag-tool-shell {
   --mag-paper: #FBFAF5;
   --mag-ink: #1B1B21;
   --mag-ink-soft: #4C4B52;
@@ -11542,7 +11545,7 @@ footer {
 }
 
 @media (prefers-color-scheme: dark) {
-  .mag-tool-page .mag-tool-shell {
+  .mag-tool-shell {
     --mag-paper: #17171B;
     --mag-ink: #ECEAE3;
     --mag-ink-soft: #A7A5A0;
@@ -11922,8 +11925,9 @@ footer {
 /* ============================================================
    2026-07-05 CEO 實機走查回饋：塔羅／生命靈數兩頁「整頁」都要換紙感風，
    不能只換 header/footer 而 hero/表單卡/選卡還是舊深藍夜空底。
-   `.mag-tool-page`：ToolShell 的 `themed` prop 開啟時才包這層（目前只有塔羅、生命靈數兩頁使用）。
-   其餘六工具頁沒有這個 class，完全不受影響，維持原本舊深藍風待階段 3。
+   `.mag-tool-page`：ToolShell 的 `themed` prop 開啟時才包這層。
+   階段 3 更新：其餘六個工具頁（八字/紫微/占星/人類圖/瑪雅/盧恩）已全部改用 `themed`，
+   八個工具頁現在都套這層紙感白底／深色 `#17171B`。
    ============================================================ */
 .mag-tool-page {
   min-height: 100vh;
@@ -11948,7 +11952,8 @@ footer {
 .mag-tool-page .birth-inputs,
 .mag-tool-page .tool-loading-ritual,
 .mag-tool-page .mele-svg-wrap,
-.mag-tool-page .tarot-style-grid button {
+.mag-tool-page .tarot-style-grid button,
+.mag-tool-page .rune-material-grid button {
   background: var(--mag-wash) !important;
   border-color: var(--mag-hair) !important;
   box-shadow: none !important;
@@ -12095,5 +12100,301 @@ footer {
 main:has(.mag-tool-page) + footer {
   margin-top: 0;
   padding-top: 4rem;
+}
+
+/* ============================================================
+   階段 3：老師頁（app/teachers/ 列表＋個人頁）改「客座作者」雜誌卡片風。
+   只動呈現層 class／樣式，排序邏輯、資料抓取、篩選流程完全未動（見 page.tsx 註解）。
+   `.mag-teachers-page` 只在 app/teachers/ 底下使用，不影響其他頁面。
+   ============================================================ */
+.mag-teachers-page {
+  min-height: 100vh;
+  background: var(--mag-paper);
+  color: var(--mag-ink);
+  font-family: var(--mag-font-sans);
+}
+
+.mag-teachers-page__kicker {
+  color: var(--mag-accent);
+}
+
+.mag-teachers-page__title {
+  font-family: var(--mag-font-serif);
+  font-weight: 600;
+  color: var(--mag-ink);
+  letter-spacing: 0.06em;
+}
+
+.mag-teachers-page__subtitle {
+  color: var(--mag-ink-soft);
+}
+
+/* .mele-section-title/.mele-section-subtitle 是舊深色卡片設計（珊瑚色字／白字60%），
+   老師頁面板已改紙白底，白字60%在紙白上幾乎看不見，這裡覆寫成紙感文字色，維持可讀性。 */
+.mag-teachers-page .mele-section-title {
+  color: var(--mag-accent) !important;
+}
+
+.mag-teachers-page .mele-section-subtitle {
+  color: var(--mag-ink-soft) !important;
+}
+
+.mag-teachers-page__body {
+  color: var(--mag-ink-soft);
+}
+
+.mag-teachers-page .mele-btn-primary {
+  background: var(--mag-ink) !important;
+  color: var(--mag-paper) !important;
+  box-shadow: none !important;
+}
+
+.mag-teachers-page .mele-btn-primary:hover {
+  background: var(--mag-accent-deep) !important;
+}
+
+.mag-teachers-page .mele-btn-secondary {
+  border-color: var(--mag-hair) !important;
+  color: var(--mag-ink) !important;
+  background: transparent !important;
+}
+
+.mag-teachers-page__panel {
+  background: var(--mag-paper) !important;
+  border: 1px solid var(--mag-hair) !important;
+  box-shadow: none !important;
+}
+
+.mag-teachers-page__filter-chip {
+  border: 1px solid var(--mag-hair);
+  background: transparent;
+  color: var(--mag-ink-soft);
+  border-radius: 999px;
+  min-height: 44px;
+}
+
+.mag-teachers-page__filter-chip.is-active {
+  border-color: var(--mag-accent);
+  background: var(--mag-accent);
+  color: var(--mag-paper);
+  font-weight: 600;
+}
+
+.mag-teachers-page__notice {
+  border: 1px solid var(--mag-hair) !important;
+  background: var(--mag-wash) !important;
+  color: var(--mag-ink-soft) !important;
+}
+
+/* 客座作者卡片：紙感邊框＋明體姓名，取代原本深藍金框卡片 */
+.mag-author-card {
+  position: relative;
+  display: block;
+  border-radius: 14px;
+  border: 1px solid var(--mag-hair);
+  background: var(--mag-paper);
+  padding: 24px;
+  color: inherit;
+  text-decoration: none;
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.mag-author-card:hover,
+.mag-author-card:focus-visible {
+  border-color: var(--mag-accent);
+  transform: translateY(-2px);
+}
+
+.mag-author-card__badge {
+  position: absolute;
+  right: 12px;
+  top: 12px;
+  border: 1px solid var(--mag-hair);
+  background: var(--mag-wash);
+  color: var(--mag-ink-soft);
+  border-radius: 999px;
+  padding: 2px 10px;
+  font-size: 10px;
+  letter-spacing: 0.05em;
+}
+
+.mag-author-card__avatar {
+  margin: 0 auto 12px;
+  display: flex;
+  height: 80px;
+  width: 80px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: var(--mag-wash);
+  border: 1px solid var(--mag-hair);
+  font-family: var(--mag-font-serif);
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--mag-accent);
+}
+
+.mag-author-card__name {
+  font-family: var(--mag-font-serif);
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--mag-ink);
+  text-align: center;
+}
+
+.mag-author-card__title {
+  color: var(--mag-ink-soft);
+  text-align: center;
+}
+
+.mag-author-card__rating {
+  color: var(--mag-accent);
+  text-align: center;
+}
+
+.mag-author-card__tags {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+}
+
+.mag-author-card__tag {
+  border: 1px solid var(--mag-hair);
+  border-radius: 6px;
+  color: var(--mag-ink-soft);
+  padding: 2px 8px;
+  font-size: 11px;
+}
+
+.mag-author-card__quote {
+  color: var(--mag-ink-soft);
+  text-align: center;
+}
+
+.mag-author-card__action {
+  border-top: 1px solid var(--mag-hair);
+  color: var(--mag-accent);
+  text-align: center;
+}
+
+/* 個人詳情頁 */
+.mag-author-detail__back {
+  color: var(--mag-ink-soft);
+  text-decoration: none;
+}
+
+.mag-author-detail__back:hover {
+  color: var(--mag-accent);
+}
+
+.mag-author-detail__avatar {
+  background: var(--mag-wash) !important;
+  color: var(--mag-accent) !important;
+  border: 1px solid var(--mag-hair);
+  font-family: var(--mag-font-serif);
+}
+
+.mag-author-detail__name {
+  font-family: var(--mag-font-serif);
+  color: var(--mag-ink);
+  letter-spacing: 0.04em;
+}
+
+.mag-author-detail__quote {
+  border-left: 4px solid var(--mag-accent) !important;
+  background: var(--mag-wash) !important;
+  color: var(--mag-ink) !important;
+}
+
+@media (max-width: 480px) {
+  .mag-author-card,
+  .mag-teachers-page__panel {
+    padding: 18px;
+  }
+}
+
+/* ============================================================
+   階段 3：每日儀式頁（LocalizedDailyClient）改紙感風格。
+   沿用 .mag-tool-page 作用域（同塔羅/生命靈數），.ritual-* 是舊深色卡片 class，
+   這裡只在 .mag-daily-page 作用域內覆寫顏色/背景，不動抽卡邏輯與 localStorage 行為。
+   ============================================================ */
+.mag-daily-page .ritual-hero,
+.mag-daily-page .ritual-panel {
+  border: 1px solid var(--mag-hair);
+  background: var(--mag-wash);
+  box-shadow: none;
+  backdrop-filter: none;
+}
+
+.mag-daily-page .ritual-hero::before,
+.mag-daily-page .ritual-panel::before {
+  border-color: var(--mag-hair);
+}
+
+.mag-daily-page .ritual-kicker {
+  color: var(--mag-accent) !important;
+}
+
+.mag-daily-page__title {
+  margin-top: 16px;
+  color: var(--mag-ink) !important;
+  font-family: var(--mag-font-serif);
+}
+
+.mag-daily-page__body {
+  color: var(--mag-ink-soft) !important;
+}
+
+.mag-daily-page .ritual-line-link {
+  color: var(--mag-accent) !important;
+}
+
+.mag-daily-page__panel {
+  color: var(--mag-ink);
+}
+
+.mag-daily-page__card {
+  border: 1px solid var(--mag-hair);
+  background: var(--mag-paper);
+}
+
+.mag-daily-page__card-title {
+  color: var(--mag-accent);
+  font-family: var(--mag-font-serif);
+}
+
+.mag-daily-page__link {
+  color: var(--mag-ink-soft);
+  text-decoration: underline;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}
+
+.mag-daily-page__link:hover {
+  color: var(--mag-accent);
+}
+
+/* 修正：.mele-btn-secondary 是舊深色卡片設計（白字疊白/[0.08]底），
+   在紙感（.mag-daily-page）紙白底上幾乎隱形（抽今日盧恩／看全部工具兩顆按鈕）。
+   改成雜誌風 ghost：紙底、墨字、髮絲線框，比照 .mag-teachers-page 已用的寫法。
+   disabled 狀態（今日已選其他工具）維持墨色但降到約 55% 透明度，確保仍可讀。 */
+.mag-daily-page .mele-btn-secondary {
+  background: transparent !important;
+  border-color: var(--mag-hair) !important;
+  color: var(--mag-ink) !important;
+}
+
+.mag-daily-page .mele-btn-secondary:hover:not(:disabled) {
+  border-color: var(--mag-accent) !important;
+  color: var(--mag-accent) !important;
+}
+
+.mag-daily-page .mele-btn-secondary:disabled {
+  color: color-mix(in srgb, var(--mag-ink) 55%, transparent) !important;
+  border-color: var(--mag-hair) !important;
+  opacity: 1;
+  cursor: not-allowed;
 }
 

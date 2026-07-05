@@ -40,17 +40,13 @@ export function ToolShell({
         <p className="mag-tool-shell__desc">{description}</p>
       </header>
 
-      <section className="mag-tool-beta-note" aria-label={locale === 'en' ? 'Feedback invitation' : '意見回報'}>
+      <section className="mag-tool-beta-note" aria-label={copy.shell.feedbackAriaLabel}>
         <div>
-          <span className="mag-label">{locale === 'en' ? 'YOUR FEEDBACK' : '歡迎回饋'}</span>
-          <p>
-            {locale === 'en'
-              ? 'Was this result clear and useful? Let us know what resonated or what could improve.'
-              : '這份結果對你有幫助嗎？歡迎告訴我們哪裡有感、哪裡還可以更好。'}
-          </p>
+          <span className="mag-label">{copy.shell.feedbackKicker}</span>
+          <p>{copy.shell.feedbackBody}</p>
         </div>
         <Link href={localizePath('/feedback', locale)}>
-          {locale === 'en' ? 'Share feedback' : '分享意見'}
+          {copy.shell.feedbackAction}
         </Link>
       </section>
 

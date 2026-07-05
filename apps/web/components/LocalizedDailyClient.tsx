@@ -84,62 +84,64 @@ export function LocalizedDailyClient({ locale }: { locale: Locale }) {
   }
 
   return (
-    <main className="min-h-screen bg-[radial-gradient(circle_at_top,#1a2438_0%,#070b12_46%,#030406_100%)]">
-      <section className="mx-auto flex max-w-6xl flex-col gap-6 px-4 pb-16 pt-20 md:px-8">
-        <div className="grid gap-6 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
-          <div className="ritual-hero">
-            <div className="ritual-kicker">{copy.kicker}</div>
-            <h1>{copy.title}</h1>
-            <p>{copy.body}</p>
-            <div className="ritual-hero__actions">
-              <button
-                type="button"
-                onClick={() => draw('tarot')}
-                className="mele-btn-primary"
-                disabled={loading !== null || (selected !== null && selected !== 'tarot')}
-              >
-                {draws.tarot ? copy.tarotDone : copy.tarot}
-              </button>
-              <button
-                type="button"
-                onClick={() => draw('runes')}
-                className="mele-btn-secondary"
-                disabled={loading !== null || (selected !== null && selected !== 'runes')}
-              >
-                {draws.runes ? copy.runesDone : copy.runes}
-              </button>
+    <div className="mag-tool-page mag-daily-page">
+      <main className="min-h-screen">
+        <section className="mx-auto flex max-w-6xl flex-col gap-6 px-4 pb-16 pt-20 md:px-8">
+          <div className="grid gap-6 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
+            <div className="ritual-hero">
+              <div className="mag-label ritual-kicker">{copy.kicker}</div>
+              <h1 className="mag-daily-page__title">{copy.title}</h1>
+              <p className="mag-daily-page__body">{copy.body}</p>
+              <div className="ritual-hero__actions">
+                <button
+                  type="button"
+                  onClick={() => draw('tarot')}
+                  className="mele-btn-primary"
+                  disabled={loading !== null || (selected !== null && selected !== 'tarot')}
+                >
+                  {draws.tarot ? copy.tarotDone : copy.tarot}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => draw('runes')}
+                  className="mele-btn-secondary"
+                  disabled={loading !== null || (selected !== null && selected !== 'runes')}
+                >
+                  {draws.runes ? copy.runesDone : copy.runes}
+                </button>
+              </div>
+              <p className="ritual-line-link mag-daily-page__body">{copy.oneChoice}</p>
             </div>
-            <p className="ritual-line-link">{copy.oneChoice}</p>
+
+            <aside className="ritual-panel mag-daily-page__panel">
+              <div className="mag-label ritual-kicker">{dateKey}</div>
+              <h2 className="mag-daily-page__title">{copy.resultTitle}</h2>
+              <p className="ritual-summary mag-daily-page__body">{copy.resultHint}</p>
+              <div className="mt-5 grid gap-3">
+                {copy.cards.map((card) => (
+                  <div key={card.title} className="mag-daily-page__card rounded-xl p-4">
+                    <strong className="mag-daily-page__card-title">{card.title}</strong>
+                    <p className="mag-daily-page__body mt-2 text-sm leading-relaxed">{card.body}</p>
+                  </div>
+                ))}
+              </div>
+            </aside>
           </div>
 
-          <aside className="ritual-panel">
-            <div className="ritual-kicker">{dateKey}</div>
-            <h2>{copy.resultTitle}</h2>
-            <p className="ritual-summary">{copy.resultHint}</p>
-            <div className="mt-5 grid gap-3">
-              {copy.cards.map((card) => (
-                <div key={card.title} className="rounded-xl border border-white/10 bg-white/[0.04] p-4">
-                  <strong className="text-accent">{card.title}</strong>
-                  <p className="mt-2 text-sm leading-relaxed text-white/70">{card.body}</p>
-                </div>
-              ))}
-            </div>
-          </aside>
-        </div>
+          {loading && <ToolLoading label={copy.loading} locale={locale} />}
+          {error && <ToolError message={error} locale={locale} />}
+          {active && <ToolResultSection kind={active.tool as DailyDrawTool} result={active} locale={locale} />}
 
-        {loading && <ToolLoading label={copy.loading} locale={locale} />}
-        {error && <ToolError message={error} locale={locale} />}
-        {active && <ToolResultSection kind={active.tool as DailyDrawTool} result={active} locale={locale} />}
-
-        <div className="flex flex-wrap gap-3">
-          <Link href={localizePath('/tools', locale)} className="mele-btn-secondary">
-            {getReleasePageCopy(locale).mobile.secondary}
-          </Link>
-          <Link href={localizePath('/teachers', locale)} className="home-ghost-link">
-            {getReleasePageCopy(locale).mobile.panels[2]?.action ?? 'Find guidance'}
-          </Link>
-        </div>
-      </section>
-    </main>
+          <div className="flex flex-wrap gap-3">
+            <Link href={localizePath('/tools', locale)} className="mele-btn-secondary">
+              {getReleasePageCopy(locale).mobile.secondary}
+            </Link>
+            <Link href={localizePath('/teachers', locale)} className="mag-daily-page__link">
+              {getReleasePageCopy(locale).mobile.panels[2]?.action ?? 'Find guidance'}
+            </Link>
+          </div>
+        </section>
+      </main>
+    </div>
   );
 }
