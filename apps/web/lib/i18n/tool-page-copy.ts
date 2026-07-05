@@ -76,6 +76,9 @@ type ToolLocaleCopy = {
     body: string;
     action: string;
   };
+  resultActions: {
+    changeAngle: string;
+  };
   autofill: {
     icon: string;
     fallbackFields: string;
@@ -365,8 +368,9 @@ const localeCopies: Record<Locale, ToolLocaleCopy> = {
     consult: {
       title: '想更深入了解自己？',
       body: '工具結果是一個參考起點。如果你想在感情、工作或人生方向上聊得更深，平台老師是一個選項，不是必須。',
-      action: '瀏覽 {label} 老師',
+      action: '需要時，找老師',
     },
+    resultActions: { changeAngle: '換個角度再看看' },
     autofill: {
       icon: '✓',
       fallbackFields: '常用出生資料',
@@ -386,8 +390,9 @@ const localeCopies: Record<Locale, ToolLocaleCopy> = {
     consult: {
       title: 'Want to explore further?',
       body: 'This result is a starting point for reflection. If you want a deeper conversation about your question, a platform guide is one option — not a requirement.',
-      action: 'Browse {label} guides',
+      action: 'Find a guide, if you need one',
     },
+    resultActions: { changeAngle: 'See it from another angle' },
     autofill: {
       icon: '✓',
       fallbackFields: 'profile data',
@@ -407,8 +412,9 @@ const localeCopies: Record<Locale, ToolLocaleCopy> = {
     consult: {
       title: 'Muốn khám phá sâu hơn?',
       body: 'Kết quả này là một điểm khởi đầu để suy ngẫm. Nếu bạn muốn trò chuyện sâu hơn, guide trên nền tảng là một lựa chọn — không bắt buộc.',
-      action: 'Xem guide {label}',
+      action: 'Cần thì tìm chuyên gia',
     },
+    resultActions: { changeAngle: 'Xem từ góc nhìn khác' },
     autofill: {
       icon: '✓',
       fallbackFields: 'hồ sơ',
@@ -438,8 +444,9 @@ const localeCopies: Record<Locale, ToolLocaleCopy> = {
     consult: {
       title: 'Ingin mengeksplorasi lebih jauh?',
       body: 'Hasil ini adalah titik awal untuk refleksi. Jika ingin percakapan lebih mendalam, guide di platform adalah salah satu pilihan — bukan keharusan.',
-      action: 'Lihat guide {label}',
+      action: 'Cari pemandu jika perlu',
     },
+    resultActions: { changeAngle: 'Lihat dari sudut lain' },
     autofill: {
       icon: '✓',
       fallbackFields: 'profil',
@@ -469,8 +476,9 @@ const localeCopies: Record<Locale, ToolLocaleCopy> = {
     consult: {
       title: 'もっと深く自分を知りたいですか？',
       body: 'この結果は振り返りのスタートポイントです。もっと深く話したい場合は、プラットフォームのガイドがひとつの選択肢です——必須ではありません。',
-      action: '{label} のガイドを見る',
+      action: '必要なときにガイドを探す',
     },
+    resultActions: { changeAngle: '別の角度から見てみる' },
     autofill: {
       icon: '✓',
       fallbackFields: 'プロフィール',
@@ -500,8 +508,9 @@ const localeCopies: Record<Locale, ToolLocaleCopy> = {
     consult: {
       title: '더 깊이 탐색하고 싶으신가요?',
       body: '이 결과는 성찰의 출발점입니다. 더 깊이 대화하고 싶다면 플랫폼 가이드가 하나의 선택지입니다——필수는 아닙니다.',
-      action: '{label} 가이드 보기',
+      action: '필요할 때 가이드 찾기',
     },
+    resultActions: { changeAngle: '다른 시각으로 보기' },
     autofill: {
       icon: '✓',
       fallbackFields: '프로필',

@@ -37,8 +37,8 @@ export async function Header() {
   ];
 
   return (
-    <header className="site-header fixed left-0 right-0 top-0 z-[100] flex items-start justify-between gap-2 px-4 py-3">
-      <a href={`/${locale}`} className="header-brand-link">
+    <header className="mag-site-header fixed left-0 right-0 top-0 z-[100] flex items-center justify-between gap-2 px-4 py-3">
+      <a href={`/${locale}`} className="mag-site-header__brand">
         <SeaStarLogo />
       </a>
 

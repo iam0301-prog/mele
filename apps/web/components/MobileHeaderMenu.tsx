@@ -75,7 +75,7 @@ export function MobileHeaderMenu({
   ];
 
   return (
-    <div ref={rootRef} className="relative ml-auto">
+    <div ref={rootRef} className="relative ml-auto mag-nav">
       <button
         type="button"
         className={`rounded-full border border-accent-dim bg-black/55 px-4 py-1.5 text-xs tracking-widest text-accent backdrop-blur transition hover:border-accent disabled:cursor-wait disabled:opacity-60 ${hydrated ? '' : 'pointer-events-none'}`}

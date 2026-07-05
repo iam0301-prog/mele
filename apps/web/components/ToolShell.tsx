@@ -10,6 +10,11 @@ interface Props {
   spec: string;
   locale?: Locale;
   children: ReactNode;
+  /**
+   * 階段 2 示範：塔羅、生命靈數兩頁整頁（含表單卡、選卡、按鈕）改全紙感 --mag-* 風，
+   * 而非只有 header/tool-beta-note。其餘六工具頁維持舊深藍風，不傳這個 prop。
+   */
+  themed?: boolean;
 }
 
 export function ToolShell({
@@ -18,25 +23,26 @@ export function ToolShell({
   description,
   locale = DEFAULT_LOCALE,
   children,
+  themed = false,
 }: Props) {
   const copy = getToolLocaleCopy(locale);
 
-  return (
-    <div className="tool-page-shell mx-auto px-5 py-8">
-      <Link href={localizePath('/tools', locale)} className="text-accent text-xs tracking-widest hover:opacity-80 transition-opacity">
+  const shell = (
+    <div className="tool-page-shell mag-tool-shell mx-auto px-5 py-8">
+      <Link href={localizePath('/tools', locale)} className="mag-tool-shell__back">
         {copy.shell.backLabel}
       </Link>
 
-      <header className="text-center pt-8 pb-6">
-        <div className="text-accent tracking-[0.35em] text-sm mb-4 opacity-70">{copy.shell.eyebrow}</div>
-        <h1 className="mele-h1">{title}</h1>
-        <div className="mele-subtitle">{subtitle}</div>
-        <p className="mt-5 text-white/70 text-sm leading-loose max-w-xl mx-auto">{description}</p>
+      <header className="mag-tool-shell__header">
+        <div className="mag-label mag-tool-shell__eyebrow">{copy.shell.eyebrow}</div>
+        <h1 className="mag-tool-shell__title">{title}</h1>
+        <div className="mag-tool-shell__subtitle">{subtitle}</div>
+        <p className="mag-tool-shell__desc">{description}</p>
       </header>
 
-      <section className="tool-beta-note" aria-label={locale === 'en' ? 'Feedback invitation' : '意見回報'}>
+      <section className="mag-tool-beta-note" aria-label={locale === 'en' ? 'Feedback invitation' : '意見回報'}>
         <div>
-          <span>{locale === 'en' ? 'YOUR FEEDBACK' : '歡迎回饋'}</span>
+          <span className="mag-label">{locale === 'en' ? 'YOUR FEEDBACK' : '歡迎回饋'}</span>
           <p>
             {locale === 'en'
               ? 'Was this result clear and useful? Let us know what resonated or what could improve.'
@@ -51,11 +57,16 @@ export function ToolShell({
       {children}
     </div>
   );
+
+  if (themed) {
+    return <div className="mag-tool-page">{shell}</div>;
+  }
+
+  return shell;
 }
 
 export function ConsultCTA({
   spec,
-  label,
   locale = DEFAULT_LOCALE,
 }: {
   spec: string;
@@ -63,14 +74,47 @@ export function ConsultCTA({
   locale?: Locale;
 }) {
   const copy = getToolLocaleCopy(locale).consult;
-  const action = copy.action.replace('{label}', label);
 
   return (
-    <div className="rounded-2xl border border-accent bg-gradient-to-br from-accent/[0.12] to-accent/[0.04] p-7 mt-8 text-center">
-      <div className="font-serif text-xl text-accent mb-3">{copy.title}</div>
-      <p className="text-white/85 text-sm leading-relaxed mb-5">{copy.body}</p>
-      <Link href={localizePath(`/teachers?spec=${encodeURIComponent(spec)}`, locale)} className="mele-btn-primary">
-        {action}
+    <div className="mag-consult">
+      <div className="mag-consult__title">{copy.title}</div>
+      <p className="mag-consult__body">{copy.body}</p>
+      <Link href={localizePath(`/teachers?spec=${encodeURIComponent(spec)}`, locale)} className="mag-consult__action">
+        {copy.action}
+      </Link>
+    </div>
+  );
+}
+
+/**
+ * 結果頁「旅程中繼站」文末的兩個溫和選項：①換個角度再看看（連到另一個工具） ②需要時，找老師。
+ * 階段 2 先只用在塔羅、生命靈數兩個示範頁；其餘工具仍沿用 ConsultCTA，階段 3 再鋪開。
+ */
+export function ResultNextSteps({
+  locale = DEFAULT_LOCALE,
+  spec,
+  alternateHref,
+  alternateLabel,
+}: {
+  locale?: Locale;
+  spec: string;
+  alternateHref: string;
+  alternateLabel: string;
+}) {
+  const copy = getToolLocaleCopy(locale);
+
+  return (
+    <div className="mag-result-actions">
+      <Link href={localizePath(alternateHref, locale)} className="mag-result-actions__link">
+        <span className="mag-label">{copy.resultActions.changeAngle}</span>
+        <strong>{alternateLabel}</strong>
+      </Link>
+      <Link
+        href={localizePath(`/teachers?spec=${encodeURIComponent(spec)}`, locale)}
+        className="mag-result-actions__link mag-result-actions__link--guide"
+      >
+        <span className="mag-label">{copy.consult.title}</span>
+        <strong>{copy.consult.action}</strong>
       </Link>
     </div>
   );

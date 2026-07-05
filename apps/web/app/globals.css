@@ -11335,6 +11335,10 @@ footer {
 
 .mag-notice a {
   flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
   border: 1px solid var(--mag-ink);
   border-radius: 999px;
   padding: 10px 18px;
@@ -11423,5 +11427,673 @@ footer {
     from { opacity: 0; transform: translateY(14px); }
     to { opacity: 1; transform: none; }
   }
+}
+
+/* ============================================================
+   2026-07-05 P1 改版階段 2：工具主線動線（全域外框 + 工具列表 + 結果頁示範）
+   影響：Header/Footer/MobileHeaderMenu（全站）、ToolShell/ConsultCTA（8 工具頁共用 chrome）、
+   工具列表頁、塔羅/生命靈數結果頁文末選項。其餘工具內文與老師排序邏輯不動。
+   ============================================================ */
+
+/* ---- A1/A2 全域外框：Header / Footer ---- */
+.mag-site-header {
+  background: color-mix(in srgb, var(--mag-paper) 92%, transparent);
+  border-bottom: 1px solid var(--mag-hair);
+  backdrop-filter: blur(10px);
+  min-height: 64px;
+}
+
+.mag-site-header__brand {
+  display: inline-flex;
+  align-items: center;
+  color: var(--mag-ink);
+  text-decoration: none;
+}
+
+.mag-site-header .sea-star-logo {
+  color: var(--mag-accent);
+}
+
+.mag-site-header .sea-star-logo__word span {
+  font-family: var(--mag-font-serif);
+  color: var(--mag-ink);
+  letter-spacing: 0.22em;
+}
+
+.mag-site-header .sea-star-logo__word small {
+  color: var(--mag-ink-soft);
+}
+
+.mag-nav > button {
+  min-height: 44px;
+  border-radius: 999px;
+  border: 1px solid var(--mag-hair);
+  background: var(--mag-paper);
+  color: var(--mag-ink);
+  font-family: var(--mag-font-sans);
+  letter-spacing: 0.2em;
+}
+
+.mag-nav > button:hover {
+  border-color: var(--mag-accent);
+  color: var(--mag-accent);
+}
+
+.mag-nav #mobile-header-menu {
+  background: var(--mag-paper);
+  border: 1px solid var(--mag-hair);
+  color: var(--mag-ink);
+  box-shadow: 0 12px 32px rgba(27, 27, 33, 0.16);
+}
+
+.mag-nav #mobile-header-menu a {
+  border-color: var(--mag-hair);
+  background: var(--mag-wash);
+  color: var(--mag-ink);
+}
+
+.mag-nav #mobile-header-menu a:hover {
+  border-color: var(--mag-accent);
+  color: var(--mag-accent);
+}
+
+.mag-site-footer {
+  color: var(--mag-ink-soft);
+  border-top: 1px solid var(--mag-hair);
+  background: var(--mag-paper);
+  font-family: var(--mag-font-sans);
+}
+
+.mag-site-footer__links a {
+  color: var(--mag-ink-soft);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.mag-site-footer__links a:hover,
+.mag-site-footer__links a:focus-visible {
+  color: var(--mag-accent);
+}
+
+/* ---- A3 工具頁共用外框：ToolShell / ConsultCTA / ResultNextSteps ---- */
+.mag-tool-shell {
+  font-family: var(--mag-font-sans);
+  /* 其餘六個工具頁的 body 目前仍是固定深藍夜空底（未整頁換色，留階段 3）。
+     這裡把 chrome 用到的 --mag-* token 就地覆寫成深色版數值（不隨系統淺色模式變白），
+     避免墨色字/茜紅在深藍底上讀不到。塔羅／生命靈數（.mag-tool-page 包住的整頁換色版）
+     在下面用更高特異度規則蓋回正常會隨系統深淺切換的版本。 */
+  --mag-paper: #17171B;
+  --mag-ink: #ECEAE3;
+  --mag-ink-soft: #A7A5A0;
+  --mag-hair: #37363E;
+  --mag-accent: #D8654F;
+  --mag-accent-deep: #E58B77;
+  --mag-wash: #1F1F25;
+}
+
+.mag-tool-page .mag-tool-shell {
+  --mag-paper: #FBFAF5;
+  --mag-ink: #1B1B21;
+  --mag-ink-soft: #4C4B52;
+  --mag-hair: #D9D6CC;
+  --mag-accent: #A63A2B;
+  --mag-accent-deep: #7C2B20;
+  --mag-wash: #F1EEE5;
+}
+
+@media (prefers-color-scheme: dark) {
+  .mag-tool-page .mag-tool-shell {
+    --mag-paper: #17171B;
+    --mag-ink: #ECEAE3;
+    --mag-ink-soft: #A7A5A0;
+    --mag-hair: #37363E;
+    --mag-accent: #D8654F;
+    --mag-accent-deep: #E58B77;
+    --mag-wash: #1F1F25;
+  }
+}
+
+.mag-tool-shell__back {
+  display: inline-block;
+  font-size: 12px;
+  letter-spacing: 0.25em;
+  color: var(--mag-ink-soft);
+  text-decoration: none;
+}
+
+.mag-tool-shell__back:hover,
+.mag-tool-shell__back:focus-visible {
+  color: var(--mag-accent);
+}
+
+.mag-tool-shell__header {
+  text-align: center;
+  padding: 32px 0 24px;
+  border-bottom: 1px solid var(--mag-hair);
+  margin-bottom: 24px;
+}
+
+.mag-tool-shell__eyebrow {
+  margin-bottom: 14px;
+  color: var(--mag-accent);
+}
+
+.mag-tool-shell__title {
+  margin: 0 0 8px;
+  font-family: var(--mag-font-serif);
+  font-size: clamp(30px, 5vw, 46px);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--mag-ink);
+}
+
+.mag-tool-shell__subtitle {
+  font-family: var(--mag-font-sans);
+  font-size: 12px;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: var(--mag-accent);
+}
+
+.mag-tool-shell__desc {
+  max-width: 34em;
+  margin: 18px auto 0;
+  color: var(--mag-ink-soft);
+  font-size: 15px;
+  line-height: 1.9;
+}
+
+.mag-tool-beta-note {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
+  padding: 16px 20px;
+  margin-bottom: 24px;
+  border: 1px solid var(--mag-hair);
+  border-radius: 12px;
+  background: var(--mag-wash);
+  color: var(--mag-ink-soft);
+  font-size: 13px;
+}
+
+.mag-tool-beta-note p {
+  margin: 4px 0 0;
+}
+
+.mag-tool-beta-note a {
+  color: var(--mag-accent);
+  font-weight: 700;
+  white-space: nowrap;
+  text-decoration: none;
+}
+
+.mag-tool-beta-note a:hover,
+.mag-tool-beta-note a:focus-visible {
+  text-decoration: underline;
+}
+
+.mag-consult {
+  margin-top: 32px;
+  padding: 28px;
+  border-top: 1px solid var(--mag-hair);
+  text-align: center;
+}
+
+.mag-consult__title {
+  font-family: var(--mag-font-serif);
+  font-size: 19px;
+  color: var(--mag-ink);
+  margin-bottom: 8px;
+}
+
+.mag-consult__body {
+  max-width: 34em;
+  margin: 0 auto 16px;
+  color: var(--mag-ink-soft);
+  font-size: 13px;
+  line-height: 1.8;
+}
+
+.mag-consult__action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 10px 26px;
+  border: 1px solid var(--mag-ink);
+  border-radius: 999px;
+  color: var(--mag-ink);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-decoration: none;
+}
+
+.mag-consult__action:hover,
+.mag-consult__action:focus-visible {
+  color: var(--mag-paper);
+  background: var(--mag-ink);
+}
+
+/* ---- C2 結果文末兩個溫和選項 ---- */
+.mag-result-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 28px;
+  padding-top: 24px;
+  border-top: 1px solid var(--mag-hair);
+}
+
+.mag-result-actions__link {
+  flex: 1 1 240px;
+  padding: 18px 20px;
+  border: 1px solid var(--mag-hair);
+  border-radius: 12px;
+  color: var(--mag-ink);
+  text-decoration: none;
+  transition: border-color 0.2s ease;
+}
+
+.mag-result-actions__link .mag-label {
+  display: block;
+  margin-bottom: 6px;
+}
+
+.mag-result-actions__link strong {
+  font-family: var(--mag-font-serif);
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.mag-result-actions__link:hover,
+.mag-result-actions__link:focus-visible {
+  border-color: var(--mag-accent);
+}
+
+.mag-result-actions__link--guide .mag-label,
+.mag-result-actions__link--guide strong {
+  color: var(--mag-accent);
+}
+
+/* ---- C1 結果共用外框：塔羅／生命靈數示範改雜誌短文式 ---- */
+.tool-result-card--tarot,
+.tool-result-card--numerology {
+  font-family: var(--mag-font-sans);
+}
+
+.tool-result-card--tarot h2,
+.tool-result-card--tarot h3,
+.tool-result-card--numerology h2,
+.tool-result-card--numerology h3 {
+  font-family: var(--mag-font-serif) !important;
+  letter-spacing: 0.04em !important;
+}
+
+.tool-result-card--tarot > p:last-of-type,
+.tool-result-card--numerology > p:last-of-type {
+  margin-top: 20px !important;
+  padding-top: 16px !important;
+  border-top: 1px solid var(--mag-hair) !important;
+}
+
+/* ---- B 工具列表頁「雜誌目錄」 ---- */
+.mag-tools-page {
+  min-height: 100vh;
+  padding: clamp(84px, 9vw, 118px) clamp(18px, 4vw, 56px) 64px;
+  background: var(--mag-paper);
+  color: var(--mag-ink);
+  font-family: var(--mag-font-sans);
+  line-height: 1.75;
+}
+
+.mag-tools-page__section {
+  width: min(1080px, 100%);
+  margin: 0 auto;
+  padding: clamp(32px, 5vw, 56px) 0;
+  border-bottom: 1px solid var(--mag-hair);
+}
+
+.mag-tools-page__section:last-child {
+  border-bottom: 0;
+}
+
+.mag-tools-page__head h1,
+.mag-tools-page__head h2 {
+  margin: 10px 0 12px;
+  font-family: var(--mag-font-serif);
+  font-size: clamp(28px, 4.6vw, 42px);
+  font-weight: 600;
+  color: var(--mag-ink);
+}
+
+.mag-tools-page__head p {
+  max-width: 42em;
+  color: var(--mag-ink-soft);
+  font-size: var(--mag-size-body);
+}
+
+.mag-tools-page__featured {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+  margin-top: 28px;
+}
+
+.mag-tools-page__featured-card {
+  display: block;
+  padding: 24px;
+  border: 1px solid var(--mag-hair);
+  border-radius: 14px;
+  color: inherit;
+  text-decoration: none;
+  transition: border-color 0.2s ease;
+}
+
+.mag-tools-page__featured-card:hover,
+.mag-tools-page__featured-card:focus-visible {
+  border-color: var(--mag-accent);
+}
+
+.mag-tools-page__featured-card strong {
+  display: block;
+  margin: 8px 0 6px;
+  font-family: var(--mag-font-serif);
+  font-size: 24px;
+  color: var(--mag-ink);
+}
+
+.mag-tools-page__featured-card p {
+  margin: 0;
+  color: var(--mag-ink-soft);
+  font-size: 14px;
+}
+
+.mag-tools-page__directory {
+  list-style: none;
+  margin: 28px 0 0;
+  padding: 0;
+  columns: 2;
+  column-gap: 64px;
+}
+
+.mag-tools-page__directory li {
+  break-inside: avoid;
+  border-bottom: 1px solid var(--mag-hair);
+}
+
+.mag-tools-page__directory a {
+  display: flex;
+  gap: 20px;
+  padding: 16px 0;
+  color: inherit;
+  text-decoration: none;
+}
+
+.mag-tools-page__directory a:hover,
+.mag-tools-page__directory a:focus-visible {
+  color: var(--mag-accent);
+}
+
+.mag-tools-page__directory-no {
+  font-family: var(--mag-font-serif);
+  font-style: italic;
+  font-size: 18px;
+  color: var(--mag-accent);
+  min-width: 2ch;
+  font-variant-numeric: tabular-nums;
+}
+
+.mag-tools-page__directory b {
+  display: block;
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--mag-ink);
+}
+
+.mag-tools-page__directory small {
+  color: var(--mag-ink-soft);
+  font-size: 13px;
+}
+
+.mag-tools-page__strip {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.mag-tools-page__strip p {
+  margin: 6px 0 0;
+  max-width: 42em;
+  color: var(--mag-ink-soft);
+  font-size: 13px;
+}
+
+.mag-tools-page__strip a {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  border: 1px solid var(--mag-ink);
+  border-radius: 999px;
+  padding: 10px 22px;
+  color: var(--mag-ink);
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.mag-tools-page__strip a:hover,
+.mag-tools-page__strip a:focus-visible {
+  color: var(--mag-paper);
+  background: var(--mag-ink);
+}
+
+@media (max-width: 720px) {
+  .mag-tools-page__featured {
+    grid-template-columns: 1fr;
+  }
+
+  .mag-tools-page__directory {
+    columns: 1;
+  }
+
+  .mag-tools-page__strip {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .mag-tools-page__strip a {
+    width: 100%;
+    text-align: center;
+  }
+
+  .mag-result-actions {
+    flex-direction: column;
+  }
+}
+
+/* ============================================================
+   2026-07-05 CEO 實機走查回饋：塔羅／生命靈數兩頁「整頁」都要換紙感風，
+   不能只換 header/footer 而 hero/表單卡/選卡還是舊深藍夜空底。
+   `.mag-tool-page`：ToolShell 的 `themed` prop 開啟時才包這層（目前只有塔羅、生命靈數兩頁使用）。
+   其餘六工具頁沒有這個 class，完全不受影響，維持原本舊深藍風待階段 3。
+   ============================================================ */
+.mag-tool-page {
+  min-height: 100vh;
+  background: var(--mag-paper);
+  color: var(--mag-ink);
+  font-family: var(--mag-font-sans);
+}
+
+/* 表單卡與結果卡共用 .mele-card：背景/邊框改紙感，文字統一收斂成墨色，
+   避免逐一覆寫 result-insights/point-unlock/personal-reading/member-resonance 內數十個
+   硬編碼 rgba(255,255,255,x) 白字（那是舊深底假設下的寫法）。 */
+.mag-tool-page .mele-card,
+.mag-tool-page .mele-card * {
+  color: var(--mag-ink) !important;
+}
+
+.mag-tool-page .mele-card,
+.mag-tool-page .member-resonance,
+.mag-tool-page .result-insights,
+.mag-tool-page .personal-reading,
+.mag-tool-page .point-unlock,
+.mag-tool-page .birth-inputs,
+.mag-tool-page .tool-loading-ritual,
+.mag-tool-page .mele-svg-wrap,
+.mag-tool-page .tarot-style-grid button {
+  background: var(--mag-wash) !important;
+  border-color: var(--mag-hair) !important;
+  box-shadow: none !important;
+}
+
+/* 眉標/kicker 類文字保留茜紅重點色（換成對比通過的 --mag-accent，不是舊金色） */
+.mag-tool-page [class$="__eyebrow"],
+.mag-tool-page [class*="__header"] > span:first-child,
+.mag-tool-page [class$="__kicker"],
+.mag-tool-page .text-accent {
+  color: var(--mag-accent) !important;
+}
+
+.mag-tool-page .mele-input,
+.mag-tool-page .mele-input option {
+  background-color: var(--mag-paper) !important;
+  border-color: var(--mag-hair) !important;
+}
+
+.mag-tool-page .mele-label {
+  color: var(--mag-ink-soft) !important;
+}
+
+.mag-tool-page input[type='checkbox'] {
+  accent-color: var(--mag-accent);
+}
+
+/* Tailwind 半透明白字工具類（AutofillBanner／question 引言／disclaimer／錯誤提示）在紙感底改回墨色 */
+.mag-tool-page .text-white\/85,
+.mag-tool-page .text-white\/70,
+.mag-tool-page .text-white\/60,
+.mag-tool-page .text-white\/50,
+.mag-tool-page .text-white\/45,
+.mag-tool-page .text-white\/40 {
+  color: var(--mag-ink-soft) !important;
+}
+
+.mag-tool-page .text-rose-300 {
+  color: #9f1239 !important;
+}
+
+/* 深色模式下 .mag-tool-page 底色轉深藍黑，#9f1239 深紅在深底上對比不足；
+   換成較亮的玫瑰色，維持錯誤/警示可讀性。 */
+@media (prefers-color-scheme: dark) {
+  .mag-tool-page .text-rose-300 {
+    color: #f4a3a3 !important;
+  }
+}
+
+/* ============================================================
+   2026-07-06 CEO 第二輪走查：生命靈數「出生資料」表單卡（BirthInputs／DateOnlyField）
+   內部子元件（目前選擇橫條、西元年/月份/日期下拉、快速選時 chips）各自有自己的深底漸層，
+   不會繼承外層 .mele-card 的紙感背景，之前只蓋了 .birth-inputs 最外層，沒蓋到裡面的
+   __panel/__summary/__field/__select-card/__control，所以還是深灰黑一整塊。這裡逐一收斂。
+   ============================================================ */
+.mag-tool-page .birth-inputs__panel {
+  background: var(--mag-wash) !important;
+  border-color: var(--mag-hair) !important;
+  box-shadow: none !important;
+}
+
+.mag-tool-page .birth-inputs__panel::before {
+  border-color: var(--mag-hair) !important;
+}
+
+.mag-tool-page .birth-inputs__summary {
+  background: var(--mag-paper) !important;
+  border-color: var(--mag-hair) !important;
+}
+
+.mag-tool-page .birth-inputs__field,
+.mag-tool-page .birth-inputs__select-card,
+.mag-tool-page .birth-inputs__control {
+  background: var(--mag-paper) !important;
+  border-color: var(--mag-hair) !important;
+  box-shadow: none !important;
+  color-scheme: light;
+}
+
+.mag-tool-page .birth-inputs__select-card::after {
+  border-color: var(--mag-accent) !important;
+}
+
+.mag-tool-page .birth-inputs__select,
+.mag-tool-page .birth-inputs__select:focus,
+.mag-tool-page .birth-inputs__control {
+  color: var(--mag-ink) !important;
+}
+
+.mag-tool-page .birth-inputs__select option {
+  color: #101820 !important;
+  background: #f5efe1 !important;
+}
+
+.mag-tool-page .birth-inputs__control::-webkit-calendar-picker-indicator {
+  filter: none;
+  opacity: 0.68;
+}
+
+.mag-tool-page .birth-inputs__header span,
+.mag-tool-page .birth-inputs__field > span,
+.mag-tool-page .birth-inputs__select-card span,
+.mag-tool-page .birth-inputs__caption {
+  color: var(--mag-accent) !important;
+}
+
+.mag-tool-page .birth-inputs__chips button {
+  background: var(--mag-paper) !important;
+  border-color: var(--mag-hair) !important;
+}
+
+.mag-tool-page .birth-inputs__chips button.is-active,
+.mag-tool-page .birth-inputs__chips button:hover {
+  border-color: var(--mag-accent) !important;
+  background: var(--mag-accent) !important;
+  color: var(--mag-paper) !important;
+}
+
+/* ============================================================
+   2026-07-06 CEO 第三輪走查：
+   1) 「開始解讀」主按鈕還是舊珊瑚橘膠囊，塔羅/生命靈數兩頁改雜誌風主 CTA（墨底紙白字，hover 茜紅）。
+   2) 頁尾上方殘留一條深藍橫帶——Footer 的 mt-16 是 margin，margin 區塊落在 <main> 之外、
+      不會被 Footer 自己的紙白背景蓋到，body 固定深藍底就從這個縫隙露出來。
+   兩項都只在 .mag-tool-page 作用域生效，只影響塔羅/生命靈數，其餘六工具頁與其他頁面不動。
+   ============================================================ */
+.mag-tool-page .mele-btn-primary {
+  background: var(--mag-ink) !important;
+  color: var(--mag-paper) !important;
+  box-shadow: none !important;
+}
+
+.mag-tool-page .mele-btn-primary:hover:not(:disabled) {
+  background: var(--mag-accent-deep) !important;
+  box-shadow: none !important;
+}
+
+.mag-tool-page .mele-btn-primary:focus-visible {
+  outline: 2px solid var(--mag-accent);
+  outline-offset: 3px;
+}
+
+/* 把 footer 前面的留白從「main 外面的 margin」搬進「footer 自己的 padding」，
+   紙白背景就能整片蓋住，不再露出 body 的深藍夜空底。只在 main 裡有 .mag-tool-page 時生效。 */
+main:has(.mag-tool-page) + footer {
+  margin-top: 0;
+  padding-top: 4rem;
 }
 

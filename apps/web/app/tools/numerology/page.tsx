@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { ToolShell, ConsultCTA } from '@/components/ToolShell';
+import { ToolShell, ResultNextSteps } from '@/components/ToolShell';
 import { ToolLoading, ToolError } from '@/components/ToolFeedback';
 import { ToolResultSection } from '@/components/ToolResultSection';
 import { AutofillBanner } from '@/components/AutofillBanner';
@@ -15,6 +15,7 @@ import { getToolPageCopy } from '@/lib/i18n/tool-page-copy';
 export default function NumerologyPage() {
   const locale = useCurrentLocale();
   const copy = getToolPageCopy(locale, 'numerology');
+  const tarotCopy = getToolPageCopy(locale, 'tarot');
   const toast = useToast();
   const profile = useProfile();
   const [date, setDate] = useState('');
@@ -61,7 +62,7 @@ export default function NumerologyPage() {
   };
 
   return (
-    <ToolShell locale={locale} title={copy.title} subtitle={copy.subtitle} description={copy.description} spec={copy.spec}>
+    <ToolShell locale={locale} title={copy.title} subtitle={copy.subtitle} description={copy.description} spec={copy.spec} themed>
       <form onSubmit={onSubmit} className="mele-card" noValidate>
         <AutofillBanner locale={locale} show={autofilled} fields={copy.autofillFields} />
 
@@ -77,7 +78,12 @@ export default function NumerologyPage() {
       {result && !loading && (
         <>
           <ToolResultSection kind="numerology" result={result} locale={locale} />
-          <ConsultCTA locale={locale} spec={copy.spec} label={copy.title} />
+          <ResultNextSteps
+            locale={locale}
+            spec={copy.spec}
+            alternateHref="/tools/tarot"
+            alternateLabel={tarotCopy.title}
+          />
         </>
       )}
     </ToolShell>
