@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { DEFAULT_LOCALE, type Locale } from '@/lib/i18n/config';
 import { timezoneOffsetAt } from '@/lib/timezone';
 
@@ -586,6 +587,10 @@ export function BirthDateTimeFields({
   const copy = copyFor(locale);
   const resolvedDateLabel = dateLabel ?? copy.dateLabel;
   const resolvedTimeLabel = timeLabel ?? copy.timeLabel;
+  // 快速選時間有兩顆按鈕（例如「中午 12:00」與「未知 12:00」）共用同一個時間值，
+  // 只靠時間值判斷選取會讓兩顆同時亮起。改用「按了哪一顆」記住身分；
+  // 手動用時間選擇器調整時間時，清掉這個記憶，回到用值比對（跟原本行為一致，只是這種情境很少見）。
+  const [selectedQuickTimeIndex, setSelectedQuickTimeIndex] = useState<number | null>(null);
 
   return (
     <div className="birth-inputs birth-inputs--oracle">
@@ -609,7 +614,15 @@ export function BirthDateTimeFields({
           </div>
           <div className="birth-inputs__field birth-inputs__field--time">
             <span>{resolvedTimeLabel} *</span>
-            <TimeSegmentPicker value={time} onChange={onTimeChange} label={resolvedTimeLabel} copy={copy} />
+            <TimeSegmentPicker
+              value={time}
+              onChange={(value) => {
+                setSelectedQuickTimeIndex(null);
+                onTimeChange(value);
+              }}
+              label={resolvedTimeLabel}
+              copy={copy}
+            />
             <small>{time ? copy.timeSelected : copy.selectedTimePlaceholder}</small>
           </div>
         </div>
@@ -617,13 +630,26 @@ export function BirthDateTimeFields({
         <div className="birth-inputs__quick">
           <div className="birth-inputs__caption">{copy.quickTimeCaption}</div>
           <div className="birth-inputs__chips birth-inputs__chips--time">
-            {copy.quickTimes.map((item, index) => (
-              <button key={`${item.value}-${index}`} type="button" className={time === item.value ? 'is-active' : ''} onClick={() => onTimeChange(item.value)}>
-                <span>{item.label}</span>
-                <strong>{item.value}</strong>
-                <small>{item.hint}</small>
-              </button>
-            ))}
+            {copy.quickTimes.map((item, index) => {
+              const isSelected = selectedQuickTimeIndex === null
+                ? time === item.value
+                : selectedQuickTimeIndex === index;
+              return (
+                <button
+                  key={`${item.value}-${index}`}
+                  type="button"
+                  className={isSelected ? 'is-active' : ''}
+                  onClick={() => {
+                    setSelectedQuickTimeIndex(index);
+                    onTimeChange(item.value);
+                  }}
+                >
+                  <span>{item.label}</span>
+                  <strong>{item.value}</strong>
+                  <small>{item.hint}</small>
+                </button>
+              );
+            })}
           </div>
           <p className="birth-inputs__hint">{unknownTimeHint ?? copy.dateTimeBody}</p>
         </div>
