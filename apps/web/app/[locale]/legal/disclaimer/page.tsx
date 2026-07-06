@@ -26,5 +26,5 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function LocalizedDisclaimerPage({ params }: PageProps) {
   const locale = await resolveLocale(params);
   const copy = getReleasePageCopy(locale).legal.disclaimer;
-  return <LocalizedStaticPage locale={locale} copy={copy} primaryHref="/tools" secondaryHref="/teachers" />;
+  return <LocalizedStaticPage locale={locale} copy={copy} primaryHref="/tools" secondaryHref="/teachers" scopeClassName="mag-legal-page" />;
 }

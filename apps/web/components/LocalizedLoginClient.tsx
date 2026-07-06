@@ -354,7 +354,7 @@ export function LocalizedLoginClient({ locale }: { locale: Locale }) {
     : ['建立帳號', '驗證 Email', '開始每日儀式'];
 
   return (
-    <main className="auth-beta-page">
+    <main className="mag-account-page auth-beta-page">
       <section className="auth-beta-shell" aria-label="登入與註冊">
         <aside className="auth-beta-story">
           <p className="auth-beta-kicker">會員入口</p>

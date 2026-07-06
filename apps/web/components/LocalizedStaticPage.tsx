@@ -15,14 +15,18 @@ export function LocalizedStaticPage({
   copy,
   primaryHref,
   secondaryHref,
+  scopeClassName,
 }: {
   locale: Locale;
   copy: StaticPageCopy;
   primaryHref: string;
   secondaryHref: string;
+  /** 額外包一層 scope class（例如 "mag-legal-page"），只給指定頁面套紙感樣式，
+   * 不影響其他共用同一元件但沒傳這個 prop 的頁面（如 ar、mobile）。 */
+  scopeClassName?: string;
 }) {
   return (
-    <main className="home-page min-h-screen">
+    <main className={`home-page min-h-screen${scopeClassName ? ` ${scopeClassName}` : ''}`}>
       <section className="home-hero">
         <div className="home-hero__content">
           <div className="home-beta-badge">{copy.kicker}</div>

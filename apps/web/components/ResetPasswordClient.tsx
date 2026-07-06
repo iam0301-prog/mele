@@ -66,7 +66,7 @@ export function ResetPasswordClient({ locale }: { locale?: Locale }) {
   }
 
   return (
-    <main className="container mx-auto max-w-lg px-5 py-12">
+    <main className="mag-account-page container mx-auto max-w-lg px-5 py-12">
       <header className="pb-8 text-center">
         <div className="mb-5 text-base tracking-[0.5em] text-accent opacity-70">PASSWORD RESET</div>
         <h1 className="mb-2 font-serif text-4xl tracking-widest">設定新密碼</h1>

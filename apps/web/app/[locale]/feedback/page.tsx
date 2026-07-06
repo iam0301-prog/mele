@@ -96,7 +96,7 @@ export default async function FeedbackPage({ params }: PageProps) {
   const mailtoHref = `mailto:support@mele.app?subject=${encodeURIComponent('MELE feedback')}&body=${mailtoBody}`;
 
   return (
-    <main className="beta2-home public-feedback-page">
+    <main className="beta2-home public-feedback-page mag-feedback-page">
       <section className="beta2-public-panel public-feedback-hero" aria-label={c.title}>
         <div>
           <span className="beta2-panel-kicker">{c.eyebrow}</span>

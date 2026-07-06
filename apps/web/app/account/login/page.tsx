@@ -382,7 +382,7 @@ function LoginInner() {
   };
 
   return (
-    <div className="container mx-auto max-w-md px-5 py-12">
+    <div className="mag-account-page container mx-auto max-w-md px-5 py-12">
       <header className="pb-8 text-center">
         <div className="mb-5 text-base tracking-[0.5em] text-accent opacity-70">ACCOUNT PORTAL</div>
         <h1 className="mb-2 font-serif text-4xl tracking-widest">{mode === 'signup' ? '建立帳號' : '登入'}</h1>
@@ -632,7 +632,7 @@ function LoginInner() {
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={<div className="container mx-auto px-5 py-16 text-center text-white/60">正在讀取登入頁...</div>}>
+    <Suspense fallback={<div className="mag-account-page container mx-auto px-5 py-16 text-center">正在讀取登入頁...</div>}>
       <LoginInner />
     </Suspense>
   );

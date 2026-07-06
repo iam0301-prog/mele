@@ -11936,9 +11936,15 @@ footer {
   font-family: var(--mag-font-sans);
 }
 
-/* 表單卡與結果卡共用 .mele-card：背景/邊框改紙感，文字統一收斂成墨色，
-   避免逐一覆寫 result-insights/point-unlock/personal-reading/member-resonance 內數十個
-   硬編碼 rgba(255,255,255,x) 白字（那是舊深底假設下的寫法）。 */
+/* 表單卡與結果卡共用 .mele-card：背景/邊框改紙感，文字統一收斂成墨色。
+   2026-07-06 修正：上一輪「拿掉 `*` 改靠 CSS 繼承」的簡化是錯的——繼承只在子孫元素
+   「自己沒有設 color」時才生效；但 `.birth-inputs__header h3`（如「出生日期」大標）、
+   `.birth-inputs__summary strong`、`.result-insights__header h2` 等其實都各自寫死了
+   自己的 color（如 #f4ead2、rgba(255,255,255,0.94)），不會被祖先的 `.mele-card { color }`
+   蓋過去，只是沒有 `!important` 而已——所以移除萬用選擇器後這些字全部變成米黃/白色，
+   疊在紙感淺底上幾乎看不見（老闆回報「出生日期」標題看不到就是這個）。
+   萬用選擇器加回來，用 `!important` 蓋掉所有這類寫死的舊深底配色；下面幾條更精確的
+   （眉標/kicker、白字工具類等）specificity 較高，仍會照樣蓋在這條之上，不衝突。 */
 .mag-tool-page .mele-card,
 .mag-tool-page .mele-card * {
   color: var(--mag-ink) !important;
@@ -12096,8 +12102,17 @@ footer {
 }
 
 /* 把 footer 前面的留白從「main 外面的 margin」搬進「footer 自己的 padding」，
-   紙白背景就能整片蓋住，不再露出 body 的深藍夜空底。只在 main 裡有 .mag-tool-page 時生效。 */
-main:has(.mag-tool-page) + footer {
+   紙白背景就能整片蓋住，不再露出 body 的深藍夜空底。
+   根 layout（app/layout.tsx）的 <main> 包住每個頁面的 children；有些頁面元件自己又
+   回傳一層 <main>/<article>（例如 app/teachers/page.tsx 的 <main className="mag-teachers-page">、
+   法務直出頁的 <article className="mag-legal-page">），造成巢狀 main，但 :has() 不管巢狀幾層，
+   只要是「根 main 的子孫元素」帶有任一 .mag-* 頁面 scope class 就會命中，所以這裡用選擇器列表
+   一次涵蓋全部套過紙感改版的頁面 scope，不用每加一個新頁面就重複寫一條規則。
+   CEO 走查發現 /zh-TW/legal/privacy 頁尾上方露出深藍橫帶，就是這條規則當初只列了
+   .mag-tool-page，沒把後續階段新增的 .mag-teachers-page/.mag-account-page/.mag-legal-page/
+   .mag-feedback-page 一起納入，這輪一次擴大涵蓋範圍（.mag-daily-page 頁面本身也同時掛了
+   .mag-tool-page，理論上已有涵蓋，這裡一併列入純粹讓清單完整、方便之後查找）。 */
+main:has(.mag-tool-page, .mag-teachers-page, .mag-daily-page, .mag-account-page, .mag-legal-page, .mag-feedback-page, .mag-home, .mag-tools-page) + footer {
   margin-top: 0;
   padding-top: 4rem;
 }
@@ -12396,5 +12411,605 @@ main:has(.mag-tool-page) + footer {
   border-color: var(--mag-hair) !important;
   opacity: 1;
   cursor: not-allowed;
+}
+
+/* ============================================================
+   階段 4：邊角頁換紙感（登入頁 / 重設密碼頁 / 法務三頁 / 意見回報頁）。
+   做法比照階段 3（.mag-teachers-page／.mag-daily-page）：整頁包一層 scope class，
+   在 scope 下覆寫舊深藍底／白字的 mele-card、mele-btn-*、text-white/* 等 class。
+   只動呈現層 class／CSS，不動表單驗證、i18n 文案 key、Supabase 邏輯。
+   ============================================================ */
+
+/* --- 登入頁 app/account/login/page.tsx ＋ 重設密碼頁 ResetPasswordClient.tsx 共用 ---
+   這兩頁的 scope class 是掛在置中窄欄（container mx-auto max-w-md/max-w-lg）本身，
+   而不是掛在整頁滿版的 wrapper 上；若只設 background，桌機寬螢幕左右兩側會露出
+   body 的舊深藍底（body 本身仍是全站預設的深底，見檔案開頭 body{} 規則）。
+   用 box-shadow + clip-path 把紙白底「撐」到滿版寬度，同時不擠出橫向捲軸。 */
+.mag-account-page {
+  min-height: 100vh;
+  background: var(--mag-paper);
+  color: var(--mag-ink);
+  font-family: var(--mag-font-sans);
+  box-shadow: 0 0 0 100vmax var(--mag-paper);
+  clip-path: inset(0 -100vmax);
+}
+
+.mag-account-page .mele-card {
+  background: var(--mag-wash) !important;
+  border-color: var(--mag-hair) !important;
+  color: var(--mag-ink) !important;
+  box-shadow: none !important;
+}
+
+.mag-account-page .mele-input {
+  background-color: var(--mag-paper) !important;
+  border-color: var(--mag-hair) !important;
+  color: var(--mag-ink) !important;
+}
+
+.mag-account-page .mele-input option {
+  background-color: var(--mag-paper) !important;
+  color: var(--mag-ink) !important;
+}
+
+.mag-account-page .mele-label {
+  color: var(--mag-ink-soft) !important;
+}
+
+.mag-account-page .mele-btn-primary {
+  background: var(--mag-ink) !important;
+  color: var(--mag-paper) !important;
+  box-shadow: none !important;
+}
+
+.mag-account-page .mele-btn-primary:hover:not(:disabled) {
+  background: var(--mag-accent-deep) !important;
+}
+
+.mag-account-page .mele-btn-secondary {
+  background: transparent !important;
+  border-color: var(--mag-hair) !important;
+  color: var(--mag-ink) !important;
+}
+
+.mag-account-page .mele-btn-secondary:hover {
+  border-color: var(--mag-accent) !important;
+  color: var(--mag-accent) !important;
+}
+
+/* ACCOUNT PORTAL / PASSWORD RESET 眉標、分頁 active 狀態、連結，統一收斂成茜紅 */
+.mag-account-page .text-accent,
+.mag-account-page .text-accent-light {
+  color: var(--mag-accent) !important;
+}
+
+/* mele-subtitle（SIGN IN / SIGN UP / PASSWORD RESET）靠 @apply text-accent 拿金色，
+   同一個「.text-accent 打不到 mele-subtitle」問題，跟法務頁一樣單獨覆寫 */
+.mag-account-page .mele-subtitle {
+  color: var(--mag-accent) !important;
+}
+
+.mag-account-page .border-accent,
+.mag-account-page .border-accent-dim {
+  border-color: var(--mag-hair) !important;
+}
+
+/* 舊深底假設下的白字透明度階梯，紙白底上收斂成墨色／次要墨色 */
+.mag-account-page .text-white,
+.mag-account-page .text-white\/80,
+.mag-account-page .text-white\/70,
+.mag-account-page .text-white\/60,
+.mag-account-page .text-white\/58,
+.mag-account-page .text-white\/50,
+.mag-account-page .text-white\/45 {
+  color: var(--mag-ink-soft) !important;
+}
+
+.mag-account-page a.text-white\/60:hover,
+.mag-account-page button.text-white\/60:hover,
+.mag-account-page .hover\:text-white:hover {
+  color: var(--mag-ink) !important;
+}
+
+/* 錯誤提示（登入失敗／重設連結失效）：舊玫瑰色banner在紙白上維持可讀，只是把邊框/底色改成髮絲線＋淡washed底 */
+.mag-account-page .text-rose-200,
+.mag-account-page .text-rose-100 {
+  color: #9f1239 !important;
+}
+
+.mag-account-page .border-reverse\/50 {
+  border-color: var(--mag-hair) !important;
+}
+
+.mag-account-page .bg-reverse\/10 {
+  background: var(--mag-wash) !important;
+}
+
+/* 邀請碼提示 banner（cyan 系）改成茜紅系 washed 底，維持「重點提示」語意 */
+.mag-account-page .text-cyan-100 {
+  color: var(--mag-ink) !important;
+}
+
+.mag-account-page .border-cyan-300\/40 {
+  border-color: var(--mag-hair) !important;
+}
+
+.mag-account-page .bg-cyan-300\/\[0\.08\] {
+  background: var(--mag-wash) !important;
+}
+
+@media (prefers-color-scheme: dark) {
+  .mag-account-page .text-rose-200,
+  .mag-account-page .text-rose-100 {
+    /* 深底下 #9f1239 對比不足，換亮玫瑰色，比照 .mag-tool-page 深色模式做法 */
+    color: #fda4af !important;
+  }
+}
+
+/* --- CEO 走查回饋：/zh-TW/account/login 實際渲染的不是 app/account/login/page.tsx，
+   而是 app/[locale]/account/login/page.tsx → components/LocalizedLoginClient.tsx，
+   用完全不同的一套 auth-beta-* class（金藍配色，見約行 10306 起的基底規則）。
+   上一輪只改了 app/account/login/page.tsx（無 locale 前綴的舊路由），漏了這條真正會被
+   瀏覽器渲染的路徑，導致 CEO 看到的登入頁還是舊深藍＋金色。這裡補上 .mag-account-page
+   scope 對 auth-beta-* 的覆寫，重設密碼頁兩套路由都共用同一個 ResetPasswordClient，
+   本來就已經吃到 .mag-account-page，不用重覆處理。 --- */
+.mag-account-page.auth-beta-page,
+.mag-account-page .auth-beta-page {
+  background: var(--mag-paper) !important;
+  color: var(--mag-ink) !important;
+}
+
+.mag-account-page .auth-beta-story,
+.mag-account-page .auth-beta-card {
+  border-color: var(--mag-hair) !important;
+  background: var(--mag-wash) !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+}
+
+.mag-account-page .auth-beta-story::after {
+  display: none;
+}
+
+.mag-account-page .auth-beta-kicker {
+  border-color: var(--mag-hair) !important;
+  color: var(--mag-accent) !important;
+  background: var(--mag-wash) !important;
+}
+
+.mag-account-page .auth-beta-story h1 {
+  color: var(--mag-ink) !important;
+}
+
+.mag-account-page .auth-beta-lead {
+  color: var(--mag-ink-soft) !important;
+}
+
+.mag-account-page .auth-beta-flow__item {
+  border-color: var(--mag-hair) !important;
+  background: var(--mag-wash) !important;
+}
+
+.mag-account-page .auth-beta-flow__item span,
+.mag-account-page .auth-beta-path-number {
+  color: var(--mag-paper) !important;
+  background: var(--mag-accent) !important;
+}
+
+.mag-account-page .auth-beta-flow__item strong {
+  color: var(--mag-ink) !important;
+}
+
+.mag-account-page .auth-beta-status div {
+  border-color: var(--mag-hair) !important;
+  background: var(--mag-wash) !important;
+}
+
+.mag-account-page .auth-beta-status span,
+.mag-account-page .auth-beta-social span,
+.mag-account-page .auth-beta-form-head span {
+  color: var(--mag-accent) !important;
+}
+
+.mag-account-page .auth-beta-status strong {
+  color: var(--mag-ink) !important;
+}
+
+.mag-account-page .auth-beta-tabs {
+  border-color: var(--mag-hair) !important;
+  background: var(--mag-wash) !important;
+}
+
+.mag-account-page .auth-beta-tabs button {
+  color: var(--mag-ink-soft) !important;
+}
+
+.mag-account-page .auth-beta-tabs button.is-active {
+  color: var(--mag-paper) !important;
+  background: var(--mag-ink) !important;
+}
+
+.mag-account-page .auth-beta-form-head strong {
+  color: var(--mag-ink-soft) !important;
+}
+
+.mag-account-page .auth-beta-notice {
+  border-color: var(--mag-hair) !important;
+  color: var(--mag-ink) !important;
+  background: var(--mag-wash) !important;
+}
+
+.mag-account-page .auth-beta-notice.is-error {
+  border-color: #9f1239 !important;
+  color: #9f1239 !important;
+  background: var(--mag-wash) !important;
+}
+
+.mag-account-page .auth-beta-section label,
+.mag-account-page .auth-beta-details__grid label {
+  color: var(--mag-ink-soft) !important;
+}
+
+.mag-account-page .auth-beta-card .mele-input {
+  border-color: var(--mag-hair) !important;
+  background: var(--mag-paper) !important;
+  color: var(--mag-ink) !important;
+}
+
+.mag-account-page .auth-beta-details {
+  border-color: var(--mag-hair) !important;
+  background: var(--mag-wash) !important;
+}
+
+.mag-account-page .auth-beta-details summary {
+  color: var(--mag-accent) !important;
+}
+
+.mag-account-page .auth-beta-presets button {
+  border-color: var(--mag-hair) !important;
+  color: var(--mag-accent) !important;
+  background: var(--mag-wash) !important;
+}
+
+.mag-account-page .auth-beta-consent {
+  border-color: var(--mag-hair) !important;
+  color: var(--mag-ink-soft) !important;
+  background: var(--mag-wash) !important;
+}
+
+.mag-account-page .auth-beta-submit {
+  color: var(--mag-paper) !important;
+  background: var(--mag-ink) !important;
+  box-shadow: none !important;
+}
+
+.mag-account-page .auth-beta-submit:hover:not(:disabled) {
+  background: var(--mag-accent-deep) !important;
+}
+
+.mag-account-page .auth-beta-help button {
+  border-color: var(--mag-hair) !important;
+  color: var(--mag-accent) !important;
+  background: var(--mag-wash) !important;
+}
+
+.mag-account-page .auth-beta-local {
+  border-color: var(--mag-hair) !important;
+  color: var(--mag-ink) !important;
+  background: var(--mag-wash) !important;
+}
+
+.mag-account-page .auth-beta-social {
+  border-top-color: var(--mag-hair) !important;
+}
+
+.mag-account-page .auth-beta-social p {
+  color: var(--mag-ink-soft) !important;
+}
+
+.mag-account-page .auth-beta-social__buttons button {
+  border-color: var(--mag-hair) !important;
+  color: var(--mag-ink) !important;
+  background: var(--mag-wash) !important;
+}
+
+.mag-account-page .auth-beta-social__buttons button.is-disabled {
+  color: var(--mag-ink-soft) !important;
+  background: var(--mag-paper) !important;
+}
+
+@media (prefers-color-scheme: dark) {
+  .mag-account-page .auth-beta-notice.is-error {
+    /* 深底下 #9f1239 對比不足，換亮玫瑰色，比照上方 text-rose-200 深色模式做法 */
+    border-color: #fda4af !important;
+    color: #fda4af !important;
+  }
+}
+
+/* --- 法務三頁：實際盤點後發現有兩套實作，都套 .mag-legal-page scope class：
+   1) app/legal/disclaimer|privacy|tos/page.tsx（無 locale 前綴，實際完整法律文字，
+      各自獨立 JSX，沒有共用元件，用 .mele-card + text-white/NN 舊寫法，下面第二段覆寫）。
+   2) app/[locale]/legal/disclaimer|privacy|tos/page.tsx（共用 LocalizedStaticPage 元件，
+      是精簡版佔位文案，用 home-page/home-hero/home-quick-card 舊寫法，第一段覆寫；
+      scopeClassName="mag-legal-page" 只加在這三頁，不影響也用同元件的 ar / mobile 頁）。 --- */
+.mag-legal-page {
+  background: var(--mag-paper);
+  color: var(--mag-ink);
+  font-family: var(--mag-font-sans);
+  /* app/legal/*（無 locale 前綴）版是掛在置中窄欄 <article className="container mx-auto max-w-4xl">，
+     跟 .mag-account-page 一樣需要撐滿版寬避免桌機露出舊深藍底；
+     home-page 版本身已是滿版 main，這條疊加無害（該變體有 overflow-x:hidden 會裁掉多出的陰影）。 */
+  box-shadow: 0 0 0 100vmax var(--mag-paper);
+  clip-path: inset(0 -100vmax);
+}
+
+.mag-legal-page.home-page {
+  overflow-x: hidden;
+}
+
+.mag-legal-page .home-hero::before {
+  display: none;
+}
+
+.mag-legal-page .home-beta-badge {
+  border-color: var(--mag-hair);
+  color: var(--mag-accent);
+  background: var(--mag-wash);
+}
+
+.mag-legal-page .home-hero h1 {
+  color: var(--mag-ink);
+  font-family: var(--mag-font-serif);
+}
+
+.mag-legal-page .home-hero p,
+.mag-legal-page .home-section__header p {
+  color: var(--mag-ink-soft) !important;
+}
+
+.mag-legal-page .home-section__header h2 {
+  color: var(--mag-ink) !important;
+  font-family: var(--mag-font-serif);
+}
+
+.mag-legal-page .home-quick-card {
+  border-color: var(--mag-hair) !important;
+  background: var(--mag-wash) !important;
+}
+
+.mag-legal-page .home-quick-card:hover {
+  border-color: var(--mag-accent) !important;
+  background: var(--mag-wash) !important;
+  transform: translateY(-2px);
+}
+
+/* CEO 走查發現：.home-quick-card span（每張卡片重複顯示的 kicker，例如「隱私權」）
+   基底規則（約行 3630）是舊水藍色 rgba(106,183,199,.86)，跟 .home-beta-badge 分開一條規則，
+   之前只覆寫了 .home-beta-badge，漏了這個卡片內重複 kicker，這輪一起收斂成茜紅。 */
+.mag-legal-page .home-quick-card span {
+  color: var(--mag-accent) !important;
+}
+
+.mag-legal-page .home-quick-card h3 {
+  color: var(--mag-ink) !important;
+}
+
+.mag-legal-page .home-quick-card p {
+  color: var(--mag-ink-soft) !important;
+}
+
+.mag-legal-page .mele-btn-primary {
+  background: var(--mag-ink) !important;
+  color: var(--mag-paper) !important;
+  box-shadow: none !important;
+}
+
+.mag-legal-page .mele-btn-primary:hover:not(:disabled) {
+  background: var(--mag-accent-deep) !important;
+}
+
+.mag-legal-page .mele-btn-secondary {
+  background: transparent !important;
+  border-color: var(--mag-hair) !important;
+  color: var(--mag-ink) !important;
+}
+
+.mag-legal-page .mele-btn-secondary:hover {
+  border-color: var(--mag-accent) !important;
+  color: var(--mag-accent) !important;
+}
+
+/* app/legal/disclaimer|privacy|tos/page.tsx 實際盤點到的舊 class：
+   mele-subtitle（沿用共用定義，本來就是 text-accent）、text-white/50、text-white/72、
+   text-white/68、text-white/60、text-accent、text-accent-light、border-accent-dim、bg-black/25。 */
+.mag-legal-page .mele-card {
+  background: var(--mag-wash) !important;
+  border-color: var(--mag-hair) !important;
+  color: var(--mag-ink) !important;
+}
+
+.mag-legal-page .text-white\/72,
+.mag-legal-page .text-white\/68,
+.mag-legal-page .text-white\/60,
+.mag-legal-page .text-white\/50 {
+  color: var(--mag-ink-soft) !important;
+}
+
+.mag-legal-page .text-accent,
+.mag-legal-page .text-accent-light {
+  color: var(--mag-accent) !important;
+}
+
+.mag-legal-page .border-accent-dim {
+  border-color: var(--mag-hair) !important;
+}
+
+/* mele-subtitle 本身靠 @apply text-accent 拿金色（--accent，無深色變體），
+   .text-accent 覆寫打不到它（元素上沒有字面 text-accent class），這裡單獨覆寫。 */
+.mag-legal-page .mele-subtitle {
+  color: var(--mag-accent) !important;
+}
+
+.mag-legal-page .bg-black\/25 {
+  background: var(--mag-wash) !important;
+}
+
+/* --- 意見回報頁 app/[locale]/feedback/page.tsx：沿用 beta2-home 版型，
+   加一層 .mag-feedback-page 只覆寫顏色，版面（grid/panel 結構）不動。
+   class 名稱對照實際 page.tsx：beta2-public-panel（主要面板）、beta2-panel-kicker（眉標）、
+   beta2-path article（3 步驟卡片）、beta2-notice（處理原則提示）、feedback-template-card（範本卡）、
+   beta2-primary/secondary/ghost（按鈕）。 */
+.mag-feedback-page.beta2-home {
+  background: var(--mag-paper) !important;
+  color: var(--mag-ink) !important;
+}
+
+/* 基底規則（約行 9970）把 .beta2-panel-kicker 跟 .beta2-notice span（處理原則提示的小標）
+   寫在同一條規則裡share同一個水藍色，上一輪只覆寫了 .beta2-panel-kicker，漏了 .beta2-notice span，
+   CEO 走查看到頁尾「意見回報處理原則」小標還是水藍色，這輪一起收斂成茜紅。 */
+.mag-feedback-page .beta2-panel-kicker,
+.mag-feedback-page .beta2-notice span {
+  color: var(--mag-accent) !important;
+}
+
+.mag-feedback-page .beta2-public-panel h1,
+.mag-feedback-page .beta2-public-panel h2,
+.mag-feedback-page .public-feedback-hero h1,
+.mag-feedback-page .beta2-path h3,
+.mag-feedback-page .feedback-template-card span {
+  color: var(--mag-ink) !important;
+}
+
+.mag-feedback-page .beta2-public-panel p,
+.mag-feedback-page .beta2-path p,
+.mag-feedback-page .beta2-notice p,
+.mag-feedback-page .feedback-template-card pre {
+  color: var(--mag-ink-soft) !important;
+}
+
+.mag-feedback-page .beta2-public-panel,
+.mag-feedback-page .beta2-notice,
+.mag-feedback-page .beta2-path article,
+.mag-feedback-page .feedback-template-card {
+  background: var(--mag-wash) !important;
+  border: 1px solid var(--mag-hair) !important;
+  box-shadow: none !important;
+}
+
+.mag-feedback-page .beta2-path article > span:first-child {
+  background: var(--mag-accent) !important;
+  color: var(--mag-paper) !important;
+}
+
+.mag-feedback-page .beta2-primary {
+  background: var(--mag-ink) !important;
+  color: var(--mag-paper) !important;
+  box-shadow: none !important;
+}
+
+.mag-feedback-page .beta2-secondary,
+.mag-feedback-page .beta2-ghost,
+.mag-feedback-page .beta2-notice a {
+  background: transparent !important;
+  border: 1px solid var(--mag-hair) !important;
+  color: var(--mag-ink) !important;
+}
+
+.mag-feedback-page .beta2-secondary:hover,
+.mag-feedback-page .beta2-ghost:hover,
+.mag-feedback-page .beta2-notice a:hover {
+  border-color: var(--mag-accent) !important;
+  color: var(--mag-accent) !important;
+}
+
+/* ============================================================
+   2026-07-06 老闆回報：生命靈數結果頁「你可以先這樣理解」提示框、
+   「主軸／優勢／卡點／行動」四張小卡還是深藍灰漸層底，像污漬疊在紙感頁面上。
+   根因跟前幾輪同一類：member-resonance/result-insights/personal-reading/point-unlock
+   底下每一個 BEM 子區塊（__mirror、__grid article、__card、__card-button、__option、
+   __point、__balance、__claim、__fact、__member-prompt 等）都各自寫死自己的深底漸層，
+   之前只蓋了最外層一層，沒有窮舉到全部子區塊。這次一次把 grep 出來、四個結果面板
+   底下所有還在用深底 `background:` 的選擇器都列出來蓋掉，避免再一輪一輪補。
+   ============================================================ */
+.mag-tool-page .member-resonance__mirror,
+.mag-tool-page .member-resonance__grid article,
+.mag-tool-page .member-resonance__question,
+.mag-tool-page .result-insights__card,
+.mag-tool-page .result-insights__card-button,
+.mag-tool-page .result-insights__fact,
+.mag-tool-page .result-insights__member-prompt,
+.mag-tool-page .personal-reading__point,
+.mag-tool-page .personal-reading__focus,
+.mag-tool-page .point-unlock__option,
+.mag-tool-page .point-unlock__balance,
+.mag-tool-page .point-unlock__claim,
+.mag-tool-page .point-unlock__notice,
+.mag-tool-page .point-unlock__revealed-grid div {
+  background: var(--mag-wash) !important;
+  border-color: var(--mag-hair) !important;
+  box-shadow: none !important;
+}
+
+/* 卡片被選取/展開/已解鎖等強調狀態：改用茜紅邊框＋淺茜紅底標示重點，而不是原本的金色深底光暈 */
+.mag-tool-page .result-insights__card.is-active,
+.mag-tool-page .result-insights__card.is-resonant,
+.mag-tool-page .personal-reading__point.is-selected,
+.mag-tool-page .point-unlock__option.is-unlocked {
+  border-color: var(--mag-accent) !important;
+  background: color-mix(in srgb, var(--mag-accent) 8%, var(--mag-wash)) !important;
+  box-shadow: none !important;
+}
+
+.mag-tool-page .result-insights__expand,
+.mag-tool-page .result-insights__resonate {
+  background: var(--mag-paper) !important;
+  border-color: var(--mag-hair) !important;
+}
+
+/* ============================================================
+   2026-07-06 老闆回報：塔羅頁「目前採用正式 2D 視覺結果」提示看不到。
+   根因：`ReadingArStage.tsx`（塔羅/盧恩/人類圖/瑪雅牌卡展示，`.reading-ar__*` 系列，
+   完全獨立於 ToolResult.tsx）是 `ToolResultSection` 回傳的 Fragment 裡跟 `.mele-card`
+   平行的 <section>，不在 `.mele-card`底下，之前逐一覆寫 `.mele-card *` 都碰不到它。
+   `.reading-ar__scene`／`__stage`／`__carousel`／`__sculpture`／`__details`／
+   `__diagram-guide` 這些是刻意做的深色「展示台」（自帶深底+亮字，本身對比沒問題，art
+   本來就該是深的，不用動）。只有 `__copy`、`__viewer-state`、`__support` 這三種是
+   「半透明白字說明條」，沒有自己的深底陪襯，直接飄在頁面紙感底上，才會看不到——
+   這裡只收斂這三種。 */
+.mag-tool-page .reading-ar__copy h2,
+.mag-tool-page .reading-ar__support strong {
+  color: var(--mag-ink) !important;
+}
+
+.mag-tool-page .reading-ar__copy p,
+.mag-tool-page .reading-ar__support p,
+.mag-tool-page .reading-ar__support span {
+  color: var(--mag-ink-soft) !important;
+}
+
+.mag-tool-page .reading-ar__viewer-state,
+.mag-tool-page .reading-ar__support {
+  background: var(--mag-wash) !important;
+  border-color: var(--mag-hair) !important;
+  color: var(--mag-ink-soft) !important;
+}
+
+.mag-tool-page .reading-ar__viewer-state--ready,
+.mag-tool-page .reading-ar__support--ready {
+  border-color: #2d6a4f !important;
+  background: color-mix(in srgb, #2d6a4f 12%, var(--mag-wash)) !important;
+  color: #1c4632 !important;
+}
+
+.mag-tool-page .reading-ar__viewer-state--fallback {
+  border-color: var(--mag-accent) !important;
+  background: color-mix(in srgb, var(--mag-accent) 10%, var(--mag-wash)) !important;
+  color: var(--mag-accent-deep) !important;
+}
+
+.mag-tool-page .reading-ar__support--blocked {
+  border-color: #b8001f !important;
+  background: color-mix(in srgb, #b8001f 10%, var(--mag-wash)) !important;
+  color: #7a0016 !important;
 }
 
