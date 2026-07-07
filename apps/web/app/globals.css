@@ -11920,6 +11920,12 @@ footer {
   .mag-result-actions {
     flex-direction: column;
   }
+
+  /* 窄螢幕改直排（column）後，flex-basis 240px 會被當成高度用，兩張卡會變成 240px 高的
+     空白大方塊（換個角度看看／需要時找老師）。改回用 auto，讓卡片跟著文字內容自然縮高。 */
+  .mag-result-actions__link {
+    flex: 1 1 auto;
+  }
 }
 
 /* ============================================================
