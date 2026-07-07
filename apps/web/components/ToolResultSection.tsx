@@ -71,7 +71,7 @@ export function ToolResultSection({
   kind,
   result,
   showAr = true,
-  arFirst = false,
+  arFirst = true,
   locale = DEFAULT_LOCALE,
 }: {
   kind: CalcTool;
@@ -83,7 +83,9 @@ export function ToolResultSection({
   const shouldRenderVisualStage = showAr && AR_STAGE_ENABLED[kind];
   const ReadingArStage = READING_AR_STAGES[locale] ?? READING_AR_STAGES[DEFAULT_LOCALE];
   const arStage = shouldRenderVisualStage ? <ReadingArStage kind={kind} result={result} /> : null;
-  const shouldShowArFirst = arFirst || kind !== 'tarot';
+  // 塔羅原本被排除在「AR/牌卡圖優先」之外（會排在文字解讀最後面，要滑到底才看得到牌）。
+  // 老闆要求塔羅要在最上面就看到牌，所以拿掉這個排除，預設所有工具（含塔羅）都先看視覺結果再看文字解讀。
+  const shouldShowArFirst = arFirst;
 
   return (
     <>

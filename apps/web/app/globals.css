@@ -13019,3 +13019,59 @@ main:has(.mag-tool-page, .mag-teachers-page, .mag-daily-page, .mag-account-page,
   color: #7a0016 !important;
 }
 
+/* ============================================================
+   2026-07-07 老闆回報：紫微「先看這三件事」引導區塊字看不到（灰底灰字）。
+   根因跟前幾輪一模一樣：占星（astro-detail）、八字（bazi-detail）、紫微（ziwei-guide）、
+   新手引導（beginner-guide）、遊戲化任務（result-game/result-reading-map）、
+   會員行動指引（member-action-path、result-next-steps）這些「各工具專屬的詳解面板」，
+   全部是 ToolResult.tsx 內部自己的 BEM class，各自寫死深底（rgba(0,0,0,x) 深黑/深藍），
+   都是 .mele-card 底下的子元素——文字被「.mele-card *」規則變墨色了，但背景沒人蓋過，
+   墨色字疊在深底上＝看起來像一片灰。這裡一次把這些工具專屬面板的背景/邊框也收斂成紙感。
+   （説明：先前只驗證過塔羅/生命靈數兩個示範，這些面板只有八字/紫微/占星/人類圖等其餘
+   六工具才會出現，所以之前沒發現。） */
+.mag-tool-page .astro-detail,
+.mag-tool-page .astro-detail__aspect-item,
+.mag-tool-page .astro-detail__house-item,
+.mag-tool-page .bazi-detail,
+.mag-tool-page .bazi-detail__dayun-step,
+.mag-tool-page .bazi-detail__pattern,
+.mag-tool-page .bazi-detail__pillar,
+.mag-tool-page .bazi-detail__shensha li,
+.mag-tool-page .ziwei-guide,
+.mag-tool-page .ziwei-guide article,
+.mag-tool-page .ziwei-guide__four-changes-grid article,
+.mag-tool-page .beginner-guide,
+.mag-tool-page .beginner-guide__item,
+.mag-tool-page .result-game,
+.mag-tool-page .result-game__quest,
+.mag-tool-page .result-game__sigil,
+.mag-tool-page .result-next-steps,
+.mag-tool-page .result-next-steps__item,
+.mag-tool-page .member-action-path,
+.mag-tool-page .member-action-path__step {
+  background: var(--mag-wash) !important;
+  border-color: var(--mag-hair) !important;
+  box-shadow: none !important;
+}
+
+.mag-tool-page .bazi-detail__pillar.is-day,
+.mag-tool-page .member-action-path__step.is-primary {
+  border-color: var(--mag-accent) !important;
+  background: color-mix(in srgb, var(--mag-accent) 8%, var(--mag-wash)) !important;
+}
+
+/* 四化色標（祿/權/科/忌）與各面板 kicker 小標維持一點彩色點綴，但改用對比通過的深色調，
+   不是原本設計給深底用的淺金/淺紅/淺藍/淺紫 */
+.mag-tool-page .ziwei-guide__four-changes-grid article[data-mutagen='祿'] {
+  border-color: #2d6a4f !important;
+}
+.mag-tool-page .ziwei-guide__four-changes-grid article[data-mutagen='權'] {
+  border-color: #a63a2b !important;
+}
+.mag-tool-page .ziwei-guide__four-changes-grid article[data-mutagen='科'] {
+  border-color: #2f5aa8 !important;
+}
+.mag-tool-page .ziwei-guide__four-changes-grid article[data-mutagen='忌'] {
+  border-color: #7b4fa3 !important;
+}
+
