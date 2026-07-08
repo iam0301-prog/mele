@@ -1,9 +1,12 @@
 'use client';
 
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { MayaTotemGlyph, getMayaTotemBySeal } from '@/components/MayaTotemGlyph';
+import { HdInteractiveLayer } from '@/components/HdInteractiveLayer';
 import type { CalcResponse, CalcTool } from '@/lib/api';
+import { DEFAULT_LOCALE, type Locale } from '@/lib/i18n/config';
+import { getToolResultCopy } from '@/lib/i18n/tool-result-copy';
 
 export type ReadingArKind = CalcTool;
 
@@ -508,40 +511,60 @@ function PlatePreview({ kind, result, asset }: { kind: ReadingArKind; result?: C
   );
 }
 
-function HumanDesignPlanarPreview({ result }: { result?: CalcResponse | null }) {
+function HumanDesignPlanarPreview({ result, locale = DEFAULT_LOCALE }: { result?: CalcResponse | null; locale?: Locale }) {
   const svg = result?.render?.svg;
   const summary = getGenericSummary('humandesign', result).slice(0, 4);
+  const t = getToolResultCopy(locale).hdPlanar;
+  const svgHostRef = useRef<HTMLDivElement | null>(null);
 
   return (
-    <div className="reading-ar__hd-planar" aria-label="人類圖 2D BodyGraph 視覺展示">
-      <div className="reading-ar__hd-planar-frame">
-        <div className="reading-ar__hd-frame-label">
-          <span>BodyGraph</span>
-          <strong>先看這張圖，不用一次看懂所有閘門</strong>
-        </div>
-        {svg ? (
-          <div className="reading-ar__hd-svg" dangerouslySetInnerHTML={{ __html: svg }} />
-        ) : (
-          <div className="reading-ar__hd-placeholder">
-            <span>BODYGRAPH</span>
-            <strong>2D</strong>
+    <div className="hd-planar-wrap">
+      {/* 第一屏：重點卡（紙感風，不用滑到底才知道自己是誰）－CEO 拍板的「資訊分層」草稿定案版 */}
+      <section className="hd-facts" aria-label={t.factsTitle}>
+        <span className="hd-facts__kicker">{t.factsKicker}</span>
+        <h2 className="hd-facts__title">{t.factsTitle}</h2>
+        <p className="hd-facts__body">{t.factsBody}</p>
+        {summary.length > 0 && (
+          <div className="hd-facts__grid">
+            {summary.map((item) => (
+              <article key={item.label}>
+                <span>{item.label}</span>
+                <strong>{item.value}</strong>
+              </article>
+            ))}
           </div>
         )}
-      </div>
-      <div className="reading-ar__hd-planar-copy">
-        <span>你的閱讀順序</span>
-        <strong>先抓三件事：類型、權威、策略</strong>
-        <p>人類圖先不要從一堆閘門開始讀。先知道你怎麼用能量、怎麼做決定，再回頭看中心與通道。</p>
-        {summary.length > 0 && (
-          <dl>
-            {summary.map((item) => (
-              <div key={item.label}>
-                <dt>{item.label}</dt>
-                <dd>{item.value}</dd>
+        <div className="hd-facts__scrollhint">{t.scrollHint}</div>
+      </section>
+
+      {/* 第二屏：BodyGraph 深底沉靜區——圖表本體（真實後端 SVG）完全不動，只換外圍文字與排版 */}
+      <div className="reading-ar__hd-planar" aria-label="人類圖 2D BodyGraph 視覺展示">
+        <div className="reading-ar__hd-planar-frame">
+          <div className="reading-ar__hd-frame-label">
+            <span>{t.frameLabel}</span>
+            <strong>{t.frameNote}</strong>
+          </div>
+          <div className="hd-graph-stack">
+            {svg ? (
+              <div className="reading-ar__hd-svg" ref={svgHostRef} dangerouslySetInnerHTML={{ __html: svg }} />
+            ) : (
+              <div className="reading-ar__hd-placeholder">
+                <span>BODYGRAPH</span>
+                <strong>2D</strong>
               </div>
-            ))}
-          </dl>
-        )}
+            )}
+            {svg && <HdInteractiveLayer result={result} locale={locale} svgHostRef={svgHostRef} />}
+          </div>
+        </div>
+        <div className="reading-ar__hd-planar-copy">
+          <span className="hd-stage-kicker">{t.stageKicker}</span>
+          <strong>{t.stageTitle}</strong>
+          <p>{t.stageBody}</p>
+          <div className="hd-legend">
+            <div><i className="hd-legend__dot hd-legend__dot--on" />{t.legendOn}</div>
+            <div><i className="hd-legend__dot hd-legend__dot--off" />{t.legendOff}</div>
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -555,6 +578,7 @@ function VisualPreview({
   tarotDraw,
   tarotStyle,
   activeTarotIndex,
+  locale,
 }: {
   kind: ReadingArKind;
   result?: CalcResponse | null;
@@ -562,8 +586,9 @@ function VisualPreview({
   tarotDraw?: TarotDraw | null;
   tarotStyle?: TarotStyle;
   activeTarotIndex?: number;
+  locale?: Locale;
 }) {
-  if (kind === 'humandesign') return <HumanDesignPlanarPreview result={result} />;
+  if (kind === 'humandesign') return <HumanDesignPlanarPreview result={result} locale={locale} />;
   if (kind === 'tarot') return <TarotPreview draw={tarotDraw ?? getTarotDraw(result)} style={tarotStyle ?? getTarotStyle(result)} activeIndex={activeTarotIndex} />;
   if (kind === 'runes') return <RunePreview result={result} />;
   return <PlatePreview kind={kind} result={result} asset={asset} />;
@@ -653,7 +678,7 @@ function VisualDiagramGuide({ kind, result }: { kind: ReadingArKind; result?: Ca
   );
 }
 
-export function ReadingArStage({ kind, result }: { kind: ReadingArKind; result?: CalcResponse | null }) {
+export function ReadingArStage({ kind, result, locale = DEFAULT_LOCALE }: { kind: ReadingArKind; result?: CalcResponse | null; locale?: Locale }) {
   const asset = ASSETS[kind];
   const tarotStyle = getTarotStyle(result);
   const tarotDraws = kind === 'tarot' ? getTarotDraws(result) : [];
@@ -676,18 +701,21 @@ export function ReadingArStage({ kind, result }: { kind: ReadingArKind; result?:
 
   return (
     <section id="reading-ar-stage" className={`reading-ar reading-ar--${asset.className} reading-ar--${kind}`}>
-      <div className="reading-ar__copy">
-        <span>視覺結果</span>
-        <h2>{asset.title}</h2>
-        <p>{asset.note}</p>
-        <em className="reading-ar__viewer-state reading-ar__viewer-state--fallback">清楚可讀的 2D 盤面</em>
-      </div>
+      {/* 人類圖已經有自己的第一屏重點卡＋第二屏 BodyGraph 標題，不用再疊一組通用標題造成重複 */}
+      {kind !== 'humandesign' && (
+        <div className="reading-ar__copy">
+          <span>視覺結果</span>
+          <h2>{asset.title}</h2>
+          <p>{asset.note}</p>
+          <em className="reading-ar__viewer-state reading-ar__viewer-state--fallback">清楚可讀的 2D 盤面</em>
+        </div>
+      )}
 
       <div className="reading-ar__stage">
         <div className="reading-ar__visual-column">
           <div className="reading-ar__model-zone">
             <div className="reading-ar__model-fallback" aria-label="精修 2D 視覺展示">
-              <VisualPreview kind={kind} result={result} asset={asset} tarotDraw={activeTarotDraw} tarotStyle={tarotStyle} activeTarotIndex={visibleTarotIndex} />
+              <VisualPreview kind={kind} result={result} asset={asset} tarotDraw={activeTarotDraw} tarotStyle={tarotStyle} activeTarotIndex={visibleTarotIndex} locale={locale} />
             </div>
           </div>
 

@@ -2445,6 +2445,20 @@ body::before {
   color: rgba(140, 180, 255, 0.7);
   margin: 0 0 10px;
 }
+/* 草稿（2026-07-07）：密集表格改摺疊，summary 沿用原本 h3 的視覺 */
+.astro-detail__collapse > summary {
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(140, 180, 255, 0.7);
+  margin: 0 0 10px;
+  list-style: none;
+}
+.astro-detail__collapse > summary::-webkit-details-marker { display: none; }
+.astro-detail__collapse > summary::after { content: ' ▾'; }
+.astro-detail__collapse[open] > summary::after { content: ' ▴'; }
 .astro-detail__planets { margin-bottom: 20px; }
 .astro-detail__planet-table {
   width: 100%;
@@ -4794,6 +4808,138 @@ body::before {
   color: rgba(255, 255, 255, 0.76);
   font-size: 12px;
   overflow-wrap: anywhere;
+}
+
+/* ============================================================
+   2026-07 人類圖結果頁重新設計（CEO 拍板草稿定案版）：
+   第一屏 .hd-facts 紙感重點卡（類型/權威/人生角色/策略等）先讓人三秒看懂自己；
+   第二屏 .reading-ar__hd-planar 維持深底沉靜感（BodyGraph 圖表本體完全不動，
+   只是外圍標題/圖例改用六語言 copy）。只影響人類圖，其餘工具不受影響。
+   ============================================================ */
+.hd-planar-wrap {
+  display: grid;
+  gap: clamp(28px, 4vw, 44px);
+  width: 100%;
+}
+
+.hd-facts {
+  width: 100%;
+  padding: clamp(20px, 3vw, 28px) clamp(20px, 3vw, 30px);
+  border: 1px solid var(--mag-hair, rgba(201, 162, 39, 0.24));
+  border-radius: 16px;
+  background: var(--mag-wash, rgba(255, 255, 255, 0.03));
+}
+
+.hd-facts__kicker {
+  display: block;
+  font-size: 11px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--mag-accent, #c9a227);
+  margin-bottom: 10px;
+}
+
+.hd-facts__title {
+  margin: 0 0 10px;
+  font-family: var(--mag-font-serif, "Noto Serif TC", serif);
+  font-size: clamp(21px, 2.6vw, 27px);
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--mag-ink, inherit);
+}
+
+.hd-facts__body {
+  margin: 0 0 18px;
+  color: var(--mag-ink-soft, inherit);
+  font-size: 14px;
+  line-height: 1.8;
+  max-width: 56ch;
+}
+
+.hd-facts__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+}
+
+.hd-facts__grid article {
+  border: 1px solid var(--mag-hair, rgba(201, 162, 39, 0.18));
+  border-radius: 12px;
+  padding: 14px 16px;
+  background: var(--mag-paper, transparent);
+}
+
+.hd-facts__grid span {
+  display: block;
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  color: var(--mag-accent, #c9a227);
+  margin-bottom: 8px;
+}
+
+.hd-facts__grid strong {
+  display: block;
+  font-family: var(--mag-font-serif, "Noto Serif TC", serif);
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--mag-ink, inherit);
+  overflow-wrap: anywhere;
+}
+
+.hd-facts__scrollhint {
+  margin-top: 18px;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  color: var(--mag-ink-soft, inherit);
+}
+
+.hd-stage-kicker{
+  color: rgba(232, 197, 71, 0.9) !important;
+}
+
+.hd-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.hd-legend div {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12.5px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.hd-legend__dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex: 0 0 auto;
+  display: inline-block;
+}
+
+.hd-legend__dot--on {
+  background: radial-gradient(circle at 35% 30%, #f0b07a, #d8654f 70%);
+  box-shadow: 0 0 8px rgba(216, 101, 79, 0.6);
+}
+
+.hd-legend__dot--off {
+  border: 1.4px solid rgba(255, 255, 255, 0.4);
+  background: transparent;
+}
+
+@media (max-width: 720px) {
+  .hd-facts__grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .hd-facts__grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .reading-ar__details {
@@ -10969,6 +11115,297 @@ footer {
 }
 
 /* ============================================================
+   2026-07-08 人類圖結果頁 P1：通道細節＋身體對照層互動（HdInteractiveLayer）
+   在真實後端 BodyGraph SVG（不動計算邏輯）上疊互動：中心/通道點擊詳解卡、
+   身體部位對照層、已定義通道清單（迴路分層＋圖表連動高亮）。
+   ============================================================ */
+
+.hd-graph-stack { position: relative; }
+
+.hd-body-overlay {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(100%, 720px);
+  aspect-ratio: 720 / 1160;
+  pointer-events: none;
+  z-index: 3;
+}
+
+.hd-body-overlay__silhouette {
+  fill: none;
+  stroke: rgba(247, 248, 248, 0.28);
+  stroke-width: 2;
+  stroke-dasharray: 5 6;
+}
+
+.hd-body-dot circle {
+  fill: rgba(247, 248, 248, 0.55);
+}
+
+.hd-body-dot text {
+  font-size: 15px;
+  fill: rgba(216, 220, 230, 0.85);
+  font-weight: 500;
+}
+
+.hd-body-dot--defined circle {
+  fill: #f5d76e;
+}
+
+.hd-body-dot--defined text {
+  fill: #f7f8f8;
+  font-weight: 700;
+}
+
+.hd-interactive__toggle {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin: 14px 0 0;
+}
+
+.hd-interactive__toggle button {
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(216, 220, 230, 0.85);
+  padding: 7px 16px;
+  border-radius: 999px;
+  font-size: 12.5px;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: background 0.25s, color 0.25s, border-color 0.25s;
+}
+
+.hd-interactive__toggle button.is-active {
+  background: rgba(130, 143, 255, 0.85);
+  border-color: transparent;
+  color: #fff;
+}
+
+.hd-interactive__toggle button:focus-visible {
+  outline: 2px solid rgba(130, 143, 255, 0.9);
+  outline-offset: 2px;
+}
+
+/* 後端真實 SVG 內的通道／中心互動節點：hover/focus/選中態 */
+.reading-ar__hd-svg :is([data-channel], [data-center]) {
+  cursor: pointer;
+  transition: filter 0.25s, opacity 0.25s;
+}
+
+.reading-ar__hd-svg [data-channel]:hover,
+.reading-ar__hd-svg [data-channel]:focus-visible,
+.reading-ar__hd-svg [data-channel].hd-channel--focused {
+  filter: drop-shadow(0 0 6px rgba(247, 215, 110, 0.85));
+}
+
+.reading-ar__hd-svg [data-center]:hover,
+.reading-ar__hd-svg [data-center]:focus-visible {
+  filter: drop-shadow(0 0 10px rgba(247, 215, 110, 0.55));
+}
+
+.hd-channel-list {
+  position: relative;
+  z-index: 2;
+  margin-top: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 16px;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.hd-channel-list__head strong {
+  display: block;
+  color: #f7f8f8;
+  font-size: 15px;
+}
+
+.hd-channel-list__head p {
+  margin: 4px 0 12px;
+  color: rgba(208, 214, 224, 0.72);
+  font-size: 12.5px;
+  line-height: 1.7;
+}
+
+.hd-channel-list ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+}
+
+.hd-channel-list button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 10px;
+  padding: 8px 10px;
+  text-align: left;
+  cursor: pointer;
+  color: rgba(216, 220, 230, 0.88);
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.hd-channel-list button:hover,
+.hd-channel-list button.is-active {
+  background: rgba(130, 143, 255, 0.14);
+  border-color: rgba(130, 143, 255, 0.4);
+}
+
+.hd-channel-list button:focus-visible {
+  outline: 2px solid rgba(130, 143, 255, 0.9);
+  outline-offset: 1px;
+}
+
+.hd-channel-list__dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex: none;
+}
+
+.hd-channel-list__dot--individual { background: #6ab7c7; }
+.hd-channel-list__dot--tribal { background: #c85b3f; }
+.hd-channel-list__dot--collective { background: #ba7bd1; }
+
+.hd-channel-list__name {
+  flex: 1;
+  font-size: 13px;
+}
+
+.hd-channel-list__gates {
+  font-size: 11.5px;
+  color: rgba(208, 214, 224, 0.55);
+}
+
+.hd-channel-list__disclaimer {
+  margin: 12px 0 0;
+  color: rgba(208, 214, 224, 0.5);
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+.hd-channel-list__empty {
+  position: relative;
+  z-index: 2;
+  margin-top: 18px;
+  color: rgba(208, 214, 224, 0.72);
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.hd-detail-scrim {
+  position: fixed;
+  inset: 0;
+  background: rgba(5, 6, 10, 0.55);
+  z-index: 90;
+}
+
+.hd-detail-card {
+  position: fixed;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+  width: min(92vw, 460px);
+  max-height: 78vh;
+  overflow-y: auto;
+  background: #14151b;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-top: 3px solid #f5d76e;
+  border-radius: 16px 16px 0 0;
+  padding: 22px 22px 26px;
+  color: #f7f8f8;
+  z-index: 91;
+  box-shadow: 0 -24px 60px rgba(0, 0, 0, 0.5);
+}
+
+.hd-detail-card__close {
+  position: absolute;
+  top: 10px;
+  right: 14px;
+  background: none;
+  border: none;
+  color: rgba(208, 214, 224, 0.7);
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.hd-detail-card__eyebrow {
+  margin: 0 0 6px;
+  color: #f5d76e;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.hd-detail-card h3 {
+  margin: 0 0 8px;
+  font-size: 19px;
+  line-height: 1.3;
+}
+
+.hd-detail-card__state {
+  margin: 0 0 10px;
+  color: rgba(208, 214, 224, 0.75);
+  font-size: 12.5px;
+}
+
+.hd-detail-card__body {
+  margin: 0 0 12px;
+  color: rgba(216, 220, 230, 0.85);
+  font-size: 13.5px;
+  line-height: 1.75;
+}
+
+.hd-detail-card__tip {
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.hd-detail-card__tip b {
+  color: #f5d76e;
+}
+
+@media (max-width: 560px) {
+  .hd-detail-card { width: 100%; padding: 18px 16px 22px; }
+  .hd-channel-list button { flex-wrap: wrap; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .reading-ar__hd-svg [data-center].glow,
+  .reading-ar__hd-svg .glow {
+    animation: hd-center-pulse 3.2s ease-in-out infinite;
+  }
+
+  .reading-ar__hd-svg [data-channel].hd-channel--defined {
+    animation: hd-channel-flow 1.6s linear infinite;
+  }
+
+  @keyframes hd-center-pulse {
+    0%, 100% { filter: drop-shadow(0 0 4px rgba(245, 215, 110, 0.35)); }
+    50% { filter: drop-shadow(0 0 12px rgba(245, 215, 110, 0.65)); }
+  }
+
+  @keyframes hd-channel-flow {
+    0% { stroke-dashoffset: 0; }
+    100% { stroke-dashoffset: -24; }
+  }
+}
+
+/* ============================================================
    2026-07-04 P1 改版階段 1：冷冽紙感精品雜誌首頁（A. 設計 token + B. 首頁）
    只影響 .mag-home 首頁樣板；不動既有 beta2-/home- 頁面（如 feedback）。
    ============================================================ */
@@ -12121,6 +12558,177 @@ footer {
 main:has(.mag-tool-page, .mag-teachers-page, .mag-daily-page, .mag-account-page, .mag-legal-page, .mag-feedback-page, .mag-home, .mag-tools-page) + footer {
   margin-top: 0;
   padding-top: 4rem;
+}
+
+/* ============================================================
+   2026-07-07 瑪雅五圖騰神諭盤（MayaOracleBoard）補紙感：
+   這個元件原本是舊版深底星象風（暗藍漸層＋米黃字），套用 .mag-tool-page 全站紙感後
+   文字疊在紙白底上看不清楚，之前先整塊隱藏（見 ToolResultSection 的
+   AR_STAGE_ENABLED/註解）。現在改用同一顆元件重新上紙感色，並補上五張小卡的白話說明，
+   只在 .mag-tool-page 作用域內覆寫，不影響任何其他頁面。
+   ============================================================ */
+.mag-tool-page .maya-oracle-board {
+  background: var(--mag-wash) !important;
+  border-color: var(--mag-hair) !important;
+  box-shadow: none !important;
+}
+
+.mag-tool-page .maya-oracle-board__header span,
+.mag-tool-page .maya-oracle-board__hero span,
+.mag-tool-page .maya-oracle-board__role {
+  color: var(--mag-accent) !important;
+}
+
+.mag-tool-page .maya-oracle-board__header h2,
+.mag-tool-page .maya-oracle-board__hero strong,
+.mag-tool-page .maya-oracle-board__cell strong,
+.mag-tool-page .maya-oracle-board__totem-name {
+  color: var(--mag-ink) !important;
+}
+
+.mag-tool-page .maya-oracle-board__header p,
+.mag-tool-page .maya-oracle-board__hero small {
+  color: var(--mag-ink-soft) !important;
+}
+
+.mag-tool-page .maya-oracle-board__cell {
+  background: var(--mag-paper) !important;
+  border-color: var(--mag-hair) !important;
+  box-shadow: none !important;
+}
+
+.mag-tool-page .maya-oracle-board__cell.is-active {
+  background: var(--mag-ink) !important;
+  border-color: var(--mag-ink) !important;
+}
+
+.mag-tool-page .maya-oracle-board__cell.is-active strong,
+.mag-tool-page .maya-oracle-board__cell.is-active .maya-oracle-board__totem-name,
+.mag-tool-page .maya-oracle-board__cell.is-active .maya-oracle-board__cell-body {
+  color: var(--mag-paper) !important;
+}
+
+.mag-tool-page .maya-oracle-board__cell-body {
+  margin: 2px 0 0;
+  color: var(--mag-ink-soft);
+  font-size: 11.5px;
+  line-height: 1.45;
+}
+
+.mag-tool-page .maya-oracle-board__crosscheck {
+  background: var(--mag-paper) !important;
+  border-color: var(--mag-hair) !important;
+}
+
+.mag-tool-page .maya-oracle-board__crosscheck dt {
+  color: var(--mag-ink-soft) !important;
+}
+
+.mag-tool-page .maya-oracle-board__crosscheck dd {
+  color: var(--mag-ink) !important;
+}
+
+/* 五張小卡（指引/對立/本命/支持/隱藏）加一句白話說明後內容變多，十字佈局的最小高度往上調，
+   避免文字被裁切；手機 390px 寬時十字佈局改直排單欄，維持可讀不爆版。 */
+.mag-tool-page .maya-oracle-board__cell {
+  min-height: 188px;
+}
+
+@media (max-width: 480px) {
+  .mag-tool-page .maya-oracle-board__grid {
+    grid-template-areas:
+      "guide"
+      "self"
+      "support"
+      "challenge"
+      "hidden";
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ============================================================
+   2026-07-07 草稿：占星「資訊分層」第一版（ToolHighlightCards）
+   （人類圖草稿改由另一位同事負責偽 3D 人形 artifact，這裡只保留占星，避免重工）
+   老闆點頭前只是草稿，不進 CI 檢查、不影響其他工具頁。第一眼只看太陽/月亮/上升三個重點，
+   星盤圖退到重點卡之後；只在 .mag-tool-page 作用域生效。
+   ============================================================ */
+.tool-highlight {
+  margin-bottom: 20px;
+  padding: clamp(16px, 3vw, 26px);
+  border: 1px solid var(--mag-hair);
+  border-radius: 10px;
+  background: var(--mag-wash);
+}
+
+.tool-highlight__eyebrow {
+  color: var(--mag-accent);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.tool-highlight__title {
+  margin: 8px 0 6px;
+  color: var(--mag-ink);
+  font-family: var(--mag-font-serif);
+  font-size: clamp(20px, 3vw, 28px);
+  line-height: 1.35;
+}
+
+.tool-highlight__lead {
+  margin: 0 0 16px;
+  color: var(--mag-ink-soft);
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.tool-highlight__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+}
+
+.tool-highlight__card {
+  display: grid;
+  gap: 4px;
+  padding: 14px 16px;
+  border: 1px solid var(--mag-hair);
+  border-radius: 8px;
+  background: var(--mag-paper);
+}
+
+.tool-highlight__card span {
+  color: var(--mag-accent);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+}
+
+.tool-highlight__card strong {
+  color: var(--mag-ink);
+  font-size: 20px;
+  line-height: 1.25;
+}
+
+.tool-highlight__card p {
+  margin: 2px 0 0;
+  color: var(--mag-ink-soft);
+  font-size: 12.5px;
+  line-height: 1.55;
+}
+
+.tool-highlight__scroll-hint {
+  margin: 16px 0 0;
+  color: var(--mag-ink-soft);
+  font-size: 12px;
+  text-align: center;
+}
+
+@media (max-width: 480px) {
+  .tool-highlight__grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
 /* ============================================================

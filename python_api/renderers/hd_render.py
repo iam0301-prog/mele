@@ -414,9 +414,13 @@ def render(data: dict) -> dict:
         stroke = PALETTE["accent_light"] if is_defined else "rgba(255,255,255,.22)"
         width = 4 if is_defined else 2.2
         opacity = ".9" if is_defined else (".42" if is_half else ".2")
-        dash = "" if is_defined else (' stroke-dasharray="8 9"' if is_half else "")
+        # 已定義通道加一段細虛線疊在實線上方視覺用的 dasharray，讓前端「流動」動畫有東西可跑
+        dash = ' stroke-dasharray="14 10"' if is_defined else (' stroke-dasharray="8 9"' if is_half else "")
+        # data-channel／class 只給前端掛互動用（hover/點擊高亮＋通道清單連動），不影響計算邏輯
+        channel_cls = "hd-channel hd-channel--defined" if is_defined else "hd-channel"
         channel_svg.append(
-            f'<line x1="{x1:.1f}" y1="{y1:.1f}" x2="{x2:.1f}" y2="{y2:.1f}" '
+            f'<line data-channel="{g1}-{g2}" class="{channel_cls}" '
+            f'x1="{x1:.1f}" y1="{y1:.1f}" x2="{x2:.1f}" y2="{y2:.1f}" '
             f'stroke="{stroke}" stroke-width="{width}" opacity="{opacity}" stroke-linecap="round"{dash}/>'
         )
 
@@ -426,14 +430,19 @@ def render(data: dict) -> dict:
         fill = meta["defined"] if is_defined else "rgba(255,255,255,.045)"
         stroke = PALETTE["accent_light"] if is_defined else "rgba(255,255,255,.22)"
         text_fill = "#111827" if is_defined else "rgba(255,255,255,.68)"
-        cls = ' class="glow"' if is_defined else ""
+        cls = "hd-center glow" if is_defined else "hd-center"
+        # data-center／data-defined 只給前端掛點擊詳解卡＋身體對照層用，圖形與定義邏輯完全不變
         centers_svg.append(
-            f'<path d="{_center_path(meta)}" fill="{fill}" stroke="{stroke}" stroke-width="2.2"{cls}/>'
+            f'<g data-center="{name}" data-defined="{"1" if is_defined else "0"}" class="{cls}">'
+        )
+        centers_svg.append(
+            f'<path d="{_center_path(meta)}" fill="{fill}" stroke="{stroke}" stroke-width="2.2"/>'
         )
         centers_svg.append(
             f'<text x="{meta["x"]}" y="{meta["y"] + 5}" text-anchor="middle" '
             f'font-size="14" fill="{text_fill}" font-weight="700">{escape(meta["label"])}</text>'
         )
+        centers_svg.append("</g>")
 
     gates_svg = []
     for gate in sorted(GATE_TO_CENTER):
