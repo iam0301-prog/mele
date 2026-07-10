@@ -2751,7 +2751,7 @@ export function ToolResult({ result, locale = DEFAULT_LOCALE }: { result: CalcRe
 
   return (
     <div ref={ref} className={`mele-card tool-result-card tool-result-card--${result.tool} mt-6 animate-fade-in`}>
-      {result.tool === 'astro' && <ToolHighlightCards result={result} />}
+      {result.tool === 'astro' && <ToolHighlightCards result={result} t={t} />}
       {result.tool !== 'tarot' && result.tool !== 'maya' && svg && result.tool !== 'humandesign' && (
         <div
           className={`mele-svg-wrap mele-svg-wrap--${result.tool} mb-6 flex justify-center`}

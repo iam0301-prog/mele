@@ -12647,17 +12647,27 @@ main:has(.mag-tool-page, .mag-teachers-page, .mag-daily-page, .mag-account-page,
 }
 
 /* ============================================================
-   2026-07-07 草稿：占星「資訊分層」第一版（ToolHighlightCards）
-   （人類圖草稿改由另一位同事負責偽 3D 人形 artifact，這裡只保留占星，避免重工）
-   老闆點頭前只是草稿，不進 CI 檢查、不影響其他工具頁。第一眼只看太陽/月亮/上升三個重點，
-   星盤圖退到重點卡之後；只在 .mag-tool-page 作用域生效。
+   2026-07 占星結果頁「資訊分層」正式版（ToolHighlightCards）
+   第一屏太陽/月亮/上升三張重點卡，星盤圖與十行星/相位表退到後面（見 ToolResult.tsx 排列順序）。
+   人類圖走另一套偽 3D 人形 artifact，不共用這裡的樣式。
    ============================================================ */
 .tool-highlight {
+  position: relative;
   margin-bottom: 20px;
   padding: clamp(16px, 3vw, 26px);
   border: 1px solid var(--mag-hair);
   border-radius: 10px;
   background: var(--mag-wash);
+  overflow: hidden;
+}
+
+.tool-highlight::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 3px;
+  background: linear-gradient(90deg, #d8a13a, #c9748f, #6f8fc9);
+  opacity: 0.85;
 }
 
 .tool-highlight__eyebrow {
@@ -12690,12 +12700,34 @@ main:has(.mag-tool-page, .mag-teachers-page, .mag-daily-page, .mag-account-page,
 }
 
 .tool-highlight__card {
+  position: relative;
   display: grid;
   gap: 4px;
   padding: 14px 16px;
   border: 1px solid var(--mag-hair);
   border-radius: 8px;
   background: var(--mag-paper);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.tool-highlight__card--sun { border-top: 2px solid #d8a13a; }
+.tool-highlight__card--moon { border-top: 2px solid #c9748f; }
+.tool-highlight__card--ascendant { border-top: 2px solid #6f8fc9; }
+
+@media (hover: hover) {
+  .tool-highlight__card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tool-highlight__card {
+    transition: none;
+  }
+  .tool-highlight__card:hover {
+    transform: none;
+  }
 }
 
 .tool-highlight__card span {

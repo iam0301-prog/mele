@@ -55,6 +55,20 @@ export type ToolResultCopy = {
     channels: Record<string, { name: string; trait: string; daily: string }>;
   };
 
+  /** 占星結果頁改版：第一屏太陽/月亮/上升重點卡（ToolHighlightCards，只有占星用到） */
+  astroHighlight: {
+    eyebrow: string;
+    lead: string;
+    scrollHint: string;
+    /** 缺出生時間等原因、算不出該點位時的替代文字 */
+    unavailable: string;
+    cards: {
+      sun: { label: string; body: string };
+      moon: { label: string; body: string };
+      ascendant: { label: string; body: string };
+    };
+  };
+
   /** MemberResonancePanel */
   resonance: {
     questionPrefix: string;
@@ -480,6 +494,17 @@ const zhTW: ToolResultCopy = {
       thirteenMoon: '13 Moon',
     },
   },
+  astroHighlight: {
+    eyebrow: '先看這三個位置',
+    lead: '不懂占星也沒關係，先知道「你是誰」，星盤細節可以往下慢慢看。',
+    scrollHint: '往下看完整星盤圖、宮位與相位細節 ↓',
+    unavailable: '需要出生時間',
+    cards: {
+      sun: { label: '太陽', body: '你想成為的樣子——核心意志與生命力方向。' },
+      moon: { label: '月亮', body: '你真正需要的安全感——情緒與內在需求。' },
+      ascendant: { label: '上升', body: '別人先看到的你——外在應對世界的方式。' },
+    },
+  },
 };
 
 const en: ToolResultCopy = {
@@ -739,6 +764,17 @@ const en: ToolResultCopy = {
       haab: 'Haab',
       longCount: 'Long Count',
       thirteenMoon: '13 Moon',
+    },
+  },
+  astroHighlight: {
+    eyebrow: 'Start with these three',
+    lead: "No astrology background needed — meet 'who you are' first, then explore the full chart below at your own pace.",
+    scrollHint: 'Scroll down for the full chart, houses, and aspects ↓',
+    unavailable: 'Needs birth time',
+    cards: {
+      sun: { label: 'Sun', body: 'Who you are becoming — your core will and drive.' },
+      moon: { label: 'Moon', body: 'What truly makes you feel safe — your emotional needs.' },
+      ascendant: { label: 'Ascendant', body: 'How others meet you first — your outward style.' },
     },
   },
 };
@@ -1002,6 +1038,17 @@ const vi: ToolResultCopy = {
       thirteenMoon: '13 Moon',
     },
   },
+  astroHighlight: {
+    eyebrow: 'Xem 3 vị trí này trước',
+    lead: 'Không cần biết chiêm tinh cũng được, cứ hiểu "bạn là ai" trước đã, chi tiết bản đồ sao để từ từ xem sau.',
+    scrollHint: 'Xem bản đồ sao đầy đủ, nhà và các góc chiếu bên dưới ↓',
+    unavailable: 'Cần giờ sinh',
+    cards: {
+      sun: { label: 'Mặt Trời', body: 'Con người bạn muốn trở thành — ý chí cốt lõi và sức sống.' },
+      moon: { label: 'Mặt Trăng', body: 'Điều khiến bạn thực sự an tâm — nhu cầu cảm xúc bên trong.' },
+      ascendant: { label: 'Cung Mọc', body: 'Ấn tượng đầu tiên người khác thấy ở bạn — cách bạn ứng xử ra ngoài.' },
+    },
+  },
 };
 
 const id: ToolResultCopy = {
@@ -1261,6 +1308,17 @@ const id: ToolResultCopy = {
       haab: 'Haab',
       longCount: 'Long Count',
       thirteenMoon: '13 Moon',
+    },
+  },
+  astroHighlight: {
+    eyebrow: 'Lihat 3 posisi ini dulu',
+    lead: 'Tidak perlu paham astrologi dulu — kenali "siapa kamu" lebih dulu, detail peta bintang bisa dilihat pelan-pelan di bawah.',
+    scrollHint: 'Gulir ke bawah untuk peta bintang lengkap, rumah, dan aspek ↓',
+    unavailable: 'Perlu jam lahir',
+    cards: {
+      sun: { label: 'Matahari', body: 'Sosok yang ingin kamu jadi — kehendak inti dan semangat hidup.' },
+      moon: { label: 'Bulan', body: 'Yang benar-benar membuatmu merasa aman — kebutuhan emosionalmu.' },
+      ascendant: { label: 'Ascendant', body: 'Kesan pertama yang orang lain lihat darimu — caramu tampil ke dunia.' },
     },
   },
 };
@@ -1524,6 +1582,17 @@ const ja: ToolResultCopy = {
       thirteenMoon: '13 Moon',
     },
   },
+  astroHighlight: {
+    eyebrow: 'まずこの3つを見る',
+    lead: '占星術の知識がなくても大丈夫。まず「あなたが誰か」を知ってから、下でチャートの詳細をゆっくり見ていきましょう。',
+    scrollHint: '下にスクロールすると星図・ハウス・アスペクトの詳細があります ↓',
+    unavailable: '出生時間が必要です',
+    cards: {
+      sun: { label: '太陽', body: 'あなたがなりたい姿——中心にある意志と生命力の方向。' },
+      moon: { label: '月', body: 'あなたが本当に必要とする安心感——感情と内面のニーズ。' },
+      ascendant: { label: 'アセンダント', body: '相手に最初に伝わるあなた——外の世界への向き合い方。' },
+    },
+  },
 };
 
 const ko: ToolResultCopy = {
@@ -1783,6 +1852,17 @@ const ko: ToolResultCopy = {
       haab: 'Haab',
       longCount: 'Long Count',
       thirteenMoon: '13 Moon',
+    },
+  },
+  astroHighlight: {
+    eyebrow: '먼저 이 세 위치를 보세요',
+    lead: '점성술을 몰라도 괜찮아요. 먼저 "당신이 누구인지" 알고 나서, 아래에서 천천히 차트 세부 사항을 살펴보세요.',
+    scrollHint: '아래로 스크롤하면 전체 차트, 하우스, 어스펙트 세부 사항이 있어요 ↓',
+    unavailable: '출생 시간이 필요해요',
+    cards: {
+      sun: { label: '태양', body: '당신이 되고 싶은 모습 — 핵심 의지와 생명력의 방향.' },
+      moon: { label: '달', body: '진짜로 안정감을 느끼게 하는 것 — 감정과 내면의 욕구.' },
+      ascendant: { label: '어센던트', body: '남들이 처음 보는 당신의 모습 — 세상과 마주하는 방식.' },
     },
   },
 };
