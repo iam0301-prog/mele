@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { MayaOracleBoard, MayaTotemGallery, MayaTotemGlyph, getMayaTotemBySeal } from '@/components/MayaTotemGlyph';
+import { ToolHighlightCards } from '@/components/ToolHighlightCards';
 import type { CalcResponse, CalcTool } from '@/lib/api';
 import {
   DAILY_POINT_AMOUNT,
@@ -1716,10 +1717,11 @@ function AstroDetailPanel({ result }: { result: CalcResponse }) {
   return (
     <section className="astro-detail" aria-label="占星排盤詳情">
 
-      {/* ── 十行星表 ── */}
+      {/* ── 十行星表 ──
+          草稿（2026-07-07）：資訊分層第一版，密集表格改摺疊，預設收起，只留標題可展開。 */}
       {hasPlanets && (
-        <div className="astro-detail__planets">
-          <h3>十顆行星位置</h3>
+        <details className="astro-detail__planets astro-detail__collapse">
+          <summary>十顆行星位置</summary>
           <table className="astro-detail__planet-table">
             <thead>
               <tr>
@@ -1752,13 +1754,13 @@ function AstroDetailPanel({ result }: { result: CalcResponse }) {
               })}
             </tbody>
           </table>
-        </div>
+        </details>
       )}
 
       {/* ── 相位 ── */}
       {aspects.length > 0 && (
-        <div className="astro-detail__aspects">
-          <h3>主要相位</h3>
+        <details className="astro-detail__aspects astro-detail__collapse">
+          <summary>主要相位</summary>
           <ul className="astro-detail__aspect-list">
             {aspects.slice(0, 18).map((item, i) => {
               const asp = asDict(item);
@@ -1777,13 +1779,13 @@ function AstroDetailPanel({ result }: { result: CalcResponse }) {
               );
             })}
           </ul>
-        </div>
+        </details>
       )}
 
       {/* ── 十二宮 ── */}
       {houses.length > 0 && (
-        <div className="astro-detail__houses">
-          <h3>十二宮位</h3>
+        <details className="astro-detail__houses astro-detail__collapse">
+          <summary>十二宮位</summary>
           <div className="astro-detail__house-grid">
             {houses.slice(0, 12).map((item, i) => {
               const h = asDict(item);
@@ -1801,7 +1803,7 @@ function AstroDetailPanel({ result }: { result: CalcResponse }) {
               );
             })}
           </div>
-        </div>
+        </details>
       )}
     </section>
   );
@@ -2749,6 +2751,7 @@ export function ToolResult({ result, locale = DEFAULT_LOCALE }: { result: CalcRe
 
   return (
     <div ref={ref} className={`mele-card tool-result-card tool-result-card--${result.tool} mt-6 animate-fade-in`}>
+      {result.tool === 'astro' && <ToolHighlightCards result={result} />}
       {result.tool !== 'tarot' && result.tool !== 'maya' && svg && result.tool !== 'humandesign' && (
         <div
           className={`mele-svg-wrap mele-svg-wrap--${result.tool} mb-6 flex justify-center`}
@@ -2757,6 +2760,7 @@ export function ToolResult({ result, locale = DEFAULT_LOCALE }: { result: CalcRe
       )}
 
       <MemberResonancePanel resonance={memberResonance} t={t} />
+      {result.tool === 'maya' && <MayaOracleBoard result={result} copy={t.mayaOracle} />}
       {result.tool !== 'maya' && <ResultInsightPanel insight={insight} speech={result.tool === 'tarot' ? undefined : speech} t={t} />}
       <AstroDetailPanel result={result} />
       <BaziDetailPanel result={result} />
