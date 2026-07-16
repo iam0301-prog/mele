@@ -30,13 +30,7 @@ def _section(title: str) -> str:
 def _wrap(parts: list[str], detail: DetailLevel) -> str:
     inner = "".join(parts)
     if detail == "teaser":
-        cta = """
-<div class='exp-paywall'>
-  <div class='exp-paywall-title'>想看完整深度解讀？</div>
-  <div class='exp-paywall-hint'>可預約老師，將此盤面延伸成關係、事業、流年與行動建議。</div>
-  <a class='exp-paywall-btn' href='/teachers'>預約老師解盤</a>
-</div>"""
-        return f"<div class='explanation'>{inner}{cta}</div>"
+        return f"<div class='explanation'>{inner}</div>"
     return f"<div class='explanation explanation-full'>{inner}</div>"
 
 

@@ -73,7 +73,6 @@ def build():
                     "keywords": c.get("keywords", []),
                     "text": c.get("reversed", ""),
                 },
-                "script": c.get("script"),
             })
         OUT_TAROT.write_text(json.dumps(cleaned, ensure_ascii=False, indent=2), encoding="utf-8")
         print(f"✓ tarot.json 寫入 {len(cleaned)} 張牌")
