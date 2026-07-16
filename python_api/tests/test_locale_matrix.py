@@ -106,7 +106,7 @@ CJK_RE = re.compile(r"[一-鿿]")
 # 「重要架構發現」一節），不是走 explanations.py 的 EXPLAINER 分支，所以即使
 # explain_humandesign 已英文化，目前使用者實際看到的 html 仍是 hd_render.py 出的中文。
 # 下一輪把 hd_render.py 也做 locale 分支後，才能把 humandesign 從這個集合移除。
-KNOWN_NOT_YET_TRANSLATED_FOR_EN = {"bazi", "ziwei", "astro", "runes", "tarot", "humandesign"}
+KNOWN_NOT_YET_TRANSLATED_FOR_EN = {"bazi", "ziwei", "runes", "tarot", "humandesign"}
 
 CASES: dict[str, dict] = {
     "numerology": {"year": 1990, "month": 5, "day": 15},

@@ -388,7 +388,9 @@ async def calc_astro(
         req.longitude,
         req.house_system,
     )
-    return wrap("astro", req.model_dump(), data, astro_render.render(data), detail=detail, locale=locale)
+    return wrap(
+        "astro", req.model_dump(), data, astro_render.render(data, locale=locale), detail=detail, locale=locale
+    )
 
 
 @app.post("/api/v1/calc/humandesign", response_model=CalcResponse, tags=["Calc"])

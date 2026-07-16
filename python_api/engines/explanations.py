@@ -1631,11 +1631,376 @@ def _planet_in_sign_desc(key: str, sign_zh: str, house: int | None) -> str:
     return f"{modifier}展現{role}"
 
 
-def explain_astro(data: dict, detail: DetailLevel = "teaser", **kwargs) -> str:
+# ── 英文版：星座名稱對照（沿用 24 號名詞表西方通用譯名） ──────────
+_SIGN_EN: dict[str, str] = {
+    "牡羊": "Aries",
+    "金牛": "Taurus",
+    "雙子": "Gemini",
+    "巨蟹": "Cancer",
+    "獅子": "Leo",
+    "處女": "Virgo",
+    "天秤": "Libra",
+    "天蠍": "Scorpio",
+    "射手": "Sagittarius",
+    "摩羯": "Capricorn",
+    "水瓶": "Aquarius",
+    "雙魚": "Pisces",
+}
+
+_PLANET_EN: dict[str, str] = {
+    "sun": "Sun",
+    "moon": "Moon",
+    "mercury": "Mercury",
+    "venus": "Venus",
+    "mars": "Mars",
+    "jupiter": "Jupiter",
+    "saturn": "Saturn",
+    "uranus": "Uranus",
+    "neptune": "Neptune",
+    "pluto": "Pluto",
+}
+
+_SUN_SIGNS_EN: dict[str, dict[str, str]] = {
+    "牡羊": {
+        "teaser_friend": "You lead with drive — act first, figure it out after is your natural rhythm. When stuck, you tend to overshoot before looping back to your team.",
+        "core": "Your core drive is instinct, initiative, and starting things; waiting drains your energy.",
+        "shadow": "When you get overly defensive or need to control things, you can push people away before you've even begun.",
+        "relationship": "Relationship pattern: you need room to lead, and do better proposing than waiting to be approached.",
+        "growth": "Practice pausing after action to integrate — otherwise you start things you can't finish.",
+    },
+    "金牛": {
+        "teaser_friend": "You need stability and substance — steady accumulation is your real strength. When stuck, you may stay put even knowing it's not working.",
+        "core": "Your core drive is security, beauty, and steady accumulation; urgency clouds your judgment.",
+        "shadow": "Stubbornness or procrastination usually points to a deeper need for security.",
+        "relationship": "Relationship pattern: loyal, but you need the other person to feel settled before you truly relax into closeness.",
+        "growth": "Learn to tell the difference between a real need and just a familiar comfort.",
+    },
+    "雙子": {
+        "teaser_friend": "You need understanding and exchange — talking it out helps you understand yourself. When stuck, you get distracted and skip past your real feelings.",
+        "core": "Your core drive is exchanging information, seeing multiple angles, and connecting ideas; boredom drains you fast.",
+        "shadow": "Over-analyzing or dodging emotional depth is sometimes a sign the real feeling is too heavy.",
+        "relationship": "Relationship pattern: you need intellectual stimulation and conversation; silence makes you anxious.",
+        "growth": "Learn to give your truly important feelings an outlet, instead of always changing the subject.",
+    },
+    "巨蟹": {
+        "teaser_friend": "You need belonging and emotional safety — caring for others is instinctive. When stuck, you tend to bring the past into the present.",
+        "core": "Your core drive is emotional connection, a sense of home, and protective instinct; no foundation leaves you drained.",
+        "shadow": "Over-protectiveness or moodiness usually comes from unclear boundaries, not weakness.",
+        "relationship": "Relationship pattern: you need to be held, and to know the other person won't disappear.",
+        "growth": "Learn to draw strength from the past instead of letting it define the present.",
+    },
+    "獅子": {
+        "teaser_friend": "You need to be seen and to create — the more genuine you are, the more you shine. When stuck, you may worry so much about performing that you can't be natural.",
+        "core": "Your core drive is self-expression, creativity, and heartfelt involvement; being ignored saps your vitality.",
+        "shadow": "A need for validation usually sits on top of self-doubt.",
+        "relationship": "Relationship pattern: you need appreciation and respect, and need to show your real self.",
+        "growth": "Learn to root your worth in genuine expression, not just achievement.",
+    },
+    "處女": {
+        "teaser_friend": "You need to get things sorted out — you build value through detail and service. When stuck, you can get so critical of yourself you never start.",
+        "core": "Your core drive is precision, analysis, and practical service; chaos wears you down.",
+        "shadow": "Perfectionism sometimes means not believing your 'good enough' self deserves acceptance.",
+        "relationship": "Relationship pattern: you express love through doing — you need the other person to notice the care behind the details.",
+        "growth": "Learn to accept 'good enough,' and aim your improving instinct where it truly matters.",
+    },
+    "天秤": {
+        "teaser_friend": "You need balance and quality relationships — harmony is a real need for you. When stuck, you may drop your own position just to avoid conflict.",
+        "core": "Your core drive is fairness, beauty, and genuine mutual understanding; imbalance leaves you unsettled.",
+        "shadow": "Indecision or people-pleasing usually means you're still not sure what you actually want.",
+        "relationship": "Relationship pattern: you need reciprocity, and tend to pull back the moment something feels unfair.",
+        "growth": "Learn to keep relationships balanced while still knowing exactly where you stand.",
+    },
+    "天蠍": {
+        "teaser_friend": "You need depth and truth — staying on the surface feels like being deceived. When stuck, you can get overly guarded or controlling.",
+        "core": "Your core drive is real connection, deep exploration, and grasping the essence of things; surface-level leaves you distrustful.",
+        "shadow": "Controlling behavior or suspicion is usually protection against getting hurt again.",
+        "relationship": "Relationship pattern: you need real commitment and transparency — once trust is built, you're deeply loyal.",
+        "growth": "Learn to keep your insight while letting yourself truly relax.",
+    },
+    "射手": {
+        "teaser_friend": "You need meaning, horizons, and room to expand your view. When stuck, you just want to leave without figuring out what you're actually chasing.",
+        "core": "Your core drive is exploration, freedom, and a bigger frame of meaning; restriction suffocates you.",
+        "shadow": "Commitment fear or excessive optimism sometimes avoids the uncertainty of going deep into one thing.",
+        "relationship": "Relationship pattern: you need your freedom respected, and a shared sense of direction.",
+        "growth": "Learn to ground your exploring — turn a broad view into a path you can actually walk.",
+    },
+    "摩羯": {
+        "teaser_friend": "You need long-term goals and responsibility — building step by step is your true rhythm. When stuck, you push yourself too hard.",
+        "core": "Your core drive is practicality, responsibility, and long-term achievement; no structure makes you anxious.",
+        "shadow": "Overworking or emotional restraint usually means you're not sure it's safe to relax.",
+        "relationship": "Relationship pattern: loyal and reliable, but you need the other person to understand love expressed through action.",
+        "growth": "Learn to enjoy what you've already built, instead of always chasing the next goal.",
+    },
+    "水瓶": {
+        "teaser_friend": "You need independent thinking and to break from convention. When stuck, you get too detached — knowing a lot but staying hard to reach.",
+        "core": "Your core drive is innovation, systems thinking, and driving change; being boxed in makes you distant.",
+        "shadow": "Emotional distance or stubbornness sometimes means not trusting that feelings themselves have value.",
+        "relationship": "Relationship pattern: you need equal respect and intellectual resonance, not just emotional dependence.",
+        "growth": "Learn to let mental clarity and real emotional needs coexist.",
+    },
+    "雙魚": {
+        "teaser_friend": "You need imagination and feeling — allow your heart to soften. When stuck, your boundaries blur and other people's emotions become your own.",
+        "core": "Your core drive is empathy, spiritual connection, and imagination beyond the concrete; rigid structure kills your flow.",
+        "shadow": "Escapism or self-sacrifice usually means not believing your own needs deserve care too.",
+        "relationship": "Relationship pattern: gentle and deeply loving, but you need clear boundaries so you don't get drained.",
+        "growth": "Learn to tell which feelings are yours and which you've absorbed from others.",
+    },
+}
+_SUN_FALLBACK_EN: dict[str, str] = {
+    "teaser_friend": "Your Sun sign represents the direction and core will you're here to live out — it only really lands once you place it in real life.",
+    "core": "Your core drive lives in the moments you naturally feel fulfilled.",
+    "shadow": "Overusing or suppressing this force tends to cost you flexibility.",
+    "relationship": "Relationship pattern: bring this energy into your relationships and watch how it shapes your expression and needs.",
+    "growth": "Learn to let this force mature, instead of only using it inside your comfort zone.",
+}
+
+_MOON_SIGNS_EN: dict[str, dict[str, str]] = {
+    "牡羊": {
+        "teaser": "Your emotions need an immediate outlet — bottling feelings up only makes you more restless.",
+        "need": "Deep need: an instant response and the safety that comes after acting.",
+        "shadow": "Under pressure you tend to react instantly, realizing afterward you spoke too sharply.",
+        "focus": "Practice one breath the moment a feeling hits, before deciding how to express it.",
+    },
+    "金牛": {
+        "teaser": "Your security comes from stability and physical comfort — sudden change is hard for you to absorb.",
+        "need": "Deep need: a predictable environment, sensory comfort, and a slow-moving pace.",
+        "shadow": "Under pressure you tend to freeze, over-indulge, or refuse to admit change is needed.",
+        "focus": "Give yourself a gentle transition period — change doesn't have to happen all at once.",
+    },
+    "雙子": {
+        "teaser": "Your emotions need a verbal outlet — putting a feeling into words actually makes you feel better.",
+        "need": "Deep need: room to express, intellectual exchange, and understanding feelings from multiple angles.",
+        "shadow": "Under pressure you tend to rationalize emotion, or fill the real emptiness with talk.",
+        "focus": "Try to find someone who will really let you finish, not just make small talk.",
+    },
+    "巨蟹": {
+        "teaser": "Emotion is your core engine — your feelings are real and deep, not something to be managed away.",
+        "need": "Deep need: feeling held emotionally, belonging, and a clear sense of home.",
+        "shadow": "Under pressure you tend to withdraw, over-care for others, or explain the present through old pain.",
+        "focus": "Let yourself be cared for too — your worth isn't only in caring for others.",
+    },
+    "獅子": {
+        "teaser": "Your emotions need to be seen and expressed — suppressing them dims your light.",
+        "need": "Deep need: sincere appreciation, emotional presence, and feeling valued.",
+        "shadow": "Under pressure you can get dramatic, or discouraged when nobody's paying attention.",
+        "focus": "Be genuine with yourself first, so outside approval becomes a bonus, not a requirement.",
+    },
+    "處女": {
+        "teaser": "Your feelings need to be understood and made concrete — not being able to explain them makes you anxious.",
+        "need": "Deep need: for things to be sorted out clearly, and for others to see the care behind the details.",
+        "shadow": "Under pressure you tend to criticize yourself or turn feelings into to-do lists to avoid them.",
+        "focus": "Let a feeling just be a feeling — you don't have to find the cause or fix it right away.",
+    },
+    "天秤": {
+        "teaser": "Your emotions need harmony and mutuality — imbalance leaves you deeply unsettled.",
+        "need": "Deep need: reciprocity in relationships, an aesthetically pleasing environment, and avoiding direct conflict.",
+        "shadow": "Under pressure you tend to suppress your own feelings to match others' expectations.",
+        "focus": "Learn to put your own needs on the negotiating table too.",
+    },
+    "天蠍": {
+        "teaser": "Your feelings run intense and deep — being brushed off feels like being misunderstood.",
+        "need": "Deep need: a truly trustworthy connection, clear commitment, and real emotional depth.",
+        "shadow": "Under pressure you tend to become suspicious, distrustful, or bottle things up until they erupt.",
+        "focus": "Allow yourself to share feelings in stages — you don't need full certainty of safety before speaking.",
+    },
+    "射手": {
+        "teaser": "Your emotions need space and optimism — sadness makes you want an immediate way out.",
+        "need": "Deep need: a sense of freedom, a forward-looking direction, and emotional lightness.",
+        "shadow": "Under pressure you tend to use humor or philosophy to skip past feelings that need processing.",
+        "focus": "Let sadness or loss linger a little — it won't trap you forever.",
+    },
+    "摩羯": {
+        "teaser": "You're used to managing your emotions well, but sometimes you manage them so tightly you lose touch with them.",
+        "need": "Deep need: respected, stable connection, and space where you don't have to perform strength.",
+        "shadow": "Under pressure you tend toward emotional distance or burying feelings in work.",
+        "focus": "Treat emotional needs as real needs, just as worthy of attention as your goals.",
+    },
+    "水瓶": {
+        "teaser": "You're used to rationalizing emotion, and sometimes not sure what you're actually feeling.",
+        "need": "Deep need: being understood rather than judged, and intimacy that still lets you keep your individuality.",
+        "shadow": "Under pressure you tend to detach or analyze your own emotions from a group perspective.",
+        "focus": "Let your feelings be illogical — they were never meant to be explained.",
+    },
+    "雙魚": {
+        "teaser": "You're extremely sensitive emotionally, easily picking up on others' states and finding it hard to separate them from your own.",
+        "need": "Deep need: being emotionally held, and space to be understood without having to explain.",
+        "shadow": "Under pressure you tend to absorb others' emotions, treating their pain as your responsibility.",
+        "focus": "Give your own feelings an outlet first, before tuning into everyone else's.",
+    },
+}
+_MOON_FALLBACK_EN: dict[str, str] = {
+    "teaser": "The Moon represents your emotional instincts and real need for safety — it only comes alive once placed in an intimate relationship context.",
+    "need": "Deep need: the feeling of being held, and space to show your real emotions.",
+    "shadow": "Under pressure this energy can show up as suppression or overreaction, depending on how it's used.",
+    "focus": "Identify which situations make you feel most secure first, then build emotional support from there.",
+}
+
+_RISING_SIGNS_EN: dict[str, dict[str, str]] = {
+    "牡羊": {
+        "teaser": "First impression: direct, energetic, no beating around the bush. You act first, others catch up.",
+        "external": "Outward vibe: bold, straightforward, fast-paced — people feel you'll say it straight.",
+        "mask": "Under the mask: you also need to be held, you're just not used to waiting for it.",
+        "adjustment": "Letting people see you can pause and listen will make your relationships steadier.",
+    },
+    "金牛": {
+        "teaser": "First impression: stable, tasteful, unhurried. People feel they can rely on you.",
+        "external": "Outward vibe: trustworthy, refined, grounded — gives people a sense of security.",
+        "mask": "Under the mask: you're actually more sensitive to change than you let on.",
+        "adjustment": "Let people see your flexible side occasionally, not just the steady weight.",
+    },
+    "雙子": {
+        "teaser": "First impression: quick, fun, talkative. You quickly put people at ease.",
+        "external": "Outward vibe: witty, curious, changeable — people feel you always have something to say.",
+        "mask": "Under the mask: sometimes you talk a lot because you're not sure silence is safe.",
+        "adjustment": "Letting people see you really stop and listen deepens the connection.",
+    },
+    "巨蟹": {
+        "teaser": "First impression: warm, caring, makes people want to be near you. You make spaces feel comfortable.",
+        "external": "Outward vibe: gentle, attentive, embracing — people feel taken care of.",
+        "mask": "Under the mask: your sensitivity runs deeper than it looks, and you need holding too.",
+        "adjustment": "Allow yourself to sometimes not be the one doing the caretaking.",
+    },
+    "獅子": {
+        "teaser": "First impression: has presence, confident, gets noticed. You naturally lead the energy in a room.",
+        "external": "Outward vibe: radiant, warm, expressive — people find you inspiring.",
+        "mask": "Under the mask: whether you're truly seen matters to you more than it looks.",
+        "adjustment": "Making room for others on the stage too will make you even more well-liked.",
+    },
+    "處女": {
+        "teaser": "First impression: careful, organized, grounded. You make things clearer.",
+        "external": "Outward vibe: cautious, precise, service-minded — people feel they can rely on you.",
+        "mask": "Under the mask: you're harder on yourself than anyone else sees.",
+        "adjustment": "Let people see the flexible side of your organizing, not just standards and critique.",
+    },
+    "天秤": {
+        "teaser": "First impression: graceful, easy to get along with, attractive. People naturally feel comfortable around you.",
+        "external": "Outward vibe: balanced, polite, aesthetic — interacting with you feels smooth.",
+        "mask": "Under the mask: you actually know exactly what you want, you just don't always say it.",
+        "adjustment": "Letting people see where you stand makes your harmony genuine, not just accommodating.",
+    },
+    "天蠍": {
+        "teaser": "First impression: mysterious, deep, piercing gaze. People feel like you're seeing right through them.",
+        "external": "Outward vibe: intense, focused, guarded with words — people sense you have depth.",
+        "mask": "Under the mask: you actually care deeply about trust and connection, you just observe first.",
+        "adjustment": "Occasionally reaching out first works better than waiting to be read.",
+    },
+    "射手": {
+        "teaser": "First impression: optimistic, open, blunt. You make people feel the world still has possibilities.",
+        "external": "Outward vibe: free, positive, far-horizoned — people feel recharged around you.",
+        "mask": "Under the mask: the optimism sometimes hides that you don't want people seeing your heavier side.",
+        "adjustment": "Letting people see you slow down and get serious builds deeper relationships.",
+    },
+    "摩羯": {
+        "teaser": "First impression: reliable, serious, purposeful. People feel what they hand you won't go wrong.",
+        "external": "Outward vibe: composed, responsible, disciplined — people find you trustworthy.",
+        "mask": "Under the mask: you actually want to relax more, you're just not sure it's allowed.",
+        "adjustment": "Letting people see you relax draws them closer more than constant reliability does.",
+    },
+    "水瓶": {
+        "teaser": "First impression: unique, opinionated, unconventional. People feel this person is different.",
+        "external": "Outward vibe: forward-thinking, rational, a bit distant — people want to understand you.",
+        "mask": "Under the mask: you actually care about finding people who truly get you, you just don't easily admit it.",
+        "adjustment": "Letting people see that you do care breaks through the isolation behind the uniqueness.",
+    },
+    "雙魚": {
+        "teaser": "First impression: gentle, dreamy, a bit hard to pin down. People feel you live in another world.",
+        "external": "Outward vibe: soft, sensitive, spiritual — people feel understood by you.",
+        "mask": "Under the mask: you actually need strong boundaries so you don't get swept up in everyone else's energy.",
+        "adjustment": "Letting people see your clear stance turns the mystery into real depth.",
+    },
+}
+_RISING_FALLBACK_EN: dict[str, str] = {
+    "teaser": "Your Rising sign is how you enter the world — others often see this layer first, not your true inner self.",
+    "external": "Outward vibe: this placement describes the aura and first impression you naturally give off.",
+    "mask": "Under the mask: the Rising sign is sometimes protective camouflage — your true self lives in the Sun and Moon.",
+    "adjustment": "When your true self shines through the Rising filter, you become even more magnetic.",
+}
+
+_PLANET_ROLES_EN: dict[str, str] = {
+    "mercury": "the energy of thinking and communication",
+    "venus": "the energy of love and beauty",
+    "mars": "the energy of action and desire",
+    "jupiter": "the energy of expansion and belief",
+    "saturn": "the energy of responsibility and discipline",
+    "uranus": "the energy of breakthrough and innovation",
+    "neptune": "the energy of spiritual intuition",
+    "pluto": "the energy of deep transformation",
+}
+_SIGN_MODIFIERS_EN: dict[str, str] = {
+    "牡羊": "actively and directly",
+    "金牛": "steadily and grounded",
+    "雙子": "flexibly and multi-facetedly",
+    "巨蟹": "gently and protectively",
+    "獅子": "passionately and creatively",
+    "處女": "analytically and helpfully",
+    "天秤": "in a balanced, coordinating way",
+    "天蠍": "deeply and transformatively",
+    "射手": "openly and exploringly",
+    "摩羯": "practically and responsibly",
+    "水瓶": "innovatively and independently",
+    "雙魚": "intuitively and sensitively",
+}
+_HOUSE_AREAS_EN: dict[int, str] = {
+    1: "self-image",
+    2: "resources and values",
+    3: "communication and learning",
+    4: "home and roots",
+    5: "creativity and romance",
+    6: "daily habits and work",
+    7: "relationships and partnership",
+    8: "transformation and deep bonds",
+    9: "beliefs and vision",
+    10: "career and public image",
+    11: "community and future goals",
+    12: "the subconscious and spirituality",
+}
+_ASPECT_TYPES_EN: dict[str, str] = {
+    "合相": "the two energies focus in the same direction, strongly amplifying each other — worth noticing whether it's synergy or over-fusion",
+    "對分相": "the two energies form an opposing axis, needing integration and balance between the two poles",
+    "三分相": "energy flows smoothly, a natural synergy or gift",
+    "四分相": "friction and tension between the two energies — a growth pressure point and a driving force",
+    "六分相": "complementary energies, effective through active effort",
+}
+_ASPECT_PAIR_NOTES_EN: dict[tuple[str, str], str] = {
+    ("moon", "sun"): "the interaction of personal will and emotional instinct, directly shaping how consistent you feel inside and out",
+    ("mercury", "sun"): "your thinking style and self-expression are highly fused — you're suited to conveying yourself through words",
+    ("sun", "venus"): "the link between love/beauty and self-identity, shaping how you attract and are appreciated",
+    ("mars", "sun"): "how well willpower and action-impulse cooperate — strong makes you decisive, tense makes you overshoot",
+    ("jupiter", "sun"): "the expansive power of personal belief and growth direction — optimism can sometimes overreach",
+    ("saturn", "sun"): "tension between self-realization and the limits of responsibility — key to long-term maturity",
+    ("moon", "venus"): "the link between emotional needs and intimacy patterns, shaping how you give and receive love",
+    ("mars", "moon"): "the interplay between emotional impulse and reaction — under pressure it can trigger directly",
+    ("moon", "saturn"): "tension between emotional security and self-discipline — feelings may get over-restrained",
+    ("mars", "venus"): "the interplay of desire energy, shaping attraction and initiative in relationships",
+    ("mars", "saturn"): "tension between drive and restriction — either builds endurance or hits blocks easily",
+    ("jupiter", "saturn"): "the balance of expansion and contraction, shaping the pace of long-term planning",
+    ("mercury", "saturn"): "thinking combined with self-discipline — meticulous and rigorous, but can over-scrutinize yourself",
+    ("jupiter", "mercury"): "ideas expand with optimism — communication is broad but needs attention to follow-through",
+    ("neptune", "sun"): "spiritual ideals interwoven with self-identity — worth distinguishing reality from projection",
+    ("pluto", "sun"): "an intense fusion of deep transformative drive and willpower — powerful energy, hard to ignore",
+    ("sun", "uranus"): "the tension between the urge to break free and the need to define yourself",
+    ("moon", "neptune"): "emotional sensitivity fused with intuition at a high level — boundaries can blur easily",
+    ("moon", "pluto"): "emotions run deep and intense — transformation often begins with the closest connections",
+}
+
+
+def _planet_in_sign_desc_en(key: str, sign_zh: str, house: int | None) -> str:
+    """英文版：行星在星座+宮位的簡短描述。"""
+    role = _PLANET_ROLES_EN.get(key, "this planet's energy")
+    modifier = _SIGN_MODIFIERS_EN.get(sign_zh, "in this sign's distinctive way")
+    area = _HOUSE_AREAS_EN.get(house, "") if house else ""
+    if area:
+        return f"expresses {role} {modifier}, in the life area of {area}"
+    return f"expresses {role} {modifier}"
+
+
+def explain_astro(data: dict, detail: DetailLevel = "teaser", locale: str = "zh-TW", **kwargs) -> str:
     """
     西洋占星完整解讀。
     kwargs 接受 voice 等擴充參數（目前保留不用）。
     """
+    loc = _locale_key(locale)
+    is_en = loc == "en"
     planets_raw = data.get("planets") or {}
     sun_data = data.get("sun") or planets_raw.get("sun") or {}
     moon_data = data.get("moon") or planets_raw.get("moon") or {}
@@ -1648,9 +2013,19 @@ def explain_astro(data: dict, detail: DetailLevel = "teaser", **kwargs) -> str:
     moon_sign = _astro_sign_zh(moon_data)
     asc_sign = _astro_sign_zh(asc_data)
 
-    sun_info = _SUN_SIGNS.get(sun_sign, _SUN_FALLBACK)
-    moon_info = _MOON_SIGNS.get(moon_sign, _MOON_FALLBACK)
-    asc_info = _RISING_SIGNS.get(asc_sign, _RISING_FALLBACK)
+    sun_info = _pick(_SUN_SIGNS, _SUN_SIGNS_EN, sun_sign, loc, "") or (_SUN_FALLBACK_EN if is_en else _SUN_FALLBACK)
+    moon_info = _pick(_MOON_SIGNS, _MOON_SIGNS_EN, moon_sign, loc, "") or (
+        _MOON_FALLBACK_EN if is_en else _MOON_FALLBACK
+    )
+    asc_info = _pick(_RISING_SIGNS, _RISING_SIGNS_EN, asc_sign, loc, "") or (
+        _RISING_FALLBACK_EN if is_en else _RISING_FALLBACK
+    )
+    if not isinstance(sun_info, dict):
+        sun_info = _SUN_FALLBACK_EN if is_en else _SUN_FALLBACK
+    if not isinstance(moon_info, dict):
+        moon_info = _MOON_FALLBACK_EN if is_en else _MOON_FALLBACK
+    if not isinstance(asc_info, dict):
+        asc_info = _RISING_FALLBACK_EN if is_en else _RISING_FALLBACK
 
     sun_deg = _astro_deg_str(sun_data)
     moon_deg = _astro_deg_str(moon_data)
@@ -1658,53 +2033,88 @@ def explain_astro(data: dict, detail: DetailLevel = "teaser", **kwargs) -> str:
     sun_house = _astro_house_str(sun_data)
     moon_house = _astro_house_str(moon_data)
 
+    sun_label = _SIGN_EN.get(sun_sign, sun_sign) if is_en else sun_sign
+    moon_label = _SIGN_EN.get(moon_sign, moon_sign) if is_en else moon_sign
+    asc_label = _SIGN_EN.get(asc_sign, asc_sign) if is_en else asc_sign
+    if is_en:
+        sun_house = sun_house.replace("第", "House ").replace("宮", "") if sun_house else ""
+        moon_house = moon_house.replace("第", "House ").replace("宮", "") if moon_house else ""
+        sun_house = f" {sun_house}" if sun_house else ""
+        moon_house = f" {moon_house}" if moon_house else ""
+
     parts: list[str] = []
 
     # ── 太陽 ──
     if detail == "teaser":
-        parts.append(
-            _line(
-                f"太陽 <strong>{sun_sign or '—'} {sun_deg}{sun_house}</strong>：{_text(sun_info.get('teaser_friend'))}"
+        if is_en:
+            parts.append(
+                _line(
+                    f"Sun in <strong>{sun_label or '—'} {sun_deg}{sun_house}</strong>: {_text(sun_info.get('teaser_friend'))}"
+                )
             )
-        )
+        else:
+            parts.append(
+                _line(
+                    f"太陽 <strong>{sun_sign or '—'} {sun_deg}{sun_house}</strong>：{_text(sun_info.get('teaser_friend'))}"
+                )
+            )
     else:
-        parts.append(_section("太陽：核心意志"))
-        parts.append(_line(f"<strong>{sun_sign or '—'} {sun_deg}{sun_house}</strong>"))
+        parts.append(_section("Sun: Core Will" if is_en else "太陽：核心意志"))
+        parts.append(_line(f"<strong>{sun_label or '—'} {sun_deg}{sun_house}</strong>"))
         parts.append(_line(_text(sun_info.get("core"))))
         parts.append(_line(_text(sun_info.get("shadow"))))
-        parts.append(_section("關係模式"))
+        parts.append(_section("Relationship Pattern" if is_en else "關係模式"))
         parts.append(_line(_text(sun_info.get("relationship"))))
         parts.append(_line(_text(sun_info.get("growth"))))
 
     # ── 月亮 ──
     if detail == "teaser":
-        parts.append(
-            _line(
-                f"月亮 <strong>{moon_sign or '—'} {moon_deg}{moon_house}</strong>：{_text(moon_info.get('teaser'))}"
+        if is_en:
+            parts.append(
+                _line(
+                    f"Moon in <strong>{moon_label or '—'} {moon_deg}{moon_house}</strong>: {_text(moon_info.get('teaser'))}"
+                )
             )
-        )
+        else:
+            parts.append(
+                _line(
+                    f"月亮 <strong>{moon_sign or '—'} {moon_deg}{moon_house}</strong>：{_text(moon_info.get('teaser'))}"
+                )
+            )
     else:
-        parts.append(_section("月亮：情感本能"))
-        parts.append(_line(f"<strong>{moon_sign or '—'} {moon_deg}{moon_house}</strong>"))
+        parts.append(_section("Moon: Emotional Instinct" if is_en else "月亮：情感本能"))
+        parts.append(_line(f"<strong>{moon_label or '—'} {moon_deg}{moon_house}</strong>"))
         parts.append(_line(_text(moon_info.get("teaser"))))
-        parts.append(_section("深層需要"))
+        parts.append(_section("Deep Needs" if is_en else "深層需要"))
         parts.append(_line(_text(moon_info.get("need"))))
         parts.append(_line(_text(moon_info.get("shadow"))))
         parts.append(_line(_text(moon_info.get("focus"))))
 
     # 月亮的安全感提示在 teaser/full 均顯示
-    parts.append(_line("月亮說的是你真正需要的安全感——情感底色穩了，其他選擇才能真正看清楚。"))
+    if is_en:
+        parts.append(
+            _line(
+                "The Moon speaks to the security you truly need — once that emotional foundation is steady, everything else becomes easier to see clearly."
+            )
+        )
+    else:
+        parts.append(_line("月亮說的是你真正需要的安全感——情感底色穩了，其他選擇才能真正看清楚。"))
 
     # ── 上升 ──
     if detail == "teaser":
-        parts.append(
-            _line(f"上升 <strong>{asc_sign or '—'} {asc_deg}</strong>：{_text(asc_info.get('teaser'))}")
-        )
+        if is_en:
+            parts.append(
+                _line(f"Rising in <strong>{asc_label or '—'} {asc_deg}</strong>: {_text(asc_info.get('teaser'))}")
+            )
+        else:
+            parts.append(
+                _line(f"上升 <strong>{asc_sign or '—'} {asc_deg}</strong>：{_text(asc_info.get('teaser'))}")
+            )
     else:
-        parts.append(_section("上升：第一印象"))
-        parts.append(_line(f"<strong>{asc_sign or '—'} {asc_deg}</strong>"))
+        parts.append(_section("Rising: First Impression" if is_en else "上升：第一印象"))
+        parts.append(_line(f"<strong>{asc_label or '—'} {asc_deg}</strong>"))
         parts.append(_line(_text(asc_info.get("teaser"))))
-        parts.append(_section("外顯氣質"))
+        parts.append(_section("Outward Vibe" if is_en else "外顯氣質"))
         parts.append(_line(_text(asc_info.get("external"))))
         parts.append(_line(_text(asc_info.get("mask"))))  # 包含「面具底下」
         parts.append(_line(_text(asc_info.get("adjustment"))))
@@ -1712,7 +2122,16 @@ def explain_astro(data: dict, detail: DetailLevel = "teaser", **kwargs) -> str:
     # ── 天頂 ──
     mc_text = _sign_text(mc_data)
     if mc_text:
-        parts.append(_line(f"天頂 <strong>{mc_text}</strong>：事業形象、公眾成就與社會角色的方向。"))
+        if is_en:
+            mc_sign_zh = _astro_sign_zh(mc_data)
+            mc_display = mc_text.replace(mc_sign_zh, _SIGN_EN.get(mc_sign_zh, mc_sign_zh)) if mc_sign_zh else mc_text
+            parts.append(
+                _line(
+                    f"Midheaven in <strong>{mc_display}</strong>: your direction for career image, public achievement, and social role."
+                )
+            )
+        else:
+            parts.append(_line(f"天頂 <strong>{mc_text}</strong>：事業形象、公眾成就與社會角色的方向。"))
 
     # ── 其他行星位置 ──
     _OTHER_PLANETS = ["mercury", "venus", "mars", "jupiter", "saturn", "uranus", "neptune", "pluto"]
@@ -1725,22 +2144,41 @@ def explain_astro(data: dict, detail: DetailLevel = "teaser", **kwargs) -> str:
         p_sign = _astro_sign_zh(p)
         p_deg = _astro_deg_str(p)
         p_house = _astro_house_str(p)
-        p_zh = _text(p.get("zh")) or _PLANET_ZH.get(key, key)
         p_sym = _text(p.get("symbol"))
         retro = "℞ " if p.get("retrograde") else ""
-        desc = _planet_in_sign_desc(key, p_sign, p.get("house"))
-        planet_lines.append(
-            _line(
-                f"{p_sym} <strong>{p_zh}{' ' + retro if retro else ''}</strong>"
-                f" {p_sign} {p_deg}{p_house}：{desc}。"
+        if is_en:
+            p_label = _PLANET_EN.get(key, key.title())
+            p_sign_label = _SIGN_EN.get(p_sign, p_sign)
+            p_house_label = f" House {p_house.replace('第', '').replace('宮', '')}" if p_house else ""
+            desc = _planet_in_sign_desc_en(key, p_sign, p.get("house"))
+            planet_lines.append(
+                _line(
+                    f"{p_sym} <strong>{p_label}{' ' + retro if retro else ''}</strong>"
+                    f" {p_sign_label} {p_deg}{p_house_label}: {desc}."
+                )
             )
-        )
+        else:
+            p_zh = _text(p.get("zh")) or _PLANET_ZH.get(key, key)
+            desc = _planet_in_sign_desc(key, p_sign, p.get("house"))
+            planet_lines.append(
+                _line(
+                    f"{p_sym} <strong>{p_zh}{' ' + retro if retro else ''}</strong>"
+                    f" {p_sign} {p_deg}{p_house}：{desc}。"
+                )
+            )
     if planet_lines:
-        parts.append(_section("其他行星位置"))
+        parts.append(_section("Other Planet Placements" if is_en else "其他行星位置"))
         parts.extend(planet_lines)
 
     # ── 主要相位 ──
     _PERSONAL = {"sun", "moon", "mercury", "venus", "mars"}
+    _ASPECT_TYPE_EN_LABEL = {
+        "合相": "Conjunction",
+        "對分相": "Opposition",
+        "三分相": "Trine",
+        "四分相": "Square",
+        "六分相": "Sextile",
+    }
     important = [
         a
         for a in aspects_raw
@@ -1748,12 +2186,10 @@ def explain_astro(data: dict, detail: DetailLevel = "teaser", **kwargs) -> str:
     ]
     limit = 5 if detail == "teaser" else 15
     if important:
-        parts.append(_section("主要相位"))
+        parts.append(_section("Key Aspects" if is_en else "主要相位"))
         for asp in important[:limit]:
             p1_key = asp.get("planet1", "")
             p2_key = asp.get("planet2", "")
-            p1_zh = _text(asp.get("planet1Zh")) or _PLANET_ZH.get(p1_key, p1_key)
-            p2_zh = _text(asp.get("planet2Zh")) or _PLANET_ZH.get(p2_key, p2_key)
             asp_type = _text(asp.get("type"))
             orb = asp.get("orb")
             try:
@@ -1761,40 +2197,81 @@ def explain_astro(data: dict, detail: DetailLevel = "teaser", **kwargs) -> str:
             except (TypeError, ValueError):
                 orb_str = ""
             pair_key = tuple(sorted([p1_key, p2_key]))
-            note = _ASPECT_PAIR_NOTES.get(pair_key, "") or _ASPECT_TYPES.get(asp_type, "")
-            parts.append(
-                _line(
-                    f"<strong>{p1_zh} {asp_type} {p2_zh}</strong>"
-                    f"{'（容許度 ' + orb_str + '）' if orb_str else ''}：{_text(note)}"
+            if is_en:
+                p1_label = _PLANET_EN.get(p1_key, p1_key.title())
+                p2_label = _PLANET_EN.get(p2_key, p2_key.title())
+                asp_type_label = _ASPECT_TYPE_EN_LABEL.get(asp_type, asp_type)
+                note = _ASPECT_PAIR_NOTES_EN.get(pair_key, "") or _ASPECT_TYPES_EN.get(asp_type, "")
+                parts.append(
+                    _line(
+                        f"<strong>{p1_label} {asp_type_label} {p2_label}</strong>"
+                        f"{' (orb ' + orb_str + ')' if orb_str else ''}: {_text(note)}"
+                    )
                 )
-            )
+            else:
+                p1_zh = _text(asp.get("planet1Zh")) or _PLANET_ZH.get(p1_key, p1_key)
+                p2_zh = _text(asp.get("planet2Zh")) or _PLANET_ZH.get(p2_key, p2_key)
+                note = _ASPECT_PAIR_NOTES.get(pair_key, "") or _ASPECT_TYPES.get(asp_type, "")
+                parts.append(
+                    _line(
+                        f"<strong>{p1_zh} {asp_type} {p2_zh}</strong>"
+                        f"{'（容許度 ' + orb_str + '）' if orb_str else ''}：{_text(note)}"
+                    )
+                )
 
     # ── Full：宮位概覽 ──
     if detail == "full" and houses_raw:
-        parts.append(_section("十二宮位星座"))
+        parts.append(_section("The 12 Houses" if is_en else "十二宮位星座"))
         for h in houses_raw[:12]:
             if not isinstance(h, dict):
                 continue
             hnum = h.get("house")
             hsign = _astro_sign_zh(h)
             hsym = (h.get("sign") or {}).get("symbol", "") if isinstance(h.get("sign"), dict) else ""
-            area = _HOUSE_AREAS.get(hnum, "")
-            parts.append(
-                _line(f"第 <strong>{hnum}</strong> 宮 {hsym}{hsign}" f"{'（' + area + '）' if area else ''}")
-            )
+            if is_en:
+                area = _HOUSE_AREAS_EN.get(hnum, "")
+                hsign_label = _SIGN_EN.get(hsign, hsign)
+                parts.append(
+                    _line(
+                        f"House <strong>{hnum}</strong> {hsym}{hsign_label}"
+                        f"{' (' + area + ')' if area else ''}"
+                    )
+                )
+            else:
+                area = _HOUSE_AREAS.get(hnum, "")
+                parts.append(
+                    _line(f"第 <strong>{hnum}</strong> 宮 {hsym}{hsign}" f"{'（' + area + '）' if area else ''}")
+                )
 
     # ── 諮詢引導 ──
-    parts.append(
-        _line("帶著星盤問老師，把你看到有感的部分說出來；" "一場好的諮詢能讓抽象符號變成真正可以行動的地圖。")
-    )
+    if is_en:
+        parts.append(
+            _line(
+                "Bring your chart to a conversation and put into words the parts that resonate with you — "
+                "a good conversation is what turns abstract symbols into a map you can actually act on."
+            )
+        )
+    else:
+        parts.append(
+            _line("帶著星盤問老師，把你看到有感的部分說出來；" "一場好的諮詢能讓抽象符號變成真正可以行動的地圖。")
+        )
 
     # ── 合規聲明 ──
-    parts.append(
-        _line(
-            "<small>以上解讀以星盤象徵作為自我觀察的參考框架，不構成預測、醫療診斷或任何形式的保證。"
-            "出生時間精準度直接影響上升與宮位準確性。</small>"
+    if is_en:
+        parts.append(
+            _line(
+                "<small>This reading uses your chart's symbolism as a reference frame for self-reflection. "
+                "It is not a prediction, medical diagnosis, or any form of guarantee. "
+                "Birth-time accuracy directly affects the precision of the Rising sign and house placements.</small>"
+            )
         )
-    )
+    else:
+        parts.append(
+            _line(
+                "<small>以上解讀以星盤象徵作為自我觀察的參考框架，不構成預測、醫療診斷或任何形式的保證。"
+                "出生時間精準度直接影響上升與宮位準確性。</small>"
+            )
+        )
 
     return _wrap(parts, detail)
 
