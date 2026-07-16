@@ -2822,36 +2822,78 @@ def explain_tarot(data: dict, detail: DetailLevel = "teaser") -> str:
     return _wrap(parts, detail)
 
 
-def explain_runes(data: dict, detail: DetailLevel = "teaser") -> str:
+def explain_runes(data: dict, detail: DetailLevel = "teaser", locale: str = "zh-TW") -> str:
+    loc = _locale_key(locale)
+    is_en = loc == "en"
     runes = data.get("runes") or []
     material = (data.get("meta") or {}).get("material")
-    parts = [
-        _section("盧恩訊息"),
-        _line(
-            f"你本次抽出 {len(runes)} 顆符文{f'，材質為 {_text(material)}' if material else ''}。盧恩適合讀成提醒、阻力與下一步。"
-        ),
-    ]
+
+    if is_en:
+        parts = [
+            _section("Rune Message"),
+            _line(
+                f"You drew {len(runes)} rune{'s' if len(runes) != 1 else ''}"
+                f"{f', made of {_text(material)}' if material else ''} this time. "
+                "Runes are best read as reminders, points of resistance, and a next step."
+            ),
+        ]
+    else:
+        parts = [
+            _section("盧恩訊息"),
+            _line(
+                f"你本次抽出 {len(runes)} 顆符文{f'，材質為 {_text(material)}' if material else ''}。盧恩適合讀成提醒、阻力與下一步。"
+            ),
+        ]
 
     for index, draw in enumerate(runes, start=1):
         rune = draw.get("rune") or {}
-        position = "逆位" if draw.get("position") == "reversed" else "正位"
-        name = rune.get("zh") or rune.get("name") or f"第 {index} 顆符文"
-        meaning = draw.get("meaning")
-        if not meaning:
-            meaning_source = rune.get("reversed") if position == "逆位" else rune.get("upright")
-            meaning = (meaning_source or {}).get("text")
-        parts.append(
-            _line(
-                f"<strong>{_text(rune.get('glyph'))} {_text(name)} / {position}</strong>：{_text(meaning, '這顆符文提醒你留意當下事件背後的能量。')}"
+        is_reversed = draw.get("position") == "reversed"
+        en_data = rune.get("en") or {}
+        if is_en:
+            position = "Reversed" if is_reversed else "Upright"
+            name = en_data.get("name") or rune.get("name") or f"Rune {index}"
+            meaning = draw.get("meaning")
+            if not meaning:
+                meaning_source = en_data.get("reversed") if is_reversed else en_data.get("upright")
+                meaning = (meaning_source or {}).get("text")
+            parts.append(
+                _line(
+                    f"<strong>{_text(rune.get('glyph'))} {_text(name)} / {position}</strong>: "
+                    f"{_text(meaning, 'This rune is a reminder to notice the energy behind what is happening right now.')}"
+                )
             )
-        )
+        else:
+            position = "逆位" if is_reversed else "正位"
+            name = rune.get("zh") or rune.get("name") or f"第 {index} 顆符文"
+            meaning = draw.get("meaning")
+            if not meaning:
+                meaning_source = rune.get("reversed") if is_reversed else rune.get("upright")
+                meaning = (meaning_source or {}).get("text")
+            parts.append(
+                _line(
+                    f"<strong>{_text(rune.get('glyph'))} {_text(name)} / {position}</strong>：{_text(meaning, '這顆符文提醒你留意當下事件背後的能量。')}"
+                )
+            )
 
     if detail == "full":
-        parts.extend(
-            [
-                _section("深度解讀方向"),
-                _line("若抽到逆位，不必視為壞事，它通常指出能量被卡住、延遲或需要重新校準。"),
-                _line("建議把符文訊息轉成一個具體行動：今天要避免什麼、練習什麼、完成什麼。"),
-            ]
-        )
+        if is_en:
+            parts.extend(
+                [
+                    _section("Going Deeper"),
+                    _line(
+                        "A reversed rune isn't necessarily bad news -- it usually points to energy that's stuck, delayed, or needs recalibrating."
+                    ),
+                    _line(
+                        "Try turning the rune's message into one concrete action: what to avoid today, what to practice, what to finish."
+                    ),
+                ]
+            )
+        else:
+            parts.extend(
+                [
+                    _section("深度解讀方向"),
+                    _line("若抽到逆位，不必視為壞事，它通常指出能量被卡住、延遲或需要重新校準。"),
+                    _line("建議把符文訊息轉成一個具體行動：今天要避免什麼、練習什麼、完成什麼。"),
+                ]
+            )
     return _wrap(parts, detail)
