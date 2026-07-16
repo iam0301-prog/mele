@@ -1857,6 +1857,91 @@ HD_AUTHORITY_GUIDE = {
     "Mental (Outer)": "環境權威需要合適場域與可信任的人作為回音壁；不是請別人決定，而是透過說話聽見自己。",
 }
 
+HD_TYPE_GUIDE_EN = {
+    "Manifestor": "Your energy is built to initiate. The key isn't waiting for everyone's approval — it's informing before you act, so there's less resistance in your way.",
+    "Generator": "Your energy comes from responding. When your body has a clear yes to something, you show up steadier; forcing yourself to chase things burns you out.",
+    "Manifesting Generator": "You need both response and fast experimentation. Give yourself permission to move in a non-linear way, but still check in with your body's response before big moves.",
+    "Projector": "Your gift is seeing how systems and people really work. Waiting for the right invitation isn't passive — it's what lets your insight actually land.",
+    "Reflector": "You're like a mirror for your environment, built to watch change unfold over time. Don't rush big decisions — let a full lunar cycle help you see clearly.",
+}
+
+HD_AUTHORITY_GUIDE_EN = {
+    "Emotional": "Emotional authority needs time. Wanting or not wanting something intensely today doesn't mean you need to decide right now — clarity comes after the wave passes.",
+    "Sacral": "Sacral authority runs on your body's in-the-moment yes/no. You need to hear your body's direct response more than you need to think it through.",
+    "Splenic": "Splenic authority is quiet and instant. The intuitive hit only speaks once, so it helps to practice noticing it when your body is relaxed.",
+    "Ego (Heart)": "Ego authority is about whether you truly have the commitment and willpower for it. Don't say yes to prove something — only real desire carries the power to follow through.",
+    "Self-Projected": "Self-projected authority needs to be spoken out loud. When you hear your own voice, your sense of direction gets clearer.",
+    "Lunar": "Lunar authority needs time and environmental observation. You're not slow — you need to see your honest reactions across different days.",
+    "Mental (Outer)": "Outer authority needs the right space and trusted people to talk things through with — not so others decide for you, but so you can hear yourself by speaking.",
+}
+
+GATE_MEANINGS_EN = {
+    1: ("Creativity", "You have the power to express yourself in a unique way; when you're not rushing to prove anything, your creativity naturally gets seen."),
+    2: ("Direction", "You're sensitive to life direction and receiving resources — best to check in with your inner sense before moving forward."),
+    3: ("Ordering Chaos", "New cycles tend to start messy, but you're able to turn that chaos into new order."),
+    4: ("Answers", "You go looking for logical answers, but also need to check whether the question is really yours to solve."),
+    5: ("Rhythm", "You need a stable rhythm and routine; your energy drains fast when that rhythm gets disrupted."),
+    6: ("Emotional Boundaries", "Closeness and distance in relationships matter a lot to you — commitments land steadier once your feelings are clear."),
+    7: ("Role & Direction", "You tend to sense direction and roles within a group, and lead well by serving the whole."),
+    8: ("Contribution Style", "You contribute through your own individual style — the more authentic you are, the more you attract the right stage."),
+    9: ("Focus", "You have an eye for detail, and do best putting your attention on the few things that truly matter."),
+    10: ("Behavior of Self", "Your life theme is living out your true self, not just playing the role others expect."),
+    11: ("Ideas", "Your mind holds many stories and flashes of inspiration — great for sharing, but not every idea needs to be acted on right away."),
+    12: ("Cautious Expression", "Your expression needs the right mood and timing; when the state is right, your words carry real impact."),
+    13: ("The Listener", "You tend to hold other people's stories — a natural listener, but you also need to protect your own emotional capacity."),
+    14: ("Power Skills", "You have the ability to put energy into resources and work — the key is investing where there's real response."),
+    15: ("Extremes", "Your rhythm may be irregular; embracing your own variability while finding a sustainable structure works best."),
+    16: ("Skills", "You build skill through practice — enthusiasm plus repetition becomes real talent."),
+    17: ("Opinions", "You're good at forming opinions and organizing ideas, but need a gentle approach for others to actually want to listen."),
+    18: ("Correction", "You can see what needs improving — the key is turning criticism into correction, not nitpicking."),
+    19: ("Sensitivity to Need", "You're sensitive to belonging, intimacy, and resource needs — it helps to say honestly what you need."),
+    20: ("The Now", "You need to live in the present moment; when your body is truly present, your expression and action get sharper."),
+    21: ("Control", "You need a sense of control over resources and responsibility — clear terms and boundaries work well for you."),
+    22: ("Grace", "Your charm is tied to your emotional state — when the mood is right, you're naturally magnetic."),
+    23: ("Simplification", "You can turn complex insight into something simple, but need to wait until others are ready to receive it."),
+    24: ("Rationalization", "You chew on ideas repeatedly until they become an answer you can understand."),
+    25: ("Innocence", "Your power lies in an unconditional heart and sincerity, but you also need to learn to protect yourself."),
+    26: ("Influence", "You're good at packaging value and persuading others — honesty is what makes your influence last."),
+    27: ("Caring", "You have a natural instinct to nurture and care for others — remember to keep enough energy for yourself first."),
+    28: ("Purpose", "You keep asking whether something is worth it — once you find meaning, you're remarkably resilient."),
+    29: ("Commitment", "You have the power to fully commit to experience, but need to check your body genuinely says yes before committing."),
+    30: ("Desire", "You're often driven by intense desire — treat it as a directional signal, not an order to obey."),
+    31: ("The Voice of Leadership", "You can lead a group through expression, but real leadership needs to be recognized by the group."),
+    32: ("Continuity", "You have a sharp sense for sustainability and risk — good at judging what's worth a long-term investment."),
+    33: ("Retreat & Reflection", "You need time to process experience; stepping back to sort things out is what turns a story into wisdom."),
+    34: ("Power", "You carry strong life force — best invested where there's real response, not just to stay busy."),
+    35: ("Change", "You crave new experience; the key is letting each change bring real growth, not just chasing a thrill."),
+    36: ("Crisis", "You learn through the unknown and emotional swings — the slower you go, the more clearly you get through the chaos."),
+    37: ("Family & Commitment", "You value reciprocity, emotional safety, and commitment — fairness in relationships affects your sense of stability."),
+    38: ("The Fighter", "You fight for what's meaningful — confirm it's worth it first, so your effort isn't wasted."),
+    39: ("The Provocateur", "You may stir others' emotions or creativity — not to provoke, but to wake up what's genuinely felt."),
+    40: ("Aloneness", "You need balance between commitment and solitude — rest is what restores your willpower."),
+    41: ("Imagination", "You're the starting point of emotional experience — imagination pushes you toward new stories."),
+    42: ("Completion", "You're good at seeing things through to completion — only then do you learn what the experience truly brought."),
+    43: ("Breakthrough Insight", "You get sudden insight, but need to wait for the right timing and words for others to understand."),
+    44: ("Pattern Recognition", "You can sense whether past patterns will repeat — good at judging the reliability of people and partnerships."),
+    45: ("Resource Management", "You're suited to managing resources and distributing value — real security comes from reciprocity, not possession."),
+    46: ("Love of the Body", "Your growth happens through the body and lived experience — trust that you're learning in the right place."),
+    47: ("Understanding Pressure", "You turn scattered chaos into understanding — don't rush to conclusions while under pressure."),
+    48: ("Depth", "You have the potential to pursue depth and mastery — avoid freezing up from feeling not good enough."),
+    49: ("Principles", "You're sensitive to principles in relationships — when values clash, you'll need to redefine the boundary."),
+    50: ("Values", "You care about responsibility, care, and ethics — good at building norms that make people feel safe."),
+    51: ("Shock", "You may be awakened through sudden events — real courage is coming back to what your heart wants."),
+    52: ("Stillness", "You need to stop and gather your energy; stillness isn't a lack of progress, it's building focus."),
+    53: ("Beginnings", "You feel the pressure to start new cycles — check you have the resources to see it through before you begin."),
+    54: ("Ambition", "You're driven to rise and improve your position — best channeled into clear partnerships and long-term strategy."),
+    55: ("Abundance & Mood", "Your state of mind shapes your sense of abundance — emotional freedom matters more than what you own."),
+    56: ("The Storyteller", "You're good at inspiring others through story and narrative — process your own feelings before you share."),
+    57: ("Intuitive Clarity", "You have sharp in-the-moment survival instinct — the quieter you are, the more clearly you hear your body's real signal."),
+    58: ("Joy of Life", "You want to improve life and pursue vitality — your criticism is really a wish to make things better."),
+    59: ("Intimacy", "You can open the door to intimacy and partnership — respect both your own boundaries and the other person's."),
+    60: ("Limitation", "You feel constraints, but limitation can also force breakthrough into new forms."),
+    61: ("Inner Truth", "You keep asking about unseen truths — the answer needs time to take shape inside you."),
+    62: ("Detail", "You express details clearly — good at using precise language to ground abstract ideas."),
+    63: ("Doubt", "Your doubt helps you check the logic — the key is turning doubt into verification, not anxiety."),
+    64: ("Confusion", "Your mind often holds many fragments and questions — give inspiration time to piece itself into meaning."),
+}
+
 GATE_MEANINGS = {
     1: ("創造", "你有用獨特方式表達自己的力量；當不急著證明時，創造力會自然被看見。"),
     2: ("方向", "你對人生方向與資源接收很敏感，適合先確認內在感受再前進。"),
@@ -1935,13 +2020,66 @@ def _hd_center_label(value: object) -> str:
     return HD_CENTER_LABELS.get(text, text)
 
 
-def explain_humandesign(data: dict, detail: DetailLevel = "teaser") -> str:
+def explain_humandesign(data: dict, detail: DetailLevel = "teaser", locale: str = "zh-TW") -> str:
+    is_en = _locale_key(locale) == "en"
     defined = data.get("definedCenters") or []
     channels = data.get("definedChannels") or []
     gates = data.get("activatedGates") or []
     type_raw = data.get("type")
     authority_raw = data.get("authority")
     strategy_raw = data.get("strategy")
+
+    if is_en:
+        # Human Design's native vocabulary is already English; use it directly instead of the zh labels.
+        type_label = str(type_raw or "")
+        authority_label = str(authority_raw or "")
+        strategy_label = str(strategy_raw or "")
+        parts = [
+            _line(
+                f"Your type is <strong>{_text(type_label)}</strong>, and your strategy is <strong>{_text(strategy_label)}</strong>."
+            ),
+            _line(
+                HD_TYPE_GUIDE_EN.get(
+                    str(type_raw),
+                    "Your type describes how you exchange energy with the world — the key is putting it into daily decisions, not just remembering the name.",
+                )
+            ),
+            _line(
+                f"Inner authority: <strong>{_text(authority_label)}</strong>. {HD_AUTHORITY_GUIDE_EN.get(str(authority_raw), 'This is the body signal you most need to trust when making important decisions.')}"
+            ),
+            _line(
+                f"Life Profile: <strong>{_text(data.get('profile'))}</strong>, describing how you learn, interact, and are seen by others."
+            ),
+        ]
+        if defined:
+            center_names = [str(center) for center in defined]
+            parts.append(
+                _line(f"Defined centers: <strong>{_join(center_names)}</strong>, representing your steadier, sustainable energy output.")
+            )
+        if channels:
+            parts.append(_line(f"Defined channels: <strong>{_join(channels)}</strong>, your more fixed circuits of talent."))
+        if gates:
+            parts.append(_section("Highlighted Activated Gates"))
+            for raw_gate in gates[:8]:
+                gate = _safe_int(raw_gate.get("gate") if isinstance(raw_gate, dict) else raw_gate)
+                title, copy = GATE_MEANINGS_EN.get(
+                    gate, ("Energy Theme", "This gate describes an activated energy that needs to be understood alongside your type, strategy, and authority.")
+                )
+                parts.append(_line(f"<strong>Gate {gate} | {_text(title)}</strong>: {_text(copy)}"))
+
+        if detail == "full":
+            parts.extend(
+                [
+                    _section("Deeper Reading Directions"),
+                    _line("The most important thing in Human Design is putting your strategy and authority into life decisions, not just memorizing your type name."),
+                    _line(
+                        "The next layer can look at undefined centers, which tend to amplify what's around you — helping you tell apart what's truly yours and what's environmental influence."
+                    ),
+                    _line("A gate isn't meant to be read alone — it needs to be read together with its center, channel, planetary position, and the Personality/Design layers."),
+                ]
+            )
+        return _wrap(parts, detail)
+
     type_label = _hd_label(type_raw, HD_TYPE_LABELS)
     authority_label = _hd_label(authority_raw, HD_AUTHORITY_LABELS)
     strategy_label = _hd_label(strategy_raw, HD_STRATEGY_LABELS)
