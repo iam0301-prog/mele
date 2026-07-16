@@ -877,7 +877,7 @@ function BookFormInner() {
           <div>
             <div className="mb-5 rounded-xl bg-black/25 p-5">
               <div className="flex items-center gap-4">
-                <div className="flex h-14 w-14 items-center justify-center rounded-full bg-mele-gold font-serif text-xl text-primary">
+                <div className="flex h-14 w-14 items-center justify-center rounded-full bg-accent font-serif text-xl text-primary">
                   {teacher.display_name.charAt(0)}
                 </div>
                 <div>
