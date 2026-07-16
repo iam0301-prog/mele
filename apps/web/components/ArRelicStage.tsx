@@ -131,7 +131,7 @@ export function ArRelicStage({ initialMode = 'human-design' }: { initialMode?: R
         <p>{active.caption}</p>
         <div className="ritual-stage__actions">
           <span className="mele-btn-secondary" aria-disabled="true">
-            AR / 3D 正式版準備中
+            2D 動態解盤舞台
           </span>
           <a href={targetFor(mode)} className="mele-btn-primary">
             {active.action}

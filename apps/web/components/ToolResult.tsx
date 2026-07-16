@@ -2,7 +2,9 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { MayaOracleBoard, MayaTotemGallery, MayaTotemGlyph, getMayaTotemBySeal } from '@/components/MayaTotemGlyph';
+import Image from 'next/image';
+import { HumanDesignBodyGraph } from '@/components/HumanDesignBodyGraph';
+import { MayaTotemGallery, MayaTotemGlyph, getMayaTotemBySeal } from '@/components/MayaTotemGlyph';
 import { ToolHighlightCards } from '@/components/ToolHighlightCards';
 import type { CalcResponse, CalcTool } from '@/lib/api';
 import {
@@ -32,6 +34,9 @@ type InsightCard = {
   body?: string;
   tags?: string[];
   mayaSeal?: unknown;
+  imageSrc?: string;
+  imageAlt?: string;
+  imageReversed?: boolean;
 };
 
 type ResultInsight = {
@@ -40,6 +45,12 @@ type ResultInsight = {
   intro: string;
   facts: InsightFact[];
   cards: InsightCard[];
+};
+
+type HumanDesignChannelSignal = {
+  gate1: number;
+  gate2: number;
+  key: string;
 };
 
 type PersonalReadingPoint = {
@@ -315,13 +326,10 @@ const KEY_LABELS: Record<string, string> = {
   birthDay: '生日數',
   lifePathArchetype: '生命原型',
   birthDayArchetype: '生日原型',
-  kin: 'Kin',
-  label: '完整名稱',
-  tone: '調性',
-  seal: '圖騰',
-  classicTzolkin: '古典 Tzolkin',
-  starroot: 'Starroot 對照',
-  longCount: '長紀曆',
+  kin: '你的 Kin 編號',
+  label: '你的印記名稱',
+  tone: '你的行動節奏',
+  seal: '你的核心天賦',
   pillars: '四柱',
   dayMaster: '日主',
   dayMasterYinYang: '日主陰陽',
@@ -386,6 +394,12 @@ const HIDDEN_FACT_KEYS = new Set([
   'svg',
   'html',
   'animations',
+  'starroot',
+  'classicTzolkin',
+  'sealNum',
+  'toneNum',
+  'source',
+  'oracle',
 ]);
 
 const HD_VALUE_LABELS: Record<string, string> = {
@@ -647,6 +661,7 @@ function tarotPositionReading(slot: string, position: string, meaning: string): 
 }
 
 function tarotCards(data: Dict): InsightCard[] {
+  const meta = asDict(data.meta);
   return asArray(data.cards).slice(0, 6).map((item, index) => {
     const draw = asDict(item);
     const card = asDict(draw.card);
@@ -654,11 +669,18 @@ function tarotCards(data: Dict): InsightCard[] {
     const slot = cleanText(draw.spread_position) || cleanText(draw.slot) || `位置 ${index + 1}`;
     const position = cleanText(draw.position);
     const meaning = meaningFrom(draw, card) || '這張牌指出你目前最需要面對的心理狀態與下一步提醒。';
+    const style = cleanText(draw.style) || cleanText(meta.tarot_style) || 'ocean_poseidon';
+    const cardId = cleanText(card.id) || cleanText(card.number) || cleanText(draw.drawIndex);
+    const numericId = Number(cardId);
+    const extension = style === 'ocean_poseidon' && Number.isFinite(numericId) && numericId >= 30 ? 'png' : 'webp';
     return {
       title: name,
       subtitle: `${slot} / ${positionLabel(position)}`,
       body: tarotPositionReading(slot, position, meaning),
       tags: keywordsFrom(draw, card),
+      imageSrc: cardId ? `/tarot/cards/${style}/${cardId}.${extension}` : undefined,
+      imageAlt: `${name}，${slot}，${positionLabel(position)}`,
+      imageReversed: position === 'reversed',
     };
   });
 }
@@ -718,7 +740,7 @@ function mayaCards(data: Dict): InsightCard[] {
 }
 
 function gateCards(data: Dict): InsightCard[] {
-  const gates = asArray(data.activatedGates).slice(0, 18);
+  const gates = asArray(data.activatedGates);
   if (!gates.length) return [];
 
   return gates.map((gate, index) => {
@@ -733,6 +755,133 @@ function gateCards(data: Dict): InsightCard[] {
       tags: asArray(item.keywords).map((entry) => cleanText(entry)).filter(Boolean).slice(0, 4),
     };
   });
+}
+
+function humanDesignGateNumber(value: unknown): number | null {
+  const item = asDict(value);
+  const candidate = cleanText(item.gate) || cleanText(item.number) || cleanText(value);
+  const gate = Number(candidate);
+  return Number.isInteger(gate) && gate >= 1 && gate <= 64 ? gate : null;
+}
+
+function humanDesignChannelSignal(value: unknown): HumanDesignChannelSignal | null {
+  const item = asDict(value);
+  const source = Array.isArray(value)
+    ? value
+    : Array.isArray(item.gates)
+      ? item.gates
+      : Array.isArray(item.channel)
+        ? item.channel
+        : Array.isArray(item.value)
+          ? item.value
+          : cleanText(value).split(/\D+/).filter(Boolean);
+  if (source.length < 2) return null;
+
+  const first = humanDesignGateNumber(source[0]);
+  const second = humanDesignGateNumber(source[1]);
+  if (!first || !second) return null;
+
+  const [gate1, gate2] = [first, second].sort((a, b) => a - b);
+  return { gate1, gate2, key: `${gate1}-${gate2}` };
+}
+
+function HumanDesignSignalsPanel({ result, t, locale }: { result: CalcResponse; t: ToolResultCopy; locale: Locale }) {
+  if (result.tool !== 'humandesign') return null;
+
+  const data = result.data ?? {};
+  const gates = Array.from(new Set(
+    asArray(data.activatedGates)
+      .map(humanDesignGateNumber)
+      .filter((gate): gate is number => gate !== null),
+  )).sort((a, b) => a - b);
+  const channels = asArray(data.definedChannels)
+    .map(humanDesignChannelSignal)
+    .filter((channel): channel is HumanDesignChannelSignal => channel !== null);
+  const channelGates = new Set(channels.flatMap((channel) => [channel.gate1, channel.gate2]));
+  const isZh = locale === 'zh-TW';
+  const hd = t.hdPlanar;
+
+  if (!gates.length && !channels.length) return null;
+
+  return (
+    <section className="human-design-signals" aria-labelledby="human-design-signals-title">
+      <div className="human-design-signals__header">
+        <span>{isZh ? '你的固定能量線索' : hd.stageKicker}</span>
+        <h2 id="human-design-signals-title">{isZh ? '你的閘門與通道' : hd.channelsTitle}</h2>
+        <p>{isZh ? '先看完整通道，再看啟動閘門。通道是較穩定的天賦迴路；單一閘門則像經常亮起的開關。' : hd.channelsHint}</p>
+      </div>
+
+      <dl className="human-design-signals__summary">
+        <div>
+          <dt>{isZh ? '啟動閘門' : hd.gateLabel}</dt>
+          <dd>{gates.length}</dd>
+        </div>
+        <div>
+          <dt>{isZh ? '完整通道' : hd.channelsTitle}</dt>
+          <dd>{channels.length}</dd>
+        </div>
+      </dl>
+
+      <div className="human-design-signals__section-head">
+        <h3>{hd.channelsTitle}</h3>
+        <p>{isZh ? '兩端閘門同時啟動，才會形成一條完整通道。' : hd.channelsHint}</p>
+      </div>
+
+      {channels.length > 0 ? (
+        <div className="human-design-signals__channels">
+          {channels.map((channel) => {
+            const copy = hd.channels[channel.key];
+            const name = copy?.name || hd.channelGenericName
+              .replace('{gate1}', String(channel.gate1))
+              .replace('{gate2}', String(channel.gate2));
+            const trait = copy?.trait || hd.channelGenericTrait
+              .replace('{gate1}', String(channel.gate1))
+              .replace('{gate2}', String(channel.gate2));
+            const daily = copy?.daily || hd.channelGenericDaily;
+
+            return (
+              <article key={channel.key} className="human-design-signals__channel">
+                <div className="human-design-signals__channel-line" aria-label={`${isZh ? '完整通道' : hd.channelsTitle} ${channel.gate1}-${channel.gate2}`}>
+                  <strong>{channel.gate1}</strong>
+                  <i aria-hidden="true" />
+                  <strong>{channel.gate2}</strong>
+                </div>
+                <div>
+                  <span>{isZh ? '穩定天賦迴路' : hd.stateDefined}</span>
+                  <h4>{name}</h4>
+                  <p>{trait}</p>
+                  <small><b>{hd.dailyLabel}</b>{daily}</small>
+                </div>
+              </article>
+            );
+          })}
+        </div>
+      ) : (
+        <p className="human-design-signals__empty">{hd.channelsEmpty}</p>
+      )}
+
+      {gates.length > 0 && (
+        <>
+          <div className="human-design-signals__section-head human-design-signals__section-head--gates">
+            <h3>{isZh ? '全部啟動閘門' : hd.gateLabel}</h3>
+            <p>{isZh ? '有連成完整通道的閘門會特別標示；其餘閘門仍然是你可觀察的固定主題。' : hd.circuitDisclaimer}</p>
+          </div>
+          <ol className="human-design-signals__gates">
+            {gates.map((gate) => {
+              const brief = GATE_BRIEFS[gate];
+              return (
+                <li key={gate} className={`human-design-signals__gate${channelGates.has(gate) ? ' is-channel-gate' : ''}`}>
+                  <span>{isZh ? `閘門 ${gate}` : `${hd.gateLabel} ${gate}`}</span>
+                  <strong>{brief?.title || (isZh ? '啟動主題' : hd.stateDefined)}</strong>
+                  {channelGates.has(gate) && <em>{isZh ? '形成完整通道' : hd.channelsTitle}</em>}
+                </li>
+              );
+            })}
+          </ol>
+        </>
+      )}
+    </section>
+  );
 }
 
 function numerologyCards(data: Dict): InsightCard[] {
@@ -1567,13 +1716,13 @@ function buildInsight(result: CalcResponse): ResultInsight {
   const base = TOOL_COPY[result.tool];
   const keyMap: Record<CalcTool, string[]> = {
     numerology: ['lifePathDisplay', 'birthDayDisplay', 'personalYearDisplay', 'comboNote', 'calculationNote', 'lifePathReduced'],
-    maya: ['kin', 'label', 'tone', 'seal', 'classicTzolkin', 'starroot'],
+    maya: ['kin', 'label', 'tone', 'seal'],
     bazi: ['pillars', 'dayMaster', 'dayMasterYinYang', 'dayMasterWuxing', 'wuxing', 'nayin'],
     ziwei: ['mingGong', 'shenGong', 'fiveElementsClass', 'palaces', 'majorStars'],
     tarot: [],
     runes: [],
     astro: ['sun', 'moon', 'ascendant', 'midheaven'],
-    humandesign: ['type', 'authority', 'profile', 'strategy', 'definedCenters', 'definedChannels', 'activatedGates'],
+    humandesign: ['type', 'authority', 'profile', 'strategy', 'definedCenters'],
   };
 
   let cards: InsightCard[] = [];
@@ -1588,6 +1737,80 @@ function buildInsight(result: CalcResponse): ResultInsight {
     facts: collectFacts(data, keyMap[result.tool]),
     cards,
   };
+}
+
+function ResultReflection({ result, insight, locale }: { result: CalcResponse; insight: ResultInsight; locale: Locale }) {
+  const [match, setMatch] = useState<'yes' | 'partly' | 'no' | null>(null);
+  const [shareNotice, setShareNotice] = useState('');
+  const [savedLocally, setSavedLocally] = useState(false);
+  const isZh = locale === 'zh-TW';
+  const summary = cleanText(insight.intro) || cleanText(insight.title);
+  const shareText = `${insight.title}\n${summary}\nMELE`;
+
+  const share = async () => {
+    const params = new URLSearchParams({
+      tool: result.tool,
+      title: insight.title.slice(0, 90),
+      summary: summary.slice(0, 180),
+      source: 'result-share',
+    });
+    const url = `${window.location.origin}/${locale}/share?${params.toString()}`;
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: insight.title, text: shareText, url });
+        setShareNotice(isZh ? '已開啟分享選單' : 'Share menu opened');
+      } else {
+        await navigator.clipboard.writeText(`${shareText}\n${url}`);
+        setShareNotice(isZh ? '分享文字與連結已複製' : 'Share text and link copied');
+      }
+    } catch (error) {
+      if ((error as Error).name !== 'AbortError') setShareNotice(isZh ? '暫時無法分享，請稍後再試' : 'Unable to share right now');
+    }
+  };
+
+  const saveToDevice = () => {
+    const storageKey = 'mele:guest-results';
+    try {
+      const previous = JSON.parse(window.localStorage.getItem(storageKey) ?? '[]') as CalcResponse[];
+      const unique = previous.filter((item) => !(item.tool === result.tool && item.computed_at === result.computed_at));
+      window.localStorage.setItem(storageKey, JSON.stringify([result, ...unique].slice(0, 5)));
+    } catch {
+      window.localStorage.setItem(storageKey, JSON.stringify([result]));
+    }
+    setSavedLocally(true);
+  };
+
+  return (
+    <section className="result-reflection" aria-labelledby={`result-reflection-${result.tool}`}>
+      <div className="result-reflection__question">
+        <span>{isZh ? '校正這次解讀' : 'Calibrate this reading'}</span>
+        <h2 id={`result-reflection-${result.tool}`}>{isZh ? '這份結果有多像你？' : 'How much does this feel like you?'}</h2>
+        <div role="group" aria-label={isZh ? '結果符合程度' : 'Reading match'}>
+          {([
+            ['yes', isZh ? '很像' : 'Very close'],
+            ['partly', isZh ? '部分符合' : 'Partly'],
+            ['no', isZh ? '不太像' : 'Not really'],
+          ] as const).map(([value, label]) => (
+            <button key={value} type="button" aria-pressed={match === value} onClick={() => setMatch(value)}>{label}</button>
+          ))}
+        </div>
+        {match && <p aria-live="polite">{isZh ? '收到。你的回應會幫助你保留主導權，而不是被結果定義。' : 'Noted. You stay in charge of the interpretation.'}</p>}
+      </div>
+      <div className="result-reflection__share">
+        <span>{isZh ? '帶走這次發現' : 'Take this insight with you'}</span>
+        <h2>{isZh ? '有想到某個朋友嗎？' : 'Did this remind you of someone?'}</h2>
+        <p>{isZh ? '分享的是摘要與連結，不會包含生日、出生時間或地點。' : 'The share includes a summary and link, never your birth details.'}</p>
+        <div className="result-reflection__actions">
+          <button type="button" onClick={share}>{isZh ? '分享這次發現' : 'Share this insight'}</button>
+          <button type="button" onClick={saveToDevice} disabled={savedLocally}>
+            {savedLocally ? (isZh ? '已暫存到這台裝置' : 'Saved on this device') : (isZh ? '暫存這次結果' : 'Save this result')}
+          </button>
+        </div>
+        {shareNotice && <small aria-live="polite">{shareNotice}</small>}
+        {savedLocally && <small aria-live="polite">{isZh ? '只存在這台裝置；登入後的結果會另外保存到「我的 MELE」。' : 'Stored only on this device. Signed-in results are saved separately.'}</small>}
+      </div>
+    </section>
+  );
 }
 
 function countResultSignals(result: CalcResponse): number {
@@ -1632,7 +1855,7 @@ function buildGameProfile(result: CalcResponse, insight: ResultInsight, reading:
     stats: [
       { label: '閱讀完成度', value: `${progress}%`, tone: 'gold' },
       { label: '重點數', value: String(Math.max(insight.facts.length, cardCount, 1)), tone: 'cyan' },
-      { label: '圖面線索', value: String(Math.max(signalCount, reading.points.length)), tone: 'rose' },
+      { label: '可用線索', value: String(Math.max(signalCount, reading.points.length)), tone: 'rose' },
       { label: '建議步驟', value: '3 步', tone: 'violet' },
     ],
     badges,
@@ -1643,9 +1866,9 @@ function buildGameProfile(result: CalcResponse, insight: ResultInsight, reading:
         reward: '你會知道：主軸是什麼',
       },
       {
-        title: '第 2 步｜再看視覺盤',
-        body: '按下方「前往視覺展示」跳到結果視覺區；圖面導覽會說明中間、外圈與線條各代表什麼。',
-        reward: '你會知道：圖面怎麼看',
+        title: '第 2 步｜對照真實生活',
+        body: '挑一張最像你的白話卡片，想一個最近真的發生過的例子。能對照生活，解讀才有用。',
+        reward: '你會知道：這和生活哪裡有關',
       },
       {
         title: '第 3 步｜選一個行動',
@@ -2164,11 +2387,7 @@ function ResultGamePanel({ profile, t }: { profile: GameProfile; t: ToolResultCo
         ))}
       </div>
 
-      <div className="result-game__actions">
-        <a href="#reading-ar-stage">{g.arLink}</a>
-        {/* 前往視覺展示（穩定 2D 展示，AR/3D 版本推出前使用） */}
-        <small>下面會把重點拆成白話卡片，不需要懂專有名詞也能讀。</small>
-      </div>
+      <div className="result-game__actions"><small>下面只保留白話重點與可以採取的行動，不需要先學會看盤。</small></div>
     </section>
   );
 }
@@ -2243,6 +2462,19 @@ function ResultInsightPanel({ insight, speech, t }: { insight: ResultInsight; sp
                   key={`${card.title}-${index}`}
                   className={`result-insights__card${isActive ? ' is-active' : ''}${isResonant ? ' is-resonant' : ''}`}
                 >
+                  {card.imageSrc && (
+                    <figure className="result-insights__tarot-art">
+                      <Image
+                        src={card.imageSrc}
+                        alt={card.imageAlt ?? card.title}
+                        width={320}
+                        height={480}
+                        sizes="(max-width: 720px) 78vw, 260px"
+                        className={card.imageReversed ? 'is-reversed' : ''}
+                      />
+                      <figcaption>{card.subtitle}</figcaption>
+                    </figure>
+                  )}
                   <button
                     type="button"
                     className="result-insights__card-button"
@@ -2352,7 +2584,7 @@ function PersonalReadingPanel({ reading, t }: { reading: PersonalReading; t: Too
   );
 }
 
-// RESULT_NEXT_STEPS — 接下來可以這樣看（預約老師解讀、穩定 2D 盤面）
+// RESULT_NEXT_STEPS — 接下來可以這樣看（生活對照、保存、需要時找老師）
 // PointUnlockPanel: 每天可領 200 點，100 點解鎖流日、流月、流年延伸解讀
 function ResultNextSteps({ tool, t }: { tool: CalcTool; t: ToolResultCopy }) {
   const steps = t.nextStepsTools[tool];
@@ -2742,30 +2974,26 @@ export function ToolResult({ result, locale = DEFAULT_LOCALE }: { result: CalcRe
 
   if (!result) return null;
 
-  const { svg, html, speech } = result.render;
+  const { speech } = result.render;
   const insight = buildInsight(result);
   const personalReading = buildPersonalReading(result);
-  const gameProfile = buildGameProfile(result, insight, personalReading);
   const memberResonance = buildMemberResonance(result);
-  const beginnerGuide = BEGINNER_GUIDES[result.tool];
 
   return (
     <div ref={ref} className={`mele-card tool-result-card tool-result-card--${result.tool} mt-6 animate-fade-in`}>
       {result.tool === 'astro' && <ToolHighlightCards result={result} t={t} />}
-      {result.tool !== 'tarot' && result.tool !== 'maya' && svg && result.tool !== 'humandesign' && (
-        <div
-          className={`mele-svg-wrap mele-svg-wrap--${result.tool} mb-6 flex justify-center`}
-          dangerouslySetInnerHTML={{ __html: svg }}
-        />
-      )}
 
       <MemberResonancePanel resonance={memberResonance} t={t} />
-      {result.tool === 'maya' && <MayaOracleBoard result={result} copy={t.mayaOracle} />}
-      {result.tool !== 'maya' && <ResultInsightPanel insight={insight} speech={result.tool === 'tarot' ? undefined : speech} t={t} />}
+      {result.tool === 'humandesign' && <HumanDesignBodyGraph data={result.data ?? {}} locale={locale} />}
+      <HumanDesignSignalsPanel result={result} t={t} locale={locale} />
+      <ResultInsightPanel insight={insight} speech={result.tool === 'tarot' || result.tool === 'maya' ? undefined : speech} t={t} />
       <AstroDetailPanel result={result} />
       <BaziDetailPanel result={result} />
       <ZiweiPlainGuide result={result} t={t} />
       {result.tool !== 'tarot' && <PersonalReadingPanel reading={personalReading} t={t} />}
+      <ResultReflection result={result} insight={insight} locale={locale} />
+      <ResultNextSteps tool={result.tool} t={t} />
+      <MemberActionPath tool={result.tool} t={t} />
       <PointUnlockPanel result={result} t={t} />
       <p className="mt-6 border-t border-accent-dim pt-4 text-center text-[11px] leading-relaxed text-white/40">
         {t.disclaimer}

@@ -13,7 +13,11 @@ interface PageProps {
   params: Promise<{ locale: string }>;
 }
 
-const CN_NUMERALS = ['一', '二', '三', '四', '五', '六', '七', '八'];
+const TOOL_GROUPS = [
+  { key: 'self', slugs: ['numerology', 'humandesign', 'maya'], zh: ['認識自己', '看見性格、天賦與做決定的方式'], en: ['Understand yourself', 'Personality, strengths, and how you decide'] },
+  { key: 'life', slugs: ['astro', 'bazi', 'ziwei'], zh: ['理解人生脈絡', '把長期模式、關係與人生階段放回完整盤面'], en: ['See the bigger pattern', 'Long-term patterns, relationships, and life stages'] },
+  { key: 'now', slugs: ['tarot', 'runes'], zh: ['解開眼前的問題', '帶著一個具體問題，整理現在最值得注意的方向'], en: ['Untangle what is happening now', 'Bring one question and find the direction that matters now'] },
+] as const;
 
 // 雜誌目錄式工具列表文案。改任何 key 都要六語言一起補齊，且不可出現金額/點數/付費字眼。
 const toolsCopy = {
@@ -24,8 +28,8 @@ const toolsCopy = {
     featuredKicker: '精選入門',
     featuredNumerologyDesc: '只需要出生日期，最快看懂自己的節奏。',
     featuredTarotDesc: '寫下一個問題，抽牌看看此刻的自己。',
-    directoryKicker: 'CONTENTS',
-    directoryTitle: '完整工具目錄——八種入口',
+    directoryKicker: '依需求選擇',
+    directoryTitle: '先找到問題，再選工具',
     teacherKicker: '需要更深入時',
     teacherTitle: '需要時，找老師',
     teacherBody: '工具是自我探索的起點。老師是選項，不是必須；你可以只用工具，不找老師。',
@@ -38,8 +42,8 @@ const toolsCopy = {
     featuredKicker: 'Start here',
     featuredNumerologyDesc: 'Just your birth date — the fastest way to see your own rhythm.',
     featuredTarotDesc: 'Write down a question, then draw cards to see where you are now.',
-    directoryKicker: 'CONTENTS',
-    directoryTitle: 'Full directory — eight ways in',
+    directoryKicker: 'CHOOSE BY NEED',
+    directoryTitle: 'Start with the question, not the system',
     teacherKicker: 'For when you want more',
     teacherTitle: 'Find a guide, if you need one',
     teacherBody: 'Tools are where self-discovery begins. Guides are optional, never required — you can always use tools alone.',
@@ -139,6 +143,11 @@ export default async function LocalizedToolsPage({ params }: PageProps) {
   const tools = dict.home.tools;
   const numerology = tools.find((tool) => tool.slug === 'numerology');
   const tarot = tools.find((tool) => tool.slug === 'tarot');
+  const groupedTools = TOOL_GROUPS.map((group) => ({
+    ...group,
+    label: locale === 'zh-TW' ? group.zh : group.en,
+    tools: group.slugs.map((slug) => tools.find((tool) => tool.slug === slug)).filter(Boolean),
+  }));
 
   return (
     <main className="mag-tools-page">
@@ -168,21 +177,29 @@ export default async function LocalizedToolsPage({ params }: PageProps) {
       <section className="mag-tools-page__section" aria-label={copy.directoryTitle}>
         <span className="mag-label">{copy.directoryKicker}</span>
         <h2>{copy.directoryTitle}</h2>
-        <ol className="mag-tools-page__directory">
-          {dict.home.tools.map((tool, index) => (
-            <li key={tool.slug}>
-              <Link href={localizePath(`/tools/${tool.slug}`, locale)}>
-                <span className="mag-tools-page__directory-no" aria-hidden="true">
-                  {locale === 'zh-TW' ? CN_NUMERALS[index] ?? String(index + 1) : String(index + 1).padStart(2, '0')}
-                </span>
-                <span>
-                  <b>{tool.name}</b>
-                  <small>{tool.desc}</small>
-                </span>
-              </Link>
-            </li>
+        <div className="tool-needs-grid">
+          {groupedTools.map((group, groupIndex) => (
+            <section key={group.key} className="tool-needs-group" aria-labelledby={`tool-group-${group.key}`}>
+              <div className="tool-needs-group__head">
+                <span aria-hidden="true">{String(groupIndex + 1).padStart(2, '0')}</span>
+                <div>
+                  <h3 id={`tool-group-${group.key}`}>{group.label[0]}</h3>
+                  <p>{group.label[1]}</p>
+                </div>
+              </div>
+              <ul>
+                {group.tools.map((tool) => tool && (
+                  <li key={tool.slug}>
+                    <Link href={localizePath(`/tools/${tool.slug}`, locale)}>
+                      <span><b>{tool.name}</b><small>{tool.desc}</small></span>
+                      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6" /></svg>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </section>
           ))}
-        </ol>
+        </div>
       </section>
 
       <section className="mag-tools-page__section mag-tools-page__strip" aria-label={copy.teacherTitle}>

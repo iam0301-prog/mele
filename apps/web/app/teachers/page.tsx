@@ -15,12 +15,21 @@ import {
 import { createClient } from '@/lib/supabase/client';
 import type { Teacher } from '@/types/db';
 
+type TeacherNeed = 'relationship' | 'career' | 'decision' | 'self';
+const TEACHER_NEEDS: Array<{ key: TeacherNeed; zh: string; en: string; specialties: string[]; reasonZh: string; reasonEn: string }> = [
+  { key: 'relationship', zh: '感情與人際', en: 'Love and relationships', specialties: ['塔羅', '占星', '人類圖'], reasonZh: '適合整理關係模式、界線與彼此互動', reasonEn: 'Good for relationship patterns, boundaries, and interaction' },
+  { key: 'career', zh: '工作與方向', en: 'Career and direction', specialties: ['八字', '紫微', '占星'], reasonZh: '適合整理職涯節奏、長期方向與資源取捨', reasonEn: 'Good for career rhythm, long-term direction, and trade-offs' },
+  { key: 'decision', zh: '一個選擇卡住了', en: 'I am stuck on a decision', specialties: ['塔羅', '盧恩', '八字'], reasonZh: '適合釐清當下選項、盲點與下一步', reasonEn: 'Good for clarifying options, blind spots, and the next step' },
+  { key: 'self', zh: '更深入理解自己', en: 'Understand myself more deeply', specialties: ['人類圖', '生命靈數', '馬雅', '占星'], reasonZh: '適合把性格、決策方式與生活節奏放在一起看', reasonEn: 'Good for connecting personality, decisions, and daily rhythm' },
+];
+
 function TeachersInner() {
   const locale = useProvidedLocale();
   const copy = getTeacherCopy(locale);
   const search = useSearchParams();
   const initialSpec = normalizeSpecialtyFilter(search.get('spec'));
   const [filter, setFilter] = useState(initialSpec);
+  const [need, setNeed] = useState<TeacherNeed | null>(null);
   const [teachers, setTeachers] = useState<Teacher[]>([]);
   const [demoMode, setDemoMode] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -59,6 +68,14 @@ function TeachersInner() {
     };
   }, [filter]);
 
+  const selectedNeed = TEACHER_NEEDS.find((item) => item.key === need) ?? null;
+  const visibleTeachers = selectedNeed
+    ? [...teachers].sort((a, b) => {
+        const score = (teacher: Teacher) => selectedNeed.specialties.filter((item) => (teacher.specialties || []).includes(item)).length;
+        return score(b) - score(a) || Number(b.rating || 0) - Number(a.rating || 0);
+      })
+    : teachers;
+
   return (
     <main className="mag-teachers-page">
     <div className="container mx-auto max-w-6xl px-5 py-12">
@@ -76,6 +93,16 @@ function TeachersInner() {
       </header>
 
       <section className="mag-teachers-page__panel mele-card">
+        <div className="teacher-needs" aria-labelledby="teacher-needs-title">
+          <span className="mag-label">{locale === 'zh-TW' ? '先說你想處理什麼' : 'Start with what you need'}</span>
+          <h2 id="teacher-needs-title">{locale === 'zh-TW' ? '你希望這次談完，哪件事更清楚？' : 'What should feel clearer after the session?'}</h2>
+          <div role="group" aria-label={locale === 'zh-TW' ? '諮詢需求' : 'Consultation need'}>
+            {TEACHER_NEEDS.map((item) => (
+              <button key={item.key} type="button" aria-pressed={need === item.key} onClick={() => { setNeed(item.key); setFilter('全部'); }}>{locale === 'zh-TW' ? item.zh : item.en}</button>
+            ))}
+          </div>
+          {selectedNeed && <p aria-live="polite">{locale === 'zh-TW' ? '已依適合程度重新排列；你仍可用下方專長進一步篩選。' : 'Reordered by fit. You can still refine by specialty below.'}</p>}
+        </div>
         <div className="mb-6 flex flex-wrap gap-2">
           {copy.specialties.map((specialty) => (
             <button
@@ -114,8 +141,8 @@ function TeachersInner() {
 
         {!loading && teachers.length > 0 && (
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {teachers.map((teacher) => (
-              <TeacherCard key={teacher.id} teacher={teacher} />
+            {visibleTeachers.map((teacher) => (
+              <TeacherCard key={teacher.id} teacher={teacher} recommendation={selectedNeed ? (locale === 'zh-TW' ? selectedNeed.reasonZh : selectedNeed.reasonEn) : undefined} />
             ))}
           </div>
         )}
@@ -125,7 +152,7 @@ function TeachersInner() {
   );
 }
 
-function TeacherCard({ teacher }: { teacher: Teacher }) {
+function TeacherCard({ teacher, recommendation }: { teacher: Teacher; recommendation?: string }) {
   const locale = useProvidedLocale();
   const copy = getTeacherCopy(locale);
   const isDemo = teacher.id.startsWith('demo-');
@@ -157,6 +184,7 @@ function TeacherCard({ teacher }: { teacher: Teacher }) {
       <div className="mag-author-card__quote mt-3 min-h-[44px] text-xs leading-relaxed">
         {displayTeacher.quote || displayTeacher.intro_short || copy.directory.fallbackBody}
       </div>
+      {recommendation && <div className="mag-author-card__match"><span>{locale === 'zh-TW' ? '推薦原因' : 'Why this guide'}</span><p>{recommendation}</p></div>}
       <div className="mag-author-card__action mt-4 pt-3 text-xs tracking-widest">
         {copy.directory.detailAction}
       </div>

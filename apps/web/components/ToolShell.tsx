@@ -2,6 +2,8 @@ import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { DEFAULT_LOCALE, localizePath, type Locale } from '@/lib/i18n/config';
 import { getToolLocaleCopy } from '@/lib/i18n/tool-page-copy';
+import type { CalcTool } from '@/lib/api';
+import { ToolExperiencePrelude } from '@/components/ToolExperiencePrelude';
 
 interface Props {
   title: string;
@@ -15,6 +17,7 @@ interface Props {
    * 而非只有 header/tool-beta-note。其餘六工具頁維持舊深藍風，不傳這個 prop。
    */
   themed?: boolean;
+  tool: CalcTool;
 }
 
 export function ToolShell({
@@ -24,11 +27,12 @@ export function ToolShell({
   locale = DEFAULT_LOCALE,
   children,
   themed = false,
+  tool,
 }: Props) {
   const copy = getToolLocaleCopy(locale);
 
   const shell = (
-    <div className="tool-page-shell mag-tool-shell mx-auto px-5 py-8">
+    <div className={`tool-page-shell mag-tool-shell mag-tool-shell--${tool} mx-auto px-5 py-8`}>
       <Link href={localizePath('/tools', locale)} className="mag-tool-shell__back">
         {copy.shell.backLabel}
       </Link>
@@ -40,17 +44,14 @@ export function ToolShell({
         <p className="mag-tool-shell__desc">{description}</p>
       </header>
 
-      <section className="mag-tool-beta-note" aria-label={copy.shell.feedbackAriaLabel}>
-        <div>
-          <span className="mag-label">{copy.shell.feedbackKicker}</span>
-          <p>{copy.shell.feedbackBody}</p>
-        </div>
-        <Link href={localizePath('/feedback', locale)}>
-          {copy.shell.feedbackAction}
-        </Link>
-      </section>
+      <ToolExperiencePrelude tool={tool} locale={locale} />
 
       {children}
+
+      <section className="mag-tool-beta-note mag-tool-beta-note--after" aria-label={copy.shell.feedbackAriaLabel}>
+        <div><span className="mag-label">{copy.shell.feedbackKicker}</span><p>{copy.shell.feedbackBody}</p></div>
+        <Link href={localizePath('/feedback', locale)}>{copy.shell.feedbackAction}</Link>
+      </section>
     </div>
   );
 

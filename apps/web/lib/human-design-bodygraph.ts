@@ -25,6 +25,72 @@ export const HD_CENTER_POSITIONS: Record<HdCenterId, { x: number; y: number; siz
 
 export const HD_VIEWBOX = { width: 720, height: 1160 };
 
+/** 人類圖的 36 條標準通道。僅供前端繪製結構；是否定義仍完全採用後端 definedChannels。 */
+export const HD_CHANNELS: [number, number][] = [
+  [64, 47], [61, 24], [63, 4], [17, 62], [43, 23], [11, 56],
+  [16, 48], [20, 57], [20, 10], [20, 34], [31, 7], [8, 1],
+  [33, 13], [35, 36], [12, 22], [45, 21], [25, 51], [10, 34],
+  [10, 57], [15, 5], [2, 14], [46, 29], [40, 37], [26, 44],
+  [34, 57], [59, 6], [9, 52], [3, 60], [42, 53], [27, 50],
+  [30, 41], [55, 39], [49, 19], [32, 54], [28, 38], [18, 58],
+];
+
+export const HD_GATE_TO_CENTER: Record<number, HdCenterId> = {
+  64: 'Head', 61: 'Head', 63: 'Head',
+  47: 'Ajna', 24: 'Ajna', 4: 'Ajna', 17: 'Ajna', 43: 'Ajna', 11: 'Ajna',
+  62: 'Throat', 23: 'Throat', 56: 'Throat', 16: 'Throat', 20: 'Throat', 31: 'Throat', 8: 'Throat', 33: 'Throat', 35: 'Throat', 12: 'Throat', 45: 'Throat',
+  7: 'G', 1: 'G', 13: 'G', 25: 'G', 10: 'G', 15: 'G', 2: 'G', 46: 'G',
+  21: 'Heart', 40: 'Heart', 26: 'Heart', 51: 'Heart',
+  34: 'Sacral', 5: 'Sacral', 14: 'Sacral', 29: 'Sacral', 59: 'Sacral', 9: 'Sacral', 3: 'Sacral', 42: 'Sacral', 27: 'Sacral',
+  6: 'SolarPlexus', 37: 'SolarPlexus', 22: 'SolarPlexus', 36: 'SolarPlexus', 30: 'SolarPlexus', 55: 'SolarPlexus', 49: 'SolarPlexus',
+  48: 'Spleen', 57: 'Spleen', 44: 'Spleen', 50: 'Spleen', 32: 'Spleen', 28: 'Spleen', 18: 'Spleen',
+  53: 'Root', 60: 'Root', 52: 'Root', 19: 'Root', 39: 'Root', 41: 'Root', 58: 'Root', 38: 'Root', 54: 'Root',
+};
+
+export type HdGateSide = 'top' | 'right' | 'bottom' | 'left';
+
+/** 閘門在各中心周圍的排列，與後端 BodyGraph 幾何一致。 */
+export const HD_CENTER_GATE_SIDES: Record<HdCenterId, Partial<Record<HdGateSide, number[]>>> = {
+  Head: { bottom: [64, 61, 63] },
+  Ajna: { top: [47, 24, 4], bottom: [17, 43, 11] },
+  Throat: { top: [62, 23, 56], left: [16, 20, 31], right: [8, 33, 35], bottom: [12, 45] },
+  G: { top: [7, 1, 13], left: [25, 10], right: [15, 2], bottom: [46] },
+  Heart: { top: [21], left: [40], right: [26], bottom: [51] },
+  Sacral: { top: [34, 5, 14, 29], left: [59, 9], right: [3, 42], bottom: [27] },
+  SolarPlexus: { top: [6, 37, 22], left: [36, 30], right: [55], bottom: [49] },
+  Spleen: { top: [48, 57], right: [44, 50], bottom: [32, 28, 18] },
+  Root: { top: [53, 60, 52], left: [19, 39], right: [41, 58], bottom: [38, 54] },
+};
+
+function spreadSlots(values: number[], start: number, end: number): number[] {
+  if (values.length === 1) return [(start + end) / 2];
+  const step = (end - start) / (values.length - 1);
+  return values.map((_, index) => start + step * index);
+}
+
+/** 每個閘門的實際線端座標，用來繪製完整通道與只啟動一側的懸掛閘門。 */
+export function getHdGatePositions(): Record<number, { x: number; y: number }> {
+  const positions: Record<number, { x: number; y: number }> = {};
+  const offset = 18;
+  HD_CENTER_IDS.forEach((centerId) => {
+    const center = HD_CENTER_POSITIONS[centerId];
+    const half = center.size / 2;
+    Object.entries(HD_CENTER_GATE_SIDES[centerId]).forEach(([side, gates]) => {
+      if (!gates) return;
+      if (side === 'top' || side === 'bottom') {
+        const xs = spreadSlots(gates, center.x - half + 10, center.x + half - 10);
+        const y = side === 'top' ? center.y - half - offset : center.y + half + offset;
+        gates.forEach((gate, index) => { positions[gate] = { x: xs[index], y }; });
+      } else {
+        const ys = spreadSlots(gates, center.y - half + 10, center.y + half - 10);
+        const x = side === 'left' ? center.x - half - offset : center.x + half + offset;
+        gates.forEach((gate, index) => { positions[gate] = { x, y: ys[index] }; });
+      }
+    });
+  });
+  return positions;
+}
+
 export type HdCircuit = 'individual' | 'tribal' | 'collective';
 
 /** 通道分類：sorted "g1-g2" -> 迴路（簡化版，僅供視覺分層辨識用） */

@@ -3,7 +3,7 @@ import type { CalcTool } from '@/lib/api';
 
 /** 占卜結果頁所有寫死的靜態 UI 文字，抽成 i18n 結構 */
 export type ToolResultCopy = {
-  /** AR 視覺展示載入中區塊 */
+  /** 2D 動態解盤舞台載入中區塊 */
   arLoading: {
     kicker: string;
     title: string;
@@ -239,7 +239,7 @@ const zhTW: ToolResultCopy = {
   arLoading: {
     kicker: 'VISUAL RESULT STAGE',
     title: '正在整理視覺結果展示',
-    body: '這裡會用穩定的 2D 盤面、牌面或石面呈現結果；AR / 3D 正式版完成後再開放。',
+    body: '盤面、牌面與關鍵線索會依閱讀順序展開，讓你先看到重點，再決定要深入哪一段。',
   },
   hdPlanar: {
     factsKicker: '三秒看懂自己',
@@ -305,7 +305,7 @@ const zhTW: ToolResultCopy = {
     understandPrefix: '你可以先這樣理解',
   },
   insight: {
-    memberNoteKicker: 'MEMBER NOTE',
+    memberNoteKicker: '本次筆記',
     memberNoteTitle: '把有感的訊息收進本次解讀',
     memberNoteEmpty: '點開一張卡，留下真正有共鳴的訊息。',
     memberNoteCount: '已標記 {count} 張，預約老師時可以回頭看。',
@@ -325,24 +325,24 @@ const zhTW: ToolResultCopy = {
   game: {
     kicker: 'READING MAP',
     title: '這份結果怎麼看？',
-    plainNote: '不用一次讀完所有名詞。先照三步抓主軸：先看核心摘要，再看視覺盤面，最後選一個今天可以練習的提醒。',
-    arLink: '看視覺盤面',
+    plainNote: '不用一次讀完所有名詞。先看核心摘要，再對照一個真實生活情境，最後選一個今天可以練習的提醒。',
+    arLink: '看白話重點',
     stepPrefix: 'STEP',
   },
   nextSteps: {
-    kicker: 'READING FLOW',
+    kicker: '閱讀順序',
     title: '接下來可以這樣看',
     bookTeacher: '預約老師解讀',
     viewHistory: '查看我的解讀紀錄',
   },
   actionPath: {
-    kicker: 'MEMBER ONBOARDING',
-    title: '下一步很清楚，會員才會留下來',
-    body: '看完結果後，先保存、再回訪、最後把有感的問題交給老師深度解讀。',
+    kicker: '保存與延伸',
+    title: '想把這次理解留下來？',
+    body: '你可以保存結果、明天回來對照，或帶著最有感的一句找老師深入談。',
     saveTitle: '保存這次解讀',
     saveLabel: '登入並保存',
     dailyTitle: '回到每日儀式',
-    dailyBody: '明天回來抽一張每日牌或盧恩，讓網站有持續陪伴感，而不是一次性工具。',
+    dailyBody: '明天回來抽一張每日牌或盧恩，看看今天的提醒是否真的幫得上忙。',
     dailyLabel: '今日儀式',
     consultTitle: '找老師深度解讀',
     consultBody: '如果某張卡或某個命盤重點很有感，可以直接帶著問題找適合的老師。',
@@ -351,7 +351,7 @@ const zhTW: ToolResultCopy = {
     footerConsult: '找老師深度解讀',
   },
   unlock: {
-    kicker: 'MEMBER EXTENDED',
+    kicker: '會員延伸',
     title: '延伸解讀',
     body: '登入會員後可查看深入解釋、流日、流月、流年等延伸解讀。免費工具本身就完整，延伸內容是選項。',
     memberStatusLabel: '會員狀態',
@@ -454,7 +454,7 @@ const zhTW: ToolResultCopy = {
     ],
     tarot: [
       { title: '先看問題與位置', body: '塔羅要先回到你問的問題，再看每張牌落在過去、現在或未來的位置。' },
-      { title: '看牌面與正逆位', body: '視覺展示會顯示牌名、正逆位、關鍵字與你選的牌組風格。' },
+      { title: '看牌面與正逆位', body: '每張解讀卡會直接顯示牌圖、牌名、正逆位與這個位置的白話意義。' },
       { title: '把答案化成行動', body: '最後整理成今天能做的一步，不要只停在觀察。' },
     ],
     runes: [
@@ -511,7 +511,7 @@ const en: ToolResultCopy = {
   arLoading: {
     kicker: 'VISUAL RESULT STAGE',
     title: 'Preparing the visual result stage',
-    body: 'Results will appear as a clear 2D chart, card layout, or stone face. The full AR / 3D experience will open when it is ready.',
+    body: 'Charts, cards, and key signals unfold in reading order so you see the point before choosing where to go deeper.',
   },
   hdPlanar: {
     factsKicker: 'Know yourself in 3 seconds',
@@ -783,7 +783,7 @@ const vi: ToolResultCopy = {
   arLoading: {
     kicker: 'VISUAL RESULT STAGE',
     title: 'Đang chuẩn bị giai đoạn trực quan',
-    body: 'Kết quả sẽ hiển thị dưới dạng sơ đồ 2D rõ ràng, bố cục bài, hoặc mặt đá. AR / 3D đầy đủ sẽ mở khi sẵn sàng.',
+    body: 'Sơ đồ, lá bài và tín hiệu chính sẽ mở theo thứ tự đọc để bạn thấy trọng điểm trước.',
   },
   hdPlanar: {
     factsKicker: 'Hiểu bản thân trong 3 giây',
@@ -1055,7 +1055,7 @@ const id: ToolResultCopy = {
   arLoading: {
     kicker: 'VISUAL RESULT STAGE',
     title: 'Menyiapkan tahap visual',
-    body: 'Hasil akan ditampilkan sebagai diagram 2D yang jelas, tata letak kartu, atau permukaan batu. AR / 3D lengkap akan dibuka saat siap.',
+    body: 'Diagram, kartu, dan sinyal utama dibuka sesuai urutan baca agar inti hasil terlihat lebih dulu.',
   },
   hdPlanar: {
     factsKicker: 'Kenali dirimu dalam 3 detik',
@@ -1327,7 +1327,7 @@ const ja: ToolResultCopy = {
   arLoading: {
     kicker: 'VISUAL RESULT STAGE',
     title: 'ビジュアル結果ステージを準備しています',
-    body: '結果は明確な 2D チャート、カードレイアウト、またはストーン面として表示されます。フル AR / 3D は準備ができ次第公開されます。',
+    body: 'チャート、カード、重要な手がかりを読む順番に展開し、最初に要点が見えるようにします。',
   },
   hdPlanar: {
     factsKicker: '3秒で自分がわかる',
@@ -1599,7 +1599,7 @@ const ko: ToolResultCopy = {
   arLoading: {
     kicker: 'VISUAL RESULT STAGE',
     title: '비주얼 결과 스테이지 준비 중',
-    body: '결과는 명확한 2D 차트, 카드 레이아웃 또는 돌 면으로 표시됩니다. 전체 AR / 3D는 준비되면 열립니다.',
+    body: '차트, 카드, 핵심 단서를 읽는 순서대로 펼쳐 먼저 중요한 내용을 볼 수 있어요.',
   },
   hdPlanar: {
     factsKicker: '3초 만에 나를 이해하기',

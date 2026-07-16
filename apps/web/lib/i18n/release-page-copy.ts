@@ -166,14 +166,14 @@ const en: ReleaseCopy = {
   },
   ar: {
     kicker: 'VISUAL EXPERIENCE',
-    title: 'Stable 2D result views first',
-    body: 'The current focus is clear 2D visual readings. Full AR models will return after the assets reach production quality.',
+    title: 'A visual reading you can actually follow',
+    body: 'Charts, cards, and key points unfold beside the reading so the experience feels alive without hiding the meaning.',
     primary: 'Try tarot',
     secondary: 'Open daily ritual',
     sections: [
       { title: 'Readable before spectacular', body: 'Every result should be easy to understand before it becomes immersive.' },
       { title: 'Tool-specific visuals', body: 'Cards, runes, totems, charts, and bodygraph surfaces should each feel distinct.' },
-      { title: 'Future AR gate', body: 'AR can become a premium layer once performance and asset quality are reliable.' },
+      { title: 'Built for real devices', body: 'The stage stays fast and readable across phones, tablets, and video consultations.' },
     ],
   },
   legal: {
@@ -286,14 +286,14 @@ const zh: ReleaseCopy = {
   },
   ar: {
     kicker: '視覺體驗',
-    title: '先把 2D 結果做到穩定精緻',
-    body: '目前以清楚、好讀、可互動的 2D 解讀為主。AR 等沉浸式模型會在資產與效能穩定後再開放。',
+    title: '看得懂，也有揭曉感的動態解盤',
+    body: '盤面、牌卡與重點會跟著閱讀順序展開；不用安裝 App，也不必等待大型模型載入。',
     primary: '試抽塔羅',
     secondary: '開啟每日儀式',
     sections: [
       { title: '先看懂，再驚豔', body: '每個結果都要先能被理解，再談沉浸效果。' },
       { title: '各工具獨立視覺', body: '牌卡、盧恩、圖騰、命盤與人類圖，都應有自己的 2D 呈現。' },
-      { title: '未來 AR 門檻', body: '等模型品質與載入速度可靠後，再作為進階體驗開放。' },
+      { title: '適合真實裝置', body: '手機、平板與視訊諮詢都能穩定呈現，不用依賴高效能 3D。' },
     ],
   },
   legal: {
@@ -423,7 +423,7 @@ const releaseCopy: Record<Locale, ReleaseCopy> = {
     ar: {
       kicker: 'TRẢI NGHIỆM HÌNH ẢNH',
       title: 'Ưu tiên kết quả 2D rõ ràng',
-      body: 'Tập trung vào phần đọc 2D rõ ràng và dễ hiểu. AR sẽ mở sau khi tài sản và hiệu năng ổn định.',
+      body: 'Biểu đồ, lá bài và điểm chính mở theo trình tự đọc, nhanh và rõ trên thiết bị thật.',
       primary: 'Thử tarot',
       secondary: 'Mở nghi thức ngày',
     },
@@ -472,7 +472,7 @@ const releaseCopy: Record<Locale, ReleaseCopy> = {
     ar: {
       kicker: 'PENGALAMAN VISUAL',
       title: 'Mulai dari tampilan 2D yang stabil',
-      body: 'Fokus pada bacaan 2D yang jelas dan mudah dipahami. AR penuh dibuka setelah aset dan performa stabil.',
+      body: 'Diagram, kartu, dan poin utama terbuka mengikuti alur bacaan, cepat dan jelas di perangkat nyata.',
       primary: 'Coba tarot',
       secondary: 'Buka ritual harian',
     },
@@ -521,7 +521,7 @@ const releaseCopy: Record<Locale, ReleaseCopy> = {
     ar: {
       kicker: 'ビジュアル体験',
       title: '安定した2D結果を優先',
-      body: 'クローズドベータでは、読みやすい2D解釈を優先します。ARは素材と速度が安定した後に開放します。',
+      body: 'チャート、カード、要点が読む順番に展開し、実際の端末でも速く明確に表示されます。',
       primary: 'タロットを試す',
       secondary: '毎日の儀式へ',
     },
@@ -570,7 +570,7 @@ const releaseCopy: Record<Locale, ReleaseCopy> = {
     ar: {
       kicker: '비주얼 경험',
       title: '안정적인 2D 결과를 먼저',
-      body: '클로즈드 베타는 읽기 쉬운 2D 해석을 우선합니다. AR은 자산과 성능이 안정된 뒤 열립니다.',
+      body: '차트, 카드, 핵심 내용이 읽는 순서대로 펼쳐지고 실제 기기에서도 빠르고 선명하게 보여요.',
       primary: '타로 체험',
       secondary: '매일 의식 열기',
     },

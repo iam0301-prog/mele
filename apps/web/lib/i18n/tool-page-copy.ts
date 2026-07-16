@@ -146,8 +146,8 @@ const zhTools: Record<ToolPageSlug, ToolPageCopy> = {
   },
   tarot: {
     title: '塔羅牌解讀',
-    subtitle: '三種藝術風格與 AR 牌面',
-    description: '輸入清楚的問題，選擇你喜歡的牌組風格與牌陣。結果會呈現牌義、位置、正逆位與 AR 卡面資訊。',
+    subtitle: '三種藝術牌組與逐張白話解讀',
+    description: '輸入一個清楚的問題，選擇牌組風格與牌陣。結果會直接顯示每張牌的圖片、位置、正逆位、白話意義與可採取的行動。',
     spec: '塔羅',
     validation: { questionRequired: '請先輸入想詢問的問題。' },
     submit: { idle: '開始抽牌', loading: '正在抽牌...' },
@@ -175,8 +175,8 @@ const zhTools: Record<ToolPageSlug, ToolPageCopy> = {
   },
   runes: {
     title: '盧恩符文解讀',
-    subtitle: '三種材質與 AR 石面',
-    description: '盧恩適合詢問行動方向、阻礙、資源與內在訊息。選擇石面、木頭或水晶材質後，結果會以符文石與 AR 形式呈現。',
+    subtitle: '阻礙、資源與下一步',
+    description: '輸入一個明確問題，結果會依符文位置與正逆位，直接整理目前阻礙、可用資源與下一個行動。',
     spec: '盧恩',
     validation: { questionRequired: '請先輸入想詢問的問題。' },
     submit: { idle: '開始抽符文', loading: '正在抽取符文...' },
@@ -224,10 +224,10 @@ const zhTools: Record<ToolPageSlug, ToolPageCopy> = {
     loadingLabel: '正在計算 BodyGraph、中心與閘門...',
     autofillFields: ['出生日期', '出生時間'],
     visualNote: {
-      kicker: '視覺展示',
-      title: '目前先採用穩定 2D BodyGraph',
-      body: '人類圖先以清楚可讀的 2D BodyGraph 呈現中心、通道與啟動閘門；正式 AR / 3D 模型完成後再開放。',
-      action: '前往視覺展示',
+      kicker: '閱讀方式',
+      title: '先從類型與內在權威開始',
+      body: '不必先學會看圖。結果會先用白話說明你的決策方式、能量界線與日常練習。',
+      action: '查看白話解讀',
     },
   },
 };
@@ -280,7 +280,7 @@ const enTools: Record<ToolPageSlug, ToolPageCopy> = {
   },
   tarot: {
     title: 'Tarot Reading',
-    subtitle: 'THREE ART STYLES AND VISUAL CARDS',
+    subtitle: 'THREE ART DECKS WITH CARD-BY-CARD GUIDANCE',
     description: 'Ask a clear question, choose a deck style and spread, then receive positions, upright/reversed states, and card meanings.',
     spec: 'Tarot',
     validation: { questionRequired: 'Please enter a question first.' },
@@ -309,7 +309,7 @@ const enTools: Record<ToolPageSlug, ToolPageCopy> = {
   },
   runes: {
     title: 'Rune Reading',
-    subtitle: 'THREE MATERIALS AND VISUAL STONES',
+    subtitle: 'OBSTACLE, RESOURCE, AND NEXT STEP',
     description: 'Ask about action, obstacles, resources, or an inner message. Choose stone, wood, or crystal for the rune material.',
     spec: 'Runes',
     validation: { questionRequired: 'Please enter a question first.' },

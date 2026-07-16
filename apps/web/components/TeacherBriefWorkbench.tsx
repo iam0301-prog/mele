@@ -351,11 +351,14 @@ function formatScheduledAt(value: string) {
 export function TeacherBriefWorkbench({ cards, demoMode = false, locale = DEFAULT_LOCALE }: Props) {
   const copy = getWorkbenchCopy(locale);
   const railRef = useRef<HTMLDivElement | null>(null);
+  const stageRef = useRef<HTMLDivElement | null>(null);
   const [activeId, setActiveId] = useState(cards[0]?.id ?? '');
   const [drafts, setDrafts] = useState<Record<string, TeacherBriefDraft>>(() =>
     Object.fromEntries(cards.map((card) => [card.id, card.draft ?? {}])),
   );
   const [message, setMessage] = useState('');
+  const [liveStageKey, setLiveStageKey] = useState<TeacherSopKey>('opening');
+  const [presenting, setPresenting] = useState(false);
   const [isPending, startTransition] = useTransition();
   const activeCard = cards.find((card) => card.id === activeId) ?? cards[0];
   const draft = useMemo(
@@ -377,8 +380,24 @@ export function TeacherBriefWorkbench({ cards, demoMode = false, locale = DEFAUL
 
   function selectCard(id: string, index: number) {
     setActiveId(id);
+    setLiveStageKey('opening');
     setMessage('');
     centerRailCard(index);
+  }
+
+  async function togglePresentation() {
+    if (!stageRef.current) return;
+    try {
+      if (document.fullscreenElement) {
+        await document.exitFullscreen();
+        setPresenting(false);
+      } else {
+        await stageRef.current.requestFullscreen();
+        setPresenting(true);
+      }
+    } catch {
+      setPresenting((value) => !value);
+    }
   }
 
   function stepCard(direction: -1 | 1) {
@@ -527,6 +546,31 @@ export function TeacherBriefWorkbench({ cards, demoMode = false, locale = DEFAUL
             {merged.tags.map((tag) => <span key={tag}>{tag}</span>)}
             {activeCard.savedStatus && <span>{copy.draftStatus}：{activeCard.savedStatus}</span>}
             {activeCard.scheduledAt && <span>{formatScheduledAt(activeCard.scheduledAt)}</span>}
+          </div>
+
+          <div ref={stageRef} className={`consultation-live-stage${presenting ? ' is-presenting' : ''}`}>
+            <div className="consultation-live-stage__topline">
+              <div><span>{locale === 'zh-TW' ? '視訊同步解盤' : 'Live consultation view'}</span><strong>{activeCard.brief.sourceLabel} · {activeCard.customerLabel}</strong></div>
+              <button type="button" onClick={togglePresentation}>{presenting ? (locale === 'zh-TW' ? '離開分享模式' : 'Exit presentation') : (locale === 'zh-TW' ? '全螢幕分享' : 'Present full screen')}</button>
+            </div>
+            <div className="consultation-live-stage__chapters" role="tablist" aria-label={locale === 'zh-TW' ? '解盤章節' : 'Reading chapters'}>
+              {merged.sopStages.map((stage, index) => (
+                <button key={stage.key} type="button" role="tab" aria-selected={liveStageKey === stage.key} onClick={() => setLiveStageKey(stage.key)}><span>{String(index + 1).padStart(2, '0')}</span>{copy.sopLabels[stage.key]}</button>
+              ))}
+            </div>
+            {merged.sopStages.filter((stage) => stage.key === liveStageKey).map((stage) => (
+              <div key={stage.key} className="consultation-live-stage__canvas" role="tabpanel">
+                <div className="consultation-live-stage__sigil" aria-hidden="true"><i /><i /><span>{String(merged.sopStages.findIndex((item) => item.key === stage.key) + 1).padStart(2, '0')}</span></div>
+                <div className="consultation-live-stage__content">
+                  <span>{stage.intent}</span><h3>{stage.title}</h3><blockquote>{stage.script}</blockquote>
+                  {stage.questions.length > 0 && <div><small>{locale === 'zh-TW' ? '接著可以問' : 'Ask next'}</small><p>{stage.questions[0]}</p></div>}
+                </div>
+              </div>
+            ))}
+            <div className="consultation-live-stage__footer">
+              <p><span>{locale === 'zh-TW' ? '會員現在最想理解' : 'Client focus'}</span>{merged.clientIntent}</p>
+              <p><span>{locale === 'zh-TW' ? '整場解盤主軸' : 'Reading anchor'}</span>{merged.plainOneLiner}</p>
+            </div>
           </div>
 
           <div className="teacher-workbench__beginner-map" aria-label={copy.beginnerAria}>

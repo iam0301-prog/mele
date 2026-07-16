@@ -2,32 +2,27 @@
 
 import { DEFAULT_LOCALE, type Locale } from '@/lib/i18n/config';
 import { getToolLocaleCopy } from '@/lib/i18n/tool-page-copy';
+import type { CalcTool } from '@/lib/api';
+import { getToolExperience } from '@/components/ToolExperiencePrelude';
 
 export function ToolLoading({
   label,
   locale = DEFAULT_LOCALE,
+  tool,
 }: {
   label?: string;
   locale?: Locale;
+  tool?: CalcTool;
 }) {
   const copy = getToolLocaleCopy(locale).feedback;
+  const experience = tool ? getToolExperience(tool, locale) : null;
 
   return (
-    <div className="tool-loading-ritual mele-card mt-6" aria-live="polite">
-      <div className="tool-loading-ritual__portrait" aria-hidden="true">
-        <span className="tool-loading-ritual__halo" />
-        <span className="tool-loading-ritual__face">
-          <i className="tool-loading-ritual__eye tool-loading-ritual__eye--left" />
-          <i className="tool-loading-ritual__eye tool-loading-ritual__eye--right" />
-          <b className="tool-loading-ritual__smile" />
-          <em className="tool-loading-ritual__spark tool-loading-ritual__spark--one" />
-          <em className="tool-loading-ritual__spark tool-loading-ritual__spark--two" />
-        </span>
-      </div>
+    <div className={`tool-loading-ritual${tool ? ` tool-loading-ritual--${tool}` : ''} mele-card mt-6`} aria-live="polite">
       <div className="tool-loading-ritual__copy">
         <span>{copy.loadingKicker}</span>
-        <strong>{label ?? copy.loadingBody}</strong>
-        <p>{copy.loadingBody}</p>
+        <strong>{label ?? experience?.loading ?? copy.loadingBody}</strong>
+        <p>{experience?.loading ?? copy.loadingBody}</p>
       </div>
       <div className="tool-loading-ritual__steps" aria-hidden="true">
         <i />

@@ -12,6 +12,7 @@ const LOCALIZED_APP_ROUTES = new Set([
   '/beta',
   '/feedback',
   '/daily',
+  '/share',
   '/mobile',
   '/ar',
   '/account/login',

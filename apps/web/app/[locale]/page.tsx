@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
+import HomeIntentSelector from '@/components/HomeIntentSelector';
 import {
   LOCALES,
   getDictionary,
@@ -65,7 +66,8 @@ const homeCopy = {
     verticalLabel: '自我理解的入口',
     title: '先整理自己，再決定下一步。',
     body: '一個讓你先整理自己、再決定下一步的工具平台。從每日儀式、命理探索到深入解讀，陪你多一個看自己的角度。需要的時候，再找老師深聊。',
-    tarotCta: '一鍵玩塔羅',
+    tarotCta: '抽一張牌，看今天的方向',
+    primaryCta: '開始認識自己',
     dailyLabel: '每日儀式',
     toolsLabel: '看全部工具',
     teacherLabel: '需要時找老師',
@@ -109,7 +111,8 @@ const homeCopy = {
     verticalLabel: 'A doorway to self-understanding',
     title: 'Understand yourself first. Then decide what comes next.',
     body: 'A platform for self-discovery before your next move. From daily rituals and astrology to in-depth readings — one more angle on yourself. Find a guide when you need one.',
-    tarotCta: 'One-tap tarot',
+    tarotCta: 'Draw a card for today',
+    primaryCta: 'Start understanding yourself',
     dailyLabel: 'Daily ritual',
     toolsLabel: 'See all tools',
     teacherLabel: 'Find a guide if needed',
@@ -150,7 +153,8 @@ const homeCopy = {
     verticalLabel: 'Lối vào để hiểu chính mình',
     title: 'Hiểu bản thân trước, rồi quyết định bước tiếp theo.',
     body: 'Một nền tảng công cụ giúp bạn sắp xếp lại bản thân trước khi đưa ra quyết định. Từ nghi thức hằng ngày, khám phá bản đồ năng lượng đến giải thích chuyên sâu — thêm một góc nhìn về chính mình. Khi cần, hãy tìm chuyên gia để trò chuyện sâu hơn.',
-    tarotCta: 'Bói tarot 1 chạm',
+    tarotCta: 'Rút một lá bài cho hôm nay',
+    primaryCta: 'Bắt đầu hiểu chính mình',
     dailyLabel: 'Nghi thức hằng ngày',
     toolsLabel: 'Xem tất cả công cụ',
     teacherLabel: 'Tìm chuyên gia khi cần',
@@ -194,7 +198,8 @@ const homeCopy = {
     verticalLabel: 'Pintu untuk memahami diri',
     title: 'Kenali dirimu dulu, lalu putuskan langkah berikutnya.',
     body: 'Platform alat yang membantumu merapikan diri sebelum mengambil keputusan. Dari ritual harian, eksplorasi diri, hingga pembacaan mendalam — satu sudut pandang tambahan tentang dirimu. Ketika perlu, cari pemandu untuk ngobrol lebih dalam.',
-    tarotCta: 'Tarot sekali klik',
+    tarotCta: 'Tarik satu kartu untuk hari ini',
+    primaryCta: 'Mulai memahami dirimu',
     dailyLabel: 'Ritual harian',
     toolsLabel: 'Lihat semua alat',
     teacherLabel: 'Cari pemandu jika perlu',
@@ -238,7 +243,8 @@ const homeCopy = {
     verticalLabel: '自分を理解する入口',
     title: 'まず自分を整理して、それから次の一歩を決める。',
     body: '自分を整理してから次のステップを決めるためのツールプラットフォームです。毎日の儀式、自己探索、深い解説まで——自分をもう一つの角度から見るきっかけになります。必要なときは、ガイドに深く話しかけてみてください。',
-    tarotCta: 'ワンタップでタロット',
+    tarotCta: '今日の一枚を引く',
+    primaryCta: '自分を知ることから始める',
     dailyLabel: '毎日の儀式',
     toolsLabel: 'すべてのツールを見る',
     teacherLabel: '必要なときにガイドを探す',
@@ -282,7 +288,8 @@ const homeCopy = {
     verticalLabel: '나를 이해하는 입구',
     title: '먼저 자신을 정리하고, 그 다음 방향을 결정하세요.',
     body: '나를 먼저 정리한 후 다음 선택을 결정하기 위한 도구 플랫폼입니다. 매일 리추얼, 자기 탐색부터 심층 해석까지 — 나를 바라보는 하나의 시각을 더해드립니다. 필요할 때 가이드를 찾아 깊이 대화해 보세요.',
-    tarotCta: '원탭 타로',
+    tarotCta: '오늘의 카드 한 장 뽑기',
+    primaryCta: '나를 이해하기 시작하기',
     dailyLabel: '데일리 리추얼',
     toolsLabel: '모든 도구 보기',
     teacherLabel: '필요할 때 가이드 찾기',
@@ -348,14 +355,11 @@ export default async function LocalizedHomePage({ params }: PageProps) {
           <p className="mag-hero__body">{copy.body}</p>
 
           <div className="mag-actions">
-            <Link href={localizePath('/tools/tarot', locale)} className="mag-cta">
+            <Link href="#intent-finder" className="mag-cta">
+              {copy.primaryCta}
+            </Link>
+            <Link href={localizePath('/tools/tarot', locale)} className="mag-cta mag-cta--ghost">
               {copy.tarotCta}
-            </Link>
-            <Link href={localizePath('/daily', locale)} className="mag-cta mag-cta--ghost">
-              {copy.dailyLabel}
-            </Link>
-            <Link href={localizePath('/tools', locale)} className="mag-cta mag-cta--ghost">
-              {copy.toolsLabel}
             </Link>
           </div>
 
@@ -366,6 +370,26 @@ export default async function LocalizedHomePage({ params }: PageProps) {
           </nav>
         </div>
       </section>
+
+      <section className="result-preview" aria-label="MELE result preview">
+        <div className="result-preview__guide">
+          <span className="mag-label">每份結果只回答三件事</span>
+          <ol>
+            <li><b>01</b><span>你現在呈現什麼模式</span></li>
+            <li><b>02</b><span>最近可能卡在哪裡</span></li>
+            <li><b>03</b><span>今天可以先做什麼</span></li>
+          </ol>
+        </div>
+        <div className="result-preview__copy">
+          <span className="mag-label">你會得到的，不是一句標籤</span>
+          <blockquote>「你習慣先看清整體，確認方向後才真正投入。」</blockquote>
+          <div className="result-preview__traits"><span>先理解</span><span>重方向</span><span>再行動</span></div>
+          <p>在工作上，你通常需要先知道目標為何，才容易真正進入狀態。</p>
+          <small>每份結果都會整理成：特質、生活情境與一個能立即做的行動。</small>
+        </div>
+      </section>
+
+      <HomeIntentSelector locale={locale} />
 
       <section className="mag-toc" aria-label={copy.tocTitle}>
         <div className="mag-toc__head">
@@ -430,8 +454,8 @@ export default async function LocalizedHomePage({ params }: PageProps) {
           <h2>{copy.finalTitle}</h2>
           <p>{copy.finalBody}</p>
         </div>
-        <Link href={localizePath('/tools/tarot', locale)} className="mag-cta">
-          {copy.tarotCta}
+        <Link href="#intent-finder" className="mag-cta">
+          {copy.primaryCta}
         </Link>
       </section>
     </main>
