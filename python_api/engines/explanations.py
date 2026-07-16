@@ -817,8 +817,423 @@ CHANG_SHENG_MEANING = {
     "绝": "斷而再生，適合澈底更新",
 }
 
+# ────────────────────────────────────────────────────────────────
+# 八字英文化資源（locale=en）。術語一律照 24_專有名詞對照表.md，
+# 表上沒有的新詞已補進該表（十二長生意義句、旺相休囚死、格局名稱、
+# 神煞名稱、日主強弱標籤）。
+# ────────────────────────────────────────────────────────────────
 
-def explain_bazi(data: dict, detail: DetailLevel = "teaser") -> str:
+GAN_PINYIN = {
+    "甲": "Jiǎ", "乙": "Yǐ", "丙": "Bǐng", "丁": "Dīng", "戊": "Wù",
+    "己": "Jǐ", "庚": "Gēng", "辛": "Xīn", "壬": "Rén", "癸": "Guǐ",
+}
+ZHI_PINYIN = {
+    "子": "Zǐ", "丑": "Chǒu", "寅": "Yín", "卯": "Mǎo", "辰": "Chén", "巳": "Sì",
+    "午": "Wǔ", "未": "Wèi", "申": "Shēn", "酉": "Yǒu", "戌": "Xū", "亥": "Hài",
+}
+WUXING_EN = {"木": "Wood", "火": "Fire", "土": "Earth", "金": "Metal", "水": "Water"}
+YIN_YANG_EN = {"陽": "Yang", "陰": "Yin"}
+
+WUXING_GUIDE_EN = {
+    "木": "Wood energy is like a tree budding in spring — it wants to grow upward and reach outward. You carry a natural forward drive and do well in environments with room to stretch — the clearer your direction, the more momentum you'll have.",
+    "火": "Fire energy is like a kindled light — it needs to be seen and lit. You do well pouring your passion into things you genuinely care about, but remember to recharge too, so the fire doesn't burn so hot you forget to take care of yourself.",
+    "土": "Earth energy is like solid ground, steadily holding everything up. You're good at making people around you feel safe, but watch whether you're carrying too much of everyone else's load — steady yourself first before you can really support others.",
+    "金": "Metal energy is clean and decisive, drawn to clear rules and boundaries. You do well building results with your own standards and judgment — let yourself soften occasionally; not everything needs to be that precise.",
+    "水": "Water energy is flexible and deep, skilled at flowing and sensing. You need flexibility and room to think, and don't like being boxed in — give yourself enough room to flow, and it gets easier to spot connections and find your way forward.",
+}
+
+DAY_MASTER_GUIDE_EN = {
+    "甲": "Your Day Master is Jiǎ Wood (Yang Wood) — principled, with a long view and steady willpower. Favor patient accumulation over rushing; influence grows naturally over time.",
+    "乙": "Your Day Master is Yǐ Wood (Yin Wood) — flexible and fine-grained, skilled at finding your own way through constraints, highly adaptable.",
+    "丙": "Your Day Master is Bǐng Fire (Yang Fire) — naturally outgoing and mood-lifting, with genuine warmth. Pair that warmth with a clear direction and you'll go further, steadier.",
+    "丁": "Your Day Master is Dīng Fire (Yin Fire) — subtle and warm, noticing details others miss, suited to quietly influencing people through your own warmth.",
+    "戊": "Your Day Master is Wù Earth (Yang Earth) — steady and dependable, people around you tend to feel safe with you. Watch that you don't carry everyone else's weight.",
+    "己": "Your Day Master is Jǐ Earth (Yin Earth) — accommodating and practical, able to nurture results over time. Be clear about which responsibilities are really yours.",
+    "庚": "Your Day Master is Gēng Metal (Yang Metal) — direct and decisive, skilled at cutting through chaos to find what matters.",
+    "辛": "Your Day Master is Xīn Metal (Yin Metal) — sharp aesthetic sense and refined taste, with a distinctive eye and a focus on protecting core values.",
+    "壬": "Your Day Master is Rén Water (Yang Water) — broad-visioned and highly fluid, able to absorb complex information quickly and adapt to nearly any environment.",
+    "癸": "Your Day Master is Guǐ Water (Yin Water) — subtly penetrating, deeply perceptive; intuition often surfaces in quiet moments — cross-check important decisions against reality before deciding.",
+}
+
+PILLAR_ROLES_EN = {
+    "year": ("Year Pillar", "your broader environment, family background, and outward disposition"),
+    "month": ("Month Pillar", "your main expression at work and in society — the energy foundation of your birth month"),
+    "day": ("Day Pillar", "the Day Master itself — closest to your inner self and intimate relationships"),
+    "time": ("Hour Pillar", "your inner longings, long-term direction, and what you build later in life"),
+}
+
+SHISHEN_EN = {
+    "比肩": "Companion (Bǐjiān)",
+    "劫財": "Rival Wealth (Jiécái)",
+    "食神": "Eating God (Shíshén)",
+    "傷官": "Hurting Officer (Shāngguān)",
+    "偏財": "Indirect Wealth (Piāncái)",
+    "正財": "Direct Wealth (Zhèngcái)",
+    "七殺": "Seven Killings (Qīshā)",
+    "正官": "Direct Officer (Zhèngguān)",
+    "偏印": "Indirect Resource (Piānyìn)",
+    "正印": "Direct Resource (Zhèngyìn)",
+}
+
+ROLE_EN = {"本氣": "chief qi", "中氣": "middle qi", "餘氣": "residual qi"}
+
+CHANG_SHENG_EN = {
+    "長生": "Birth", "沐浴": "Bath", "冠帶": "Cap", "臨官": "Office", "帝旺": "Prime",
+    "衰": "Decline", "病": "Illness", "死": "Death", "墓": "Tomb", "絕": "Extinction",
+    "胎": "Gestation", "養": "Nurture",
+}
+
+CHANG_SHENG_MEANING_EN = {
+    "長生": "budding and full of promise, energy steadily building",
+    "沐浴": "sensitive and lively, still finding your footing amid variety",
+    "冠帶": "energetic, with a strong eagerness to show what you've got",
+    "臨官": "capability lands, career momentum picks up",
+    "帝旺": "at full strength — but peak strength can tip into decline, so don't overreach",
+    "衰": "starting to fade — a good time to pull back and regroup",
+    "病": "energy runs low — proceed carefully and conservatively",
+    "死": "stillness here — the focus is transformation, not a sprint",
+    "墓": "storing and settling — sometimes what's hidden resurfaces later",
+    "絕": "an ending that makes room for renewal — good for a fresh start",
+    "胎": "quietly gathering potential, poised to begin",
+    "養": "nourishing growth — move once the foundation is solid",
+}
+
+MONTH_STATE_EN = {"旺": "Prosperous", "相": "Supportive", "休": "Resting", "囚": "Trapped", "死": "Dormant"}
+
+STRENGTH_LABEL_EN = {
+    "身強": "Strong Day Master",
+    "中和偏強": "Balanced-Strong",
+    "身弱": "Weak Day Master",
+    "中和偏弱": "Balanced-Weak",
+}
+
+PATTERN_NAME_EN = {
+    "正官": "Direct Officer Pattern",
+    "七殺": "Seven Killings Pattern (Indirect Officer)",
+    "正印": "Direct Resource Pattern",
+    "偏印": "Indirect Resource Pattern (Owl Pattern)",
+    "正財": "Direct Wealth Pattern",
+    "偏財": "Indirect Wealth Pattern",
+    "食神": "Eating God Pattern",
+    "傷官": "Hurting Officer Pattern",
+    "比肩": "Jiànlù Pattern (Companion Rules the Month)",
+    "劫財": "Yuèjié Pattern (Rival Wealth Rules the Month)",
+}
+
+PATTERN_MEANING_EN = {
+    "正官": "Rule-abiding and orderly — suited to work within institutions or clear structures; values reputation and responsibility.",
+    "七殺": "Bold and resilient under pressure — suited to competitive environments; watch for impulsive reactions when the pressure builds too high.",
+    "正印": "Strong capacity to learn, with protective connections — suited to education or research, but watch for over-dependence.",
+    "偏印": "Distinctive thinking and strong intuition — suited to creative or spiritual fields; watch for a tendency toward isolation.",
+    "正財": "Grounded and practical, values steady income — suited to long-term accumulation, though relatively conservative about risk.",
+    "偏財": "Flexible with money and good at spotting opportunities — suited to business or investing, though spending patterns can swing.",
+    "食神": "Rich in talent and appetite for life, expressive and creative, with a strong sense of enjoyment.",
+    "傷官": "Visibly talented with a distinct personality and real creative drive — relationships with authority need deliberate care.",
+    "比肩": "Independent and opinionated, prefers to get things done alone — watch for rivalry with peers.",
+    "劫財": "Strong drive and good at pulling resources together, but money tends to swing between big gains and big losses.",
+}
+
+SHENSHA_NAME_EN = {
+    "天乙貴人": "Nobleman Star (Tiānyǐ Guìrén)",
+    "桃花": "Peach Blossom (Táohuā)",
+    "驛馬": "Traveling Horse (Yìmǎ)",
+    "華蓋": "Canopy Star (Huágài)",
+}
+
+
+def _wuxing_balance_lines_en(counts: dict, day_wuxing: object) -> list[str]:
+    numeric = {str(name): _safe_int(count) for name, count in counts.items()}
+    if not numeric:
+        return []
+
+    max_count = max(numeric.values())
+    min_count = min(numeric.values())
+    strong = [name for name, count in numeric.items() if count == max_count and count > 0]
+    soft = [name for name, count in numeric.items() if count == min_count]
+    missing = [name for name, count in numeric.items() if count == 0]
+    day_count = numeric.get(str(day_wuxing), 0)
+
+    def _names_en(names: list[str]) -> str:
+        return ", ".join(WUXING_EN.get(n, n) for n in names)
+
+    lines = []
+    if missing:
+        lines.append(
+            f"No <strong>{_names_en(missing)}</strong> in the chart: the Ten Gods tied to it are absent from "
+            "both stems and branches, and need to be supplemented through luck cycles and yearly pillars."
+        )
+    else:
+        lines.append("All five elements are present — the focus is on the balance between strong and weak.")
+
+    if strong:
+        lines.append(
+            f"<strong>{_names_en(strong)}</strong> is the strongest energy ({max_count} instances) — "
+            "the Ten Gods tied to it are the easiest to draw on."
+        )
+    if soft and not missing:
+        lines.append(
+            f"<strong>{_names_en(soft)}</strong> is relatively weak ({min_count} instances) — the Ten Gods "
+            "tied to it will need support from luck cycles or the outer environment."
+        )
+    if day_wuxing:
+        day_wuxing_en = WUXING_EN.get(str(day_wuxing), str(day_wuxing))
+        if day_count >= 2:
+            lines.append(
+                f"The Day Master's own element, <strong>{day_wuxing_en}</strong>, appears {day_count} times "
+                "(strong Companion support) — a steadier foundation."
+            )
+        else:
+            lines.append(
+                f"The Day Master's own element, <strong>{day_wuxing_en}</strong>, appears only {day_count} time(s) "
+                "(thin Companion support) — Resource or Companion luck cycles would help."
+            )
+    return lines
+
+
+def _explain_bazi_en(data: dict, detail: DetailLevel = "teaser") -> str:
+    pillars = data.get("pillars") or {}
+    counts = (data.get("wuxing") or {}).get("counts") or {}
+    day_master = data.get("dayMaster")
+    day_wuxing = data.get("dayMasterWuxing")
+    day_yinyang = data.get("dayMasterYinYang")
+    hidden_stems = data.get("hiddenStems") or {}
+    shishen_gan = data.get("shishen") or {}
+    chang_sheng = data.get("changSheng") or {}
+    da_yun = data.get("daYun") or {}
+    shensha = data.get("shensha") or []
+    strength = data.get("strength") or {}
+    pattern = data.get("pattern") or {}
+
+    CS_TRAD = {
+        "长生": "長生", "沐浴": "沐浴", "冠带": "冠帶", "临官": "臨官", "帝旺": "帝旺",
+        "衰": "衰", "病": "病", "死": "死", "墓": "墓", "绝": "絕", "胎": "胎", "养": "養",
+    }
+
+    def _gz_en(gan: str, zhi: str) -> str:
+        return f"{GAN_PINYIN.get(gan, gan)} {ZHI_PINYIN.get(zhi, zhi)}"
+
+    day_master_pinyin = GAN_PINYIN.get(_text(day_master), _text(day_master))
+    day_yinyang_en = YIN_YANG_EN.get(_text(day_yinyang), _text(day_yinyang))
+    day_wuxing_en = WUXING_EN.get(_text(day_wuxing), _text(day_wuxing))
+
+    parts = [
+        _line(
+            f"Your Day Master is <strong>{day_yinyang_en} {day_wuxing_en} ({day_master_pinyin})</strong> — "
+            "the whole chart is read around the Day Master."
+        ),
+        _line(
+            DAY_MASTER_GUIDE_EN.get(
+                _text(day_master),
+                WUXING_GUIDE_EN.get(_text(day_wuxing), "The Day Master describes how your energy naturally moves — it's the starting point for reading the whole chart."),
+            )
+        ),
+    ]
+
+    # ── 日主強弱 ──
+    strength_val_zh = _text(strength.get("strength"))
+    month_state_zh = _text(strength.get("monthState"))
+    if strength_val_zh:
+        strength_label = STRENGTH_LABEL_EN.get(strength_val_zh, strength_val_zh)
+        month_state_en = MONTH_STATE_EN.get(month_state_zh, month_state_zh)
+        if strength_val_zh == "身強":
+            desc = (
+                f"Your Day Master is supported by the month (in a {month_state_en} phase), and the chart overall "
+                "leans toward strong support — pointing toward a Strong Day Master. Consider Output Gods "
+                "(Eating God/Hurting Officer) or Wealth/Officer stars as your Useful God direction; cross-check "
+                "with the full chart to confirm."
+            )
+        elif strength_val_zh == "中和偏強":
+            desc = (
+                f"Your Day Master is supported by the month (in a {month_state_en} phase), leaning moderately "
+                "strong overall. Consider Output Gods or Wealth stars, but keep watching for combinations and "
+                "clashes among the branches."
+            )
+        elif strength_val_zh == "身弱":
+            desc = (
+                f"Your Day Master lacks month support (in a {month_state_en} phase), with limited reinforcement "
+                "elsewhere in the chart — leaning toward a Weak Day Master. Consider Resource or Companion stars "
+                "to support the Day Master; cross-check with the full chart to confirm."
+            )
+        else:
+            desc = (
+                f"Your Day Master lacks month support (in a {month_state_en} phase), though there is some "
+                "reinforcement elsewhere. Leaning moderately weak — Resource and Companion stars are the "
+                "reference for your Useful God; still worth checking against the month pillar and luck cycles."
+            )
+        parts.append(_section("Day Master Strength"))
+        parts.append(_line(f"<strong>{strength_label}</strong>: {desc}"))
+
+    # ── 格局 ──
+    dominant = _text(pattern.get("dominant_shishen"))
+    if dominant:
+        pat_name_en = PATTERN_NAME_EN.get(dominant, f"{SHISHEN_EN.get(dominant, dominant)} Pattern")
+        pat_meaning_en = PATTERN_MEANING_EN.get(dominant, "")
+        parts.append(_section("Pattern & Useful God Direction"))
+        parts.append(_line(f"Your chart's main pattern is <strong>{pat_name_en}</strong>. {pat_meaning_en}"))
+        if "強" in strength_val_zh:
+            yong_hint = (
+                "General direction: a strong Day Master benefits from Output (Eating God/Hurting Officer), "
+                "Control (Officer/Seven Killings), or Drain (Wealth) — confirm the Useful God against the full chart."
+            )
+        else:
+            yong_hint = (
+                "General direction: a weak Day Master benefits from Generation (Resource) or Support (Companion) "
+                "stars, while avoiding heavy pressure from Officer/Seven Killings/Wealth — cross-check with the "
+                "month pillar and combinations to confirm."
+            )
+        parts.append(_line(f"Useful God direction: {yong_hint}"))
+
+    # ── 四柱 + 天干十神 ──
+    parts.append(_section("Four Pillars & Stem Ten Gods"))
+    for key in ("year", "month", "day", "time"):
+        label, role = PILLAR_ROLES_EN[key]
+        pillar = pillars.get(key) or []
+        if not pillar:
+            continue
+        gan, zhi = pillar[0], pillar[1]
+        ss_zh = _bazi_shishen_label(_text(shishen_gan.get(key, ""))) if key != "day" else ""
+        ss = "Day Master" if key == "day" else SHISHEN_EN.get(ss_zh, ss_zh)
+        cs_zh = CS_TRAD.get(_text(chang_sheng.get(key, "")), _text(chang_sheng.get(key, "")))
+        cs_en = CHANG_SHENG_EN.get(cs_zh, cs_zh)
+        cs_meaning_en = CHANG_SHENG_MEANING_EN.get(cs_zh, "")
+        ss_char = f"【{ss}】" if ss else ""
+        cs_char = (
+            f"Stage: {cs_en} ({cs_meaning_en})" if cs_zh and cs_meaning_en else (f"Stage: {cs_en}" if cs_en else "")
+        )
+        parts.append(
+            _line(
+                f"<strong>{label} {_gz_en(gan, zhi)}</strong> {ss_char}"
+                f"{'　' if cs_char else ''}{cs_char}"
+                f"　→ {role}."
+            )
+        )
+
+    # ── 地支藏干十神 ──
+    parts.append(_section("Hidden Stems & Their Ten Gods"))
+    parts.append(
+        _line(
+            "Each branch conceals one or more hidden stems, and the Ten God tied to each hidden stem is key to "
+            "reading the chart — the Month Branch's hidden stems in particular reflect the strength of the "
+            "\"month command\" and whether the Day Master is supported by the season."
+        )
+    )
+    for key in ("year", "month", "day", "time"):
+        label = PILLAR_ROLES_EN[key][0]
+        pillar = pillars.get(key) or []
+        zhi = pillar[1] if len(pillar) > 1 else ""
+        stems = hidden_stems.get(key) or []
+        if not stems:
+            continue
+        stem_parts = []
+        for s in stems:
+            g = _text(s.get("gan"))
+            ss_zh = _bazi_shishen_label(_text(s.get("shishen")))
+            ss_en = SHISHEN_EN.get(ss_zh, ss_zh)
+            role_tag = ROLE_EN.get(_text(s.get("role")), _text(s.get("role")))
+            if g and ss_en:
+                stem_parts.append(f"{GAN_PINYIN.get(g, g)} ({ss_en} · {role_tag})")
+        if stem_parts:
+            parts.append(
+                _line(f"<strong>{label} branch {ZHI_PINYIN.get(zhi, zhi)}</strong>: {' / '.join(stem_parts)}")
+            )
+
+    # ── 五行分布 ──
+    if counts:
+        parts.append(_section("Five Element Distribution"))
+        count_display = _join([f"{WUXING_EN.get(name, name)} {count}" for name, count in counts.items()], sep=", ")
+        parts.append(_line(f"Wood / Fire / Earth / Metal / Water: {count_display} (stems + branches, 1 each)"))
+        for line in _wuxing_balance_lines_en(counts, day_wuxing):
+            parts.append(_line(line))
+
+    # ── 神煞 ──
+    if shensha:
+        parts.append(_section("Special Stars (Shén Shà)"))
+        for ss_item in shensha:
+            name_zh = _text(ss_item.get("name"))
+            name_en = SHENSHA_NAME_EN.get(name_zh, name_zh)
+            zhi_hit = ss_item.get("zhi") or []
+            zhi_str = ", ".join(ZHI_PINYIN.get(z, z) for z in zhi_hit)
+            if name_zh == "天乙貴人":
+                desc_en = "Strong Nobleman support: at key moments, you're likely to meet the right helping hand."
+            elif name_zh == "桃花":
+                desc_en = (
+                    f"Your chart carries Peach Blossom (branch: {zhi_str}): strong personal charm and more "
+                    "romantic opportunities — mind the boundaries in relationships."
+                )
+            elif name_zh == "驛馬":
+                desc_en = (
+                    f"Your chart carries Traveling Horse (branch: {zhi_str}): a natural mover — relocation, "
+                    "travel, and business trips show up more across your life."
+                )
+            elif name_zh == "華蓋":
+                desc_en = (
+                    "Your chart carries Canopy Star: a strong pull toward art and spirituality, suited to "
+                    "creative or research work, though it comes with a stronger sense of solitude."
+                )
+            else:
+                desc_en = _text(ss_item.get("desc"))
+            if name_en and desc_en:
+                zhi_note = f" (branch hit: {zhi_str})" if zhi_str and name_zh != "天乙貴人" and name_zh != "華蓋" else ""
+                parts.append(_line(f"<strong>{name_en}</strong>{zhi_note}: {desc_en}"))
+
+    if detail == "full":
+        # ── 大運 ──
+        steps = da_yun.get("steps") or []
+        if steps:
+            start_age = da_yun.get("startAge")
+            start_month_yun = da_yun.get("startMonth", "")
+            direction = "forward" if da_yun.get("isForward") else "reverse"
+            parts.append(_section("Luck Pillars (Dà Yùn)"))
+            age_str = str(start_age) if start_age is not None else "?"
+            parts.append(
+                _line(
+                    f"Luck begins at age {age_str}, {start_month_yun} month(s) in, running {direction}. "
+                    "Each Luck Pillar covers 10 years — the stem influences the first half, the branch the second."
+                )
+            )
+            for step in steps[:6]:
+                gan = _text(step.get("gan"))
+                zhi = _text(step.get("zhi"))
+                ss_gan_zh = _bazi_shishen_label(_text(step.get("shishenGan")))
+                ss_gan_en = SHISHEN_EN.get(ss_gan_zh, ss_gan_zh)
+                s_age = step.get("startAge", "")
+                e_age = step.get("endAge", "")
+                s_year = step.get("startYear", "")
+                if gan or zhi:
+                    ss_str = f" ({ss_gan_en})" if ss_gan_en else ""
+                    parts.append(
+                        _line(
+                            f"<strong>{_gz_en(gan, zhi)}</strong>{ss_str}　ages {s_age}–{e_age}　from {s_year}"
+                        )
+                    )
+
+        parts.extend(
+            [
+                _section("Reading Notes"),
+                _line(
+                    "The pattern and Useful God should be checked against the month pillar, combinations, and "
+                    "clashes to be confirmed. Luck cycles and yearly pillars carry far more weight than a static "
+                    "chart — the same chart can play out very differently across different luck periods."
+                ),
+                _line(
+                    "BaZi shows tendencies and lessons, not a fixed fate. Bringing a real question into the "
+                    "conversation is worth more than a generic reading."
+                ),
+            ]
+        )
+
+    parts.append(
+        _line(
+            "<small>This reading uses traditional metaphysical symbolism as a lens for self-reflection. It is not "
+            "a medical or psychological diagnosis, nor a prediction or guarantee of future events.</small>"
+        )
+    )
+    return _wrap(parts, detail)
+
+
+def explain_bazi(data: dict, detail: DetailLevel = "teaser", locale: str = "zh-TW") -> str:
+    if _locale_key(locale) == "en":
+        return _explain_bazi_en(data, detail)
     pillars = data.get("pillars") or {}
     counts = (data.get("wuxing") or {}).get("counts") or {}
     day_master = data.get("dayMaster")
