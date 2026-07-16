@@ -62,7 +62,7 @@ export default function ZiweiPage() {
     try {
       const [year, month, day] = date.split('-').map(Number);
       const [hour, minute] = time.split(':').map(Number);
-      const response = await calc('ziwei', { year, month, day, hour, minute, gender });
+      const response = await calc('ziwei', { year, month, day, hour, minute, gender }, locale);
       setResult(response);
     } catch (err) {
       const message = err instanceof CalcError ? err.message : (err as Error).message;

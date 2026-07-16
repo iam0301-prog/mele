@@ -60,7 +60,7 @@ export default function BaziPage() {
         minute,
         sect: 2,
         longitude: useTrueSolar ? longitude : null,
-      });
+      }, locale);
       setResult(response);
     } catch (err) {
       const message = err instanceof CalcError ? err.message : (err as Error).message;

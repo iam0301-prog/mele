@@ -64,7 +64,7 @@ describe('<AstroPage /> timezone handling', () => {
 
     await waitFor(() => {
       expect(fetchMock).toHaveBeenCalledWith(
-        '/api/calc/astro',
+        '/api/calc/astro?locale=zh-TW',
         expect.objectContaining({
           body: expect.any(String),
           method: 'POST',

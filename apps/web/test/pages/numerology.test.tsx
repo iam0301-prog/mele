@@ -81,7 +81,7 @@ describe('<NumerologyPage />', () => {
 
     await waitFor(() => {
       expect(fetchMock).toHaveBeenCalledWith(
-        '/api/calc/numerology',
+        '/api/calc/numerology?locale=zh-TW',
         expect.objectContaining({ method: 'POST' }),
       );
     });

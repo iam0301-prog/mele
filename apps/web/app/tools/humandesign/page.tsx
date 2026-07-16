@@ -72,7 +72,7 @@ export default function HumanDesignPage() {
         hour,
         minute,
         timezone,
-      });
+      }, locale);
       setResult(response);
     } catch (err) {
       const message = err instanceof CalcError ? err.message : (err as Error).message;

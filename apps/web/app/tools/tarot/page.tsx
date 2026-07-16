@@ -44,7 +44,7 @@ export default function TarotPage() {
         spread: selectedSpread?.value ?? 'three_card',
         question: question.trim(),
         tarot_style: tarotStyle,
-      });
+      }, locale);
       setResult(response);
     } catch (err) {
       const message = err instanceof CalcError ? err.message : (err as Error).message;

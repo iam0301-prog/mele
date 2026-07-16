@@ -147,16 +147,25 @@ EXPLAINER = {
 
 
 def wrap(
-    tool: str, request_input: dict, data: dict, render_bundle: dict, detail: str = "teaser"
+    tool: str,
+    request_input: dict,
+    data: dict,
+    render_bundle: dict,
+    detail: str = "teaser",
+    locale: str = "zh-TW",
 ) -> CalcResponse:
     """Normalize every calculator result into the public API response shell."""
 
     if tool in EXPLAINER and not render_bundle.get("html"):
         try:
             try:
-                render_bundle["html"] = EXPLAINER[tool](data, detail=detail)
+                render_bundle["html"] = EXPLAINER[tool](data, detail=detail, locale=locale)
             except TypeError:
-                render_bundle["html"] = EXPLAINER[tool](data)
+                # 缺件安全網：引擎尚未支援 locale 參數時，退回原本呼叫方式（永遠輸出中文，不開天窗）
+                try:
+                    render_bundle["html"] = EXPLAINER[tool](data, detail=detail)
+                except TypeError:
+                    render_bundle["html"] = EXPLAINER[tool](data)
         except Exception:
             traceback.print_exc()
             render_bundle["html"] = ""
@@ -270,26 +279,36 @@ async def global_exception_handler(request: Request, exc: Exception):
 
 
 DetailQuery = Literal["teaser", "full"]
+# 支援語言：繁中／英／越南／印尼／日／韓。缺翻譯時各引擎內部會做安全網退回（en→zh-TW）。
+LocaleQuery = Literal["zh-TW", "en", "vi", "id", "ja", "ko"]
 
 
 @app.post("/api/v1/calc/numerology", response_model=CalcResponse, tags=["Calc"])
-async def calc_numerology(req: NumerologyRequest, detail: DetailQuery = Query("teaser")):
+async def calc_numerology(
+    req: NumerologyRequest, detail: DetailQuery = Query("teaser"), locale: LocaleQuery = Query("zh-TW")
+):
     """靈數：生命靈數、生日數與核心傾向。"""
 
     data = await run_calc("numerology", _cached_numerology, req.year, req.month, req.day)
-    return wrap("numerology", req.model_dump(), data, numerology_render.render(data), detail=detail)
+    return wrap(
+        "numerology", req.model_dump(), data, numerology_render.render(data), detail=detail, locale=locale
+    )
 
 
 @app.post("/api/v1/calc/maya", response_model=CalcResponse, tags=["Calc"])
-async def calc_maya(req: MayaRequest, detail: DetailQuery = Query("teaser")):
+async def calc_maya(
+    req: MayaRequest, detail: DetailQuery = Query("teaser"), locale: LocaleQuery = Query("zh-TW")
+):
     """馬雅曆：Kin、Seal、Tone 與 oracle 關係。"""
 
     data = await run_calc("maya", _cached_maya, req.year, req.month, req.day, req.include_leap_day)
-    return wrap("maya", req.model_dump(), data, maya_render.render(data), detail=detail)
+    return wrap("maya", req.model_dump(), data, maya_render.render(data), detail=detail, locale=locale)
 
 
 @app.post("/api/v1/calc/bazi", response_model=CalcResponse, tags=["Calc"])
-async def calc_bazi(req: BaziRequest, detail: DetailQuery = Query("teaser")):
+async def calc_bazi(
+    req: BaziRequest, detail: DetailQuery = Query("teaser"), locale: LocaleQuery = Query("zh-TW")
+):
     """八字：四柱、五行分布與日主觀察。"""
 
     data = await run_calc(
@@ -304,21 +323,25 @@ async def calc_bazi(req: BaziRequest, detail: DetailQuery = Query("teaser")):
         req.longitude,
         req.is_male,
     )
-    return wrap("bazi", req.model_dump(), data, bazi_render.render(data), detail=detail)
+    return wrap("bazi", req.model_dump(), data, bazi_render.render(data), detail=detail, locale=locale)
 
 
 @app.post("/api/v1/calc/ziwei", response_model=CalcResponse, tags=["Calc"])
-async def calc_ziwei(req: ZiweiRequest, detail: DetailQuery = Query("teaser")):
+async def calc_ziwei(
+    req: ZiweiRequest, detail: DetailQuery = Query("teaser"), locale: LocaleQuery = Query("zh-TW")
+):
     """紫微斗數：十二宮、主星與命盤結構。"""
 
     data = await run_calc(
         "ziwei", _cached_ziwei, req.year, req.month, req.day, req.hour, req.minute, req.gender
     )
-    return wrap("ziwei", req.model_dump(), data, ziwei_render.render(data), detail=detail)
+    return wrap("ziwei", req.model_dump(), data, ziwei_render.render(data), detail=detail, locale=locale)
 
 
 @app.post("/api/v1/calc/tarot", response_model=CalcResponse, tags=["Calc"])
-async def calc_tarot(req: TarotRequest, detail: DetailQuery = Query("teaser")):
+async def calc_tarot(
+    req: TarotRequest, detail: DetailQuery = Query("teaser"), locale: LocaleQuery = Query("zh-TW")
+):
     """塔羅：抽牌、正逆位與牌陣位置。"""
 
     data = await run_calc(
@@ -330,21 +353,26 @@ async def calc_tarot(req: TarotRequest, detail: DetailQuery = Query("teaser")):
         data,
         tarot_render.render(data, data.get("meta", {}).get("tarot_style")),
         detail=detail,
+        locale=locale,
     )
 
 
 @app.post("/api/v1/calc/runes", response_model=CalcResponse, tags=["Calc"])
-async def calc_runes(req: RunesRequest, detail: DetailQuery = Query("teaser")):
+async def calc_runes(
+    req: RunesRequest, detail: DetailQuery = Query("teaser"), locale: LocaleQuery = Query("zh-TW")
+):
     """盧恩：Elder Futhark 抽石與材質呈現。"""
 
     data = await run_calc(
         "runes", runes.draw, req.count, req.reversed_enabled, req.seed, req.spread, req.material or "stone"
     )
-    return wrap("runes", req.model_dump(), data, runes_render.render(data), detail=detail)
+    return wrap("runes", req.model_dump(), data, runes_render.render(data), detail=detail, locale=locale)
 
 
 @app.post("/api/v1/calc/astro", response_model=CalcResponse, tags=["Calc"])
-async def calc_astro(req: AstroRequest, detail: DetailQuery = Query("teaser")):
+async def calc_astro(
+    req: AstroRequest, detail: DetailQuery = Query("teaser"), locale: LocaleQuery = Query("zh-TW")
+):
     """西洋占星：行星、宮位與上升點。"""
 
     data = await run_calc(
@@ -360,11 +388,13 @@ async def calc_astro(req: AstroRequest, detail: DetailQuery = Query("teaser")):
         req.longitude,
         req.house_system,
     )
-    return wrap("astro", req.model_dump(), data, astro_render.render(data), detail=detail)
+    return wrap("astro", req.model_dump(), data, astro_render.render(data), detail=detail, locale=locale)
 
 
 @app.post("/api/v1/calc/humandesign", response_model=CalcResponse, tags=["Calc"])
-async def calc_humandesign(req: HumanDesignRequest, detail: DetailQuery = Query("teaser")):
+async def calc_humandesign(
+    req: HumanDesignRequest, detail: DetailQuery = Query("teaser"), locale: LocaleQuery = Query("zh-TW")
+):
     """人類圖：類型、中心、閘門與通道。"""
 
     data = await run_calc(
@@ -377,7 +407,9 @@ async def calc_humandesign(req: HumanDesignRequest, detail: DetailQuery = Query(
         req.minute,
         req.timezone,
     )
-    return wrap("humandesign", req.model_dump(), data, hd_render.render(data), detail=detail)
+    return wrap(
+        "humandesign", req.model_dump(), data, hd_render.render(data), detail=detail, locale=locale
+    )
 
 
 @app.get("/", response_class=HTMLResponse, tags=["Meta"])

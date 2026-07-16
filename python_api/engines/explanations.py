@@ -34,6 +34,23 @@ def _wrap(parts: list[str], detail: DetailLevel) -> str:
     return f"<div class='explanation explanation-full'>{inner}</div>"
 
 
+def _locale_key(locale: object) -> str:
+    """正規化 locale。目前只有 zh-TW／en 有實際翻譯資源；其餘語言（vi/id/ja/ko）
+    尚未翻譯，先安全網退回中文，不開天窗（見 22 號任務清單 T4）。"""
+    text = str(locale or "zh-TW")
+    if text == "en":
+        return "en"
+    return "zh-TW"
+
+
+def _pick(zh: dict, en: dict, key: object, locale: str, fallback: str = "") -> str:
+    """依 locale 從雙語字典挑文字：en 缺件退回 zh；其他語言目前直接退回 zh。"""
+    loc = _locale_key(locale)
+    if loc == "en":
+        return en.get(key, zh.get(key, fallback))
+    return zh.get(key, fallback)
+
+
 NUMEROLOGY_GUIDE = {
     1: "主題是開創與自我領導。你適合先把方向立起來，再邀請他人一起完成。",
     2: "主題是合作與感受力。你能讀懂關係中的細節，也需要練習清楚表達界線。",
@@ -47,6 +64,21 @@ NUMEROLOGY_GUIDE = {
     11: "主題是 11/2：11 代表靈感與感召，2 是關係與感受力的底色。你的直覺強，但也需要清楚界線。",
     22: "主題是 22/4：22 代表大型建造力，4 是秩序與落地的底色。你適合把理想做成可執行的結構。",
     33: "主題是 33/6：33 代表療癒與服務，6 是照顧與責任的底色。你適合陪伴他人，也要先照顧自己。",
+}
+
+NUMEROLOGY_GUIDE_EN = {
+    1: "Your theme is initiation and self-leadership. You do best setting the direction first, then inviting others to join you.",
+    2: "Your theme is cooperation and sensitivity. You read the nuances of relationships well, and you're practicing clear boundaries.",
+    3: "Your theme is expression and creativity. Your energy needs to be spoken, written, or performed before it truly flows.",
+    4: "Your theme is order and building. You turn chaos into systems well, but watch that you don't push yourself too hard.",
+    5: "Your theme is freedom and change. You need movement, exploration, and novelty, while still leaving room for commitment.",
+    6: "Your theme is care and responsibility. You're good at making people feel safe, but don't carry everyone else's homework for them.",
+    7: "Your theme is exploration and insight. You need solitude, research, and depth — answers often surface in the quiet.",
+    8: "Your theme is resources and influence. You're suited to managing, integrating, and scaling value, letting power serve a vision.",
+    9: "Your theme is compassion and completion. You easily see the bigger picture; your life lesson is letting go and fulfillment.",
+    11: "Your theme is 11/2: 11 stands for inspiration and calling, with 2's relational sensitivity as the undertone. Your intuition is strong, but you still need clear boundaries.",
+    22: "Your theme is 22/4: 22 stands for large-scale building power, with 4's order and grounding as the undertone. You're suited to turning ideals into executable structures.",
+    33: "Your theme is 33/6: 33 stands for healing and service, with 6's care and responsibility as the undertone. You're suited to accompanying others, while remembering to care for yourself first.",
 }
 
 
@@ -73,6 +105,29 @@ MAYA_SEAL_THEMES = {
     "太陽": "主題是生命光、覺察與溫暖。你適合把事情照亮，也要記得讓自己被光照顧。",
 }
 
+MAYA_SEAL_THEMES_EN = {
+    "龍": "Your theme is vitality, nurturing, and new beginnings. You shine when caring for others, laying foundations, or starting fresh.",
+    "風": "Your theme is breath, communication, and the flow of information. You need to voice your feelings clearly, and you're a natural bridge between ideas.",
+    "夜": "Your theme is dreams, abundance, and inner security. Your answers often live in intuition, imagination, and the quiet inner world.",
+    "種子": "Your theme is goals, sprouting, and focus. Given time to take root, your potential grows steadily.",
+    "蛇": "Your theme is instinct, the body, and life-force heat. Trust your body's signals — don't over-rationalize your intuition away.",
+    "世界橋": "Your theme is letting go, transition, and bridging. You're skilled at closing old chapters and connecting different people and things.",
+    "手": "Your theme is healing, completion, and craft. Your strength is handling things directly, turning abstract understanding into concrete results.",
+    "星星": "Your theme is beauty, harmony, and order. You're drawn to texture and proportion, and good at turning chaos into elegant form.",
+    "月": "Your theme is emotional flow, cleansing, and sensitivity. Let feelings have an outlet — the more they flow, the clearer your direction.",
+    "狗": "Your theme is love, loyalty, and heart connection. Your growth often happens through relationships; the key is love with boundaries.",
+    "猴": "Your theme is playfulness, magic, and flexibility. Humor and creativity loosen deadlocks, but don't use jokes to dodge real feelings.",
+    "人": "Your theme is free will, wisdom, and choice. Your life lesson is making choices that are truly your own.",
+    "天行者": "Your theme is exploration, space, and courage. You need to move, expand your horizons, and know yourself through experience.",
+    "巫師": "Your theme is presence, receptivity, and trust. When you stop rushing to control outcomes, you sync with timing more easily.",
+    "鷹": "Your theme is vision, creation, and the big picture. You see the long view and are suited to turning it into an executable design.",
+    "戰士": "Your theme is inquiry, courage, and wisdom. You naturally question the truth — the more honestly you ask, the more courage you find.",
+    "地球": "Your theme is synchronicity, navigation, and grounding. You need to hear the signals your environment sends and let your body lead the rhythm.",
+    "鏡": "Your theme is truth, boundaries, and reflection. You see the essence of things clearly — practice stating boundaries gently.",
+    "風暴": "Your theme is transformation, release, and reset. Chaos isn't loss of control — it's old energy being renewed.",
+    "太陽": "Your theme is life-light, awareness, and warmth. You're good at illuminating things — remember to let yourself be warmed by that light too.",
+}
+
 MAYA_TONE_THEMES = {
     "磁性": "啟動方式是吸引與定錨，先確認你真正想召喚的主題。",
     "月亮": "啟動方式是辨認兩極與挑戰，關鍵在於看見對比後做選擇。",
@@ -89,6 +144,22 @@ MAYA_TONE_THEMES = {
     "宇宙": "啟動方式是超越與整合，適合回顧一整個循環的成熟與禮物。",
 }
 
+MAYA_TONE_THEMES_EN = {
+    "磁性": "Activated through attraction and anchoring — first confirm what you truly want to call in.",
+    "月亮": "Activated by recognizing polarity and challenge — the key is seeing the contrast, then choosing.",
+    "電力": "Activated through service and connection — turn inspiration into action that helps others.",
+    "自我存在": "Activated through definition and form — turn vague feelings into a clear structure.",
+    "超頻": "Activated through empowerment and centering — focus your resources on what truly matters.",
+    "韻律": "Activated through balance and organization — a steady life rhythm lets your energy unfold naturally.",
+    "共振": "Activated through attunement and sensing — trust your sensitivity to the mood of a space.",
+    "銀河": "Activated through wholeness and integrity — align outer action with inner values.",
+    "太陽": "Activated through intention and pulse — a clear intention brings the next push forward.",
+    "行星": "Activated through manifestation and completion — turn insight into a visible outcome.",
+    "光譜": "Activated through release and liberation — letting go of roles you no longer need brings your power back.",
+    "水晶": "Activated through collaboration and sharing — answers often become whole through group exchange.",
+    "宇宙": "Activated through transcendence and integration — a good time to review the maturity and gifts of a full cycle.",
+}
+
 MAYA_ORACLE_ROLES = {
     "self": ("本命核心", "這是你最主要的生命題目，描述你自然發光的方式。"),
     "guide": ("引導力量", "這股力量像內在指南針，適合用來判斷下一步要往哪裡走。"),
@@ -97,13 +168,26 @@ MAYA_ORACLE_ROLES = {
     "occult": ("隱藏力量", "這股力量常在低谷或意外中出現，像潛意識送來的暗線禮物。"),
 }
 
+MAYA_ORACLE_ROLES_EN = {
+    "self": ("Core Self", "This is your primary life theme — how you naturally shine."),
+    "guide": ("Guiding Force", "This force works like an inner compass, useful for deciding your next step."),
+    "analog": ("Support Force", "This force is your ally and backup supply — a place to find stability when you're stuck."),
+    "antipode": ("Challenge Force", "This force isn't an enemy but a training ground, pushing you to see the opposite capacity you haven't integrated yet."),
+    "occult": ("Hidden Force", "This force often shows up in low points or surprises, like a gift the subconscious sends along a hidden thread."),
+}
 
-def _maya_theme(name: object) -> str:
+
+def _maya_theme(name: object, locale: str = "zh-TW") -> str:
     text = str(name or "")
-    for key, value in MAYA_SEAL_THEMES.items():
+    source = MAYA_SEAL_THEMES_EN if _locale_key(locale) == "en" else MAYA_SEAL_THEMES
+    for key, value in source.items():
         if key in text:
             return value
-    return "這個圖騰代表你與世界互動的一種能量語言，重點是把象徵放回真實生活裡觀察。"
+    return (
+        "This seal represents one energetic language for how you interact with the world — the key is observing the symbol in real life."
+        if _locale_key(locale) == "en"
+        else "這個圖騰代表你與世界互動的一種能量語言，重點是把象徵放回真實生活裡觀察。"
+    )
 
 
 MAYA_MEMBER_READING = {
@@ -186,27 +270,122 @@ MAYA_MEMBER_READING = {
     ),
 }
 
+MAYA_MEMBER_READING_EN = {
+    "龍": (
+        "You easily become the person who brings things back to life — start by building foundations, tending resources, and restoring vitality.",
+        "Watch whether you're putting everyone else's needs first again, forgetting to ask: is my own foundation stable?",
+    ),
+    "風": (
+        "You need to voice your feelings clearly — the more plainly you speak, the more easily relationships and choices flow.",
+        "When you're stuck it's not that you can't speak — you may be saying a lot around the edges while the real need still has no outlet.",
+    ),
+    "夜": (
+        "Your inner world is rich; intuition, dreams, and imagination often sense the answer before logic does.",
+        "Watch whether you're tucking your unease away inside, so others can't see what you truly need.",
+    ),
+    "種子": (
+        "You do well focusing on growing one thing — given the right environment, that growth is solid.",
+        "When stuck, you may keep waiting for a better moment, and what really wants to sprout stalls too long.",
+    ),
+    "蛇": (
+        "Your body sense is strong — like, dislike, approach, or retreat, your body often knows before your mind does.",
+        "Watch whether you're suppressing instinct until it finally shows up as an overreaction protecting you.",
+    ),
+    "世界橋": (
+        "You have the ability to close old chapters, shift relationship positions, and reconnect.",
+        "When stuck, it's often reluctance to let go of a role that no longer fits, leaving you stuck in between.",
+    ),
+    "手": (
+        "You do well handling problems directly, turning understanding into repair, organization, and completion.",
+        "Watch whether you keep finishing things for others that they should be completing themselves.",
+    ),
+    "星星": (
+        "You're sensitive to beauty, harmony, and order, able to turn chaos into a form that feels comfortable.",
+        "When stuck, you may ignore what's genuinely uncomfortable just to keep things looking good or peaceful.",
+    ),
+    "月": (
+        "You sense emotional flow well, using feeling to identify what needs clearing or renewal.",
+        "Watch a passing wave of emotion — don't take it as the whole truth.",
+    ),
+    "狗": (
+        "Your core is trust, loyalty, and heart connection; the quality of your relationships deeply affects your state.",
+        "When stuck, you may over-endure out of caring, or turn loyalty into an inability to leave.",
+    ),
+    "猴": (
+        "You have humor, creativity, and the ability to break deadlocks — the more relaxed you are, the more new solutions you find.",
+        "Watch whether you're using jokes or distraction to dodge a truly vulnerable issue.",
+    ),
+    "人": (
+        "Your lesson is choice and free will — you need to feel that a decision is truly your own.",
+        "When stuck, you may listen to too many opinions and lose your own judgment.",
+    ),
+    "天行者": (
+        "You need space, experience, and exploration — going out into the world helps you know yourself better.",
+        "Tell apart whether you want to leave in order to expand, or to avoid facing what's in front of you.",
+    ),
+    "巫師": (
+        "You have a strong sense of presence — when you're not rushing to control things, you sense timing more easily.",
+        "When stuck, you may stay in waiting mode, missing the next step that would ground the feeling.",
+    ),
+    "鷹": (
+        "You see the big picture and future blueprint, suited to lifting complex situations up a level and redesigning them.",
+        "Watch whether you're looking so far ahead that you neglect the most urgent next step.",
+    ),
+    "戰士": (
+        "You find truth through questioning — the more honestly you face a problem, the more courage grows.",
+        "When stuck, you may use doubt to protect yourself, questioning endlessly without acting.",
+    ),
+    "地球": (
+        "You do well listening to environmental signals and life's rhythm; answers often appear in sync with events around you.",
+        "Watch whether you're chasing outer signs so hard that you ignore what you already feel.",
+    ),
+    "鏡": (
+        "You easily see truth and boundaries, able to reflect things very clearly.",
+        "When stuck, you may cut things off too fast or too sharply, turning clarity into defensiveness.",
+    ),
+    "風暴": (
+        "You carry the power to renew and restart — chaos is sometimes forcing you out of an old pattern that no longer fits.",
+        "Watch whether you're grabbing for control amid change, making yourself more exhausted.",
+    ),
+    "太陽": (
+        "You have the ability to illuminate things, bringing clarity and warmth, suited to explaining what's vague.",
+        "When stuck, you may keep playing the bright one without letting your own needs be seen.",
+    ),
+}
 
-def _maya_member_reading(name: object) -> tuple[str, str]:
+
+def _maya_member_reading(name: object, locale: str = "zh-TW") -> tuple[str, str]:
     text = str(name or "")
-    for key, value in MAYA_MEMBER_READING.items():
+    source = MAYA_MEMBER_READING_EN if _locale_key(locale) == "en" else MAYA_MEMBER_READING
+    for key, value in source.items():
         if key in text:
             return value
+    if _locale_key(locale) == "en":
+        return (
+            "This seal is like the tone you habitually use when facing the world — first observe it in daily choices, relationships, and stress responses.",
+            "When stuck, it's usually not that the seal is 'bad' — this force is being used too urgently, too fully, or in the wrong place.",
+        )
     return (
         "這個圖騰像你面對世界時常用的語氣，請先把它放回日常選擇、關係與壓力反應裡觀察。",
         "卡住時通常不是圖騰不好，而是這股力量被用得太急、太滿，或用在不適合的地方。",
     )
 
 
-def _tone_theme(name: object) -> str:
+def _tone_theme(name: object, locale: str = "zh-TW") -> str:
     text = str(name or "")
-    for key, value in MAYA_TONE_THEMES.items():
+    source = MAYA_TONE_THEMES_EN if _locale_key(locale) == "en" else MAYA_TONE_THEMES
+    for key, value in source.items():
         if key in text:
             return value
-    return "這個調性說明能量如何被啟動、組織與表達。"
+    return (
+        "This tone describes how the energy is activated, organized, and expressed."
+        if _locale_key(locale) == "en"
+        else "這個調性說明能量如何被啟動、組織與表達。"
+    )
 
 
-def explain_numerology(data: dict, detail: DetailLevel = "teaser") -> str:
+def explain_numerology(data: dict, detail: DetailLevel = "teaser", locale: str = "zh-TW") -> str:
+    is_en = _locale_key(locale) == "en"
     lp = data.get("lifePath")
     lp_display = data.get("lifePathDisplay") or lp
     lp_reduced = data.get("lifePathReduced")
@@ -226,49 +405,84 @@ def explain_numerology(data: dict, detail: DetailLevel = "teaser") -> str:
     combo_note = data.get("comboNote") or ""
 
     # ── 生命靈數核心 ──
-    parts = [
-        _line(
-            f"你的生命靈數是 <strong>{_text(lp_display)}</strong>"
-            f"{'（保留大師數，也看底色數）' if is_master else ''}，核心原型是 <strong>{_text(arche.get('name'))}</strong>。"
-        ),
-        _line(NUMEROLOGY_GUIDE.get(lp, _text(arche.get("desc"), "此數字代表你一生反覆練習的核心節奏。"))),
-    ]
+    if is_en:
+        parts = [
+            _line(
+                f"Your Life Path number is <strong>{_text(lp_display)}</strong>"
+                f"{' (a master number, viewed alongside its reduced form)' if is_master else ''}, "
+                f"with a core archetype of <strong>{_text(arche.get('name'))}</strong>."
+            ),
+            _line(
+                NUMEROLOGY_GUIDE_EN.get(
+                    lp, _text(arche.get("desc"), "This number represents the core rhythm you practice throughout life.")
+                )
+            ),
+        ]
+    else:
+        parts = [
+            _line(
+                f"你的生命靈數是 <strong>{_text(lp_display)}</strong>"
+                f"{'（保留大師數，也看底色數）' if is_master else ''}，核心原型是 <strong>{_text(arche.get('name'))}</strong>。"
+            ),
+            _line(NUMEROLOGY_GUIDE.get(lp, _text(arche.get("desc"), "此數字代表你一生反覆練習的核心節奏。"))),
+        ]
 
     if is_master and lp_reduced:
-        parts.append(
-            _line(
-                f"其他平台把你算成 <strong>{_text(lp_reduced)}</strong> 不是誰錯誰對——"
-                f"那是把大師數繼續化簡的做法。本平台保留 <strong>{_text(lp_display)}</strong>，兩種視角都可參考。"
+        if is_en:
+            parts.append(
+                _line(
+                    f"Other platforms would reduce you further to <strong>{_text(lp_reduced)}</strong> — "
+                    f"that's not wrong, it's just a different reduction convention. This platform keeps "
+                    f"<strong>{_text(lp_display)}</strong> as the master number; both views are worth considering."
+                )
             )
-        )
+        else:
+            parts.append(
+                _line(
+                    f"其他平台把你算成 <strong>{_text(lp_reduced)}</strong> 不是誰錯誰對——"
+                    f"那是把大師數繼續化簡的做法。本平台保留 <strong>{_text(lp_display)}</strong>，兩種視角都可參考。"
+                )
+            )
 
     # ── 生日數 ──
     if bd and bd != lp:
-        parts.append(
-            _line(
-                f"生日數 <strong>{_text(bd_display)}</strong>（{_text(bd_arche.get('name'), '個人特質')}）："
-                f"{_text(bd_arche.get('desc'), '這是你日常最容易被感受到的能力與反應方式。')}"
+        if is_en:
+            parts.append(
+                _line(
+                    f"Birthday number <strong>{_text(bd_display)}</strong> ({_text(bd_arche.get('name'), 'personal trait')}): "
+                    f"{_text(bd_arche.get('desc'), 'This is the ability and reaction pattern most visible in your daily life.')}"
+                )
             )
-        )
+        else:
+            parts.append(
+                _line(
+                    f"生日數 <strong>{_text(bd_display)}</strong>（{_text(bd_arche.get('name'), '個人特質')}）："
+                    f"{_text(bd_arche.get('desc'), '這是你日常最容易被感受到的能力與反應方式。')}"
+                )
+            )
 
     # ── 組合洞察 ──
     if combo_note:
-        parts.append(_section("主數與生日數的互動"))
+        parts.append(_section("Life Path × Birthday Interaction" if is_en else "主數與生日數的互動"))
         parts.append(_line(_text(combo_note)))
 
     # ── 流年數 ──
     if personal_year and personal_year_meaning:
         # S5：personal_year_cal 是整數，直接嵌入不需 _text（避免雙 escape）
-        parts.append(_section(f"{personal_year_cal} 個人流年"))
+        parts.append(_section(f"{personal_year_cal} Personal Year" if is_en else f"{personal_year_cal} 個人流年"))
         parts.append(
-            _line(f"<strong>{_text(personal_year_display)}</strong>：{_text(personal_year_meaning)}")
+            _line(f"<strong>{_text(personal_year_display)}</strong>: {_text(personal_year_meaning)}" if is_en
+                  else f"<strong>{_text(personal_year_display)}</strong>：{_text(personal_year_meaning)}")
         )
 
     # ── 四個巔峰數 ──
     if pinnacles:
-        parts.append(_section("人生四大巔峰（Pinnacles）"))
+        parts.append(_section("Four Life Pinnacles" if is_en else "人生四大巔峰（Pinnacles）"))
         parts.append(
             _line(
+                "Pinnacle numbers describe the external theme of each life stage — the 'arena' fate hands you, "
+                "not personal will. Age at which the first pinnacle ends = 36 minus your reduced Life Path number."
+                if is_en else
                 "巔峰數描述人生各階段的外部主題，是命運給你的「場域」，不是個人意志。"
                 "第一巔峰結束年齡 = 36 − 生命靈數底色。"
             )
@@ -278,99 +492,197 @@ def explain_numerology(data: dict, detail: DetailLevel = "teaser") -> str:
             pnum = _text(p.get("display"))
             parch = _text(p.get("archetype"))
             meaning = _text(p.get("meaning"))
-            parts.append(
-                _line(
-                    f"第 {p.get('index')} 巔峰 <strong>{pnum}</strong>（{age_label}）"
-                    f"{'｜' + parch if parch else ''}：{meaning}"
+            if is_en:
+                parts.append(
+                    _line(
+                        f"Pinnacle {p.get('index')} <strong>{pnum}</strong> ({age_label})"
+                        f"{' | ' + parch if parch else ''}: {meaning}"
+                    )
                 )
-            )
+            else:
+                parts.append(
+                    _line(
+                        f"第 {p.get('index')} 巔峰 <strong>{pnum}</strong>（{age_label}）"
+                        f"{'｜' + parch if parch else ''}：{meaning}"
+                    )
+                )
 
     # ── 四個挑戰數 ──
     if challenges:
-        parts.append(_section("人生四大挑戰（Challenges）"))
-        parts.append(_line("挑戰數是巔峰期的內在功課：不是命運打擊，而是這段時期最需要整合的反面能力。"))
+        parts.append(_section("Four Life Challenges" if is_en else "人生四大挑戰（Challenges）"))
+        parts.append(
+            _line(
+                "Challenge numbers are the inner homework of each pinnacle period: not a blow from fate, "
+                "but the opposite ability that most needs integrating during that stretch of time."
+                if is_en else
+                "挑戰數是巔峰期的內在功課：不是命運打擊，而是這段時期最需要整合的反面能力。"
+            )
+        )
         for c in challenges:
             age_label = _text(c.get("ageLabel"))
             cnum = c.get("number")
             meaning = _text(c.get("meaning"))
-            parts.append(_line(f"第 {c.get('index')} 挑戰 <strong>{cnum}</strong>（{age_label}）：{meaning}"))
+            if is_en:
+                parts.append(_line(f"Challenge {c.get('index')} <strong>{cnum}</strong> ({age_label}): {meaning}"))
+            else:
+                parts.append(_line(f"第 {c.get('index')} 挑戰 <strong>{cnum}</strong>（{age_label}）：{meaning}"))
 
     if detail == "full":
-        parts.extend(
-            [
-                _section("進階解讀方向"),
-                _line(
-                    "回想最近一次重大選擇：你是急著掌控、過度配合、逃避表達，還是先退回分析？這比單看數字更能看出生命靈數的陰影面。"
-                ),
-                _line(
-                    "把生命靈數用在職涯、親密關係與財務模式各問一個問題：「這個數字讓我在這裡過度發揮，還是根本沒有用到？」"
-                ),
-                _line(
-                    "流年數每年轉換，搭配生命靈數判斷今年適合「主動推進」（流年 1/3/5/8）還是「整理收斂」（流年 2/4/7/9）。"
-                ),
-                _line(
-                    "巔峰數是外部場域的主題（命運給的環境），挑戰數是內在功課（自己要整合的反面能力），兩者需要一起讀才完整。"
-                ),
-            ]
-        )
+        if is_en:
+            parts.extend(
+                [
+                    _section("Directions for Deeper Reading"),
+                    _line(
+                        "Recall your last major decision: were you rushing to control it, over-accommodating, "
+                        "avoiding expression, or retreating into analysis? That reveals the shadow side of your "
+                        "Life Path number better than the number alone."
+                    ),
+                    _line(
+                        "Apply your Life Path number to career, intimate relationships, and money patterns, and "
+                        "ask one question in each: 'Am I overplaying this number here, or not using it at all?'"
+                    ),
+                    _line(
+                        "The Personal Year number changes every year — combine it with your Life Path number to "
+                        "judge whether this year favors 'pushing forward' (Personal Years 1/3/5/8) or "
+                        "'consolidating' (Personal Years 2/4/7/9)."
+                    ),
+                    _line(
+                        "Pinnacle numbers are the external arena (the environment fate hands you); Challenge "
+                        "numbers are the inner homework (the opposite ability you need to integrate). Read both "
+                        "together for the full picture."
+                    ),
+                ]
+            )
+        else:
+            parts.extend(
+                [
+                    _section("進階解讀方向"),
+                    _line(
+                        "回想最近一次重大選擇：你是急著掌控、過度配合、逃避表達，還是先退回分析？這比單看數字更能看出生命靈數的陰影面。"
+                    ),
+                    _line(
+                        "把生命靈數用在職涯、親密關係與財務模式各問一個問題：「這個數字讓我在這裡過度發揮，還是根本沒有用到？」"
+                    ),
+                    _line(
+                        "流年數每年轉換，搭配生命靈數判斷今年適合「主動推進」（流年 1/3/5/8）還是「整理收斂」（流年 2/4/7/9）。"
+                    ),
+                    _line(
+                        "巔峰數是外部場域的主題（命運給的環境），挑戰數是內在功課（自己要整合的反面能力），兩者需要一起讀才完整。"
+                    ),
+                ]
+            )
 
-    parts.append(
-        _line("<small>本解讀以畢氏靈數象徵作為自我觀察的參考框架，不構成對未來的預測或保證。</small>")
-    )
+    if is_en:
+        parts.append(
+            _line(
+                "<small>This reading uses Pythagorean numerology symbolism as a frame for self-reflection; "
+                "it does not predict or guarantee future events.</small>"
+            )
+        )
+    else:
+        parts.append(
+            _line("<small>本解讀以畢氏靈數象徵作為自我觀察的參考框架，不構成對未來的預測或保證。</small>")
+        )
 
     return _wrap(parts, detail)
 
 
-def explain_maya(data: dict, detail: DetailLevel = "teaser") -> str:
+def explain_maya(data: dict, detail: DetailLevel = "teaser", locale: str = "zh-TW") -> str:
+    is_en = _locale_key(locale) == "en"
     seal = data.get("seal") or {}
     tone = data.get("tone") or {}
     oracle = data.get("oracle") or {}
     seal_name = seal.get("zh") or seal.get("name") or seal.get("label")
     tone_name = tone.get("zh") or tone.get("name") or tone.get("label")
-    gift, shadow = _maya_member_reading(seal_name)
+    gift, shadow = _maya_member_reading(seal_name, locale)
 
-    parts = [
-        _line(
-            f"你是 <strong>Kin {_text(data.get('kin'))}</strong>，能量名稱為 <strong>{_text(tone_name)}{_text(seal_name)}</strong>。"
-        ),
-        _line(
-            f"白話先看你本人：<strong>{_text(seal_name)}</strong> 不是稱號，而是在說你的慣用節奏。{_text(gift)}"
-        ),
-        _line(f"如果這段有中，通常會中在卡點：{_text(shadow)}"),
-        _line(
-            f"銀河調性 <strong>{_text(tone_name)}</strong> 補充的是這股力量如何被啟動：{_tone_theme(tone_name)}"
-        ),
-    ]
+    if is_en:
+        parts = [
+            _line(
+                f"You are <strong>Kin {_text(data.get('kin'))}</strong>, with the energy name "
+                f"<strong>{_text(tone_name)} {_text(seal_name)}</strong>."
+            ),
+            _line(
+                f"In plain terms, first look at yourself: <strong>{_text(seal_name)}</strong> isn't a title, "
+                f"it describes your habitual rhythm. {_text(gift)}"
+            ),
+            _line(f"If this resonates, it usually resonates at the sticking point: {_text(shadow)}"),
+            _line(
+                f"Galactic tone <strong>{_text(tone_name)}</strong> adds how this force gets activated: "
+                f"{_tone_theme(tone_name, locale)}"
+            ),
+        ]
+        parts.append(_section("Maya Oracle Relationships"))
+    else:
+        parts = [
+            _line(
+                f"你是 <strong>Kin {_text(data.get('kin'))}</strong>，能量名稱為 <strong>{_text(tone_name)}{_text(seal_name)}</strong>。"
+            ),
+            _line(
+                f"白話先看你本人：<strong>{_text(seal_name)}</strong> 不是稱號，而是在說你的慣用節奏。{_text(gift)}"
+            ),
+            _line(f"如果這段有中，通常會中在卡點：{_text(shadow)}"),
+            _line(
+                f"銀河調性 <strong>{_text(tone_name)}</strong> 補充的是這股力量如何被啟動：{_tone_theme(tone_name, locale)}"
+            ),
+        ]
+        parts.append(_section("馬雅神諭關係"))
 
-    parts.append(_section("馬雅神諭關係"))
+    roles_source = MAYA_ORACLE_ROLES_EN if is_en else MAYA_ORACLE_ROLES
     for key in ("guide", "analog", "antipode", "occult"):
-        label, role_copy = MAYA_ORACLE_ROLES[key]
+        label, role_copy = roles_source[key]
         item = oracle.get(key) or {}
         item_seal_obj = item.get("seal") or {}
         item_tone_obj = item.get("tone") or {}
         item_seal = item_seal_obj.get("zh") or item_seal_obj.get("name") or item_seal_obj.get("label")
         item_tone = item_tone_obj.get("zh") or item_tone_obj.get("name") or item_tone_obj.get("label")
         if item_seal:
-            kin_text = f"Kin {_text(item.get('kin'))}，" if item.get("kin") else ""
-            tone_text = f"{_text(item_tone)}" if item_tone else ""
-            parts.append(
-                _line(
-                    f"<strong>{label}</strong>：{kin_text}{tone_text}{_text(item_seal)}。"
-                    f"{role_copy}{_maya_member_reading(item_seal)[0]}"
+            if is_en:
+                kin_text = f"Kin {_text(item.get('kin'))}, " if item.get("kin") else ""
+                tone_text = f"{_text(item_tone)} " if item_tone else ""
+                parts.append(
+                    _line(
+                        f"<strong>{label}</strong>: {kin_text}{tone_text}{_text(item_seal)}. "
+                        f"{role_copy}{_maya_member_reading(item_seal, locale)[0]}"
+                    )
                 )
-            )
+            else:
+                kin_text = f"Kin {_text(item.get('kin'))}，" if item.get("kin") else ""
+                tone_text = f"{_text(item_tone)}" if item_tone else ""
+                parts.append(
+                    _line(
+                        f"<strong>{label}</strong>：{kin_text}{tone_text}{_text(item_seal)}。"
+                        f"{role_copy}{_maya_member_reading(item_seal, locale)[0]}"
+                    )
+                )
 
     if detail == "full":
         starroot = data.get("starroot") or {}
-        parts.extend(
-            [
-                _section("跨曆法對照"),
-                _line(
-                    f"Dreamspell / 13 Moon / 傳統卓爾金等對照可用來確認同一天在不同系統中的定位：{_text(starroot.get('dreamspell', {}).get('label'))}。"
-                ),
-                _line("若要作為正式諮詢，建議同時說明所採用的曆法系統，避免使用者把不同流派混為一談。"),
-            ]
-        )
+        if is_en:
+            parts.extend(
+                [
+                    _section("Cross-Calendar Reference"),
+                    _line(
+                        f"Dreamspell / 13 Moon / the traditional Tzolk'in and other systems can be cross-checked "
+                        f"to confirm how the same day maps across calendars: "
+                        f"{_text(starroot.get('dreamspell', {}).get('label'))}."
+                    ),
+                    _line(
+                        "For formal consultation use, state which calendar system is being used, so users don't "
+                        "conflate different traditions."
+                    ),
+                ]
+            )
+        else:
+            parts.extend(
+                [
+                    _section("跨曆法對照"),
+                    _line(
+                        f"Dreamspell / 13 Moon / 傳統卓爾金等對照可用來確認同一天在不同系統中的定位：{_text(starroot.get('dreamspell', {}).get('label'))}。"
+                    ),
+                    _line("若要作為正式諮詢，建議同時說明所採用的曆法系統，避免使用者把不同流派混為一談。"),
+                ]
+            )
     return _wrap(parts, detail)
 
 

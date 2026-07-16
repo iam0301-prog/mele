@@ -49,7 +49,7 @@ export default function NumerologyPage() {
 
     try {
       const [year, month, day] = date.split('-').map(Number);
-      const response = await calc('numerology', { year, month, day });
+      const response = await calc('numerology', { year, month, day }, locale);
       setResult(response);
     } catch (err) {
       const message = err instanceof CalcError ? err.message : (err as Error).message;

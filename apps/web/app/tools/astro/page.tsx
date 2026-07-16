@@ -67,7 +67,7 @@ export default function AstroPage() {
         timezone,
         latitude: lat,
         longitude: lon,
-      });
+      }, locale);
       setResult(response);
     } catch (err) {
       const message = err instanceof CalcError ? err.message : (err as Error).message;

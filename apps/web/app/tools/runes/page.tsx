@@ -42,7 +42,7 @@ export default function RunesPage() {
         spread: selectedSpread?.value ?? 'three',
         material: 'stone',
         question: question.trim(),
-      });
+      }, locale);
       setResult(response);
     } catch (err) {
       const message = err instanceof CalcError ? err.message : (err as Error).message;
