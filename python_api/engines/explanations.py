@@ -1019,12 +1019,58 @@ _PALACE_DOMAINS: dict[str, str] = {
     "父母": "父母緣、上位者互動",
 }
 
+_PALACE_DOMAINS_EN: dict[str, str] = {
+    "命宮": "core personality, how you meet the world",
+    "兄弟": "sibling resources, ties with peers",
+    "夫妻": "relationship patterns, partner traits",
+    "子女": "connection to children, creativity and romance",
+    "財帛": "sources of wealth, cash flow",
+    "疾厄": "physical and mental health, stress patterns",
+    "遷移": "travel luck, opportunities away from home",
+    "僕役": "social resources, friends and staff",
+    "交友": "social resources, friends and staff",
+    "官祿": "career direction, professional positioning",
+    "田宅": "home environment, property luck",
+    "福德": "inner life, capacity for enjoyment",
+    "父母": "connection to parents, relationships with authority",
+}
+
+_PALACE_NAME_EN: dict[str, str] = {
+    "命宮": "Life Palace",
+    "兄弟": "Siblings Palace",
+    "夫妻": "Spouse Palace",
+    "子女": "Children Palace",
+    "財帛": "Wealth Palace",
+    "疾厄": "Health Palace",
+    "遷移": "Travel Palace",
+    "僕役": "Friends Palace",
+    "交友": "Friends Palace",
+    "官祿": "Career Palace",
+    "田宅": "Property Palace",
+    "福德": "Wellbeing Palace",
+    "父母": "Parents Palace",
+}
+
 # 生年四化含義（祿權科忌）
 _MUTAGEN_MEANINGS: dict[str, str] = {
     "祿": "資源活水，財氣與人緣在此宮順暢流動",
     "權": "主導力強，掌控欲與野心在此宮明顯",
     "科": "名聲貴人，文書考試與社會評價在此宮得利",
     "忌": "執著課題，暗耗與阻礙的核心壓力在此宮",
+}
+
+_MUTAGEN_MEANINGS_EN: dict[str, str] = {
+    "祿": "a flow of resources — money and goodwill move smoothly through this palace",
+    "權": "strong drive — a clear pull toward control and ambition shows up in this palace",
+    "科": "reputation and support — paperwork, exams, and public standing work in your favor here",
+    "忌": "a recurring lesson — this palace carries the core pressure of quiet drain and obstacles",
+}
+
+_MUTAGEN_EN_LABEL: dict[str, str] = {
+    "祿": "Fortune",
+    "權": "Power",
+    "科": "Merit",
+    "忌": "Adversity",
 }
 
 # 主星廟旺利陷簡述（星曜強弱指標）
@@ -1036,6 +1082,34 @@ _BRIGHTNESS_DESC: dict[str, str] = {
     "平": "平",
     "不": "不利",
     "陷": "落陷",
+}
+
+_BRIGHTNESS_DESC_EN: dict[str, str] = {
+    "廟": "Exalted",
+    "旺": "Strong",
+    "得": "Favorable",
+    "利": "Beneficial",
+    "平": "Neutral",
+    "不": "Unfavorable",
+    "陷": "Weak",
+}
+
+# 十四正曜中英對照（音譯＋括號直譯星名，見 24 號名詞表）
+_STAR_NAME_EN: dict[str, str] = {
+    "紫微": "Zi Wei (Purple Subtlety)",
+    "天機": "Tian Ji (Heavenly Mechanism)",
+    "太陽": "Tai Yang (Sun Star)",
+    "武曲": "Wu Qu (Military Song)",
+    "天同": "Tian Tong (Heavenly Unity)",
+    "廉貞": "Lian Zhen (Chastity Star)",
+    "天府": "Tian Fu (Heavenly Storehouse)",
+    "太陰": "Tai Yin (Moon Star)",
+    "貪狼": "Tan Lang (Greedy Wolf)",
+    "巨門": "Ju Men (Giant Gate)",
+    "天相": "Tian Xiang (Heavenly Minister)",
+    "天梁": "Tian Liang (Heavenly Beam)",
+    "七殺": "Qi Sha (Seven Killings)",
+    "破軍": "Po Jun (Army Breaker)",
 }
 
 # 十四正曜一句話簡述（用於十二宮一覽）
@@ -1056,23 +1130,51 @@ _STAR_BRIEF: dict[str, str] = {
     "破軍": "求變破舊，耗散中創新",
 }
 
+_STAR_BRIEF_EN: dict[str, str] = {
+    "紫微": "sets the overall pattern — dignified, doesn't just follow the crowd",
+    "天機": "strategic and quick-witted — good at analysis and planning",
+    "太陽": "outgoing and proactive — drives visibility and networking",
+    "武曲": "decisive in action — takes charge of financial decisions",
+    "天同": "easygoing and content — values quality of life",
+    "廉貞": "administratively decisive — handles social dealings and competition",
+    "天府": "steady wealth-builder — accumulates resources conservatively",
+    "太陰": "sensitive and detail-oriented — deep ties to money and family",
+    "貪狼": "multi-talented and appetitive — wide-ranging romance and interests",
+    "巨門": "thoughtful and argumentative — skilled talker and communicator",
+    "天相": "coordinating and supportive — values systems and relationships",
+    "天梁": "principled and protective — good at resolving crises",
+    "七殺": "driven and forceful — strong initiative and follow-through",
+    "破軍": "change-seeking, breaks the old — creates through upheaval",
+}
 
-def _star_display(star: object) -> str:
+
+def _star_label(name: str, locale_is_en: bool) -> str:
+    if locale_is_en:
+        return _STAR_NAME_EN.get(name, name)
+    return name
+
+
+def _star_display(star: object, locale_is_en: bool = False) -> str:
     """格式化主星名稱 + 廟旺陷標示（可選四化）"""
     if isinstance(star, dict):
         name = _text(star.get("name") or star.get("nameZh") or star.get("label"))
         brightness = _text(star.get("brightness", ""))
         mutagen = _text(star.get("mutagen", ""))
-        parts: list[str] = [name]
+        display_name = _star_label(name, locale_is_en) if name else name
+        parts: list[str] = [display_name]
         if brightness:
-            parts.append(f"[{_BRIGHTNESS_DESC.get(brightness, brightness)}]")
+            table = _BRIGHTNESS_DESC_EN if locale_is_en else _BRIGHTNESS_DESC
+            parts.append(f"[{table.get(brightness, brightness)}]")
         if mutagen:
-            parts.append(f"（化{mutagen}）")
+            m_label = _MUTAGEN_EN_LABEL.get(mutagen, mutagen) if locale_is_en else mutagen
+            parts.append(f" ({m_label} Transformation)" if locale_is_en else f"（化{mutagen}）")
         return "".join(parts)
     return _text(star)
 
 
-def explain_ziwei(data: dict, detail: DetailLevel = "teaser") -> str:
+def explain_ziwei(data: dict, detail: DetailLevel = "teaser", locale: str = "zh-TW") -> str:
+    loc = _locale_key(locale)
+    is_en = loc == "en"
     ming = data.get("mingGong") or {}
     palaces = data.get("palaces") or []
     soul = data.get("soul")
@@ -1115,21 +1217,33 @@ def explain_ziwei(data: dict, detail: DetailLevel = "teaser") -> str:
                         }
                     )
 
-    # ── 命盤基本資訊 ──
-    parts = [
-        _line(
-            f"命盤結構：<strong>{_text(five, '五行局')}</strong>，命主 <strong>{_text(soul)}</strong>、身主 <strong>{_text(body)}</strong>。"
-        ),
-        _line(
-            f"命宮（{_text(ming_branch or ming_name, '命宮')}）主星："
-            f"<strong>{_join(_star_name(s) for s in ming_stars) or '空宮（看對宮與三方）'}</strong>。"
-            "命宮是整張盤的主軸，先確認這裡的星曜特質，再延伸讀其他宮位。"
-        ),
-    ]
+    if is_en:
+        ming_stars_en = _join(_star_label(_star_name(s), True) for s in ming_stars) or "an empty palace (read the opposite and triangle palaces)"
+        parts = [
+            _line(
+                f"Chart structure: <strong>{_text(five, 'Five Elements Class')}</strong>, life-master star <strong>{_star_label(_text(soul), True) if soul else _text(soul)}</strong>, body-master star <strong>{_star_label(_text(body), True) if body else _text(body)}</strong>."
+            ),
+            _line(
+                f"Life Palace ({_PALACE_NAME_EN.get('命宮', 'Life Palace')}, branch {_text(ming_branch or ming_name, 'Life Palace')}) major stars: "
+                f"<strong>{ming_stars_en}</strong>. "
+                "The Life Palace is the chart's central axis — get a feel for its stars first, then read outward into the other palaces."
+            ),
+        ]
+    else:
+        parts = [
+            _line(
+                f"命盤結構：<strong>{_text(five, '五行局')}</strong>，命主 <strong>{_text(soul)}</strong>、身主 <strong>{_text(body)}</strong>。"
+            ),
+            _line(
+                f"命宮（{_text(ming_branch or ming_name, '命宮')}）主星："
+                f"<strong>{_join(_star_name(s) for s in ming_stars) or '空宮（看對宮與三方）'}</strong>。"
+                "命宮是整張盤的主軸，先確認這裡的星曜特質，再延伸讀其他宮位。"
+            ),
+        ]
 
     # ── 生年四化（核心）──
     if four_changes:
-        parts.append(_section("生年四化"))
+        parts.append(_section("Birth-Year Four Transformations" if is_en else "生年四化"))
         # 依祿→權→科→忌排序
         _order = {"祿": 0, "權": 1, "科": 2, "忌": 3}
         sorted_fc = sorted(four_changes, key=lambda x: _order.get(x.get("mutagen", ""), 9))
@@ -1137,72 +1251,136 @@ def explain_ziwei(data: dict, detail: DetailLevel = "teaser") -> str:
             m = _text(fc.get("mutagen", ""))
             star = _text(fc.get("star", ""))
             palace = _text(fc.get("palace", ""))
-            meaning = _MUTAGEN_MEANINGS.get(m, "")
-            domain = _PALACE_DOMAINS.get(palace, "")
+            if is_en:
+                m_label = _MUTAGEN_EN_LABEL.get(fc.get("mutagen", ""), m)
+                star_label = _star_label(fc.get("star", ""), True)
+                palace_label = _PALACE_NAME_EN.get(fc.get("palace", ""), palace)
+                meaning = _MUTAGEN_MEANINGS_EN.get(fc.get("mutagen", ""), "")
+                domain = _PALACE_DOMAINS_EN.get(fc.get("palace", ""), "")
+                parts.append(
+                    _line(
+                        f"<strong>{m_label} Transformation: {star_label}, in the {palace_label}</strong>"
+                        f"{' (' + domain + ')' if domain else ''}. "
+                        f"{meaning.capitalize() if meaning else ''}."
+                    )
+                )
+            else:
+                meaning = _MUTAGEN_MEANINGS.get(m, "")
+                domain = _PALACE_DOMAINS.get(palace, "")
+                parts.append(
+                    _line(
+                        f"<strong>化{m}：{star}星，落{palace}</strong>"
+                        f"{'（' + domain + '）' if domain else ''}。"
+                        f"{meaning}。"
+                    )
+                )
+        if is_en:
             parts.append(
                 _line(
-                    f"<strong>化{m}：{star}星，落{palace}</strong>"
-                    f"{'（' + domain + '）' if domain else ''}。"
-                    f"{meaning}。"
+                    "The Four Transformations are the core of Zi Wei reading: which palace they land in shows where this energy is most active in your life — it's the first entry point for reading the chart."
                 )
             )
-        parts.append(_line("四化是紫微判斷核心：落宮決定這股能量在哪個生活領域最活躍，是讀盤的第一入口。"))
+        else:
+            parts.append(_line("四化是紫微判斷核心：落宮決定這股能量在哪個生活領域最活躍，是讀盤的第一入口。"))
 
     # ── 十二宮完整列表 ──
     if isinstance(palaces, list) and palaces:
-        parts.append(_section("十二宮一覽"))
+        parts.append(_section("The 12 Palaces" if is_en else "十二宮一覽"))
         for palace in palaces[:12]:
             p_name = _text(palace.get("name"))
             branch = _text(palace.get("earthlyBranch"))
             stem = _text(palace.get("heavenlyStem"))
             stars = palace.get("majorStars") or []
-            star_display = _join(_star_display(s) for s in stars) or "空宮"
-            domain = _PALACE_DOMAINS.get(p_name, "")
+            star_display = _join(_star_display(s, is_en) for s in stars) or (
+                "Empty Palace" if is_en else "空宮"
+            )
             # 四化標記
-            fc_tags = [
-                f"化{fc['mutagen']}"
-                for fc in four_changes
-                if fc.get("palace") == p_name and fc.get("mutagen")
-            ]
-            fc_str = "".join(f"<em>【{tag}】</em>" for tag in fc_tags)
+            fc_tags_raw = [fc["mutagen"] for fc in four_changes if fc.get("palace") == p_name and fc.get("mutagen")]
+            if is_en:
+                fc_str = "".join(
+                    f"<em>[{_MUTAGEN_EN_LABEL.get(tag, tag)}]</em>" for tag in fc_tags_raw
+                )
+            else:
+                fc_str = "".join(f"<em>【化{tag}】</em>" for tag in fc_tags_raw)
             # 主星一句話
             star_names = [_star_name(s) for s in stars[:2] if _star_name(s)]
-            star_briefs = [_STAR_BRIEF[n] for n in star_names if n in _STAR_BRIEF]
-            note_str = (
-                "　→　" + "；".join(star_briefs)
-                if star_briefs
-                else ("　→　空宮，留意對宮借星" if not stars else "")
+            if is_en:
+                star_briefs = [_STAR_BRIEF_EN[n] for n in star_names if n in _STAR_BRIEF_EN]
+                note_str = (
+                    "　→　" + "; ".join(star_briefs)
+                    if star_briefs
+                    else ("　→　empty palace, watch the opposite palace's borrowed stars" if not stars else "")
+                )
+                palace_label = _PALACE_NAME_EN.get(p_name, p_name)
+                domain = _PALACE_DOMAINS_EN.get(p_name, "")
+                parts.append(
+                    _line(
+                        f"<strong>{palace_label}</strong> ({stem}{branch}) {fc_str}"
+                        f"　{star_display}{note_str}" + (f"　<small>{domain}</small>" if domain else "")
+                    )
+                )
+            else:
+                star_briefs = [_STAR_BRIEF[n] for n in star_names if n in _STAR_BRIEF]
+                note_str = (
+                    "　→　" + "；".join(star_briefs)
+                    if star_briefs
+                    else ("　→　空宮，留意對宮借星" if not stars else "")
+                )
+                domain = _PALACE_DOMAINS.get(p_name, "")
+                parts.append(
+                    _line(
+                        f"<strong>{p_name}</strong>（{stem}{branch}）{fc_str}"
+                        f"　{star_display}{note_str}" + (f"　<small>{domain}</small>" if domain else "")
+                    )
+                )
+
+    # ── 閱讀引導 ──
+    if is_en:
+        parts.append(
+            _line(
+                "Pick one question you genuinely want answered, notice which palace resonates most, then read outward through its opposite and triangle palaces — "
+                "that's easier to find an answer in than trying to take in all 12 palaces at once."
             )
+        )
+    else:
+        parts.append(
+            _line(
+                "先挑一個真的想問的題目，確認你對哪個宮位最有感覺，再往三方四正延伸閱讀，"
+                "會比一次看完十二宮更容易找到答案。"
+                "有想深入的方向，帶著問題諮詢老師最有效率。"
+            )
+        )
+
+    if detail == "full":
+        if is_en:
             parts.append(
                 _line(
-                    f"<strong>{p_name}</strong>（{stem}{branch}）{fc_str}"
-                    f"　{star_display}{note_str}" + (f"　<small>{domain}</small>" if domain else "")
+                    "For a full reading, string the Life, Body, Wealth, Career, Spouse, and Travel palaces into your life's main narrative, "
+                    "then use where the Four Transformations land to gauge each area's energy — for yearly outlooks, look at how the decade cycle and transiting stars overlap."
+                )
+            )
+        else:
+            parts.append(
+                _line(
+                    "正式解盤建議把命宮、身宮、財帛、官祿、夫妻、遷移六宮串成人生主敘事，"
+                    "再以四化落宮確認各領域的能量強弱，流年則看大限與流曜的疊合。"
                 )
             )
 
-    # ── 閱讀引導 ──
-    parts.append(
-        _line(
-            "先挑一個真的想問的題目，確認你對哪個宮位最有感覺，再往三方四正延伸閱讀，"
-            "會比一次看完十二宮更容易找到答案。"
-            "有想深入的方向，帶著問題諮詢老師最有效率。"
-        )
-    )
-
-    if detail == "full":
+    if is_en:
         parts.append(
             _line(
-                "正式解盤建議把命宮、身宮、財帛、官祿、夫妻、遷移六宮串成人生主敘事，"
-                "再以四化落宮確認各領域的能量強弱，流年則看大限與流曜的疊合。"
+                "<small>This reading uses Zi Wei Dou Shu star symbolism as a reference frame for self-reflection. "
+                "It is not a prediction or guarantee about the future, and does not offer medical, legal, or financial advice.</small>"
             )
         )
-
-    parts.append(
-        _line(
-            "<small>本解讀以紫微斗數星曜象徵作為自我觀察的參考框架，不構成對未來的預測或保證，"
-            "不提供醫療、法律或財務建議。</small>"
+    else:
+        parts.append(
+            _line(
+                "<small>本解讀以紫微斗數星曜象徵作為自我觀察的參考框架，不構成對未來的預測或保證，"
+                "不提供醫療、法律或財務建議。</small>"
+            )
         )
-    )
 
     return _wrap(parts, detail)
 
