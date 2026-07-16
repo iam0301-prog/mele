@@ -72,7 +72,7 @@ export default function HumanDesignPage() {
         hour,
         minute,
         timezone,
-      });
+      }, locale);
       setResult(response);
     } catch (err) {
       const message = err instanceof CalcError ? err.message : (err as Error).message;
@@ -85,7 +85,7 @@ export default function HumanDesignPage() {
   };
 
   return (
-    <ToolShell locale={locale} title={copy.title} subtitle={copy.subtitle} description={copy.description} spec={copy.spec}>
+    <ToolShell tool="humandesign" locale={locale} title={copy.title} subtitle={copy.subtitle} description={copy.description} spec={copy.spec} themed>
       <form onSubmit={onSubmit} className="mele-card" noValidate>
         <AutofillBanner locale={locale} show={autofilled} fields={copy.autofillFields} />
 
@@ -112,7 +112,7 @@ export default function HumanDesignPage() {
         </div>
       </form>
 
-      {loading && <ToolLoading locale={locale} label={copy.loadingLabel} />}
+      {loading && <ToolLoading tool="humandesign" locale={locale} label={copy.loadingLabel} />}
       {error && !loading && <ToolError locale={locale} message={error} />}
       {result && !loading && (
         <>

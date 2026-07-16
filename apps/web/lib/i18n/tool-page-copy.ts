@@ -70,11 +70,18 @@ type ToolLocaleCopy = {
   shell: {
     backLabel: string;
     eyebrow: string;
+    feedbackAriaLabel: string;
+    feedbackKicker: string;
+    feedbackBody: string;
+    feedbackAction: string;
   };
   consult: {
     title: string;
     body: string;
     action: string;
+  };
+  resultActions: {
+    changeAngle: string;
   };
   autofill: {
     icon: string;
@@ -139,8 +146,8 @@ const zhTools: Record<ToolPageSlug, ToolPageCopy> = {
   },
   tarot: {
     title: '塔羅牌解讀',
-    subtitle: '三種藝術風格與 AR 牌面',
-    description: '輸入清楚的問題，選擇你喜歡的牌組風格與牌陣。結果會呈現牌義、位置、正逆位與 AR 卡面資訊。',
+    subtitle: '三種藝術牌組與逐張白話解讀',
+    description: '輸入一個清楚的問題，選擇牌組風格與牌陣。結果會直接顯示每張牌的圖片、位置、正逆位、白話意義與可採取的行動。',
     spec: '塔羅',
     validation: { questionRequired: '請先輸入想詢問的問題。' },
     submit: { idle: '開始抽牌', loading: '正在抽牌...' },
@@ -168,8 +175,8 @@ const zhTools: Record<ToolPageSlug, ToolPageCopy> = {
   },
   runes: {
     title: '盧恩符文解讀',
-    subtitle: '三種材質與 AR 石面',
-    description: '盧恩適合詢問行動方向、阻礙、資源與內在訊息。選擇石面、木頭或水晶材質後，結果會以符文石與 AR 形式呈現。',
+    subtitle: '阻礙、資源與下一步',
+    description: '輸入一個明確問題，結果會依符文位置與正逆位，直接整理目前阻礙、可用資源與下一個行動。',
     spec: '盧恩',
     validation: { questionRequired: '請先輸入想詢問的問題。' },
     submit: { idle: '開始抽符文', loading: '正在抽取符文...' },
@@ -217,10 +224,10 @@ const zhTools: Record<ToolPageSlug, ToolPageCopy> = {
     loadingLabel: '正在計算 BodyGraph、中心與閘門...',
     autofillFields: ['出生日期', '出生時間'],
     visualNote: {
-      kicker: '視覺展示',
-      title: '目前先採用穩定 2D BodyGraph',
-      body: '人類圖先以清楚可讀的 2D BodyGraph 呈現中心、通道與啟動閘門；正式 AR / 3D 模型完成後再開放。',
-      action: '前往視覺展示',
+      kicker: '閱讀方式',
+      title: '先從類型與內在權威開始',
+      body: '不必先學會看圖。結果會先用白話說明你的決策方式、能量界線與日常練習。',
+      action: '查看白話解讀',
     },
   },
 };
@@ -273,7 +280,7 @@ const enTools: Record<ToolPageSlug, ToolPageCopy> = {
   },
   tarot: {
     title: 'Tarot Reading',
-    subtitle: 'THREE ART STYLES AND VISUAL CARDS',
+    subtitle: 'THREE ART DECKS WITH CARD-BY-CARD GUIDANCE',
     description: 'Ask a clear question, choose a deck style and spread, then receive positions, upright/reversed states, and card meanings.',
     spec: 'Tarot',
     validation: { questionRequired: 'Please enter a question first.' },
@@ -302,7 +309,7 @@ const enTools: Record<ToolPageSlug, ToolPageCopy> = {
   },
   runes: {
     title: 'Rune Reading',
-    subtitle: 'THREE MATERIALS AND VISUAL STONES',
+    subtitle: 'OBSTACLE, RESOURCE, AND NEXT STEP',
     description: 'Ask about action, obstacles, resources, or an inner message. Choose stone, wood, or crystal for the rune material.',
     spec: 'Runes',
     validation: { questionRequired: 'Please enter a question first.' },
@@ -361,12 +368,20 @@ const enTools: Record<ToolPageSlug, ToolPageCopy> = {
 
 const localeCopies: Record<Locale, ToolLocaleCopy> = {
   'zh-TW': {
-    shell: { backLabel: '回到工具入口', eyebrow: '解讀工具實驗室' },
+    shell: {
+      backLabel: '回到工具入口',
+      eyebrow: '解讀工具實驗室',
+      feedbackAriaLabel: '意見回報',
+      feedbackKicker: '歡迎回饋',
+      feedbackBody: '這份結果對你有幫助嗎？歡迎告訴我們哪裡有感、哪裡還可以更好。',
+      feedbackAction: '分享意見',
+    },
     consult: {
       title: '想更深入了解自己？',
       body: '工具結果是一個參考起點。如果你想在感情、工作或人生方向上聊得更深，平台老師是一個選項，不是必須。',
-      action: '瀏覽 {label} 老師',
+      action: '需要時，找老師',
     },
+    resultActions: { changeAngle: '換個角度再看看' },
     autofill: {
       icon: '✓',
       fallbackFields: '常用出生資料',
@@ -382,12 +397,20 @@ const localeCopies: Record<Locale, ToolLocaleCopy> = {
     tools: zhTools,
   },
   en: {
-    shell: { backLabel: 'Back to tools hub', eyebrow: 'ORACLE TOOL LAB' },
+    shell: {
+      backLabel: 'Back to tools hub',
+      eyebrow: 'ORACLE TOOL LAB',
+      feedbackAriaLabel: 'Feedback invitation',
+      feedbackKicker: 'YOUR FEEDBACK',
+      feedbackBody: 'Was this result clear and useful? Let us know what resonated or what could improve.',
+      feedbackAction: 'Share feedback',
+    },
     consult: {
       title: 'Want to explore further?',
       body: 'This result is a starting point for reflection. If you want a deeper conversation about your question, a platform guide is one option — not a requirement.',
-      action: 'Browse {label} guides',
+      action: 'Find a guide, if you need one',
     },
+    resultActions: { changeAngle: 'See it from another angle' },
     autofill: {
       icon: '✓',
       fallbackFields: 'profile data',
@@ -403,12 +426,20 @@ const localeCopies: Record<Locale, ToolLocaleCopy> = {
     tools: enTools,
   },
   vi: {
-    shell: { backLabel: 'Về cổng tâm linh', eyebrow: 'PHÒNG THỬ CÔNG CỤ' },
+    shell: {
+      backLabel: 'Về cổng tâm linh',
+      eyebrow: 'PHÒNG THỬ CÔNG CỤ',
+      feedbackAriaLabel: 'Mời góp ý',
+      feedbackKicker: 'GÓP Ý CỦA BẠN',
+      feedbackBody: 'Kết quả này có rõ ràng và hữu ích không? Hãy cho chúng tôi biết điều gì đúng hoặc cần cải thiện.',
+      feedbackAction: 'Gửi góp ý',
+    },
     consult: {
       title: 'Muốn khám phá sâu hơn?',
       body: 'Kết quả này là một điểm khởi đầu để suy ngẫm. Nếu bạn muốn trò chuyện sâu hơn, guide trên nền tảng là một lựa chọn — không bắt buộc.',
-      action: 'Xem guide {label}',
+      action: 'Cần thì tìm chuyên gia',
     },
+    resultActions: { changeAngle: 'Xem từ góc nhìn khác' },
     autofill: {
       icon: '✓',
       fallbackFields: 'hồ sơ',
@@ -434,12 +465,20 @@ const localeCopies: Record<Locale, ToolLocaleCopy> = {
     },
   },
   id: {
-    shell: { backLabel: 'Kembali ke hub alat', eyebrow: 'LAB ALAT ORAKEL' },
+    shell: {
+      backLabel: 'Kembali ke hub alat',
+      eyebrow: 'LAB ALAT ORAKEL',
+      feedbackAriaLabel: 'Undangan masukan',
+      feedbackKicker: 'MASUKAN ANDA',
+      feedbackBody: 'Apakah hasil ini jelas dan bermanfaat? Beri tahu kami bagian mana yang berkesan atau bisa diperbaiki.',
+      feedbackAction: 'Bagikan masukan',
+    },
     consult: {
       title: 'Ingin mengeksplorasi lebih jauh?',
       body: 'Hasil ini adalah titik awal untuk refleksi. Jika ingin percakapan lebih mendalam, guide di platform adalah salah satu pilihan — bukan keharusan.',
-      action: 'Lihat guide {label}',
+      action: 'Cari pemandu jika perlu',
     },
+    resultActions: { changeAngle: 'Lihat dari sudut lain' },
     autofill: {
       icon: '✓',
       fallbackFields: 'profil',
@@ -465,12 +504,20 @@ const localeCopies: Record<Locale, ToolLocaleCopy> = {
     },
   },
   ja: {
-    shell: { backLabel: 'スピリチュアル入口へ戻る', eyebrow: 'オラクルツールラボ' },
+    shell: {
+      backLabel: 'スピリチュアル入口へ戻る',
+      eyebrow: 'オラクルツールラボ',
+      feedbackAriaLabel: 'フィードバックのお願い',
+      feedbackKicker: 'ご意見をお聞かせください',
+      feedbackBody: 'この結果はわかりやすく役に立ちましたか？共感した点や改善できる点をぜひ教えてください。',
+      feedbackAction: 'フィードバックを送る',
+    },
     consult: {
       title: 'もっと深く自分を知りたいですか？',
       body: 'この結果は振り返りのスタートポイントです。もっと深く話したい場合は、プラットフォームのガイドがひとつの選択肢です——必須ではありません。',
-      action: '{label} のガイドを見る',
+      action: '必要なときにガイドを探す',
     },
+    resultActions: { changeAngle: '別の角度から見てみる' },
     autofill: {
       icon: '✓',
       fallbackFields: 'プロフィール',
@@ -496,12 +543,20 @@ const localeCopies: Record<Locale, ToolLocaleCopy> = {
     },
   },
   ko: {
-    shell: { backLabel: '영성 허브로 돌아가기', eyebrow: '오라클 도구 실험실' },
+    shell: {
+      backLabel: '영성 허브로 돌아가기',
+      eyebrow: '오라클 도구 실험실',
+      feedbackAriaLabel: '피드백 요청',
+      feedbackKicker: '여러분의 의견',
+      feedbackBody: '이 결과가 명확하고 도움이 되었나요? 공감된 부분이나 개선할 점을 알려주세요.',
+      feedbackAction: '의견 남기기',
+    },
     consult: {
       title: '더 깊이 탐색하고 싶으신가요?',
       body: '이 결과는 성찰의 출발점입니다. 더 깊이 대화하고 싶다면 플랫폼 가이드가 하나의 선택지입니다——필수는 아닙니다.',
-      action: '{label} 가이드 보기',
+      action: '필요할 때 가이드 찾기',
     },
+    resultActions: { changeAngle: '다른 시각으로 보기' },
     autofill: {
       icon: '✓',
       fallbackFields: '프로필',

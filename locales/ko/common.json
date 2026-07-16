@@ -30,7 +30,7 @@
     "dataRights": "데이터 권리",
     "admin": "관리",
     "signOut": "로그아웃",
-    "beta": "베타 참여"
+    "beta": "탐색하기"
   },
   "footer": {
     "privacy": "개인정보",
@@ -40,7 +40,7 @@
     "copyright": "MELE | SELF DISCOVERY HUB"
   },
   "home": {
-    "badge": "Closed Beta | SELF DISCOVERY TOOLS",
+    "badge": "MELE | SELF DISCOVERY TOOLS",
     "title": "MELE",
     "subtitle": "다양한 자기 이해 도구",
     "description": "자신을 알고, 현재 상태를 정리하고, 다음 선택을 바라보기 위한 도구 공간입니다. 무료 테스트, 데일리 리추얼, 깊은 해석을 통해 먼저 자신을 이해하고 필요할 때만 상담으로 이어집니다.",
@@ -50,8 +50,8 @@
       "teachers": "필요할 때 상담"
     },
     "console": {
-      "ariaLabel": "베타 태스크 보드",
-      "label": "베타 태스크 보드",
+      "ariaLabel": "자기 탐색 태스크 보드",
+      "label": "자기 탐색 태스크 보드",
       "title": "자기 탐색 흐름이 준비되었습니다",
       "tarotAlt": "Ocean Poseidon 타로 카드",
       "mayaAlt": "마야 Yellow Human 토템",
@@ -92,9 +92,14 @@
     "roleKicker": "역할 흐름",
     "roleTitle": "회원, 가이드, 플랫폼의 관계를 명확하게",
     "roleBody": "회원은 쉬운 설명과 상호작용 도구에서 시작하고, 가이드는 깊은 대화를 원할 때만 함께합니다.",
-    "finalKicker": "READY FOR CLOSED BETA",
-    "finalTitle": "테스트하고 이해시키고 다시 돌아오게 만든 뒤 유료화",
-    "finalBody": "다국어 기반은 기존 기능을 유지하며 공개 콘텐츠를 관리 가능한 JSON으로 옮깁니다.",
+    "finalKicker": "MELE",
+    "finalTitle": "오늘부터 시작하세요. 천천히 깊어집니다.",
+    "finalBody": "무료 도구, 일일 리추얼, 심층 리딩이 준비되어 있습니다. 도움이 되는 것을 사용하고, 더 깊은 지원이 필요할 때 가이드를 예약하세요.",
+    "philosophy": {
+      "kicker": "OUR APPROACH",
+      "title": "우리가 만드는 것은 사실 매우 단순합니다",
+      "body": "우리는 당신 대신 결론을 내리지 않습니다 — 단지 자신을 바라보는 또 다른 시각을 제공합니다. 도구 결과는 참고 사항이지 판단이 아니며, 가이드는 선택 사항이지 필수가 아닙니다."
+    },
     "proof": [
       "다국어 라우트",
       "경로 유지 언어 전환",
@@ -176,6 +181,9 @@
       }
     ]
   },
+  "tool": {
+    "disclaimer": "도구 결과는 자기 탐색을 위한 참고 사항일 뿐이며 어떠한 진단, 치료, 의료 또는 정신 건강 전문적 조언도 구성하지 않습니다."
+  },
   "markets": {
     "items": [
       {
@@ -246,23 +254,23 @@
     "current": "현재 언어"
   },
   "beta": {
-    "seoTitle": "클로즈드 베타 | MELE",
-    "seoDescription": "MELE 베타에 참여해 무료 자기 이해 도구, 데일리 리추얼, 심층 해석을 정식 출시 전에 먼저 경험하세요.",
-    "badge": "CLOSED BETA INVITATION",
+    "seoTitle": "무료 탐색 | MELE",
+    "seoDescription": "MELE의 무료 도구, 데일리 리추얼, 심층 해석을 지금 바로 경험하세요.",
+    "badge": "FREE TO EXPLORE",
     "title": "먼저 나를 이해하고, 선택을 더 선명하게",
-    "description": "이곳은 초기 테스트 입구입니다. 무료 도구로 시작하고, 데일리 리추얼을 완료하고, 심층 해석을 열어 보며 불편한 점과 인상 깊은 점을 알려주세요.",
-    "primaryCta": "베타 참여",
+    "description": "무료 도구로 시작하고, 데일리 리추얼을 완료하고, 심층 해석을 열어 보세요. 더 깊은 대화가 필요할 때 가이드를 찾으면 됩니다.",
+    "primaryCta": "지금 시작하기",
     "secondaryCta": "도구 보기",
     "dailyCta": "오늘의 리추얼",
     "inviteNote": "초대 코드는 가입 흐름에 자동으로 이어집니다. 이미 계정이 있다면 로그인 후 차트 기록으로 돌아갈 수 있습니다.",
-    "panelLabel": "BETA TASK BOARD",
-    "panelTitle": "오늘은 이 세 가지를 테스트해 주세요",
+    "panelLabel": "TODAY'S JOURNEY",
+    "panelTitle": "오늘은 이 세 가지부터 시작하세요",
     "panelItems": [
       "무료 도구 하나를 완료하고 결과가 이해하기 쉬운지 확인하기.",
       "데일리 리추얼을 완료하고 심층 해석 하나 열어보기.",
       "헷갈리는 부분, 오류, 혹은 마음에 남은 부분을 알려주기."
     ],
-    "rulesTitle": "베타 안내",
+    "rulesTitle": "이용 안내",
     "rules": [
       {
         "label": "데일리 리추얼",

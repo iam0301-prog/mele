@@ -12,10 +12,10 @@ import asyncio
 import os
 import traceback
 from copy import deepcopy
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from functools import lru_cache
 from time import monotonic
-from typing import Literal, Optional
+from typing import Literal
 
 from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -45,7 +45,6 @@ from renderers import (
     ziwei_render,
 )
 
-
 API_VERSION = "1.0.0"
 ENGINES = ["numerology", "maya", "bazi", "ziwei", "tarot", "runes", "astro", "humandesign"]
 
@@ -63,10 +62,11 @@ app = FastAPI(
 )
 
 
-# Defaults cover local development plus the first closed-beta Vercel domain.
-# Production can still override with
-# MELE_ALLOWED_ORIGINS="https://example.com,https://www.example.com".
-_default_origins = [
+# These origins are always allowed regardless of the MELE_ALLOWED_ORIGINS env var.
+# They cover local development plus the production Vercel domain so that the
+# Vercel frontend can always reach the Render backend, even when the env var is
+# set to a restricted list (e.g. in CI).
+_base_origins = [
     "https://mele-chi.vercel.app",
     "http://localhost:3000",
     "http://localhost:3001",
@@ -76,12 +76,10 @@ _default_origins = [
     "http://127.0.0.1:3006",
     "http://127.0.0.1:3007",
 ]
+# MELE_ALLOWED_ORIGINS adds extra origins on top of the base list (not a replacement).
 _env_origins = os.environ.get("MELE_ALLOWED_ORIGINS", "").strip()
-allowed_origins = (
-    [origin.strip() for origin in _env_origins.split(",") if origin.strip()]
-    if _env_origins
-    else _default_origins
-)
+_extra_origins = [origin.strip() for origin in _env_origins.split(",") if origin.strip()]
+allowed_origins = list(dict.fromkeys(_base_origins + _extra_origins))
 
 app.add_middleware(
     CORSMiddleware,
@@ -148,15 +146,26 @@ EXPLAINER = {
 }
 
 
-def wrap(tool: str, request_input: dict, data: dict, render_bundle: dict, detail: str = "teaser") -> CalcResponse:
+def wrap(
+    tool: str,
+    request_input: dict,
+    data: dict,
+    render_bundle: dict,
+    detail: str = "teaser",
+    locale: str = "zh-TW",
+) -> CalcResponse:
     """Normalize every calculator result into the public API response shell."""
 
     if tool in EXPLAINER and not render_bundle.get("html"):
         try:
             try:
-                render_bundle["html"] = EXPLAINER[tool](data, detail=detail)
+                render_bundle["html"] = EXPLAINER[tool](data, detail=detail, locale=locale)
             except TypeError:
-                render_bundle["html"] = EXPLAINER[tool](data)
+                # 缺件安全網：引擎尚未支援 locale 參數時，退回原本呼叫方式（永遠輸出中文，不開天窗）
+                try:
+                    render_bundle["html"] = EXPLAINER[tool](data, detail=detail)
+                except TypeError:
+                    render_bundle["html"] = EXPLAINER[tool](data)
         except Exception:
             traceback.print_exc()
             render_bundle["html"] = ""
@@ -164,7 +173,7 @@ def wrap(tool: str, request_input: dict, data: dict, render_bundle: dict, detail
     return CalcResponse(
         tool=tool,
         version=API_VERSION,
-        computed_at=datetime.now(timezone.utc),
+        computed_at=datetime.now(UTC),
         input=request_input,
         data=data,
         render=RenderBundle(**render_bundle),
@@ -199,9 +208,10 @@ def _cached_bazi(
     hour: int,
     minute: int,
     sect: int,
-    longitude: Optional[float],
+    longitude: float | None,
+    is_male: bool,
 ) -> dict:
-    return bazi.calculate(year, month, day, hour, minute, sect, longitude)
+    return bazi.calculate(year, month, day, hour, minute, sect, longitude, is_male=is_male)
 
 
 @lru_cache(maxsize=2048)
@@ -269,26 +279,36 @@ async def global_exception_handler(request: Request, exc: Exception):
 
 
 DetailQuery = Literal["teaser", "full"]
+# 支援語言：繁中／英／越南／印尼／日／韓。缺翻譯時各引擎內部會做安全網退回（en→zh-TW）。
+LocaleQuery = Literal["zh-TW", "en", "vi", "id", "ja", "ko"]
 
 
 @app.post("/api/v1/calc/numerology", response_model=CalcResponse, tags=["Calc"])
-async def calc_numerology(req: NumerologyRequest, detail: DetailQuery = Query("teaser")):
+async def calc_numerology(
+    req: NumerologyRequest, detail: DetailQuery = Query("teaser"), locale: LocaleQuery = Query("zh-TW")
+):
     """靈數：生命靈數、生日數與核心傾向。"""
 
     data = await run_calc("numerology", _cached_numerology, req.year, req.month, req.day)
-    return wrap("numerology", req.model_dump(), data, numerology_render.render(data), detail=detail)
+    return wrap(
+        "numerology", req.model_dump(), data, numerology_render.render(data), detail=detail, locale=locale
+    )
 
 
 @app.post("/api/v1/calc/maya", response_model=CalcResponse, tags=["Calc"])
-async def calc_maya(req: MayaRequest, detail: DetailQuery = Query("teaser")):
+async def calc_maya(
+    req: MayaRequest, detail: DetailQuery = Query("teaser"), locale: LocaleQuery = Query("zh-TW")
+):
     """馬雅曆：Kin、Seal、Tone 與 oracle 關係。"""
 
     data = await run_calc("maya", _cached_maya, req.year, req.month, req.day, req.include_leap_day)
-    return wrap("maya", req.model_dump(), data, maya_render.render(data), detail=detail)
+    return wrap("maya", req.model_dump(), data, maya_render.render(data), detail=detail, locale=locale)
 
 
 @app.post("/api/v1/calc/bazi", response_model=CalcResponse, tags=["Calc"])
-async def calc_bazi(req: BaziRequest, detail: DetailQuery = Query("teaser")):
+async def calc_bazi(
+    req: BaziRequest, detail: DetailQuery = Query("teaser"), locale: LocaleQuery = Query("zh-TW")
+):
     """八字：四柱、五行分布與日主觀察。"""
 
     data = await run_calc(
@@ -301,36 +321,58 @@ async def calc_bazi(req: BaziRequest, detail: DetailQuery = Query("teaser")):
         req.minute,
         req.sect,
         req.longitude,
+        req.is_male,
     )
-    return wrap("bazi", req.model_dump(), data, bazi_render.render(data), detail=detail)
+    return wrap("bazi", req.model_dump(), data, bazi_render.render(data), detail=detail, locale=locale)
 
 
 @app.post("/api/v1/calc/ziwei", response_model=CalcResponse, tags=["Calc"])
-async def calc_ziwei(req: ZiweiRequest, detail: DetailQuery = Query("teaser")):
+async def calc_ziwei(
+    req: ZiweiRequest, detail: DetailQuery = Query("teaser"), locale: LocaleQuery = Query("zh-TW")
+):
     """紫微斗數：十二宮、主星與命盤結構。"""
 
-    data = await run_calc("ziwei", _cached_ziwei, req.year, req.month, req.day, req.hour, req.minute, req.gender)
-    return wrap("ziwei", req.model_dump(), data, ziwei_render.render(data), detail=detail)
+    data = await run_calc(
+        "ziwei", _cached_ziwei, req.year, req.month, req.day, req.hour, req.minute, req.gender
+    )
+    return wrap("ziwei", req.model_dump(), data, ziwei_render.render(data), detail=detail, locale=locale)
 
 
 @app.post("/api/v1/calc/tarot", response_model=CalcResponse, tags=["Calc"])
-async def calc_tarot(req: TarotRequest, detail: DetailQuery = Query("teaser")):
+async def calc_tarot(
+    req: TarotRequest, detail: DetailQuery = Query("teaser"), locale: LocaleQuery = Query("zh-TW")
+):
     """塔羅：抽牌、正逆位與牌陣位置。"""
 
-    data = await run_calc("tarot", tarot.draw, req.count, req.reversed_enabled, req.spread, req.seed, req.tarot_style)
-    return wrap("tarot", req.model_dump(), data, tarot_render.render(data, data.get("meta", {}).get("tarot_style")), detail=detail)
+    data = await run_calc(
+        "tarot", tarot.draw, req.count, req.reversed_enabled, req.spread, req.seed, req.tarot_style
+    )
+    return wrap(
+        "tarot",
+        req.model_dump(),
+        data,
+        tarot_render.render(data, data.get("meta", {}).get("tarot_style")),
+        detail=detail,
+        locale=locale,
+    )
 
 
 @app.post("/api/v1/calc/runes", response_model=CalcResponse, tags=["Calc"])
-async def calc_runes(req: RunesRequest, detail: DetailQuery = Query("teaser")):
+async def calc_runes(
+    req: RunesRequest, detail: DetailQuery = Query("teaser"), locale: LocaleQuery = Query("zh-TW")
+):
     """盧恩：Elder Futhark 抽石與材質呈現。"""
 
-    data = await run_calc("runes", runes.draw, req.count, req.reversed_enabled, req.seed, req.spread, req.material or "stone")
-    return wrap("runes", req.model_dump(), data, runes_render.render(data), detail=detail)
+    data = await run_calc(
+        "runes", runes.draw, req.count, req.reversed_enabled, req.seed, req.spread, req.material or "stone"
+    )
+    return wrap("runes", req.model_dump(), data, runes_render.render(data), detail=detail, locale=locale)
 
 
 @app.post("/api/v1/calc/astro", response_model=CalcResponse, tags=["Calc"])
-async def calc_astro(req: AstroRequest, detail: DetailQuery = Query("teaser")):
+async def calc_astro(
+    req: AstroRequest, detail: DetailQuery = Query("teaser"), locale: LocaleQuery = Query("zh-TW")
+):
     """西洋占星：行星、宮位與上升點。"""
 
     data = await run_calc(
@@ -346,11 +388,15 @@ async def calc_astro(req: AstroRequest, detail: DetailQuery = Query("teaser")):
         req.longitude,
         req.house_system,
     )
-    return wrap("astro", req.model_dump(), data, astro_render.render(data), detail=detail)
+    return wrap(
+        "astro", req.model_dump(), data, astro_render.render(data, locale=locale), detail=detail, locale=locale
+    )
 
 
 @app.post("/api/v1/calc/humandesign", response_model=CalcResponse, tags=["Calc"])
-async def calc_humandesign(req: HumanDesignRequest, detail: DetailQuery = Query("teaser")):
+async def calc_humandesign(
+    req: HumanDesignRequest, detail: DetailQuery = Query("teaser"), locale: LocaleQuery = Query("zh-TW")
+):
     """人類圖：類型、中心、閘門與通道。"""
 
     data = await run_calc(
@@ -363,7 +409,14 @@ async def calc_humandesign(req: HumanDesignRequest, detail: DetailQuery = Query(
         req.minute,
         req.timezone,
     )
-    return wrap("humandesign", req.model_dump(), data, hd_render.render(data), detail=detail)
+    return wrap(
+        "humandesign",
+        req.model_dump(),
+        data,
+        hd_render.render(data, locale=locale),
+        detail=detail,
+        locale=locale,
+    )
 
 
 @app.get("/", response_class=HTMLResponse, tags=["Meta"])
@@ -414,4 +467,4 @@ async def ready():
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=8000)  # noqa: S104

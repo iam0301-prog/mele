@@ -152,6 +152,66 @@ function calcPlanets(jd) {
   return out;
 }
 
+// 判斷行星落入哪個宮位（依宮頭黃道度數）
+function getPlanetHouse(planetLon, cusps) {
+  const lon = ((planetLon % 360) + 360) % 360;
+  const n = cusps.length;
+  for (let i = 0; i < n; i++) {
+    const cur = ((cusps[i] % 360) + 360) % 360;
+    const next = ((cusps[(i + 1) % n] % 360) + 360) % 360;
+    if (cur <= next) {
+      if (lon >= cur && lon < next) return i + 1;
+    } else {
+      // 跨越 0° 牡羊的宮
+      if (lon >= cur || lon < next) return i + 1;
+    }
+  }
+  return 1;
+}
+
+// 主要相位定義（容許度 orb）
+const ASPECT_DEFS = [
+  { zh: '合相',   angle: 0,   orb: 8 },
+  { zh: '對分相', angle: 180, orb: 8 },
+  { zh: '三分相', angle: 120, orb: 8 },
+  { zh: '四分相', angle: 90,  orb: 7 },
+  { zh: '六分相', angle: 60,  orb: 6 },
+];
+
+// 計算行星兩兩相位
+function calcAspects(planets) {
+  const aspects = [];
+  const keys = Object.keys(planets);
+  for (let i = 0; i < keys.length; i++) {
+    for (let j = i + 1; j < keys.length; j++) {
+      const p1 = planets[keys[i]];
+      const p2 = planets[keys[j]];
+      // 先將黃道經度正規化到 0–360，再取最短角距
+      const lon1 = ((p1.longitude % 360) + 360) % 360;
+      const lon2 = ((p2.longitude % 360) + 360) % 360;
+      let diff = Math.abs(lon1 - lon2);
+      if (diff > 180) diff = 360 - diff;
+      for (const asp of ASPECT_DEFS) {
+        const orb = Math.abs(diff - asp.angle);
+        if (orb <= asp.orb) {
+          aspects.push({
+            planet1: keys[i],
+            planet2: keys[j],
+            planet1Zh: p1.zh,
+            planet2Zh: p2.zh,
+            type: asp.zh,
+            angle: asp.angle,
+            orb: Math.round(orb * 10) / 10,
+            exact: Math.round(diff * 10) / 10,
+          });
+          break; // 每對行星只取優先序最高的相位（排列順序見 ASPECT_DEFS）
+        }
+      }
+    }
+  }
+  return aspects;
+}
+
 function calcAstro(args) {
   const jd = dateTimeToJD(args);
   const planets = calcPlanets(jd);
@@ -168,8 +228,20 @@ function calcAstro(args) {
       result.ascendant = { longitude: points[0], sign: longitudeToSign(points[0]) };
       result.midheaven = { longitude: points[1], sign: longitudeToSign(points[1]) };
       result.houses = cusps.map((c, i) => ({ house: i + 1, longitude: c, sign: longitudeToSign(c) }));
+
+      // 為每顆行星標記所在宮位
+      const cuspLons = cusps.map(c => c);
+      for (const key of Object.keys(result.planets)) {
+        result.planets[key].house = getPlanetHouse(result.planets[key].longitude, cuspLons);
+      }
+      if (result.sun) result.sun.house = result.planets.sun.house;
+      if (result.moon) result.moon.house = result.planets.moon.house;
     }
   }
+
+  // 計算相位（無論有無地理座標都算）
+  result.aspects = calcAspects(result.planets);
+
   return result;
 }
 

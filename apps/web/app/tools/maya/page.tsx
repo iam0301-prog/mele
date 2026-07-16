@@ -35,7 +35,7 @@ export default function MayaPage() {
 
     try {
       const [year, month, day] = date.split('-').map(Number);
-      const response = await calc('maya', { year, month, day });
+      const response = await calc('maya', { year, month, day }, locale);
       setResult(response);
     } catch (err) {
       const message = err instanceof CalcError ? err.message : (err as Error).message;
@@ -48,7 +48,7 @@ export default function MayaPage() {
   };
 
   return (
-    <ToolShell locale={locale} title={copy.title} subtitle={copy.subtitle} description={copy.description} spec={copy.spec}>
+    <ToolShell tool="maya" locale={locale} title={copy.title} subtitle={copy.subtitle} description={copy.description} spec={copy.spec} themed>
       <form onSubmit={onSubmit} className="mele-card" noValidate>
         <DateOnlyField locale={locale} date={date} onDateChange={setDate} label={copy.birth?.dateLabel} hint={copy.dateHint} />
 
@@ -57,7 +57,7 @@ export default function MayaPage() {
         </button>
       </form>
 
-      {loading && <ToolLoading locale={locale} label={copy.loadingLabel} />}
+      {loading && <ToolLoading tool="maya" locale={locale} label={copy.loadingLabel} />}
       {error && !loading && <ToolError locale={locale} message={error} />}
       {result && !loading && (
         <>

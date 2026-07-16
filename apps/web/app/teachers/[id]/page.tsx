@@ -55,32 +55,33 @@ export default async function TeacherDetailPage({ params }: PageProps) {
     ]);
 
   return (
-    <main className="container mx-auto max-w-4xl px-5 py-10">
-      <Link href={localizePath('/teachers', locale)} className="text-accent text-xs tracking-widest hover:opacity-80">
+    <main className="mag-teachers-page">
+    <div className="container mx-auto max-w-4xl px-5 py-10">
+      <Link href={localizePath('/teachers', locale)} className="mag-author-detail__back text-xs tracking-widest hover:opacity-80">
         {copy.detail.back}
       </Link>
 
-      <section className="mele-card mt-5">
+      <section className="mag-teachers-page__panel mele-card mt-5">
         {isDemo && (
-          <div className="mb-5 rounded-xl border border-accent-dim bg-black/25 p-4 text-sm leading-relaxed text-white/70">
+          <div className="mag-teachers-page__notice mb-5 rounded-xl p-4 text-sm leading-relaxed">
             {copy.detail.demoNotice}
           </div>
         )}
 
         <div className="grid gap-7 md:grid-cols-[140px_1fr] md:items-center">
-          <div className="mx-auto flex h-32 w-32 items-center justify-center rounded-full bg-mele-gold font-serif text-5xl font-bold text-primary md:mx-0 md:h-36 md:w-36">
+          <div className="mag-author-detail__avatar mx-auto flex h-32 w-32 items-center justify-center rounded-full text-5xl font-bold md:mx-0 md:h-36 md:w-36">
             {teacher.display_name.charAt(0)}
           </div>
           <div>
-            <h1 className="font-serif text-3xl tracking-widest text-accent">{teacher.display_name}</h1>
-            <div className="mt-1 text-sm text-white/60">{teacher.title || copy.detail.fallbackTitle}</div>
-            <div className="mt-3 text-sm text-yellow-400">
+            <h1 className="mag-author-detail__name text-3xl tracking-widest">{teacher.display_name}</h1>
+            <div className="mag-teachers-page__subtitle mt-1 text-sm">{teacher.title || copy.detail.fallbackTitle}</div>
+            <div className="mag-author-card__rating mt-3 text-sm">
               {Number(teacher.rating || 0).toFixed(1)} {copy.detail.ratingSuffix}
-              <span className="text-white/60">{copy.detail.reviewCaseText(teacher.total_reviews || 0, teacher.cases_count || 0)}</span>
+              <span className="mag-teachers-page__subtitle">{copy.detail.reviewCaseText(teacher.total_reviews || 0, teacher.cases_count || 0)}</span>
             </div>
             <div className="mt-3 flex flex-wrap gap-2">
               {(teacher.specialties || []).map((specialty) => (
-                <span key={specialty} className="rounded-full border border-accent-dim px-3 py-1 text-xs">{specialtyLabel(locale, specialty)}</span>
+                <span key={specialty} className="mag-author-card__tag rounded-full px-3 py-1 text-xs">{specialtyLabel(locale, specialty)}</span>
               ))}
             </div>
             <div className="mt-4 flex flex-wrap gap-3 text-sm">
@@ -88,7 +89,7 @@ export default async function TeacherDetailPage({ params }: PageProps) {
                 const url = (teacher as unknown as Record<string, string | null>)[key];
                 if (!url) return null;
                 return (
-                  <a key={key} href={url} target="_blank" rel="noreferrer" className="text-accent-light hover:underline">
+                  <a key={key} href={url} target="_blank" rel="noreferrer" className="mag-author-detail__back hover:underline">
                     {SOCIAL_LABELS[key]}
                   </a>
                 );
@@ -98,12 +99,12 @@ export default async function TeacherDetailPage({ params }: PageProps) {
         </div>
 
         {teacher.quote && (
-          <blockquote className="mt-7 border-l-4 border-accent bg-black/25 p-5 italic text-white/85">
+          <blockquote className="mag-author-detail__quote mt-7 p-5 italic">
             「{teacher.quote}」
           </blockquote>
         )}
 
-        <div className="mt-5 whitespace-pre-wrap leading-loose text-white/85">
+        <div className="mag-teachers-page__body mt-5 whitespace-pre-wrap leading-loose">
           {teacher.intro_long || teacher.intro_short || copy.detail.fallbackIntro}
         </div>
 
@@ -113,31 +114,31 @@ export default async function TeacherDetailPage({ params }: PageProps) {
             [copy.detail.styleTitle, teacher.consultation_style || copy.detail.styleFallback],
             [copy.detail.safetyTitle, copy.detail.safetyBody],
           ].map(([title, body]) => (
-            <div key={title} className="rounded-lg border border-accent-dim bg-white/[0.035] p-4">
-              <div className="text-xs tracking-[0.25em] text-accent">{title}</div>
-              <p className="mt-2 text-xs leading-relaxed text-white/68">{body}</p>
+            <div key={title} className="mag-teachers-page__panel rounded-lg p-4">
+              <div className="mag-teachers-page__kicker text-xs tracking-[0.25em]">{title}</div>
+              <p className="mag-teachers-page__body mt-2 text-xs leading-relaxed">{body}</p>
             </div>
           ))}
         </div>
       </section>
 
       {services && services.length > 0 ? (
-        <section className="mele-card">
+        <section className="mag-teachers-page__panel mele-card">
           <div className="mele-section-title">{copy.detail.servicesTitle}</div>
           <div className="mele-section-subtitle">{copy.detail.servicesSubtitle}</div>
           <div className="space-y-3">
             {services.map((service: TeacherService) => (
-              <div key={service.id} className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-accent-dim bg-white/[0.04] p-5">
+              <div key={service.id} className="mag-teachers-page__panel flex flex-wrap items-center justify-between gap-4 rounded-xl p-5">
                 <div className="min-w-[200px] flex-1">
                   <div className="text-base font-semibold">{service.name}</div>
-                  <div className="my-1 text-xs text-white/60">{service.duration_minutes} {copy.detail.minutes}</div>
-                  {service.description && <div className="text-sm leading-relaxed text-white/70">{service.description}</div>}
-                  <div className="mt-3 text-[11px] leading-relaxed text-white/45">
+                  <div className="mag-teachers-page__subtitle my-1 text-xs">{service.duration_minutes} {copy.detail.minutes}</div>
+                  {service.description && <div className="mag-teachers-page__body text-sm leading-relaxed">{service.description}</div>}
+                  <div className="mag-teachers-page__subtitle mt-3 text-[11px] leading-relaxed">
                     {copy.detail.serviceNote}
                   </div>
                 </div>
                 <div className="text-center">
-                  <div className="font-serif text-base text-success">{copy.detail.betaFreeLabel ?? '公測期免費'}</div>
+                  <div className="mag-author-card__rating font-serif text-base">{copy.detail.betaFreeLabel ?? '免費體驗'}</div>
                   {isDemo ? (
                     <Link href={localizePath('/mobile', locale)} className="mele-btn-secondary mt-2 !px-5 !py-2 !text-xs">
                       {copy.detail.guideBack}
@@ -156,24 +157,24 @@ export default async function TeacherDetailPage({ params }: PageProps) {
           </div>
         </section>
       ) : (
-        <section className="mele-card text-center">
+        <section className="mag-teachers-page__panel mele-card text-center">
           <div className="mele-section-title">{copy.detail.unavailableTitle}</div>
-          <p className="text-sm leading-relaxed text-white/68">
+          <p className="mag-teachers-page__body text-sm leading-relaxed">
             {copy.detail.unavailableBody}
           </p>
         </section>
       )}
 
       {reviews && reviews.length > 0 && (
-        <section className="mele-card">
+        <section className="mag-teachers-page__panel mele-card">
           <div className="mele-section-title">{copy.detail.reviewsTitle}</div>
           <div className="mele-section-subtitle">{copy.detail.reviewsSubtitle}</div>
           <div className="space-y-4">
             {reviews.map((review: Review) => (
-              <div key={review.id} className="border-b border-accent-dim/30 py-3">
-                <div className="text-yellow-400">{'★'.repeat(review.rating)}{'☆'.repeat(5 - review.rating)}</div>
-                <div className="mt-1 text-sm text-white/85">{review.comment || copy.detail.noComment}</div>
-                <div className="mt-1 text-[11px] text-white/40">
+              <div key={review.id} className="py-3" style={{ borderBottom: '1px solid var(--mag-hair)' }}>
+                <div className="mag-author-card__rating">{'★'.repeat(review.rating)}{'☆'.repeat(5 - review.rating)}</div>
+                <div className="mag-teachers-page__body mt-1 text-sm">{review.comment || copy.detail.noComment}</div>
+                <div className="mag-teachers-page__subtitle mt-1 text-[11px]">
                   {new Date(review.created_at).toLocaleDateString(localeTag)}
                   {review.is_anonymous && ` · ${copy.detail.anonymous}`}
                 </div>
@@ -182,6 +183,7 @@ export default async function TeacherDetailPage({ params }: PageProps) {
           </div>
         </section>
       )}
+    </div>
     </main>
   );
 }

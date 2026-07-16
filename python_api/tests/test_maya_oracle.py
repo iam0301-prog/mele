@@ -2,23 +2,23 @@
 Maya Oracle 黃金測試
 與 JS 版本 (packages/calc/src/maya.js) 對齊；遵循 Argüelles' Dreamspell 標準。
 """
+
 import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from engines.maya import calculate_oracle, kin_info, calculate, ANALOG_TABLE
-
+from engines.maya import ANALOG_TABLE, calculate, calculate_oracle, kin_info
 
 # 與 JS 對齊的黃金預期值（直接從 JS 跑出來的結果）
 # 格式：kin -> {guide, analog, antipode, occult}
 GOLDEN_ORACLE = {
     # 對齊官方 Argüelles Pacal Votan Oracle，多重交叉驗證 (galacticark, soultivation, timewaves)
-    1:   {"guide":   1, "analog": 118, "antipode": 131, "occult": 260},  # 磁性紅龍
-    34:  {"guide": 138, "analog": 125, "antipode": 164, "occult": 227},  # 銀河白巫師
+    1: {"guide": 1, "analog": 118, "antipode": 131, "occult": 260},  # 磁性紅龍
+    34: {"guide": 138, "analog": 125, "antipode": 164, "occult": 227},  # 銀河白巫師
     100: {"guide": 256, "analog": 139, "antipode": 230, "occult": 161},  # 太陽黃太陽
-    207: {"guide": 259, "analog":  12, "antipode":  77, "occult":  54},  # 水晶藍手
-    260: {"guide": 104, "analog":  39, "antipode": 130, "occult":   1},  # 宇宙黃太陽
+    207: {"guide": 259, "analog": 12, "antipode": 77, "occult": 54},  # 水晶藍手
+    260: {"guide": 104, "analog": 39, "antipode": 130, "occult": 1},  # 宇宙黃太陽
 }
 
 
@@ -28,9 +28,7 @@ def test_oracle_golden():
         o = calculate_oracle(kin)
         assert o["self"] == kin
         for pos in ("guide", "analog", "antipode", "occult"):
-            assert o[pos] == expected[pos], (
-                f"Kin {kin} {pos}: expected {expected[pos]}, got {o[pos]}"
-            )
+            assert o[pos] == expected[pos], f"Kin {kin} {pos}: expected {expected[pos]}, got {o[pos]}"
 
 
 def test_occult_property():
@@ -65,9 +63,9 @@ def test_analog_symmetric():
     """Analog 應該對稱：analog(analog(k)) = k"""
     for seal in range(1, 21):
         partner = ANALOG_TABLE[seal]
-        assert ANALOG_TABLE[partner] == seal, (
-            f"Asymmetric pair: {seal} -> {partner} -> {ANALOG_TABLE[partner]}"
-        )
+        assert (
+            ANALOG_TABLE[partner] == seal
+        ), f"Asymmetric pair: {seal} -> {partner} -> {ANALOG_TABLE[partner]}"
 
 
 def test_guide_for_magnetic_tone_is_self():
@@ -82,31 +80,29 @@ def test_guide_same_color_family():
     """Guide 必與 Self 同色族 (Red/White/Blue/Yellow)"""
     for kin in [1, 34, 52, 100, 162, 207, 260]:
         o = calculate_oracle(kin)
-        self_color = ((kin - 1) % 20) % 4   # 0..3
+        self_color = ((kin - 1) % 20) % 4  # 0..3
         guide_seal = ((o["guide"] - 1) % 20) + 1
         guide_color = (guide_seal - 1) % 4
-        assert self_color == guide_color, (
-            f"Kin {kin}: guide color mismatch (self {self_color}, guide {guide_color})"
-        )
+        assert (
+            self_color == guide_color
+        ), f"Kin {kin}: guide color mismatch (self {self_color}, guide {guide_color})"
 
 
 def test_guide_oracle_known_kins():
     """Guide 必符合官方公開記載"""
     # 來源：galacticark, soultivation, timewaves
     expected_guide_seal = {
-        52:  16,   # Yellow Cosmic Human → guide Yellow Warrior
-        162: 2,    # White Rhythmic Wind → guide White Wind (self)
-        260: 4,    # Yellow Cosmic Sun → guide Yellow Seed (Flowering)
-        9:   5,    # Red Solar Moon → guide Red Serpent
-        100: 16,   # Yellow Solar Sun → guide Yellow Warrior (Intelligence)
-        121: 17,   # Red Self-Existing Dragon → guide Red Earth (Navigation)
+        52: 16,  # Yellow Cosmic Human → guide Yellow Warrior
+        162: 2,  # White Rhythmic Wind → guide White Wind (self)
+        260: 4,  # Yellow Cosmic Sun → guide Yellow Seed (Flowering)
+        9: 5,  # Red Solar Moon → guide Red Serpent
+        100: 16,  # Yellow Solar Sun → guide Yellow Warrior (Intelligence)
+        121: 17,  # Red Self-Existing Dragon → guide Red Earth (Navigation)
     }
     for kin, exp_seal in expected_guide_seal.items():
         o = calculate_oracle(kin)
         actual_seal = ((o["guide"] - 1) % 20) + 1
-        assert actual_seal == exp_seal, (
-            f"Kin {kin}: guide seal expected {exp_seal}, got {actual_seal}"
-        )
+        assert actual_seal == exp_seal, f"Kin {kin}: guide seal expected {exp_seal}, got {actual_seal}"
 
 
 def test_anchor_kin():
@@ -233,11 +229,11 @@ def test_determinism():
 
 
 if __name__ == "__main__":
+    import contextlib
     import sys
-    try:
+
+    with contextlib.suppress(Exception):
         sys.stdout.reconfigure(encoding="utf-8")
-    except Exception:
-        pass
     test_oracle_golden()
     test_occult_property()
     test_antipode_seal_diff_10()

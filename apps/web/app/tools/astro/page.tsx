@@ -67,7 +67,7 @@ export default function AstroPage() {
         timezone,
         latitude: lat,
         longitude: lon,
-      });
+      }, locale);
       setResult(response);
     } catch (err) {
       const message = err instanceof CalcError ? err.message : (err as Error).message;
@@ -80,7 +80,7 @@ export default function AstroPage() {
   };
 
   return (
-    <ToolShell locale={locale} title={copy.title} subtitle={copy.subtitle} description={copy.description} spec={copy.spec}>
+    <ToolShell tool="astro" locale={locale} title={copy.title} subtitle={copy.subtitle} description={copy.description} spec={copy.spec} themed>
       <form onSubmit={onSubmit} className="mele-card" noValidate>
         <AutofillBanner locale={locale} show={autofilled} fields={copy.autofillFields} />
 
@@ -114,7 +114,7 @@ export default function AstroPage() {
         </button>
       </form>
 
-      {loading && <ToolLoading locale={locale} label={copy.loadingLabel} />}
+      {loading && <ToolLoading tool="astro" locale={locale} label={copy.loadingLabel} />}
       {error && !loading && <ToolError locale={locale} message={error} />}
       {result && !loading && (
         <>

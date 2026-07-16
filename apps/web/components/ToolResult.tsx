@@ -2,7 +2,10 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { MayaOracleBoard, MayaTotemGallery, MayaTotemGlyph, getMayaTotemBySeal } from '@/components/MayaTotemGlyph';
+import Image from 'next/image';
+import { HumanDesignBodyGraph } from '@/components/HumanDesignBodyGraph';
+import { MayaTotemGallery, MayaTotemGlyph, getMayaTotemBySeal } from '@/components/MayaTotemGlyph';
+import { ToolHighlightCards } from '@/components/ToolHighlightCards';
 import type { CalcResponse, CalcTool } from '@/lib/api';
 import {
   DAILY_POINT_AMOUNT,
@@ -31,6 +34,9 @@ type InsightCard = {
   body?: string;
   tags?: string[];
   mayaSeal?: unknown;
+  imageSrc?: string;
+  imageAlt?: string;
+  imageReversed?: boolean;
 };
 
 type ResultInsight = {
@@ -39,6 +45,12 @@ type ResultInsight = {
   intro: string;
   facts: InsightFact[];
   cards: InsightCard[];
+};
+
+type HumanDesignChannelSignal = {
+  gate1: number;
+  gate2: number;
+  key: string;
 };
 
 type PersonalReadingPoint = {
@@ -314,19 +326,22 @@ const KEY_LABELS: Record<string, string> = {
   birthDay: '生日數',
   lifePathArchetype: '生命原型',
   birthDayArchetype: '生日原型',
-  kin: 'Kin',
-  label: '完整名稱',
-  tone: '調性',
-  seal: '圖騰',
-  classicTzolkin: '古典 Tzolkin',
-  starroot: 'Starroot 對照',
-  longCount: '長紀曆',
+  kin: '你的 Kin 編號',
+  label: '你的印記名稱',
+  tone: '你的行動節奏',
+  seal: '你的核心天賦',
   pillars: '四柱',
   dayMaster: '日主',
   dayMasterYinYang: '日主陰陽',
   dayMasterWuxing: '日主五行',
   wuxing: '五行分布',
   nayin: '納音',
+  hiddenStems: '地支藏干',
+  changSheng: '十二長生',
+  daYun: '大運',
+  shensha: '神煞',
+  strength: '日主強弱',
+  pattern: '格局',
   mingGong: '命宮',
   shenGong: '身宮',
   fiveElementsClass: '五行局',
@@ -363,6 +378,9 @@ const NUMEROLOGY_FACT_LABELS: Record<string, string> = {
   birthDayDisplay: '生日數',
   calculationMethod: '算法說明',
   calculationNote: '數字說明',
+  personalYearDisplay: '個人流年',
+  personalYearMeaning: '流年含義',
+  comboNote: '主數組合',
 };
 
 const HIDDEN_FACT_KEYS = new Set([
@@ -376,6 +394,12 @@ const HIDDEN_FACT_KEYS = new Set([
   'svg',
   'html',
   'animations',
+  'starroot',
+  'classicTzolkin',
+  'sealNum',
+  'toneNum',
+  'source',
+  'oracle',
 ]);
 
 const HD_VALUE_LABELS: Record<string, string> = {
@@ -637,6 +661,7 @@ function tarotPositionReading(slot: string, position: string, meaning: string): 
 }
 
 function tarotCards(data: Dict): InsightCard[] {
+  const meta = asDict(data.meta);
   return asArray(data.cards).slice(0, 6).map((item, index) => {
     const draw = asDict(item);
     const card = asDict(draw.card);
@@ -644,11 +669,18 @@ function tarotCards(data: Dict): InsightCard[] {
     const slot = cleanText(draw.spread_position) || cleanText(draw.slot) || `位置 ${index + 1}`;
     const position = cleanText(draw.position);
     const meaning = meaningFrom(draw, card) || '這張牌指出你目前最需要面對的心理狀態與下一步提醒。';
+    const style = cleanText(draw.style) || cleanText(meta.tarot_style) || 'ocean_poseidon';
+    const cardId = cleanText(card.id) || cleanText(card.number) || cleanText(draw.drawIndex);
+    const numericId = Number(cardId);
+    const extension = style === 'ocean_poseidon' && Number.isFinite(numericId) && numericId >= 30 ? 'png' : 'webp';
     return {
       title: name,
       subtitle: `${slot} / ${positionLabel(position)}`,
       body: tarotPositionReading(slot, position, meaning),
       tags: keywordsFrom(draw, card),
+      imageSrc: cardId ? `/tarot/cards/${style}/${cardId}.${extension}` : undefined,
+      imageAlt: `${name}，${slot}，${positionLabel(position)}`,
+      imageReversed: position === 'reversed',
     };
   });
 }
@@ -708,7 +740,7 @@ function mayaCards(data: Dict): InsightCard[] {
 }
 
 function gateCards(data: Dict): InsightCard[] {
-  const gates = asArray(data.activatedGates).slice(0, 18);
+  const gates = asArray(data.activatedGates);
   if (!gates.length) return [];
 
   return gates.map((gate, index) => {
@@ -723,6 +755,192 @@ function gateCards(data: Dict): InsightCard[] {
       tags: asArray(item.keywords).map((entry) => cleanText(entry)).filter(Boolean).slice(0, 4),
     };
   });
+}
+
+function humanDesignGateNumber(value: unknown): number | null {
+  const item = asDict(value);
+  const candidate = cleanText(item.gate) || cleanText(item.number) || cleanText(value);
+  const gate = Number(candidate);
+  return Number.isInteger(gate) && gate >= 1 && gate <= 64 ? gate : null;
+}
+
+function humanDesignChannelSignal(value: unknown): HumanDesignChannelSignal | null {
+  const item = asDict(value);
+  const source = Array.isArray(value)
+    ? value
+    : Array.isArray(item.gates)
+      ? item.gates
+      : Array.isArray(item.channel)
+        ? item.channel
+        : Array.isArray(item.value)
+          ? item.value
+          : cleanText(value).split(/\D+/).filter(Boolean);
+  if (source.length < 2) return null;
+
+  const first = humanDesignGateNumber(source[0]);
+  const second = humanDesignGateNumber(source[1]);
+  if (!first || !second) return null;
+
+  const [gate1, gate2] = [first, second].sort((a, b) => a - b);
+  return { gate1, gate2, key: `${gate1}-${gate2}` };
+}
+
+function HumanDesignSignalsPanel({ result, t, locale }: { result: CalcResponse; t: ToolResultCopy; locale: Locale }) {
+  if (result.tool !== 'humandesign') return null;
+
+  const data = result.data ?? {};
+  const gates = Array.from(new Set(
+    asArray(data.activatedGates)
+      .map(humanDesignGateNumber)
+      .filter((gate): gate is number => gate !== null),
+  )).sort((a, b) => a - b);
+  const channels = asArray(data.definedChannels)
+    .map(humanDesignChannelSignal)
+    .filter((channel): channel is HumanDesignChannelSignal => channel !== null);
+  const channelGates = new Set(channels.flatMap((channel) => [channel.gate1, channel.gate2]));
+  const isZh = locale === 'zh-TW';
+  const hd = t.hdPlanar;
+
+  if (!gates.length && !channels.length) return null;
+
+  return (
+    <section className="human-design-signals" aria-labelledby="human-design-signals-title">
+      <div className="human-design-signals__header">
+        <span>{isZh ? '你的固定能量線索' : hd.stageKicker}</span>
+        <h2 id="human-design-signals-title">{isZh ? '你的閘門與通道' : hd.channelsTitle}</h2>
+        <p>{isZh ? '先看完整通道，再看啟動閘門。通道是較穩定的天賦迴路；單一閘門則像經常亮起的開關。' : hd.channelsHint}</p>
+      </div>
+
+      <dl className="human-design-signals__summary">
+        <div>
+          <dt>{isZh ? '啟動閘門' : hd.gateLabel}</dt>
+          <dd>{gates.length}</dd>
+        </div>
+        <div>
+          <dt>{isZh ? '完整通道' : hd.channelsTitle}</dt>
+          <dd>{channels.length}</dd>
+        </div>
+      </dl>
+
+      <div className="human-design-signals__section-head">
+        <h3>{hd.channelsTitle}</h3>
+        <p>{isZh ? '兩端閘門同時啟動，才會形成一條完整通道。' : hd.channelsHint}</p>
+      </div>
+
+      {channels.length > 0 ? (
+        <div className="human-design-signals__channels">
+          {channels.map((channel) => {
+            const copy = hd.channels[channel.key];
+            const name = copy?.name || hd.channelGenericName
+              .replace('{gate1}', String(channel.gate1))
+              .replace('{gate2}', String(channel.gate2));
+            const trait = copy?.trait || hd.channelGenericTrait
+              .replace('{gate1}', String(channel.gate1))
+              .replace('{gate2}', String(channel.gate2));
+            const daily = copy?.daily || hd.channelGenericDaily;
+
+            return (
+              <article key={channel.key} className="human-design-signals__channel">
+                <div className="human-design-signals__channel-line" aria-label={`${isZh ? '完整通道' : hd.channelsTitle} ${channel.gate1}-${channel.gate2}`}>
+                  <strong>{channel.gate1}</strong>
+                  <i aria-hidden="true" />
+                  <strong>{channel.gate2}</strong>
+                </div>
+                <div>
+                  <span>{isZh ? '穩定天賦迴路' : hd.stateDefined}</span>
+                  <h4>{name}</h4>
+                  <p>{trait}</p>
+                  <small><b>{hd.dailyLabel}</b>{daily}</small>
+                </div>
+              </article>
+            );
+          })}
+        </div>
+      ) : (
+        <p className="human-design-signals__empty">{hd.channelsEmpty}</p>
+      )}
+
+      {gates.length > 0 && (
+        <>
+          <div className="human-design-signals__section-head human-design-signals__section-head--gates">
+            <h3>{isZh ? '全部啟動閘門' : hd.gateLabel}</h3>
+            <p>{isZh ? '有連成完整通道的閘門會特別標示；其餘閘門仍然是你可觀察的固定主題。' : hd.circuitDisclaimer}</p>
+          </div>
+          <ol className="human-design-signals__gates">
+            {gates.map((gate) => {
+              const brief = GATE_BRIEFS[gate];
+              return (
+                <li key={gate} className={`human-design-signals__gate${channelGates.has(gate) ? ' is-channel-gate' : ''}`}>
+                  <span>{isZh ? `閘門 ${gate}` : `${hd.gateLabel} ${gate}`}</span>
+                  <strong>{brief?.title || (isZh ? '啟動主題' : hd.stateDefined)}</strong>
+                  {channelGates.has(gate) && <em>{isZh ? '形成完整通道' : hd.channelsTitle}</em>}
+                </li>
+              );
+            })}
+          </ol>
+        </>
+      )}
+    </section>
+  );
+}
+
+function numerologyCards(data: Dict): InsightCard[] {
+  const cards: InsightCard[] = [];
+
+  // 個人流年卡
+  const pyDisplay = cleanText(data.personalYearDisplay);
+  const pyMeaning = cleanText(data.personalYearMeaning);
+  const pyYear = cleanText(data.personalYearCalendarYear);
+  if (pyDisplay && pyMeaning) {
+    cards.push({
+      title: `${pyYear} 個人流年 ${pyDisplay}`,
+      subtitle: '流年數每年轉換，搭配生命靈數看節奏',
+      body: pyMeaning,
+      tags: [`流年 ${pyDisplay}`],
+    });
+  }
+
+  // 四個巔峰數卡
+  const pinnacles = asArray(data.pinnacles);
+  for (const item of pinnacles) {
+    const p = asDict(item);
+    const idx = cleanText(p.index);
+    const pDisplay = cleanText(p.display);
+    const ageLabel = cleanText(p.ageLabel);
+    const archetype = cleanText(p.archetype);
+    const meaning = cleanText(p.meaning);
+    if (!pDisplay) continue;
+    cards.push({
+      title: `第 ${idx} 巔峰｜${pDisplay}`,
+      subtitle: `${ageLabel}${archetype ? '｜' + archetype : ''}`,
+      body: meaning || '這個巔峰描述你在這段時期的人生主題。',
+      tags: [pDisplay, ageLabel].filter(Boolean).slice(0, 2),
+    });
+  }
+
+  // 四個挑戰數卡（合併成一張概覽卡，四期均呈現）
+  const challenges = asArray(data.challenges);
+  if (challenges.length) {
+    const challengeLines = challenges.map((item) => {
+      const c = asDict(item);
+      const cNum = cleanText(c.number);
+      const cAge = cleanText(c.ageLabel);
+      const cMeaning = cleanText(c.meaning);
+      return `第 ${cleanText(c.index)} 挑戰 ${cNum}（${cAge}）：${cMeaning || '—'}`;
+    }).join('\n');
+    const summaryTags = challenges.slice(0, 4).map((item) => {
+      const c = asDict(item);
+      return `C${cleanText(c.index)}=${cleanText(c.number)}`;
+    });
+    cards.push({
+      title: '人生四大挑戰數',
+      subtitle: '挑戰數是各巔峰期最需要整合的內在功課，不是命定弱點',
+      body: challengeLines,
+      tags: summaryTags,
+    });
+  }
+
+  return cards;
 }
 
 function firstQuestion(result: CalcResponse): string {
@@ -1497,17 +1715,18 @@ function buildInsight(result: CalcResponse): ResultInsight {
   const data = result.data ?? {};
   const base = TOOL_COPY[result.tool];
   const keyMap: Record<CalcTool, string[]> = {
-    numerology: ['lifePathDisplay', 'lifePathReduced', 'birthDayDisplay', 'calculationNote', 'lifePathArchetype', 'birthDayArchetype'],
-    maya: ['kin', 'label', 'tone', 'seal', 'classicTzolkin', 'starroot'],
+    numerology: ['lifePathDisplay', 'birthDayDisplay', 'personalYearDisplay', 'comboNote', 'calculationNote', 'lifePathReduced'],
+    maya: ['kin', 'label', 'tone', 'seal'],
     bazi: ['pillars', 'dayMaster', 'dayMasterYinYang', 'dayMasterWuxing', 'wuxing', 'nayin'],
     ziwei: ['mingGong', 'shenGong', 'fiveElementsClass', 'palaces', 'majorStars'],
     tarot: [],
     runes: [],
     astro: ['sun', 'moon', 'ascendant', 'midheaven'],
-    humandesign: ['type', 'authority', 'profile', 'strategy', 'definedCenters', 'definedChannels', 'activatedGates'],
+    humandesign: ['type', 'authority', 'profile', 'strategy', 'definedCenters'],
   };
 
   let cards: InsightCard[] = [];
+  if (result.tool === 'numerology') cards = numerologyCards(data);
   if (result.tool === 'tarot') cards = tarotCards(data);
   if (result.tool === 'runes') cards = runeCards(data);
   if (result.tool === 'maya') cards = mayaCards(data);
@@ -1518,6 +1737,80 @@ function buildInsight(result: CalcResponse): ResultInsight {
     facts: collectFacts(data, keyMap[result.tool]),
     cards,
   };
+}
+
+function ResultReflection({ result, insight, locale }: { result: CalcResponse; insight: ResultInsight; locale: Locale }) {
+  const [match, setMatch] = useState<'yes' | 'partly' | 'no' | null>(null);
+  const [shareNotice, setShareNotice] = useState('');
+  const [savedLocally, setSavedLocally] = useState(false);
+  const isZh = locale === 'zh-TW';
+  const summary = cleanText(insight.intro) || cleanText(insight.title);
+  const shareText = `${insight.title}\n${summary}\nMELE`;
+
+  const share = async () => {
+    const params = new URLSearchParams({
+      tool: result.tool,
+      title: insight.title.slice(0, 90),
+      summary: summary.slice(0, 180),
+      source: 'result-share',
+    });
+    const url = `${window.location.origin}/${locale}/share?${params.toString()}`;
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: insight.title, text: shareText, url });
+        setShareNotice(isZh ? '已開啟分享選單' : 'Share menu opened');
+      } else {
+        await navigator.clipboard.writeText(`${shareText}\n${url}`);
+        setShareNotice(isZh ? '分享文字與連結已複製' : 'Share text and link copied');
+      }
+    } catch (error) {
+      if ((error as Error).name !== 'AbortError') setShareNotice(isZh ? '暫時無法分享，請稍後再試' : 'Unable to share right now');
+    }
+  };
+
+  const saveToDevice = () => {
+    const storageKey = 'mele:guest-results';
+    try {
+      const previous = JSON.parse(window.localStorage.getItem(storageKey) ?? '[]') as CalcResponse[];
+      const unique = previous.filter((item) => !(item.tool === result.tool && item.computed_at === result.computed_at));
+      window.localStorage.setItem(storageKey, JSON.stringify([result, ...unique].slice(0, 5)));
+    } catch {
+      window.localStorage.setItem(storageKey, JSON.stringify([result]));
+    }
+    setSavedLocally(true);
+  };
+
+  return (
+    <section className="result-reflection" aria-labelledby={`result-reflection-${result.tool}`}>
+      <div className="result-reflection__question">
+        <span>{isZh ? '校正這次解讀' : 'Calibrate this reading'}</span>
+        <h2 id={`result-reflection-${result.tool}`}>{isZh ? '這份結果有多像你？' : 'How much does this feel like you?'}</h2>
+        <div role="group" aria-label={isZh ? '結果符合程度' : 'Reading match'}>
+          {([
+            ['yes', isZh ? '很像' : 'Very close'],
+            ['partly', isZh ? '部分符合' : 'Partly'],
+            ['no', isZh ? '不太像' : 'Not really'],
+          ] as const).map(([value, label]) => (
+            <button key={value} type="button" aria-pressed={match === value} onClick={() => setMatch(value)}>{label}</button>
+          ))}
+        </div>
+        {match && <p aria-live="polite">{isZh ? '收到。你的回應會幫助你保留主導權，而不是被結果定義。' : 'Noted. You stay in charge of the interpretation.'}</p>}
+      </div>
+      <div className="result-reflection__share">
+        <span>{isZh ? '帶走這次發現' : 'Take this insight with you'}</span>
+        <h2>{isZh ? '有想到某個朋友嗎？' : 'Did this remind you of someone?'}</h2>
+        <p>{isZh ? '分享的是摘要與連結，不會包含生日、出生時間或地點。' : 'The share includes a summary and link, never your birth details.'}</p>
+        <div className="result-reflection__actions">
+          <button type="button" onClick={share}>{isZh ? '分享這次發現' : 'Share this insight'}</button>
+          <button type="button" onClick={saveToDevice} disabled={savedLocally}>
+            {savedLocally ? (isZh ? '已暫存到這台裝置' : 'Saved on this device') : (isZh ? '暫存這次結果' : 'Save this result')}
+          </button>
+        </div>
+        {shareNotice && <small aria-live="polite">{shareNotice}</small>}
+        {savedLocally && <small aria-live="polite">{isZh ? '只存在這台裝置；登入後的結果會另外保存到「我的 MELE」。' : 'Stored only on this device. Signed-in results are saved separately.'}</small>}
+      </div>
+    </section>
+  );
 }
 
 function countResultSignals(result: CalcResponse): number {
@@ -1536,7 +1829,10 @@ function countResultSignals(result: CalcResponse): number {
   }
   if (result.tool === 'maya') return ['kin', 'tone', 'seal', 'guide', 'analog', 'antipode', 'occult'].filter((key) => data[key]).length;
   if (result.tool === 'astro') return ['sun', 'moon', 'ascendant', 'midheaven'].filter((key) => data[key]).length;
-  return ['lifePathDisplay', 'lifePathReduced', 'birthDayDisplay', 'calculationNote', 'lifePathArchetype', 'birthDayArchetype'].filter((key) => data[key]).length;
+  const pinnacleCount = asArray(data.pinnacles).length;
+  const challengeCount = asArray(data.challenges).length;
+  const baseCount = ['lifePathDisplay', 'birthDayDisplay', 'personalYear', 'comboNote'].filter((key) => data[key]).length;
+  return baseCount + pinnacleCount + challengeCount;
 }
 
 function buildGameProfile(result: CalcResponse, insight: ResultInsight, reading: PersonalReading): GameProfile {
@@ -1559,7 +1855,7 @@ function buildGameProfile(result: CalcResponse, insight: ResultInsight, reading:
     stats: [
       { label: '閱讀完成度', value: `${progress}%`, tone: 'gold' },
       { label: '重點數', value: String(Math.max(insight.facts.length, cardCount, 1)), tone: 'cyan' },
-      { label: '圖面線索', value: String(Math.max(signalCount, reading.points.length)), tone: 'rose' },
+      { label: '可用線索', value: String(Math.max(signalCount, reading.points.length)), tone: 'rose' },
       { label: '建議步驟', value: '3 步', tone: 'violet' },
     ],
     badges,
@@ -1570,9 +1866,9 @@ function buildGameProfile(result: CalcResponse, insight: ResultInsight, reading:
         reward: '你會知道：主軸是什麼',
       },
       {
-        title: '第 2 步｜再看視覺盤',
-        body: '按下方「前往視覺展示」跳到結果視覺區；圖面導覽會說明中間、外圈與線條各代表什麼。',
-        reward: '你會知道：圖面怎麼看',
+        title: '第 2 步｜對照真實生活',
+        body: '挑一張最像你的白話卡片，想一個最近真的發生過的例子。能對照生活，解讀才有用。',
+        reward: '你會知道：這和生活哪裡有關',
       },
       {
         title: '第 3 步｜選一個行動',
@@ -1622,6 +1918,285 @@ function palaceStars(palace: Dict) {
   return stars.slice(0, 4);
 }
 
+// ── 占星專屬詳細排盤面板 ──
+const ASTRO_PLANET_ORDER = ['sun', 'moon', 'mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune', 'pluto'] as const;
+const ASTRO_PLANET_ZH: Record<string, string> = {
+  sun: '太陽', moon: '月亮', mercury: '水星', venus: '金星', mars: '火星',
+  jupiter: '木星', saturn: '土星', uranus: '天王星', neptune: '海王星', pluto: '冥王星',
+};
+const ASTRO_HOUSE_AREAS: Record<number, string> = {
+  1: '自我', 2: '資源', 3: '溝通', 4: '家庭', 5: '創造', 6: '健康',
+  7: '關係', 8: '轉化', 9: '遠景', 10: '事業', 11: '群體', 12: '靈性',
+};
+
+function AstroDetailPanel({ result }: { result: CalcResponse }) {
+  if (result.tool !== 'astro') return null;
+  const data = result.data ?? {};
+  const planets = asDict(data.planets);
+  const aspects = asArray(data.aspects);
+  const houses = asArray(data.houses);
+  const hasPlanets = ASTRO_PLANET_ORDER.some((k) => planets[k]);
+
+  return (
+    <section className="astro-detail" aria-label="占星排盤詳情">
+
+      {/* ── 十行星表 ──
+          草稿（2026-07-07）：資訊分層第一版，密集表格改摺疊，預設收起，只留標題可展開。 */}
+      {hasPlanets && (
+        <details className="astro-detail__planets astro-detail__collapse">
+          <summary>十顆行星位置</summary>
+          <table className="astro-detail__planet-table">
+            <thead>
+              <tr>
+                <th>行星</th>
+                <th>星座</th>
+                <th>度數</th>
+                <th>宮位</th>
+              </tr>
+            </thead>
+            <tbody>
+              {ASTRO_PLANET_ORDER.map((key) => {
+                const p = asDict(planets[key]);
+                if (!p || !p.sign) return null;
+                const sign = asDict(p.sign);
+                const symbol = cleanText(p.symbol);
+                const zh = cleanText(p.zh) || ASTRO_PLANET_ZH[key];
+                const signSymbol = cleanText(sign.symbol);
+                const signZh = cleanText(sign.zh);
+                const deg = Number(sign.degInSign);
+                const house = Number(p.house);
+                const retro = p.retrograde ? ' ℞' : '';
+                return (
+                  <tr key={key}>
+                    <td><span className="astro-detail__symbol">{symbol}</span> {zh}{retro}</td>
+                    <td>{signSymbol} {signZh}</td>
+                    <td>{Number.isFinite(deg) ? `${deg.toFixed(1)}°` : '—'}</td>
+                    <td>{Number.isFinite(house) && house > 0 ? `第${house}宮` : '—'}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </details>
+      )}
+
+      {/* ── 相位 ── */}
+      {aspects.length > 0 && (
+        <details className="astro-detail__aspects astro-detail__collapse">
+          <summary>主要相位</summary>
+          <ul className="astro-detail__aspect-list">
+            {aspects.slice(0, 18).map((item, i) => {
+              const asp = asDict(item);
+              const p1 = cleanText(asp.planet1Zh);
+              const p2 = cleanText(asp.planet2Zh);
+              const type = cleanText(asp.type);
+              const orb = Number(asp.orb);
+              if (!p1 || !p2 || !type) return null;
+              return (
+                <li key={i} className="astro-detail__aspect-item">
+                  <strong>{p1}</strong>
+                  <em>{type}</em>
+                  <strong>{p2}</strong>
+                  {Number.isFinite(orb) && <small>{orb.toFixed(1)}°</small>}
+                </li>
+              );
+            })}
+          </ul>
+        </details>
+      )}
+
+      {/* ── 十二宮 ── */}
+      {houses.length > 0 && (
+        <details className="astro-detail__houses astro-detail__collapse">
+          <summary>十二宮位</summary>
+          <div className="astro-detail__house-grid">
+            {houses.slice(0, 12).map((item, i) => {
+              const h = asDict(item);
+              const hNum = Number(h.house);
+              const sign = asDict(h.sign);
+              const signZh = cleanText(sign.zh);
+              const signSym = cleanText(sign.symbol);
+              const area = Number.isFinite(hNum) ? ASTRO_HOUSE_AREAS[hNum] : '';
+              return (
+                <div key={Number.isFinite(hNum) ? hNum : i} className="astro-detail__house-item">
+                  <span className="astro-detail__house-num">{hNum}</span>
+                  <span className="astro-detail__house-sign">{signSym} {signZh}</span>
+                  {area && <small>{area}</small>}
+                </div>
+              );
+            })}
+          </div>
+        </details>
+      )}
+    </section>
+  );
+}
+
+// ── 八字專屬詳細排盤面板 ──
+const BAZI_PILLAR_LABELS: Record<string, string> = {
+  year: '年柱', month: '月柱', day: '日柱', time: '時柱',
+};
+const BAZI_SHISHEN_TRAD: Record<string, string> = {
+  '劫财': '劫財', '伤官': '傷官', '偏财': '偏財',
+  '正财': '正財', '七杀': '七殺',
+};
+const BAZI_CS_TRAD: Record<string, string> = {
+  '长生': '長生', '冠带': '冠帶', '临官': '臨官', '养': '養', '绝': '絕',
+};
+const BAZI_NAYIN_TRAD: Record<string, string> = {
+  '杨柳木': '楊柳木', '白蜡金': '白臘金',
+  '剑锋金': '劍鋒金', '山头火': '山頭火', '涧下水': '澗下水',
+  '炉中火': '爐中火', '覆灯火': '覆燈火', '钗钏金': '釵釧金',
+  '长流水': '長流水', '霹雳火': '霹靂火', '大驿土': '大驛土',
+  '城头土': '城牆土',
+};
+function baziSs(text: string): string {
+  return BAZI_SHISHEN_TRAD[text] ?? text;
+}
+function baziCs(text: string): string {
+  return BAZI_CS_TRAD[text] ?? text;
+}
+function baziNayin(text: string): string {
+  return BAZI_NAYIN_TRAD[text] ?? text;
+}
+
+function BaziDetailPanel({ result }: { result: CalcResponse }) {
+  if (result.tool !== 'bazi') return null;
+  const data = result.data ?? {};
+  const pillars = asDict(data.pillars);
+  const hiddenStems = asDict(data.hiddenStems);
+  const changSheng = asDict(data.changSheng);
+  const shishenGan = asDict(data.shishen);
+  const nayin = asDict(data.nayin);
+  const shensha = asArray(data.shensha);
+  const strengthData = asDict(data.strength);
+  const patternData = asDict(data.pattern);
+  const daYun = asDict(data.daYun);
+  const daYunSteps = asArray(daYun.steps);
+
+  const pillarKeys = ['year', 'month', 'day', 'time'] as const;
+
+  return (
+    <section className="bazi-detail" aria-label="八字排盤詳情">
+      {/* ── 強弱 + 格局 ── */}
+      {(cleanText(strengthData.strength) || cleanText(patternData.name)) && (
+        <div className="bazi-detail__header">
+          {cleanText(strengthData.strength) && (
+            <div className="bazi-detail__strength">
+              <span>日主強弱</span>
+              <strong>{cleanText(strengthData.strength)}</strong>
+              <p>{cleanText(strengthData.desc)}</p>
+            </div>
+          )}
+          {cleanText(patternData.name) && (
+            <div className="bazi-detail__pattern">
+              <span>格局</span>
+              <strong>{cleanText(patternData.name)}</strong>
+              <p>{cleanText(patternData.yongShenHint)}</p>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ── 四柱藏干表格 ── */}
+      <div className="bazi-detail__pillars">
+        <h3>四柱 · 藏干 · 十神</h3>
+        <div className="bazi-detail__pillar-grid">
+          {pillarKeys.map((key) => {
+            const pillar = asArray(pillars[key]);
+            const gan = cleanText(pillar[0]);
+            const zhi = cleanText(pillar[1]);
+            const ssGan = key !== 'day' ? baziSs(cleanText(shishenGan[key])) : '日主';
+            const cs = cleanText(changSheng[key]);
+            const ny = cleanText(nayin[key]);
+            const stems = asArray(hiddenStems[key]);
+            return (
+              <article key={key} className={`bazi-detail__pillar${key === 'day' ? ' is-day' : ''}`}>
+                <span className="bazi-detail__pillar-label">{BAZI_PILLAR_LABELS[key]}</span>
+                <div className="bazi-detail__pillar-ganzhi">
+                  <strong className="bazi-detail__gan">{gan}</strong>
+                  <span className="bazi-detail__zhi">{zhi}</span>
+                </div>
+                {ssGan && <span className="bazi-detail__ss-gan">{ssGan}</span>}
+                {ny && <span className="bazi-detail__nayin">{baziNayin(ny)}</span>}
+                {cs && <span className="bazi-detail__changsheng">{baziCs(cs)}</span>}
+                {stems.length > 0 && (
+                  <ul className="bazi-detail__hidden-stems">
+                    {stems.slice(0, 3).map((stem, i) => {
+                      const s = asDict(stem);
+                      const stemGan = cleanText(s.gan);
+                      const stemSs = baziSs(cleanText(s.shishen));
+                      const stemRole = cleanText(s.role);
+                      return stemGan ? (
+                        <li key={i}>
+                          <span>{stemGan}</span>
+                          {stemSs && <em>{stemSs}</em>}
+                          {stemRole && <small>{stemRole}</small>}
+                        </li>
+                      ) : null;
+                    })}
+                  </ul>
+                )}
+              </article>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* ── 神煞 ── */}
+      {shensha.length > 0 && (
+        <div className="bazi-detail__shensha">
+          <h3>神煞</h3>
+          <ul>
+            {shensha.map((item, i) => {
+              const ss = asDict(item);
+              return (
+                <li key={i}>
+                  <strong>{cleanText(ss.name)}</strong>
+                  <span>{cleanText(ss.desc)}</span>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      )}
+
+      {/* ── 大運 ── */}
+      {daYunSteps.length > 0 && (
+        <div className="bazi-detail__dayun">
+          <h3>
+            大運
+            {(daYun.startAge != null) && (
+              <span className="bazi-detail__dayun-start">
+                {cleanText(daYun.startAge)}歲{cleanText(daYun.startMonth)}個月起運
+                · {daYun.isForward ? '順行' : '逆行'}
+              </span>
+            )}
+          </h3>
+          <div className="bazi-detail__dayun-steps">
+            {daYunSteps.slice(0, 6).map((step, i) => {
+              const s = asDict(step);
+              const gz = cleanText(s.ganZhi);
+              const ssG = baziSs(cleanText(s.shishenGan));
+              const startAge = cleanText(s.startAge);
+              const endAge = cleanText(s.endAge);
+              const startYear = cleanText(s.startYear);
+              return gz ? (
+                <article key={i} className="bazi-detail__dayun-step">
+                  <strong>{gz}</strong>
+                  {ssG && <span>{ssG}</span>}
+                  <small>{startAge}—{endAge}歲</small>
+                  <small>{startYear}年起</small>
+                </article>
+              ) : null;
+            })}
+          </div>
+        </div>
+      )}
+    </section>
+  );
+}
+
 function ZiweiPlainGuide({ result, t }: { result: CalcResponse; t: ToolResultCopy }) {
   if (result.tool !== 'ziwei') return null;
 
@@ -1631,6 +2206,12 @@ function ZiweiPlainGuide({ result, t }: { result: CalcResponse; t: ToolResultCop
   const wuxing = firstValue(data, ['fiveElementsClass'], '五行局');
   const palaces = palaceListFrom(data).slice(0, 12);
   const g = t.ziweiGuide;
+  // 生年四化（依祿→權→科→忌排序）
+  const _fcOrder: Record<string, number> = { 祿: 0, 權: 1, 科: 2, 忌: 3 };
+  const fourChangesList = asArray(data.fourChanges)
+    .map(asDict)
+    .filter((fc) => fc.mutagen)
+    .sort((a, b) => (_fcOrder[cleanText(a.mutagen)] ?? 9) - (_fcOrder[cleanText(b.mutagen)] ?? 9));
 
   return (
     <section className="ziwei-guide" aria-label={g.kicker}>
@@ -1668,16 +2249,48 @@ function ZiweiPlainGuide({ result, t }: { result: CalcResponse; t: ToolResultCop
         ))}
       </div>
 
+      {/* ── 生年四化 ── */}
+      {fourChangesList.length > 0 && (
+        <div className="ziwei-guide__four-changes">
+          <h3>生年四化</h3>
+          <div className="ziwei-guide__four-changes-grid">
+            {fourChangesList.map((fc, i) => {
+              const m = cleanText(fc.mutagen);
+              const star = cleanText(fc.star);
+              const palace = cleanText(fc.palace);
+              return (
+                <article key={i} data-mutagen={m}>
+                  <span>化{m}</span>
+                  <strong>{star}</strong>
+                  <em>{palace}</em>
+                </article>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       {palaces.length > 0 && (
         <div className="ziwei-guide__palaces">
           {palaces.map((palace, index) => {
             const title = palaceTitle(palace, `第 ${index + 1} 宮`);
             const branch = palaceBranch(palace);
             const stars = palaceStars(palace);
+            // 標記此宮的四化
+            const palaceMutagens = fourChangesList
+              .filter((fc) => cleanText(fc.palace) === title)
+              .map((fc) => cleanText(fc.mutagen));
             return (
               <article key={`${title}-${index}`}>
                 <span>{branch || String(index + 1).padStart(2, '0')}</span>
-                <h3>{title}</h3>
+                <h3>
+                  {title}
+                  {palaceMutagens.length > 0 && (
+                    <span className="ziwei-guide__palace-mutagen">
+                      {palaceMutagens.map((m) => `化${m}`).join(' ')}
+                    </span>
+                  )}
+                </h3>
                 <p>{stars.length > 0 ? stars.join(' / ') : t.palaceNoStar}</p>
               </article>
             );
@@ -1721,6 +2334,7 @@ function BeginnerGuidePanel({ guide }: { guide: BeginnerGuide }) {
   return (
     <section className="beginner-guide" aria-label="beginner guide">
       <div className="beginner-guide__header">
+        {/* 會員初階導讀 */}
         <span>MEMBER STARTER</span>
         <h2>{guide.title}</h2>
         <p>{guide.intro}</p>
@@ -1739,6 +2353,7 @@ function BeginnerGuidePanel({ guide }: { guide: BeginnerGuide }) {
   );
 }
 
+// ResultGamePanel — 新手閱讀順序（READING MAP）引導
 function ResultGamePanel({ profile, t }: { profile: GameProfile; t: ToolResultCopy }) {
   const g = t.game;
   return (
@@ -1772,10 +2387,7 @@ function ResultGamePanel({ profile, t }: { profile: GameProfile; t: ToolResultCo
         ))}
       </div>
 
-      <div className="result-game__actions">
-        <a href="#reading-ar-stage">{g.arLink}</a>
-        <small>下面會把重點拆成白話卡片，不需要懂專有名詞也能讀。</small>
-      </div>
+      <div className="result-game__actions"><small>下面只保留白話重點與可以採取的行動，不需要先學會看盤。</small></div>
     </section>
   );
 }
@@ -1850,6 +2462,19 @@ function ResultInsightPanel({ insight, speech, t }: { insight: ResultInsight; sp
                   key={`${card.title}-${index}`}
                   className={`result-insights__card${isActive ? ' is-active' : ''}${isResonant ? ' is-resonant' : ''}`}
                 >
+                  {card.imageSrc && (
+                    <figure className="result-insights__tarot-art">
+                      <Image
+                        src={card.imageSrc}
+                        alt={card.imageAlt ?? card.title}
+                        width={320}
+                        height={480}
+                        sizes="(max-width: 720px) 78vw, 260px"
+                        className={card.imageReversed ? 'is-reversed' : ''}
+                      />
+                      <figcaption>{card.subtitle}</figcaption>
+                    </figure>
+                  )}
                   <button
                     type="button"
                     className="result-insights__card-button"
@@ -1959,6 +2584,8 @@ function PersonalReadingPanel({ reading, t }: { reading: PersonalReading; t: Too
   );
 }
 
+// RESULT_NEXT_STEPS — 接下來可以這樣看（生活對照、保存、需要時找老師）
+// PointUnlockPanel: 每天可領 200 點，100 點解鎖流日、流月、流年延伸解讀
 function ResultNextSteps({ tool, t }: { tool: CalcTool; t: ToolResultCopy }) {
   const steps = t.nextStepsTools[tool];
   const ns = t.nextSteps;
@@ -1985,6 +2612,7 @@ function ResultNextSteps({ tool, t }: { tool: CalcTool; t: ToolResultCopy }) {
   );
 }
 
+// MEMBER ONBOARDING — 保存這次解讀 / 回到每日儀式 / 找老師深度解讀
 function MemberActionPath({ tool, t }: { tool: CalcTool; t: ToolResultCopy }) {
   const toolName = TOOL_COPY[tool]?.title ?? '';
   const ap = t.actionPath;
@@ -2297,6 +2925,7 @@ function PointUnlockPanel({ result, t }: { result: CalcResponse; t: ToolResultCo
   );
 }
 
+// 結果重點解讀 — 呈現完整解讀結果；正在整理解讀（載入中）；解讀失敗（錯誤狀態）
 export function ToolResult({ result, locale = DEFAULT_LOCALE }: { result: CalcResponse | null; locale?: Locale }) {
   const ref = useRef<HTMLDivElement>(null);
   const savedRecordKeys = useRef<Set<string>>(new Set());
@@ -2345,26 +2974,26 @@ export function ToolResult({ result, locale = DEFAULT_LOCALE }: { result: CalcRe
 
   if (!result) return null;
 
-  const { svg, html, speech } = result.render;
+  const { speech } = result.render;
   const insight = buildInsight(result);
   const personalReading = buildPersonalReading(result);
-  const gameProfile = buildGameProfile(result, insight, personalReading);
   const memberResonance = buildMemberResonance(result);
-  const beginnerGuide = BEGINNER_GUIDES[result.tool];
 
   return (
     <div ref={ref} className={`mele-card tool-result-card tool-result-card--${result.tool} mt-6 animate-fade-in`}>
-      {result.tool !== 'tarot' && result.tool !== 'maya' && svg && result.tool !== 'humandesign' && (
-        <div
-          className={`mele-svg-wrap mele-svg-wrap--${result.tool} mb-6 flex justify-center`}
-          dangerouslySetInnerHTML={{ __html: svg }}
-        />
-      )}
+      {result.tool === 'astro' && <ToolHighlightCards result={result} t={t} />}
 
       <MemberResonancePanel resonance={memberResonance} t={t} />
-      {result.tool !== 'maya' && <ResultInsightPanel insight={insight} speech={result.tool === 'tarot' ? undefined : speech} t={t} />}
+      {result.tool === 'humandesign' && <HumanDesignBodyGraph data={result.data ?? {}} locale={locale} />}
+      <HumanDesignSignalsPanel result={result} t={t} locale={locale} />
+      <ResultInsightPanel insight={insight} speech={result.tool === 'tarot' || result.tool === 'maya' ? undefined : speech} t={t} />
+      <AstroDetailPanel result={result} />
+      <BaziDetailPanel result={result} />
       <ZiweiPlainGuide result={result} t={t} />
       {result.tool !== 'tarot' && <PersonalReadingPanel reading={personalReading} t={t} />}
+      <ResultReflection result={result} insight={insight} locale={locale} />
+      <ResultNextSteps tool={result.tool} t={t} />
+      <MemberActionPath tool={result.tool} t={t} />
       <PointUnlockPanel result={result} t={t} />
       <p className="mt-6 border-t border-accent-dim pt-4 text-center text-[11px] leading-relaxed text-white/40">
         {t.disclaimer}

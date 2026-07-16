@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef, useState } from 'react';
-import { ConsultCTA, ToolShell } from '@/components/ToolShell';
+import { ResultNextSteps, ToolShell } from '@/components/ToolShell';
 import { ToolError, ToolLoading } from '@/components/ToolFeedback';
 import { ToolResultSection } from '@/components/ToolResultSection';
 import { calc, CalcError, type CalcResponse } from '@/lib/api';
@@ -12,6 +12,7 @@ import { getToolPageCopy } from '@/lib/i18n/tool-page-copy';
 export default function TarotPage() {
   const locale = useCurrentLocale();
   const copy = getToolPageCopy(locale, 'tarot');
+  const numerologyCopy = getToolPageCopy(locale, 'numerology');
   const toast = useToast();
   const [question, setQuestion] = useState('');
   const [spread, setSpread] = useState(copy.spreads?.[0]?.value ?? 'three_card');
@@ -43,7 +44,7 @@ export default function TarotPage() {
         spread: selectedSpread?.value ?? 'three_card',
         question: question.trim(),
         tarot_style: tarotStyle,
-      });
+      }, locale);
       setResult(response);
     } catch (err) {
       const message = err instanceof CalcError ? err.message : (err as Error).message;
@@ -56,7 +57,7 @@ export default function TarotPage() {
   };
 
   return (
-    <ToolShell locale={locale} title={copy.title} subtitle={copy.subtitle} description={copy.description} spec={copy.spec}>
+    <ToolShell tool="tarot" locale={locale} title={copy.title} subtitle={copy.subtitle} description={copy.description} spec={copy.spec} themed>
       <form onSubmit={onSubmit} className="mele-card" noValidate>
         <div className="mb-5">
           <label className="mele-label">{copy.question?.label}</label>
@@ -111,7 +112,7 @@ export default function TarotPage() {
         </button>
       </form>
 
-      {loading && <ToolLoading locale={locale} label={copy.loadingLabel} />}
+      {loading && <ToolLoading tool="tarot" locale={locale} label={copy.loadingLabel} />}
       {error && !loading && <ToolError locale={locale} message={error} />}
       {result && !loading && (
         <>
@@ -120,7 +121,12 @@ export default function TarotPage() {
             <div className="text-white/85 italic">“{question}”</div>
           </div>
           <ToolResultSection kind="tarot" result={result} locale={locale} />
-          <ConsultCTA locale={locale} spec={copy.spec} label={copy.title} />
+          <ResultNextSteps
+            locale={locale}
+            spec={copy.spec}
+            alternateHref="/tools/numerology"
+            alternateLabel={numerologyCopy.title}
+          />
         </>
       )}
     </ToolShell>

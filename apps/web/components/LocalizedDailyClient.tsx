@@ -10,6 +10,33 @@ import { localizePath, type Locale } from '@/lib/i18n/config';
 import { getReleasePageCopy } from '@/lib/i18n/release-page-copy';
 
 type Draws = Partial<Record<DailyDrawTool, CalcResponse>>;
+type DailyReflection = { date: string; feeling: string; note: string; updatedAt: string };
+
+const REFLECTION_PREFIX = 'mele:daily-reflection:';
+
+function readReflection(dateKey: string): DailyReflection | null {
+  if (typeof window === 'undefined') return null;
+  try {
+    const raw = window.localStorage.getItem(`${REFLECTION_PREFIX}${dateKey}`);
+    return raw ? JSON.parse(raw) as DailyReflection : null;
+  } catch {
+    return null;
+  }
+}
+
+function readRecentReflections(): DailyReflection[] {
+  if (typeof window === 'undefined') return [];
+  const rows: DailyReflection[] = [];
+  for (let index = 0; index < window.localStorage.length; index += 1) {
+    const key = window.localStorage.key(index);
+    if (!key?.startsWith(REFLECTION_PREFIX)) continue;
+    try {
+      const row = JSON.parse(window.localStorage.getItem(key) ?? '') as DailyReflection;
+      if (row.date) rows.push(row);
+    } catch { /* ignore a damaged local row */ }
+  }
+  return rows.sort((a, b) => b.date.localeCompare(a.date)).slice(0, 7);
+}
 
 function readStoredDraw(tool: DailyDrawTool, dateKey: string) {
   if (typeof window === 'undefined') return null;
@@ -34,6 +61,11 @@ export function LocalizedDailyClient({ locale }: { locale: Locale }) {
   const [active, setActive] = useState<CalcResponse | null>(() => draws.tarot ?? draws.runes ?? null);
   const [loading, setLoading] = useState<DailyDrawTool | null>(null);
   const [error, setError] = useState('');
+  const existingReflection = useMemo(() => readReflection(dateKey), [dateKey]);
+  const [feeling, setFeeling] = useState(existingReflection?.feeling ?? '');
+  const [reflectionNote, setReflectionNote] = useState(existingReflection?.note ?? '');
+  const [reflectionSaved, setReflectionSaved] = useState(Boolean(existingReflection));
+  const [recentReflections, setRecentReflections] = useState<DailyReflection[]>(() => readRecentReflections());
 
   const selected = draws.tarot ? 'tarot' : draws.runes ? 'runes' : null;
 
@@ -83,63 +115,102 @@ export function LocalizedDailyClient({ locale }: { locale: Locale }) {
     }
   }
 
+  function saveReflection() {
+    if (!feeling && !reflectionNote.trim()) return;
+    const row: DailyReflection = { date: dateKey, feeling, note: reflectionNote.trim().slice(0, 500), updatedAt: new Date().toISOString() };
+    window.localStorage.setItem(`${REFLECTION_PREFIX}${dateKey}`, JSON.stringify(row));
+    setReflectionSaved(true);
+    setRecentReflections(readRecentReflections());
+  }
+
   return (
-    <main className="min-h-screen bg-[radial-gradient(circle_at_top,#1a2438_0%,#070b12_46%,#030406_100%)]">
-      <section className="mx-auto flex max-w-6xl flex-col gap-6 px-4 pb-16 pt-20 md:px-8">
-        <div className="grid gap-6 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
-          <div className="ritual-hero">
-            <div className="ritual-kicker">{copy.kicker}</div>
-            <h1>{copy.title}</h1>
-            <p>{copy.body}</p>
-            <div className="ritual-hero__actions">
-              <button
-                type="button"
-                onClick={() => draw('tarot')}
-                className="mele-btn-primary"
-                disabled={loading !== null || (selected !== null && selected !== 'tarot')}
-              >
-                {draws.tarot ? copy.tarotDone : copy.tarot}
-              </button>
-              <button
-                type="button"
-                onClick={() => draw('runes')}
-                className="mele-btn-secondary"
-                disabled={loading !== null || (selected !== null && selected !== 'runes')}
-              >
-                {draws.runes ? copy.runesDone : copy.runes}
-              </button>
+    <div className="mag-tool-page mag-daily-page">
+      <main className="min-h-screen">
+        <section className="mx-auto flex max-w-6xl flex-col gap-6 px-4 pb-16 pt-20 md:px-8">
+          <div className="grid gap-6 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
+            <div className="ritual-hero">
+              <div className="mag-label ritual-kicker">{copy.kicker}</div>
+              <h1 className="mag-daily-page__title">{copy.title}</h1>
+              <p className="mag-daily-page__body">{copy.body}</p>
+              <div className="ritual-hero__actions">
+                <button
+                  type="button"
+                  onClick={() => draw('tarot')}
+                  className="mele-btn-primary"
+                  disabled={loading !== null || (selected !== null && selected !== 'tarot')}
+                >
+                  {draws.tarot ? copy.tarotDone : copy.tarot}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => draw('runes')}
+                  className="mele-btn-secondary"
+                  disabled={loading !== null || (selected !== null && selected !== 'runes')}
+                >
+                  {draws.runes ? copy.runesDone : copy.runes}
+                </button>
+              </div>
+              <p className="ritual-line-link mag-daily-page__body">{copy.oneChoice}</p>
             </div>
-            <p className="ritual-line-link">{copy.oneChoice}</p>
+
+            <aside className="ritual-panel mag-daily-page__panel">
+              <div className="mag-label ritual-kicker">{dateKey}</div>
+              <h2 className="mag-daily-page__title">{copy.resultTitle}</h2>
+              <p className="ritual-summary mag-daily-page__body">{copy.resultHint}</p>
+              <div className="mt-5 grid gap-3">
+                {copy.cards.map((card) => (
+                  <div key={card.title} className="mag-daily-page__card rounded-xl p-4">
+                    <strong className="mag-daily-page__card-title">{card.title}</strong>
+                    <p className="mag-daily-page__body mt-2 text-sm leading-relaxed">{card.body}</p>
+                  </div>
+                ))}
+              </div>
+            </aside>
           </div>
 
-          <aside className="ritual-panel">
-            <div className="ritual-kicker">{dateKey}</div>
-            <h2>{copy.resultTitle}</h2>
-            <p className="ritual-summary">{copy.resultHint}</p>
-            <div className="mt-5 grid gap-3">
-              {copy.cards.map((card) => (
-                <div key={card.title} className="rounded-xl border border-white/10 bg-white/[0.04] p-4">
-                  <strong className="text-accent">{card.title}</strong>
-                  <p className="mt-2 text-sm leading-relaxed text-white/70">{card.body}</p>
+          {loading && <ToolLoading label={copy.loading} locale={locale} />}
+          {error && <ToolError message={error} locale={locale} />}
+          {active && <ToolResultSection kind={active.tool as DailyDrawTool} result={active} locale={locale} />}
+
+          {active && (
+            <section className="daily-reflection" aria-labelledby="daily-reflection-title">
+              <div>
+                <span className="mag-label">{locale === 'zh-TW' ? '晚上回來看一眼' : 'Return this evening'}</span>
+                <h2 id="daily-reflection-title">{locale === 'zh-TW' ? '今天，你有在哪一刻注意到自己？' : 'When did you notice yourself today?'}</h2>
+                <p>{locale === 'zh-TW' ? '不用寫日記。選一個感受，再留一句真正發生的事。' : 'No long journal. Choose a feeling and note one real moment.'}</p>
+              </div>
+              <div className="daily-reflection__feelings" role="group" aria-label={locale === 'zh-TW' ? '今天的感受' : 'Today’s feeling'}>
+                {(locale === 'zh-TW' ? ['有做到', '有注意到', '還在卡住'] : ['I did it', 'I noticed it', 'Still stuck']).map((label) => (
+                  <button key={label} type="button" aria-pressed={feeling === label} onClick={() => { setFeeling(label); setReflectionSaved(false); }}>{label}</button>
+                ))}
+              </div>
+              <label>
+                <span>{locale === 'zh-TW' ? '只寫一句就好' : 'One sentence is enough'}</span>
+                <textarea value={reflectionNote} maxLength={500} onChange={(event) => { setReflectionNote(event.target.value); setReflectionSaved(false); }} placeholder={locale === 'zh-TW' ? '例如：今天開會時，我沒有立刻答應不合理的要求。' : 'For example: I paused before saying yes in today’s meeting.'} />
+              </label>
+              <button className="daily-reflection__save" type="button" onClick={saveReflection} disabled={!feeling && !reflectionNote.trim()}>
+                {reflectionSaved ? (locale === 'zh-TW' ? '已保存今天的回顧' : 'Saved today') : (locale === 'zh-TW' ? '保存今天的回顧' : 'Save reflection')}
+              </button>
+              {recentReflections.length > 0 && (
+                <div className="daily-reflection__trail">
+                  <strong>{locale === 'zh-TW' ? '最近七次回顧' : 'Your last seven reflections'}</strong>
+                  <ol>{recentReflections.map((row) => <li key={row.date}><time>{row.date}</time><span>{row.feeling || row.note}</span></li>)}</ol>
                 </div>
-              ))}
-            </div>
-          </aside>
-        </div>
+              )}
+              <small>{locale === 'zh-TW' ? '封測期間先保存在這台裝置，不會公開或出現在分享內容。' : 'Stored on this device during beta and never included in shared content.'}</small>
+            </section>
+          )}
 
-        {loading && <ToolLoading label={copy.loading} locale={locale} />}
-        {error && <ToolError message={error} locale={locale} />}
-        {active && <ToolResultSection kind={active.tool as DailyDrawTool} result={active} locale={locale} />}
-
-        <div className="flex flex-wrap gap-3">
-          <Link href={localizePath('/tools', locale)} className="mele-btn-secondary">
-            {getReleasePageCopy(locale).mobile.secondary}
-          </Link>
-          <Link href={localizePath('/teachers', locale)} className="home-ghost-link">
-            {getReleasePageCopy(locale).mobile.panels[2]?.action ?? 'Find guidance'}
-          </Link>
-        </div>
-      </section>
-    </main>
+          <div className="flex flex-wrap gap-3">
+            <Link href={localizePath('/tools', locale)} className="mele-btn-secondary">
+              {getReleasePageCopy(locale).mobile.secondary}
+            </Link>
+            <Link href={localizePath('/teachers', locale)} className="mag-daily-page__link">
+              {getReleasePageCopy(locale).mobile.panels[2]?.action ?? 'Find guidance'}
+            </Link>
+          </div>
+        </section>
+      </main>
+    </div>
   );
 }

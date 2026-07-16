@@ -53,8 +53,8 @@ test.describe('Teacher multilingual surfaces', () => {
 
     await page.goto('/en/teacher-portal', { waitUntil: 'domcontentloaded' });
     await expect(page.getByRole('heading', { name: 'Guide Workspace', exact: true })).toBeVisible();
-    await expect(page.getByRole('heading', { name: 'Reading Assist' })).toBeVisible();
-    await expect(page.getByText('Suggested opening questions')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Full guide workspace' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Member Context Brief' })).toBeVisible();
     await expect(page.getByText('老師後台')).toHaveCount(0);
   });
 });

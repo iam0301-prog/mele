@@ -2,6 +2,7 @@
 瑪雅 Tzolkin Dreamspell
 錨點 1987-07-26 (UTC) = Kin 34 (8 Wizard / 8 白巫師)
 """
+
 from datetime import date
 
 ANCHOR = date(1987, 7, 26)
@@ -230,16 +231,24 @@ def find_kin(seal: int, tone: int) -> int | None:
 # 例：Wind (2) ↔ Earth (17)、Dragon (1) ↔ Mirror (18)
 # 驗證來源：Kin 162 (White Wind) 官方 Analog = Red Earth
 ANALOG_TABLE = {
-    1: 18,   # Dragon  ↔ Mirror
-    2: 17,   # Wind    ↔ Earth
-    3: 16,   # Night   ↔ Warrior
-    4: 15,   # Seed    ↔ Eagle
-    5: 14,   # Serpent ↔ Wizard
-    6: 13,   # Worldbridger ↔ Skywalker
-    7: 12,   # Hand    ↔ Human
-    8: 11,   # Star    ↔ Monkey
-    9: 10,   # Moon    ↔ Dog
-    10: 9, 11: 8, 12: 7, 13: 6, 14: 5, 15: 4, 16: 3, 17: 2, 18: 1,
+    1: 18,  # Dragon  ↔ Mirror
+    2: 17,  # Wind    ↔ Earth
+    3: 16,  # Night   ↔ Warrior
+    4: 15,  # Seed    ↔ Eagle
+    5: 14,  # Serpent ↔ Wizard
+    6: 13,  # Worldbridger ↔ Skywalker
+    7: 12,  # Hand    ↔ Human
+    8: 11,  # Star    ↔ Monkey
+    9: 10,  # Moon    ↔ Dog
+    10: 9,
+    11: 8,
+    12: 7,
+    13: 6,
+    14: 5,
+    15: 4,
+    16: 3,
+    17: 2,
+    18: 1,
     19: 20,  # Storm   ↔ Sun
     20: 19,
 }
@@ -273,8 +282,8 @@ def calculate_oracle(kin: int) -> dict:
     #     3 (tone 4, 9)     → +4
     #     4 (tone 5, 10)    → +2
     GUIDE_FAMILY_OFFSET = {0: 0, 1: 3, 2: 1, 3: 4, 4: 2}
-    color_index = (seal_num - 1) % 4         # 0=紅 1=白 2=藍 3=黃
-    self_pos = (seal_num - 1) // 4           # 0..4 在同色族裡的位置
+    color_index = (seal_num - 1) % 4  # 0=紅 1=白 2=藍 3=黃
+    self_pos = (seal_num - 1) // 4  # 0..4 在同色族裡的位置
     tone_mod = (tone_num - 1) % 5
     guide_pos = (self_pos + GUIDE_FAMILY_OFFSET[tone_mod]) % 5
     guide_seal = color_index + 1 + guide_pos * 4

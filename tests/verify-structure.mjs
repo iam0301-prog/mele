@@ -384,6 +384,7 @@ log('middleware lets localized release utility pages render natively', ["'/daily
 log('sitemap emits localized hreflang alternates', sitemapRoute.includes('buildAlternateLanguages') && sitemapRoute.includes('alternates') && sitemapRoute.includes('languages'));
 log('sitemap includes localized utility pages', ["'/daily'", "'/mobile'", "'/ar'", "'/legal/privacy'", "'/legal/tos'", "'/legal/disclaimer'"].every((token) => sitemapRoute.includes(token)));
 const localizedToolsPage = readFileSync('apps/web/app/[locale]/tools/page.tsx', 'utf8');
+const sharedInsightPage = readFileSync('apps/web/app/[locale]/share/page.tsx', 'utf8');
 const localizedBetaPage = readFileSync('apps/web/app/[locale]/beta/page.tsx', 'utf8');
 log(
   'localized beta page routes invite testers into signup',
@@ -397,8 +398,18 @@ log(
     'home-beta-roadmap',
   ].every((token) => localizedBetaPage.includes(token)),
 );
-log('localized tools lobby exposes all calculator entrances', localizedToolsPage.includes('dict.home.tools.map') && localizedToolsPage.includes('dict.nav.tools') && localizedToolsPage.includes('`/tools/${tool.slug}`'));
+log(
+  'localized tools lobby exposes all calculator entrances',
+  localizedToolsPage.includes('TOOL_GROUPS')
+    && localizedToolsPage.includes('group.slugs.map')
+    && localizedToolsPage.includes('dict.nav.tools')
+    && localizedToolsPage.includes('`/tools/${tool.slug}`')
+    && ['numerology', 'maya', 'bazi', 'tarot', 'runes', 'astro', 'ziwei', 'humandesign']
+      .every((tool) => localizedToolsPage.includes(`'${tool}'`)),
+);
 log('sitemap includes the localized tools lobby', sitemapRoute.includes("'/tools'"));
+log('shared insight landing page strips sensitive inputs and returns to the matching tool', sharedInsightPage.includes('safeText') && sharedInsightPage.includes('source=shared-insight') && !sharedInsightPage.includes('birthDate'));
+log('middleware lets the localized shared insight page render natively', i18nMiddleware.includes("'/share'"));
 log('sitemap includes the localized beta entry', sitemapRoute.includes("'/beta'"));
 log('public sitemap no longer publishes the retired spiritual market route', !sitemapRoute.includes("'/spiritual'"));
 
@@ -423,8 +434,15 @@ log(
 log('birth input component offers timezone presets', birthInputs.includes('Taiwan / Hong Kong / Singapore') && birthInputs.includes('UTC'));
 log('birth input component offers location presets', birthInputs.includes('Preset cities') && birthInputs.includes('Taipei') && birthInputs.includes('Singapore'));
 const toolShell = readFileSync('apps/web/components/ToolShell.tsx', 'utf8');
+const toolExperiencePrelude = readFileSync('apps/web/components/ToolExperiencePrelude.tsx', 'utf8');
 const toolPageCopy = readFileSync('apps/web/lib/i18n/tool-page-copy.ts', 'utf8');
 log('tool shell uses localized navigation and CTA copy', ['getToolLocaleCopy', "localizePath('/tools'", 'copy.shell.backLabel', '.consult'].every((token) => toolShell.includes(token) || toolPageCopy.includes(token)));
+log(
+  'all eight tools have distinct discovery promises and three-part reveals',
+  ['numerology', 'maya', 'bazi', 'ziwei', 'tarot', 'runes', 'astro', 'humandesign'].every((tool) => toolExperiencePrelude.includes(`${tool}:`)) &&
+    ['ToolExperiencePrelude', 'ToolResultReveal', 'chapters', 'duration', 'input', 'reveal'].every((token) => toolExperiencePrelude.includes(token)),
+);
+log('tool feedback moves after the experience instead of interrupting the first task', toolShell.indexOf('{children}') < toolShell.indexOf('mag-tool-beta-note--after'));
 log('tool page copy includes translated tool surfaces', ['Maya Calendar Kin', 'Lịch Maya Kin', 'Kalender Maya Kin', 'マヤ暦 Kin', '마야력 Kin', '馬雅曆 Kin'].every((token) => toolPageCopy.includes(token)));
 
 for (const tool of ['bazi', 'ziwei', 'astro', 'humandesign']) {
@@ -460,8 +478,8 @@ for (const [file, rpc] of rpcChecks) {
 const localizedHome = readFileSync('apps/web/app/[locale]/page.tsx', 'utf8');
 log(
   'home page distinguishes primary CTA from secondary route links',
-  localizedHome.includes('home-route-links') &&
-    localizedHome.includes('home-trust-list') &&
+  localizedHome.includes('mag-cta--ghost') &&
+    localizedHome.includes('mag-trust') &&
     localizedHome.includes('aria-label={copy.secondaryRoutesLabel}'),
 );
 const adminApplications = readFileSync('apps/web/app/admin/applications/page.tsx', 'utf8');
@@ -704,9 +722,11 @@ log('legal pages cover privacy terms and disclaimer', ['隱私權政策', '資�
 log('footer links all legal pages', ['/legal/privacy', '/legal/tos', '/legal/disclaimer'].every((token) => footer.includes(token)));
 
 const dailyPage = readFileSync('apps/web/app/daily/page.tsx', 'utf8');
+const localizedDailyClient = readFileSync('apps/web/components/LocalizedDailyClient.tsx', 'utf8');
 log('daily ritual page persists daily_readings', dailyPage.includes('daily_readings') && dailyPage.includes('upsert'));
 log('daily ritual page enforces daily_draws', dailyPage.includes('daily_draws') && dailyPage.includes('draw_date'));
 log('daily ritual page supports guest local daily lock', dailyPage.includes('localDrawKey') && dailyPage.includes('localStorage'));
+log('daily ritual supports a private evening reflection and seven-entry local trail', localizedDailyClient.includes('REFLECTION_PREFIX') && localizedDailyClient.includes('readRecentReflections') && localizedDailyClient.includes('最近七次回顧'));
 log('daily ritual page calls tarot and runes calculators', dailyPage.includes("drawDaily('tarot')") && dailyPage.includes("drawDaily('runes')"));
 log(
   'daily ritual page lets members choose only one daily draw',
@@ -740,27 +760,24 @@ log(
     !zhCommon.includes('老師' + '媒合'),
 );
 log(
-  'localized home presents public-beta command center',
+  'localized home presents formal free positioning without points wording',
   [
-    'PUBLIC BETA · 公開測試中',
-    '每日可領 200 測試點',
-    '100 點解鎖深度解讀',
-    '老師諮詢仍是選項，不是強迫購買',
-    '公開測試流程',
-    '今天請你幫忙測這 4 件事',
+    '免費自我探索工具',
+    '八種命理工具，免費直接用',
+    '老師是選項，不是必須',
   ].every((token) => homePage.includes(token) || zhCommon.includes(token)) &&
+  ['測試點', '點解鎖', 'PUBLIC BETA'].every((token) => !homePage.includes(token)) &&
   [
-    'beta2-hero',
-    'beta2-phone',
-    "from 'next/image'",
-    '/tarot/cards/ocean_poseidon/19.webp',
-    '/maya/totems/yellow-human.png',
+    'mag-home',
+    'mag-hero',
+    'mag-toc',
+    'mag-cta',
   ].every((token) => homePage.includes(token)) &&
     [
-      '.beta2-hero',
-      '.beta2-phone',
-      '.beta2-public-panel',
-      '.beta2-final-cta',
+      '.mag-home',
+      '.mag-hero',
+      '.mag-toc',
+      '.mag-cta',
     ].every((token) => homeGlobalCss.includes(token)),
 );
 
@@ -786,7 +803,7 @@ log('teacher portal keeps booking table mobile readable', teacherPortal.includes
 log(
   'teacher portal includes actionable readiness checklist',
   ['TeacherPortalReadiness', 'copy.readiness.items.profile', 'copy.readiness.items.services', 'copy.readiness.items.testMode'].every((token) => teacherPortal.includes(token)) &&
-    ['後台準備度', '公開頁完整度', '服務項目已設定', '測試模式提醒'].every((token) => teacherCopy.includes(token)),
+    ['後台準備度', '公開頁完整度', '服務項目已設定', '費用說明'].every((token) => teacherCopy.includes(token)),
 );
 
 const myBookingsPage = readFileSync('apps/web/app/account/mybookings/page.tsx', 'utf8');
@@ -808,7 +825,7 @@ log(
   'my bookings shows free test bookings without payment CTA',
   myBookingsPage.includes('payment_provider') &&
     myBookingsPage.includes('free_test') &&
-    myBookingsPage.includes('測試期免費'),
+    myBookingsPage.includes('免費'),
 );
 
 const bookingExperiencePage = readFileSync('apps/web/app/account/book/page.tsx', 'utf8');
@@ -832,7 +849,7 @@ log(
     bookingExperiencePage.includes("rpc('create_booking_request'") &&
     bookingExperiencePage.includes('p_free_test_mode') &&
     bookingExperiencePage.includes('/account/mybookings') &&
-    bookingExperiencePage.includes('測試期免費') &&
+    bookingExperiencePage.includes('目前免費') &&
     !bookingExperiencePage.includes(".from('bookings').insert("),
 );
 
@@ -848,6 +865,11 @@ log(
   ['copy.directory.title', 'copy.directory.guidanceCta', 'copy.directory.detailAction', 'copy.directory.emptyAction'].every((token) => teachersPage.includes(token)) &&
     ['諮詢老師入口', '進入諮詢引導', '查看老師詳情', '申請成為 MELE 諮詢老師'].every((token) => teacherCopy.includes(token)) &&
     !teacherCopy.includes('命理' + '媒合中心'),
+);
+log(
+  'teacher list ranks guides by member need and explains each recommendation',
+  ['TEACHER_NEEDS', 'visibleTeachers', '推薦原因', 'aria-pressed'].every((token) => teachersPage.includes(token))
+    && ['.teacher-needs', '.mag-author-card__match'].every((token) => readFileSync('apps/web/app/globals.css', 'utf8').includes(token)),
 );
 
 const teacherApplyPage = readFileSync('apps/web/app/teachers/apply/page.tsx', 'utf8');
@@ -883,7 +905,7 @@ const humanDesignToolPage = readFileSync('apps/web/app/tools/humandesign/page.ts
 log('tarot reading result includes AR stage', tarotPage.includes('ToolResultSection') && tarotPage.includes('kind="tarot"'));
 log('runes reading result includes AR stage', runesPage.includes('ToolResultSection') && runesPage.includes('kind="runes"'));
 log('tarot page offers three visual styles', ['forest_athena', 'ocean_poseidon', 'ancient_pharaoh'].every((style) => toolPageCopy.includes(style)) && tarotPage.includes('tarot_style: tarotStyle'));
-log('runes page offers three material choices', ['stone', 'wood', 'crystal'].every((material) => toolPageCopy.includes(`value: '${material}'`)) && runesPage.includes('material,'));
+log('runes page removes decorative material choices and sends one stable backend material', !runesPage.includes('rune-material-grid') && runesPage.includes("material: 'stone'"));
 log('tarot and runes pages use localized form copy', ['Forest Athena', 'Ocean Poseidon', 'Ancient Pharaoh', 'Draw cards'].every((token) => toolPageCopy.includes(token)) && ['Stone', 'Wood', 'Crystal', 'Draw runes'].every((token) => toolPageCopy.includes(token)));
 log('core tool pages have clean Traditional Chinese copy', [
   [numerologyPage, ["calc('numerology'", 'DateOnlyField', 'ToolResultSection', "getToolPageCopy(locale, 'numerology')"]],
@@ -925,7 +947,7 @@ log('mobile matching UI has dedicated CSS', ['.mobile-match-steps', '.mobile-mat
 
 const arStage = readFileSync('apps/web/components/ArRelicStage.tsx', 'utf8');
 log('AR relic stage includes human-design/plate/card/stone modes', arStage.includes("'human-design'") && arStage.includes("'plate'") && arStage.includes("'card'") && arStage.includes("'stone'"));
-log('AR relic stage avoids unfinished GLB/model-viewer output', !arStage.includes('@google/model-viewer') && !arStage.includes('<model-viewer') && arStage.includes('AR / 3D'));
+log('2D reveal stage avoids unfinished GLB/model-viewer output', !arStage.includes('@google/model-viewer') && !arStage.includes('<model-viewer') && arStage.includes('2D 動態解盤舞台'));
 log('AR relic stage uses stable 2D visual previews', ['RelicPreview', '2D VISUAL READY', 'ritual-relic--${mode}', 'targetFor'].every((token) => arStage.includes(token)));
 const readingArStage = readFileSync('apps/web/components/ReadingArStage.tsx', 'utf8');
 log('reading AR stage binds tarot/rune result details', readingArStage.includes('getTarotDraw') && readingArStage.includes('getRuneDraw') && readingArStage.includes('positionLabel'));
@@ -952,6 +974,8 @@ log('result CSS includes interactive reading card states', ['.result-insights__m
 log('result CSS includes member onboarding path cards', ['.member-action-path', '.member-action-path__steps', '.member-action-path__step.is-primary', '.member-action-path__actions'].every((token) => globalCss.includes(token)));
 log('CSS includes teacher readiness surfaces', ['.teacher-readiness', '.teacher-readiness__grid', '.teacher-readiness__item.is-complete', '.teacher-readiness__actions'].every((token) => globalCss.includes(token)));
 const toolResult = readFileSync('apps/web/components/ToolResult.tsx', 'utf8');
+const humanDesignBodyGraph = readFileSync('apps/web/components/HumanDesignBodyGraph.tsx', 'utf8');
+const humanDesignChannelGuide = readFileSync('apps/web/lib/human-design-channel-guide.ts', 'utf8');
 const memberUnlocks = existsSync('apps/web/lib/member-unlocks.ts')
   ? readFileSync('apps/web/lib/member-unlocks.ts', 'utf8')
   : '';
@@ -997,19 +1021,23 @@ log(
     !mayaTotemGlyph.includes('<circle'),
 );
 log(
-  'maya result uses totem glyphs in gallery, cards, and visual stage',
-  toolResult.includes('MayaTotemGallery') &&
-    toolResult.includes('MayaOracleBoard') &&
-    toolResult.includes('MayaTotemGlyph') &&
-    toolResult.includes('mayaSeal') &&
-    readingArStage.includes('MayaTotemGlyph') &&
-    readingArStage.includes('sculpture-plate__maya-totem') &&
-    globalCss.includes('.maya-oracle-board') &&
-    globalCss.includes('.maya-totem-gallery') &&
-    globalCss.includes('.sculpture-plate__maya-totem'),
+  'maya result keeps explained cards but removes the standalone oracle board',
+  toolResult.includes('MayaTotemGlyph') && toolResult.includes('ResultInsightPanel') && !toolResult.includes('<MayaOracleBoard'),
 );
 log('tool result gives members an actionable onboarding path', ['MemberActionPath', 'MEMBER ONBOARDING', '保存這次解讀', '/account/login?return=/account/charts', '回到每日儀式', '找老師深度解讀'].every((token) => toolResult.includes(token)));
-log('tool result cards get per-tool ornate styling hooks', toolResult.includes('tool-result-card--${result.tool}') && toolResult.includes('mele-svg-wrap--${result.tool}'));
+log('tool result cards keep per-tool styling without injecting unexplained SVG boards', toolResult.includes('tool-result-card--${result.tool}') && !toolResult.includes('dangerouslySetInnerHTML={{ __html: svg }}'));
+log('maya result hides raw Starroot and numeric implementation fields', ['starroot', 'sealNum', 'toneNum'].every((token) => toolResult.includes(`'${token}'`)) && !toolResult.includes("starroot: 'Starroot 對照'"));
+log('tarot result cards restore meaningful card art with position and reversal context', ['imageSrc', 'imageAlt', 'imageReversed', '/tarot/cards/${style}/${cardId}.${extension}', 'result-insights__tarot-art'].every((token) => toolResult.includes(token)));
+log(
+  'Human Design result presents a native interactive BodyGraph plus every activated gate and defined channel',
+  ['HumanDesignSignalsPanel', 'humanDesignChannelSignal', 'human-design-signals__channels', 'human-design-signals__gates', '完整通道'].every((token) => toolResult.includes(token)) &&
+    ['definedChannels.map', 'HD_GATE_TO_CENTER', 'designBodies', 'personalityBodies', 'hd-live__graph', 'aria-pressed'].every((token) => humanDesignBodyGraph.includes(token)) &&
+    ['HD_CHANNELS', 'HD_CHANNEL_GUIDE', '36 條通道總表', '已開啟時', '未開啟時', '在圖上定位'].every((token) => humanDesignBodyGraph.includes(token)) &&
+    (humanDesignChannelGuide.match(/\n  '\d+-\d+':/g) || []).length === 36 &&
+    ['.human-design-signals__channel', '.human-design-signals__gate', '.human-design-signals__channel-line'].every((token) => globalCss.includes(token)) &&
+    ['.hd-live__workspace', '.hd-live__center', '.hd-live__activation'].every((token) => globalCss.includes(token)) &&
+    !toolResult.includes('<HumanDesignPlanarStage'),
+);
 log('tool result adds readable per-tool explanations', ['TOOL_COPY', 'buildInsight', 'ResultInsightPanel', 'result-insights', 'tarotCards', 'runeCards', 'gateCards'].every((token) => toolResult.includes(token)));
 log(
   'tool result adds beginner member guide for all calculators',
@@ -1032,13 +1060,13 @@ log(
     '這裡很適合延伸成一場老師諮詢',
   ].every((token) => toolResult.includes(token)),
 );
-log('tool result gives clear post-reading next steps', ['RESULT_NEXT_STEPS', 'ResultNextSteps', '\u63a5\u4e0b\u4f86\u53ef\u4ee5\u9019\u6a23\u770b', '\u9810\u7d04\u8001\u5e2b\u89e3\u8b80', '2D'].every((token) => toolResult.includes(token)));
+log('tool result gives clear post-reading next steps without a visual-board detour', ['RESULT_NEXT_STEPS', 'ResultNextSteps', 'result-next-steps', 'bookTeacher', 'viewHistory'].every((token) => toolResult.includes(token)) && !toolResult.includes('2D'));
 log('tool result covers every calculator explanation type', ['numerology', 'maya', 'bazi', 'ziwei', 'tarot', 'runes', 'astro', 'humandesign'].every((tool) => toolResult.includes(`${tool}:`)));
 log('tool result has clean Chinese result states', ['結果重點解讀', '生命靈數解讀', '塔羅牌解讀', '正在整理解讀', '解讀失敗'].every((token) => toolResult.includes(token)));
 log('tool result gives unique Maya and Human Design card copy', toolResult.includes('MAYA_ORACLE_COPY') && toolResult.includes('GATE_BRIEFS') && toolResult.includes('顯示生產者') && toolResult.includes('情緒權威'));
 log('result CSS prevents compressed unreadable mobile charts', ['.result-insights', 'overflow-wrap: anywhere', '@media (max-width: 720px)', 'overflow-x: auto', 'width: 860px'].every((token) => globalCss.includes(token)));
 log('tool result uses beginner-readable reading map', ['GAME_META', 'buildGameProfile', 'ResultGamePanel', 'READING MAP', '新手閱讀順序', '第 1 步｜先看核心主題', '不用一次看懂全部'].every((token) => toolResult.includes(token)));
-log('tool result gamified quest links to visual stage', ['#reading-ar-stage', '前往視覺展示', '穩定 2D 展示'].every((token) => toolResult.includes(token)) && readingArStage.includes('id="reading-ar-stage"'));
+log('tool result reading map prioritizes a real-life example instead of a visual stage', ['第 2 步｜對照真實生活', '能對照生活，解讀才有用'].every((token) => toolResult.includes(token)) && !toolResult.includes('#reading-ar-stage'));
 log('result CSS includes gamified quest panel', ['.result-game', '.result-game__meter', '.result-game__stats', '.result-game__badges', '.result-game__quests', '.result-game__actions'].every((token) => globalCss.includes(token)));
 log(
   'tool result exposes member point unlock flow',
@@ -1101,6 +1129,11 @@ log(
   'teacher workbench briefs prioritize client issue and plain Human Design gates',
   ['parseClientIssueContext', 'clientIssueSummary', '先了解客人', '針對客人問題', '先翻成人話', '不是少了這個能力'].every((token) => teacherConsultationBriefs.includes(token)),
 );
+log(
+  'teacher workbench includes a fullscreen five-chapter 2D consultation stage',
+  ['consultation-live-stage', 'requestFullscreen', "setLiveStageKey('opening')", 'merged.sopStages'].every((token) => teacherBriefWorkbench.includes(token))
+    && ['.consultation-live-stage__chapters', '.consultation-live-stage__canvas', ':fullscreen'].every((token) => globalCss.includes(token)),
+);
 const explanations = readFileSync('python_api/engines/explanations.py', 'utf8');
 log('backend explanations include non-repetitive Maya oracle roles', explanations.includes('MAYA_ORACLE_ROLES') && explanations.includes('這股力量不是敵人') && !explanations.includes('提醒你從不同角度理解本命 Kin'));
 log('backend explanations include richer Bazi day-master guidance', explanations.includes('DAY_MASTER_GUIDE') && explanations.includes('PILLAR_ROLES') && explanations.includes('月令、十神、格局'));
@@ -1148,7 +1181,7 @@ log(
   paymentPage.includes('NEXT_PUBLIC_ENABLE_FREE_BOOKING_TEST_MODE') &&
     paymentPage.includes('free_test') &&
     paymentPage.includes("bookingData.status === 'pending'") &&
-    paymentPage.includes('測試期免費'),
+    paymentPage.includes('目前免費體驗'),
 );
 const paymentResultPage = readFileSync('apps/web/app/account/payment/result/page.tsx', 'utf8');
 log('payment result page shows booking state and recovery actions', ['付款已收到', '付款狀態確認中', '查看我的預約', 'ClientBackURL'].every((token) => paymentResultPage.includes(token)));

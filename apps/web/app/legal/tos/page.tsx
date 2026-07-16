@@ -29,7 +29,7 @@ const teacherTerms = [
 
 export default function TosPage() {
   return (
-    <article className="container mx-auto max-w-4xl px-5 py-12">
+    <article className="mag-legal-page container mx-auto max-w-4xl px-5 py-12">
       <header className="pb-8 text-center">
         <h1 className="mb-2 font-serif text-3xl tracking-widest">服務條款</h1>
         <div className="mele-subtitle">TERMS OF SERVICE</div>

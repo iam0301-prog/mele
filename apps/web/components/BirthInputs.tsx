@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { DEFAULT_LOCALE, type Locale } from '@/lib/i18n/config';
 import { timezoneOffsetAt } from '@/lib/timezone';
 
@@ -554,6 +555,11 @@ export function DateOnlyField({
           <DateSegmentPicker value={date} onChange={onDateChange} label={dateLabel} copy={copy} />
           <small>{formatDateDisplay(date, copy)}</small>
         </div>
+        <p className="birth-inputs__privacy">
+          {locale === 'zh-TW'
+            ? '你的出生資料只用來產生這次結果，不會出現在分享內容中。'
+            : 'Your birth data is used for this reading and never appears in shared content.'}
+        </p>
         {hint && <p className="birth-inputs__hint">{hint}</p>}
       </div>
     </div>
@@ -586,6 +592,22 @@ export function BirthDateTimeFields({
   const copy = copyFor(locale);
   const resolvedDateLabel = dateLabel ?? copy.dateLabel;
   const resolvedTimeLabel = timeLabel ?? copy.timeLabel;
+  // 快速選時間有兩顆按鈕（例如「中午 12:00」與「未知 12:00」）共用同一個時間值，
+  // 只靠時間值判斷選取會讓兩顆同時亮起。改用「按了哪一顆」記住身分；
+  // 手動用時間選擇器調整時間時，清掉這個記憶，回到用值比對（跟原本行為一致，只是這種情境很少見）。
+  const [selectedQuickTimeIndex, setSelectedQuickTimeIndex] = useState<number | null>(null);
+  const [timeConfidence, setTimeConfidence] = useState<'exact' | 'approximate' | 'unknown'>('exact');
+  const confidenceOptions = locale === 'zh-TW'
+    ? [
+        { value: 'exact', label: '我知道準確時間', hint: '依分鐘輸入' },
+        { value: 'approximate', label: '只知道大約時間', hint: '選最接近時段' },
+        { value: 'unknown', label: '不知道出生時間', hint: '先用中午計算' },
+      ] as const
+    : [
+        { value: 'exact', label: 'I know the exact time', hint: 'Enter hour and minute' },
+        { value: 'approximate', label: 'I know roughly', hint: 'Choose the closest time' },
+        { value: 'unknown', label: 'I do not know', hint: 'Use noon for now' },
+      ] as const;
 
   return (
     <div className="birth-inputs birth-inputs--oracle">
@@ -601,32 +623,90 @@ export function BirthDateTimeFields({
           <strong>{formatDateDisplay(date, copy)} / {formatTimeDisplay(time, copy)}</strong>
         </div>
 
+        <div className="birth-inputs__confidence">
+          <div className="birth-inputs__caption">{locale === 'zh-TW' ? '出生時間掌握程度' : 'How well do you know the birth time?'}</div>
+          <div role="group" aria-label={locale === 'zh-TW' ? '出生時間掌握程度' : 'Birth time confidence'}>
+            {confidenceOptions.map((option) => (
+              <button
+                key={option.value}
+                type="button"
+                aria-pressed={timeConfidence === option.value}
+                className={timeConfidence === option.value ? 'is-active' : ''}
+                onClick={() => {
+                  setTimeConfidence(option.value);
+                  setSelectedQuickTimeIndex(null);
+                  if (option.value === 'unknown') onTimeChange('12:00');
+                }}
+              >
+                <strong>{option.label}</strong>
+                <small>{option.hint}</small>
+              </button>
+            ))}
+          </div>
+        </div>
+
         <div className="birth-inputs__grid birth-inputs__picker-grid">
           <div className="birth-inputs__field">
             <span>{resolvedDateLabel} *</span>
             <DateSegmentPicker value={date} onChange={onDateChange} label={resolvedDateLabel} copy={copy} />
             <small>{formatDateDisplay(date, copy)}</small>
           </div>
-          <div className="birth-inputs__field birth-inputs__field--time">
+          {timeConfidence !== 'unknown' && <div className="birth-inputs__field birth-inputs__field--time">
             <span>{resolvedTimeLabel} *</span>
-            <TimeSegmentPicker value={time} onChange={onTimeChange} label={resolvedTimeLabel} copy={copy} />
+            <TimeSegmentPicker
+              value={time}
+              onChange={(value) => {
+                setSelectedQuickTimeIndex(null);
+                onTimeChange(value);
+              }}
+              label={resolvedTimeLabel}
+              copy={copy}
+            />
             <small>{time ? copy.timeSelected : copy.selectedTimePlaceholder}</small>
-          </div>
+          </div>}
         </div>
 
-        <div className="birth-inputs__quick">
+        {timeConfidence !== 'exact' && timeConfidence !== 'unknown' && <div className="birth-inputs__quick">
           <div className="birth-inputs__caption">{copy.quickTimeCaption}</div>
           <div className="birth-inputs__chips birth-inputs__chips--time">
-            {copy.quickTimes.map((item, index) => (
-              <button key={`${item.value}-${index}`} type="button" className={time === item.value ? 'is-active' : ''} onClick={() => onTimeChange(item.value)}>
-                <span>{item.label}</span>
-                <strong>{item.value}</strong>
-                <small>{item.hint}</small>
-              </button>
-            ))}
+            {copy.quickTimes.slice(0, 4).map((item, index) => {
+              const isSelected = selectedQuickTimeIndex === null
+                ? time === item.value
+                : selectedQuickTimeIndex === index;
+              return (
+                <button
+                  key={`${item.value}-${index}`}
+                  type="button"
+                  className={isSelected ? 'is-active' : ''}
+                  onClick={() => {
+                    setSelectedQuickTimeIndex(index);
+                    onTimeChange(item.value);
+                  }}
+                >
+                  <span>{item.label}</span>
+                  <strong>{item.value}</strong>
+                  <small>{item.hint}</small>
+                </button>
+              );
+            })}
           </div>
           <p className="birth-inputs__hint">{unknownTimeHint ?? copy.dateTimeBody}</p>
-        </div>
+        </div>}
+
+        {timeConfidence === 'unknown' && (
+          <div className="birth-inputs__unknown-note" role="status">
+            <strong>{locale === 'zh-TW' ? '可以繼續使用' : 'You can continue'}</strong>
+            <p>{locale === 'zh-TW'
+              ? '系統會先以 12:00 建立結果；與精準時間相關的宮位或細節只能作為參考，之後可再補資料重算。'
+              : 'We will use 12:00 for now. Time-sensitive details are approximate, and you can recalculate later.'}</p>
+          </div>
+        )}
+
+        <p className="birth-inputs__privacy">
+          {locale === 'zh-TW'
+            ? '出生日期、時間與地點不會出現在分享卡；登入後才會依你的選擇保存。'
+            : 'Birth date, time, and location never appear in shared cards. Saving is optional after sign-in.'}
+        </p>
       </div>
 
       {typeof timezone === 'number' && onTimezoneChange && (
@@ -714,6 +794,9 @@ export function LocationFields({
             </button>
           ))}
         </div>
+        <p className="birth-inputs__privacy">
+          {locale === 'zh-TW' ? '地點只用於盤面計算，分享內容不會顯示座標。' : 'Location is used for chart calculation and coordinates are never shared.'}
+        </p>
       </div>
     </div>
   );

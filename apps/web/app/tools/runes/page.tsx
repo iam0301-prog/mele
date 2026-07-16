@@ -14,7 +14,6 @@ export default function RunesPage() {
   const copy = getToolPageCopy(locale, 'runes');
   const toast = useToast();
   const [question, setQuestion] = useState('');
-  const [material, setMaterial] = useState(copy.materials?.[0]?.value ?? 'stone');
   const [spread, setSpread] = useState(copy.spreads?.[1]?.value ?? 'three');
   const [reversed, setReversed] = useState(true);
   const [loading, setLoading] = useState(false);
@@ -41,9 +40,9 @@ export default function RunesPage() {
         count: selectedSpread?.count ?? 3,
         reversed,
         spread: selectedSpread?.value ?? 'three',
-        material,
+        material: 'stone',
         question: question.trim(),
-      });
+      }, locale);
       setResult(response);
     } catch (err) {
       const message = err instanceof CalcError ? err.message : (err as Error).message;
@@ -56,7 +55,7 @@ export default function RunesPage() {
   };
 
   return (
-    <ToolShell locale={locale} title={copy.title} subtitle={copy.subtitle} description={copy.description} spec={copy.spec}>
+    <ToolShell tool="runes" locale={locale} title={copy.title} subtitle={copy.subtitle} description={copy.description} spec={copy.spec} themed>
       <form onSubmit={onSubmit} className="mele-card" noValidate>
         <div className="mb-5">
           <label className="mele-label">{copy.question?.label}</label>
@@ -69,27 +68,6 @@ export default function RunesPage() {
             className="mele-input"
           />
           {copy.question?.hint && <p className="text-xs text-white/50 mt-2">{copy.question.hint}</p>}
-        </div>
-
-        <div className="mb-5">
-          <label className="mele-label">{copy.materialLabel}</label>
-          <div className="rune-material-grid">
-            {copy.materials?.map((item) => (
-              <button
-                key={item.value}
-                type="button"
-                onClick={() => setMaterial(item.value)}
-                aria-pressed={material === item.value}
-                className={material === item.value ? 'is-active' : ''}
-              >
-                <span className={`rune-material-preview rune-material-preview--${item.value}`} aria-hidden="true">
-                  <i />
-                </span>
-                <strong>{item.label}</strong>
-                <small>{item.desc}</small>
-              </button>
-            ))}
-          </div>
         </div>
 
         <div className="mb-5">
@@ -111,7 +89,7 @@ export default function RunesPage() {
         </button>
       </form>
 
-      {loading && <ToolLoading locale={locale} label={copy.loadingLabel} />}
+      {loading && <ToolLoading tool="runes" locale={locale} label={copy.loadingLabel} />}
       {error && !loading && <ToolError locale={locale} message={error} />}
       {result && !loading && (
         <>

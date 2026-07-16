@@ -98,8 +98,8 @@ export default async function PaymentResultPage({ searchParams }: { searchParams
     <main className="container mx-auto max-w-2xl px-5 py-12">
       {/* PAYMENT_GATE: 公測期間此頁不應被使用者觸達。保留供正式收費時使用。 */}
       <div className="mb-6 rounded-xl border border-success/30 bg-success/10 p-4 text-sm text-success leading-relaxed">
-        <strong>公測期免費體驗</strong>
-        <p className="mt-1 text-white/70">目前平台處於公測期，所有諮詢預約均為免費體驗。</p>
+        <strong>目前免費體驗</strong>
+        <p className="mt-1 text-white/70">目前所有諮詢預約均為免費體驗。</p>
         <Link href="/account/mybookings" className="mt-2 inline-block text-accent underline text-xs">前往我的諮詢</Link>
       </div>
       {/* PAYMENT_GATE: 公測期間整個付款結果 section 隱藏，不渲染金額與交易資訊。

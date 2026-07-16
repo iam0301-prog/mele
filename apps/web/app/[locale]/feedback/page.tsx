@@ -24,21 +24,21 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const locale = await resolveLocale(params);
   const isEnglish = locale === 'en';
   return {
-    title: isEnglish ? 'Public Beta Feedback' : '公開測試回報',
+    title: isEnglish ? 'Feedback | MELE' : '使用意見回報 | MELE',
     description: isEnglish
-      ? 'Tell MELE what felt confusing, broken, useful, or worth improving during public beta.'
-      : '回報 MELE 公開測試期間看不懂、卡住、有感或需要改善的地方。',
+      ? 'Tell MELE what felt confusing, broken, useful, or worth improving.'
+      : '告訴 MELE 你在哪裡看不懂、卡住、有感，或值得改善的地方。',
   };
 }
 
 const copy = {
   'zh-TW': {
-    eyebrow: 'PUBLIC BETA FEEDBACK',
-    title: '回報一個卡住點，就能幫 MELE 更接近公開。',
-    body: '公開測試最需要的不是漂亮稱讚，而是「我在哪一步看不懂、按不下去、不敢相信」。請先用下面格式回報，正式表單串好前，這頁就是測試者的回報入口。',
+    eyebrow: 'FEEDBACK',
+    title: '使用有感？還是哪裡卡住了？都歡迎告訴我們。',
+    body: '最有價值的不是漂亮稱讚，而是「我在哪一步看不懂、按不下去、不確定怎麼繼續」。請先用下面格式回報，也可以直接寄信。',
     primary: '複製回報格式',
-    secondary: '回到公開測試',
-    tertiary: '繼續測工具',
+    secondary: '回首頁',
+    tertiary: '繼續探索工具',
     sections: [
       {
         title: '1. 你剛剛在哪裡？',
@@ -66,16 +66,16 @@ const copy = {
       '手機 / 瀏覽器：',
       '截圖：有 / 無',
     ],
-    noteTitle: '公開測試處理原則',
+    noteTitle: '意見回報處理原則',
     noteBody: '登入、資料保存異常優先處理；文字不清楚與手機版擁擠第二優先；個人解讀內容是否有感會累積成下一輪內容修正。',
   },
   en: {
-    eyebrow: 'PUBLIC BETA FEEDBACK',
-    title: 'Report one point of friction and help MELE get closer to launch.',
-    body: 'Public beta does not need polished praise. It needs the moment where you felt confused, stuck, or unsure whether to trust the product. Until the final form is connected, this page is the feedback entry.',
+    eyebrow: 'FEEDBACK',
+    title: 'Something felt off, or something worked well? Tell us.',
+    body: 'The most useful feedback is not polished praise. It is the moment you felt confused, stuck, or unsure whether to trust the product. Use the format below or send directly by email.',
     primary: 'Copy feedback format',
-    secondary: 'Back to public beta',
-    tertiary: 'Keep testing tools',
+    secondary: 'Back to home',
+    tertiary: 'Keep exploring tools',
     sections: [
       { title: '1. Where were you?', body: 'Home, daily ritual, tarot result, numerology, login, guide page, tool result, etc.' },
       { title: '2. What happened?', body: 'Confusing copy, unclear button, cramped mobile layout, generic result, login redirect issue, etc.' },
@@ -83,8 +83,8 @@ const copy = {
       { title: '4. Screenshots help, but are optional', body: 'Include phone model, browser, page URL, and time. Do not send ID cards, credit cards, or sensitive data.' },
     ],
     templateTitle: 'Suggested feedback format',
-    template: ['I was on:', 'I wanted to:', 'What felt stuck / untrustworthy:', 'I expected:', 'Phone / browser:', 'Screenshot: yes / no'],
-    noteTitle: 'How beta feedback is handled',
+    template: ['I was on:', 'I wanted to:', 'What felt stuck / unclear:', 'I expected:', 'Phone / browser:', 'Screenshot: yes / no'],
+    noteTitle: 'How feedback is handled',
     noteBody: 'Login and saved-data issues are first priority. Unclear copy and cramped mobile screens are second. Reading quality feedback will shape the next content pass.',
   },
 } as const;
@@ -93,10 +93,10 @@ export default async function FeedbackPage({ params }: PageProps) {
   const locale = await resolveLocale(params);
   const c = locale === 'en' ? copy.en : copy['zh-TW'];
   const mailtoBody = encodeURIComponent(c.template.join('\n'));
-  const mailtoHref = `mailto:support@mele.app?subject=${encodeURIComponent('MELE public beta feedback')}&body=${mailtoBody}`;
+  const mailtoHref = `mailto:support@mele.app?subject=${encodeURIComponent('MELE feedback')}&body=${mailtoBody}`;
 
   return (
-    <main className="beta2-home public-feedback-page">
+    <main className="beta2-home public-feedback-page mag-feedback-page">
       <section className="beta2-public-panel public-feedback-hero" aria-label={c.title}>
         <div>
           <span className="beta2-panel-kicker">{c.eyebrow}</span>
@@ -104,7 +104,7 @@ export default async function FeedbackPage({ params }: PageProps) {
           <p>{c.body}</p>
           <div className="beta2-actions public-feedback-actions">
             <a href={mailtoHref} className="beta2-primary">{c.primary}</a>
-            <Link href={localizePath('/beta', locale)} className="beta2-secondary">{c.secondary}</Link>
+            <Link href={localizePath('/', locale)} className="beta2-secondary">{c.secondary}</Link>
             <Link href={localizePath('/tools', locale)} className="beta2-ghost">{c.tertiary}</Link>
           </div>
         </div>

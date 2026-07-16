@@ -62,7 +62,7 @@ export default function ZiweiPage() {
     try {
       const [year, month, day] = date.split('-').map(Number);
       const [hour, minute] = time.split(':').map(Number);
-      const response = await calc('ziwei', { year, month, day, hour, minute, gender });
+      const response = await calc('ziwei', { year, month, day, hour, minute, gender }, locale);
       setResult(response);
     } catch (err) {
       const message = err instanceof CalcError ? err.message : (err as Error).message;
@@ -75,7 +75,7 @@ export default function ZiweiPage() {
   };
 
   return (
-    <ToolShell locale={locale} title={copy.title} subtitle={copy.subtitle} description={copy.description} spec={copy.spec}>
+    <ToolShell tool="ziwei" locale={locale} title={copy.title} subtitle={copy.subtitle} description={copy.description} spec={copy.spec} themed>
       <form onSubmit={onSubmit} className="mele-card" noValidate>
         <AutofillBanner locale={locale} show={autofilled} fields={copy.autofillFields} />
 
@@ -103,7 +103,7 @@ export default function ZiweiPage() {
         </button>
       </form>
 
-      {loading && <ToolLoading locale={locale} label={copy.loadingLabel} />}
+      {loading && <ToolLoading tool="ziwei" locale={locale} label={copy.loadingLabel} />}
       {error && !loading && <ToolError locale={locale} message={error} />}
       {result && !loading && (
         <>

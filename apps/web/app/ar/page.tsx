@@ -28,7 +28,7 @@ export default function ARPage() {
             等卡牌、石面與盤面模型完成後，再恢復真正 AR。
           </p>
           <div className="ritual-hero__actions">
-            <Link href="/tools/ziwei" className="mele-btn-primary">測試紫微命盤</Link>
+            <Link href="/tools/ziwei" className="mele-btn-primary">探索紫微命盤</Link>
             <Link href="/daily" className="mele-btn-secondary">查看每日儀式</Link>
           </div>
         </div>

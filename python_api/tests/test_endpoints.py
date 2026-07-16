@@ -17,7 +17,6 @@ import sys
 import urllib.error
 import urllib.request
 
-
 DEFAULT_BASE = "http://localhost:8000"
 
 
@@ -61,7 +60,9 @@ CASES = [
     (
         "humandesign",
         {"year": 1990, "month": 5, "day": 15, "hour": 12, "minute": 0, "timezone": 8.0},
-        lambda data: data["type"] in {"Manifestor", "Generator", "Manifesting Generator", "Projector", "Reflector"},
+        lambda data: (
+            data["type"] in {"Manifestor", "Generator", "Manifesting Generator", "Projector", "Reflector"}
+        ),
     ),
 ]
 

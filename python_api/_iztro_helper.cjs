@@ -82,11 +82,27 @@ function run(raw) {
       minorStars: p.minorStars.map((s) => ({
         name: s.name,
         brightness: s.brightness,
+        mutagen: s.mutagen,
       })),
       adjectiveStars: p.adjectiveStars.map((s) => ({ name: s.name })),
     }));
 
     const ming = palaces.find((p) => p.name === '命宮');
+
+    // 提取生年四化（化祿/化權/化科/化忌），落在哪顆星、哪個宮
+    const fourChanges = [];
+    for (const p of palaces) {
+      for (const s of p.majorStars) {
+        if (s.mutagen) {
+          fourChanges.push({ mutagen: s.mutagen, star: s.name, palace: p.name });
+        }
+      }
+      for (const s of p.minorStars) {
+        if (s.mutagen) {
+          fourChanges.push({ mutagen: s.mutagen, star: s.name, palace: p.name });
+        }
+      }
+    }
 
     const output = {
       solarDate: a.solarDate,
@@ -107,6 +123,7 @@ function run(raw) {
         majorStarNames: ming.majorStars.map((s) => s.name),
       } : null,
       palaces,
+      fourChanges,
     };
     console.log(JSON.stringify(output));
   } catch (e) {

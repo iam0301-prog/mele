@@ -490,7 +490,7 @@ export default function MobilePage() {
                       {result.service && (
                         <div className="mobile-match-card__service">
                           <span>{result.service.name}</span>
-                          <strong>公測期免費 / {result.service.duration_minutes} 分鐘</strong>
+                          <strong>免費 / {result.service.duration_minutes} 分鐘</strong>
                         </div>
                       )}
                       <div className="mobile-match-card__actions">

@@ -4,7 +4,7 @@ from renderers import maya_render
 
 def _cell_snippet(svg: str, x: int, y: int) -> str:
     start = svg.index(f'<rect x="{x}" y="{y}"')
-    return svg[start:start + 2200]
+    return svg[start : start + 2200]
 
 
 def test_maya_oracle_board_places_challenge_left_and_hidden_force_bottom():
@@ -33,4 +33,4 @@ def test_maya_oracle_board_uses_png_totem_art_for_each_oracle_position():
         assert "maya-totem-image" in cell_svg
         assert ".png" in cell_svg
 
-    assert f'maya-totem-image--{data["sealNum"]}' in svg
+    assert f"maya-totem-image--{data['sealNum']}" in svg

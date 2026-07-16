@@ -232,13 +232,49 @@ export function MayaTotemGallery({ activeSeal }: { activeSeal?: unknown }) {
   );
 }
 
+type MayaOracleCopy = {
+  eyebrow: string;
+  title: string;
+  subtitle: string;
+  heroLabel: string;
+  roles: { self: string; guide: string; analog: string; antipode: string; occult: string };
+  bodies: { self: string; guide: string; analog: string; antipode: string; occult: string };
+  crosscheck: { dreamspell: string; tzolkin: string; haab: string; longCount: string; thirteenMoon: string };
+};
+
+const FALLBACK_MAYA_ORACLE_COPY: MayaOracleCopy = {
+  eyebrow: 'MAYA ORACLE',
+  title: '五圖騰神諭盤',
+  subtitle: '用完整圖騰卡面看五股力量的關係：上方是導引，右側是支持，左側是對立，下方是隱藏，中間是你的本命。',
+  heroLabel: '本命圖騰',
+  roles: { self: '本命', guide: '導引', analog: '支持', antipode: '對立', occult: '隱藏' },
+  bodies: {
+    self: '你的核心主軸，日常最自然使用的能量。',
+    guide: '卡住時可以借力的方向。',
+    analog: '你的補給站，需要支持時先找回這股力量。',
+    antipode: '看似對立，其實是提醒你把反面能力練成熟。',
+    occult: '低潮或意外裡才會浮現的暗線資源。',
+  },
+  crosscheck: {
+    dreamspell: 'Dreamspell',
+    tzolkin: '傳統 Tzolkin',
+    haab: 'Haab',
+    longCount: 'Long Count',
+    thirteenMoon: '13 Moon',
+  },
+};
+
+type OracleRole = 'self' | 'guide' | 'analog' | 'antipode' | 'occult';
+
 function OracleCell({
   role,
+  body,
   entry,
   area,
   active = false,
 }: {
   role: string;
+  body: string;
   entry?: MayaOracleEntry;
   area: string;
   active?: boolean;
@@ -253,11 +289,13 @@ function OracleCell({
       <MayaTotemGlyph totem={totem} size="sm" showLabel={false} active={active} priority />
       <strong>Kin {entry?.kin ?? '-'}</strong>
       <small className="maya-oracle-board__totem-name">{title}</small>
+      <p className="maya-oracle-board__cell-body">{body}</p>
     </article>
   );
 }
 
-export function MayaOracleBoard({ result }: { result: MayaOracleBoardResult }) {
+export function MayaOracleBoard({ result, copy }: { result: MayaOracleBoardResult; copy?: MayaOracleCopy }) {
+  const t = copy ?? FALLBACK_MAYA_ORACLE_COPY;
   const data = result.data ?? {};
   const oracle = data.oracle ?? {};
   const selfEntry: MayaOracleEntry = {
@@ -268,51 +306,53 @@ export function MayaOracleBoard({ result }: { result: MayaOracleBoardResult }) {
   const selfTotem = getMayaTotemBySeal(data.seal);
   const starroot = data.starroot ?? {};
   const longCount = starroot.longCount?.starrootLabel ?? starroot.longCount?.label;
+  const roleLabel = (key: OracleRole) => t.roles[key];
+  const roleBody = (key: OracleRole) => t.bodies[key];
 
   return (
-    <section className="maya-oracle-board" aria-label="馬雅圖騰神諭盤">
+    <section className="maya-oracle-board" aria-label={t.title}>
       <div className="maya-oracle-board__header">
-        <span>MAYA ORACLE</span>
-        <h2>馬雅圖騰神諭盤</h2>
-        <p>用完整圖騰卡面看五股力量的關係：上方是指引，右側是支持，左側是挑戰，下方是隱藏推動力，中間是你的本命。</p>
+        <span>{t.eyebrow}</span>
+        <h2>{t.title}</h2>
+        <p>{t.subtitle}</p>
       </div>
 
       <div className="maya-oracle-board__hero">
         <MayaTotemGlyph totem={selfTotem} size="stage" showLabel={false} active priority />
         <div>
-          <span>本命圖騰</span>
+          <span>{t.heroLabel}</span>
           <strong>Kin {data.kin ?? '-'}</strong>
           <small>{data.tone?.zh} {selfTotem?.zh}</small>
         </div>
       </div>
 
       <div className="maya-oracle-board__grid">
-        <OracleCell role="指引" area="guide" entry={oracle.guide} />
-        <OracleCell role="挑戰" area="challenge" entry={oracle.antipode} />
-        <OracleCell role="本命" area="self" entry={selfEntry} active />
-        <OracleCell role="支持" area="support" entry={oracle.analog} />
-        <OracleCell role="隱藏推動力" area="hidden" entry={oracle.occult} />
+        <OracleCell role={roleLabel('guide')} body={roleBody('guide')} area="guide" entry={oracle.guide} />
+        <OracleCell role={roleLabel('antipode')} body={roleBody('antipode')} area="challenge" entry={oracle.antipode} />
+        <OracleCell role={roleLabel('self')} body={roleBody('self')} area="self" entry={selfEntry} active />
+        <OracleCell role={roleLabel('analog')} body={roleBody('analog')} area="support" entry={oracle.analog} />
+        <OracleCell role={roleLabel('occult')} body={roleBody('occult')} area="hidden" entry={oracle.occult} />
       </div>
 
       <dl className="maya-oracle-board__crosscheck">
         <div>
-          <dt>Dreamspell</dt>
+          <dt>{t.crosscheck.dreamspell}</dt>
           <dd>Kin {data.kin ?? '-'} / {data.tone?.en} {selfTotem?.en}</dd>
         </div>
         <div>
-          <dt>傳統 Tzolkin</dt>
+          <dt>{t.crosscheck.tzolkin}</dt>
           <dd>{starroot.classicTzolkin?.label ?? '-'}</dd>
         </div>
         <div>
-          <dt>Haab</dt>
+          <dt>{t.crosscheck.haab}</dt>
           <dd>{starroot.haab?.label ?? '-'}</dd>
         </div>
         <div>
-          <dt>Long Count</dt>
+          <dt>{t.crosscheck.longCount}</dt>
           <dd>{longCount ?? '-'}</dd>
         </div>
         <div>
-          <dt>13 Moon</dt>
+          <dt>{t.crosscheck.thirteenMoon}</dt>
           <dd>{starroot.thirteenMoon?.label ?? '-'}</dd>
         </div>
       </dl>

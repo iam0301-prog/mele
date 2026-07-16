@@ -1,4 +1,5 @@
 import { defineConfig, devices } from '@playwright/test';
+import path from 'node:path';
 
 const PORT = Number(process.env.PORT ?? 3006);
 const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? `http://127.0.0.1:${PORT}`;
@@ -13,7 +14,7 @@ const isCI = !!process.env.CI;
 const useProductionServer = isCI || process.env.PLAYWRIGHT_USE_BUILD === 'true';
 
 export default defineConfig({
-  testDir: './e2e',
+  testDir: path.join(__dirname, 'e2e'),
   fullyParallel: false,
   forbidOnly: isCI,
   retries: isCI ? 2 : 0,

@@ -69,3 +69,5 @@ $env:MELE_API_URL='http://127.0.0.1:8015'; npm.cmd run build
 - Do not rewrite migrations that were already pushed to Supabase; add a new migration instead.
 - Do not bypass RLS or direct-update sensitive booking/payment/member point tables from the frontend.
 - Keep copy in Traditional Chinese for user-facing UI.
+
+## Imported Claude Cowork project instructions

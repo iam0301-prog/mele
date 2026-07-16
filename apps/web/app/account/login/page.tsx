@@ -309,7 +309,7 @@ function LoginInner() {
     try {
       const supabase = createClient();
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent('/account/reset-password')}`,
+        redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent('/account/profile')}`,
       });
       if (error) return toast(error.message, 'error');
       toast('密碼重設信已寄出，請到信箱查看。', 'success');
@@ -382,7 +382,7 @@ function LoginInner() {
   };
 
   return (
-    <div className="container mx-auto max-w-md px-5 py-12">
+    <div className="mag-account-page container mx-auto max-w-md px-5 py-12">
       <header className="pb-8 text-center">
         <div className="mb-5 text-base tracking-[0.5em] text-accent opacity-70">ACCOUNT PORTAL</div>
         <h1 className="mb-2 font-serif text-4xl tracking-widest">{mode === 'signup' ? '建立帳號' : '登入'}</h1>
@@ -402,7 +402,7 @@ function LoginInner() {
         )}
         {inviteCode && (
           <div className="mb-4 rounded-lg border border-cyan-300/40 bg-cyan-300/[0.08] p-3 text-sm leading-loose text-cyan-100">
-            你正在使用封測邀請碼 <strong className="text-white">{inviteCode}</strong>。完成註冊後，後台會自動把你標記為封測測試者。
+            你正在使用邀請碼 <strong className="text-white">{inviteCode}</strong>。完成註冊後即可正常使用平台。
           </div>
         )}
         <div className="mb-6 flex border-b border-accent-dim">
@@ -632,7 +632,7 @@ function LoginInner() {
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={<div className="container mx-auto px-5 py-16 text-center text-white/60">正在讀取登入頁...</div>}>
+    <Suspense fallback={<div className="mag-account-page container mx-auto px-5 py-16 text-center">正在讀取登入頁...</div>}>
       <LoginInner />
     </Suspense>
   );

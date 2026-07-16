@@ -282,7 +282,7 @@ export function LocalizedLoginClient({ locale }: { locale: Locale }) {
     try {
       const supabase = createClient();
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: buildAuthCallbackUrl(localizePath('/account/reset-password', locale)),
+        redirectTo: buildAuthCallbackUrl(localizePath('/account/profile', locale)),
       });
       if (error) throw error;
       setSignupNotice(copy.resetSent);
@@ -350,14 +350,14 @@ export function LocalizedLoginClient({ locale }: { locale: Locale }) {
       : 'Email 可用；Google / LINE 會依 Supabase 設定顯示';
 
   const flowSteps = mode === 'signin'
-    ? ['登入帳號', '完成每日儀式', '回到封測任務']
+    ? ['登入帳號', '完成每日儀式', '回到會員頁面']
     : ['建立帳號', '驗證 Email', '開始每日儀式'];
 
   return (
-    <main className="auth-beta-page">
-      <section className="auth-beta-shell" aria-label="登入與註冊封測入口">
+    <main className="mag-account-page auth-beta-page">
+      <section className="auth-beta-shell" aria-label="登入與註冊">
         <aside className="auth-beta-story">
-          <p className="auth-beta-kicker">會員入口 · 封測第一步</p>
+          <p className="auth-beta-kicker">會員入口</p>
           <h1>{copy.title}</h1>
           <p className="auth-beta-lead">{copy.body}</p>
 
@@ -370,7 +370,7 @@ export function LocalizedLoginClient({ locale }: { locale: Locale }) {
             ))}
           </div>
 
-          <div className="auth-beta-status" aria-label="封測登入狀態">
+          <div className="auth-beta-status" aria-label="會員功能總覽">
             <div>
               <span>每日儀式</span>
               <strong>塔羅 / 盧恩</strong>
@@ -405,7 +405,7 @@ export function LocalizedLoginClient({ locale }: { locale: Locale }) {
           </div>
 
           <div className="auth-beta-form-head">
-            <span>{mode === 'signin' ? '回到你的封測進度' : '建立封測帳號'}</span>
+            <span>{mode === 'signin' ? '回到你的會員進度' : '建立會員帳號'}</span>
             <strong>{mode === 'signin' ? '登入後會回到會員解讀庫或剛才的任務。' : '先留下必要資料，出生資料可以之後再補。'}</strong>
           </div>
 

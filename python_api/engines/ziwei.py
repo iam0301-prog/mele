@@ -13,9 +13,10 @@
 
 回傳資料結構：見 _iztro_helper.js
 """
+
 import json
-import subprocess
 import os
+import subprocess
 from pathlib import Path
 
 from .bazi import calculate as bazi_calculate
@@ -24,8 +25,16 @@ from .bazi import calculate as bazi_calculate
 HELPER = str(Path(__file__).resolve().parents[1] / "_iztro_helper.cjs")
 
 
-def calculate(year: int, month: int, day: int, hour: int, minute: int = 0,
-              gender: str = "男", sect: int = 2, fix_leap: bool = True) -> dict:
+def calculate(
+    year: int,
+    month: int,
+    day: int,
+    hour: int,
+    minute: int = 0,
+    gender: str = "男",
+    sect: int = 2,
+    fix_leap: bool = True,
+) -> dict:
     """
     計算紫微斗數命盤
 
@@ -54,41 +63,42 @@ def calculate(year: int, month: int, day: int, hour: int, minute: int = 0,
         raise RuntimeError(f"iztro helper not found at {HELPER}")
 
     try:
-        result = subprocess.run(
-            ["node", HELPER, json.dumps(args, ensure_ascii=False)],
+        result = subprocess.run(  # noqa: S603
+            ["node", HELPER, json.dumps(args, ensure_ascii=False)],  # noqa: S607
             capture_output=True,
             text=True,
             encoding="utf-8",
             timeout=15,
             check=False,
         )
-    except FileNotFoundError:
-        raise RuntimeError("Node.js 未安裝或不在 PATH 中。紫微計算需要 Node.js。")
+    except FileNotFoundError as e:
+        raise RuntimeError("Node.js 未安裝或不在 PATH 中。紫微計算需要 Node.js。") from e
 
     if result.returncode != 0:
         try:
             err = json.loads(result.stderr)
             raise RuntimeError(f"iztro 計算錯誤：{err.get('error', result.stderr)}")
-        except json.JSONDecodeError:
-            raise RuntimeError(f"iztro helper 失敗：{result.stderr or result.stdout}")
+        except json.JSONDecodeError as je:
+            raise RuntimeError(f"iztro helper 失敗：{result.stderr or result.stdout}") from je
 
     try:
         data = json.loads(result.stdout)
     except json.JSONDecodeError as e:
-        raise RuntimeError(f"無法解析 iztro 輸出：{e}\n輸出前 500 字：{result.stdout[:500]}")
+        raise RuntimeError(f"無法解析 iztro 輸出：{e}\n輸出前 500 字：{result.stdout[:500]}") from e
 
     # 修正 chineseDate：iztro 用農曆月推月柱（錯）→ 用我方 BaZi 模組（節氣月）覆蓋
     try:
-        bazi_data = bazi_calculate(year, month, day, hour, minute,
-                                    sect=sect, longitude=None)
+        bazi_data = bazi_calculate(year, month, day, hour, minute, sect=sect, longitude=None)
         if "pillars" in bazi_data:
             p = bazi_data["pillars"]
-            corrected = " ".join([
-                "".join(p["year"]),  # ['乙','未'] → '乙未'
-                "".join(p["month"]),
-                "".join(p["day"]),
-                "".join(p["time"]),
-            ])
+            corrected = " ".join(
+                [
+                    "".join(p["year"]),  # ['乙','未'] → '乙未'
+                    "".join(p["month"]),
+                    "".join(p["day"]),
+                    "".join(p["time"]),
+                ]
+            )
             data["chineseDateRaw"] = data.get("chineseDate")
             data["chineseDate"] = corrected
             data["bazi"] = bazi_data  # 順手把完整八字資料附上

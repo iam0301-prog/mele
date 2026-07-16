@@ -26,5 +26,5 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function LocalizedTosPage({ params }: PageProps) {
   const locale = await resolveLocale(params);
   const copy = getReleasePageCopy(locale).legal.tos;
-  return <LocalizedStaticPage locale={locale} copy={copy} primaryHref="/tools" secondaryHref="/" />;
+  return <LocalizedStaticPage locale={locale} copy={copy} primaryHref="/tools" secondaryHref="/" scopeClassName="mag-legal-page" />;
 }

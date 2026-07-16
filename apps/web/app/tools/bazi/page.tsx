@@ -60,7 +60,7 @@ export default function BaziPage() {
         minute,
         sect: 2,
         longitude: useTrueSolar ? longitude : null,
-      });
+      }, locale);
       setResult(response);
     } catch (err) {
       const message = err instanceof CalcError ? err.message : (err as Error).message;
@@ -73,7 +73,7 @@ export default function BaziPage() {
   };
 
   return (
-    <ToolShell locale={locale} title={copy.title} subtitle={copy.subtitle} description={copy.description} spec={copy.spec}>
+    <ToolShell tool="bazi" locale={locale} title={copy.title} subtitle={copy.subtitle} description={copy.description} spec={copy.spec} themed>
       <form onSubmit={onSubmit} className="mele-card" noValidate>
         <AutofillBanner locale={locale} show={autofilled} fields={copy.autofillFields} />
 
@@ -100,7 +100,7 @@ export default function BaziPage() {
         </button>
       </form>
 
-      {loading && <ToolLoading locale={locale} label={copy.loadingLabel} />}
+      {loading && <ToolLoading tool="bazi" locale={locale} label={copy.loadingLabel} />}
       {error && !loading && <ToolError locale={locale} message={error} />}
       {result && !loading && (
         <>

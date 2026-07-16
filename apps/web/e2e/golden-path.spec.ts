@@ -103,16 +103,25 @@ test.describe('Smoke: home and tools index', () => {
 });
 
 test.describe('Public beta premium flows', () => {
-  test('homepage exposes the public beta task board, points economy, and visual assets', async ({ page }) => {
+  test('homepage exposes the magazine layout, policy trust lines, and tools directory', async ({ page }) => {
     await page.goto('/zh-TW');
 
     await expect(page.getByRole('heading', { name: 'MELE' })).toBeVisible();
-    await expect(page.getByLabel('公開測試首頁')).toBeVisible();
-    await expect(page.getByText('每日可領 200 測試點')).toBeVisible();
-    await expect(page.getByText('100 點解鎖深度解讀')).toBeVisible();
-    await expect(page.getByText('老師諮詢仍是選項，不是強迫購買')).toBeVisible();
-    await expect(page.getByAltText('大海波賽頓塔羅卡面')).toBeVisible();
-    await expect(page.getByAltText('瑪雅黃色人圖騰')).toBeVisible();
+    await expect(page.getByLabel('MELE 首頁')).toBeVisible();
+    await expect(page.getByText('八種命理工具，免費直接用')).toBeVisible();
+    await expect(page.getByText('每日儀式，保留一點儀式感')).toBeVisible();
+    await expect(page.getByText('老師是選項，不是必須').first()).toBeVisible();
+    await expect(page.getByText('目錄——八種入口')).toBeVisible();
+    await expect(page.getByRole('link', { name: '塔羅牌' })).toBeVisible();
+  });
+
+  test('homepage primary CTA leads the golden path to tarot', async ({ page }) => {
+    test.setTimeout(60_000);
+    await page.goto('/zh-TW');
+
+    await page.getByRole('link', { name: '一鍵玩塔羅' }).first().click();
+    await page.waitForURL(/\/zh-TW\/tools\/tarot$/, { timeout: 30_000 });
+    await expect(page.getByRole('heading', { name: '塔羅牌解讀' })).toBeVisible();
   });
 
   test('local beta auth opens the member archive and teacher portal', async ({ page }, testInfo) => {
@@ -129,8 +138,8 @@ test.describe('Public beta premium flows', () => {
     await page.getByRole('button', { name: '使用本機測試帳號' }).click();
     await expect(page).toHaveURL(/\/zh-TW\/account\/charts$/);
     await expect(page.getByRole('heading', { name: '會員解讀庫' })).toBeVisible({ timeout: 15_000 });
-    await expect(page.getByText('每天可領 200 點')).toBeVisible();
-    await expect(page.getByText('流日、流月、流年')).toBeVisible();
+    await expect(page.getByText('免費解鎖體驗')).toBeVisible();
+    await expect(page.getByText(/流日、流月、流年均可直接查看/).first()).toBeVisible();
 
     await page.goto('/zh-TW/teacher-portal');
     await expect(page.getByRole('heading', { name: '老師後台' })).toBeVisible();
@@ -144,7 +153,7 @@ test.describe('Public beta premium flows', () => {
     await expect(page.getByRole('heading', { name: '每日儀式中心' })).toBeVisible();
     await expect(page.getByRole('button', { name: /抽今日塔羅|查看今日塔羅/ })).toBeVisible();
     await expect(page.getByRole('button', { name: /抽今日盧恩|查看今日盧恩/ })).toBeVisible();
-    await expect(page.getByText('每日可在塔羅與盧恩之間擇一')).toBeVisible();
+    await expect(page.getByText(/每天只能選擇塔羅或盧恩|每日可在塔羅與盧恩之間擇一/).first()).toBeVisible();
   });
 
   test('tarot page exposes style selection and the draw entry point', async ({ page }) => {

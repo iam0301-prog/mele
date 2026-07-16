@@ -37,8 +37,13 @@ export class CalcError extends Error {
   }
 }
 
-export async function calc(tool: CalcTool, input: Record<string, unknown>): Promise<CalcResponse> {
-  const response = await fetch(`/api/calc/${tool}`, {
+export async function calc(
+  tool: CalcTool,
+  input: Record<string, unknown>,
+  locale?: string
+): Promise<CalcResponse> {
+  const query = locale ? `?locale=${encodeURIComponent(locale)}` : '';
+  const response = await fetch(`/api/calc/${tool}${query}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(input),

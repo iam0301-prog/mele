@@ -34,7 +34,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function LocalizedLoginPage({ params }: PageProps) {
   const locale = await resolveLocale(params);
   return (
-    <Suspense fallback={<main className="container mx-auto max-w-5xl px-5 py-16" />}>
+    <Suspense fallback={<main className="mag-account-page container mx-auto max-w-5xl px-5 py-16" />}>
       <LocalizedLoginClient locale={locale} />
     </Suspense>
   );
