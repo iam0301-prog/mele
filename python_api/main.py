@@ -410,7 +410,12 @@ async def calc_humandesign(
         req.timezone,
     )
     return wrap(
-        "humandesign", req.model_dump(), data, hd_render.render(data), detail=detail, locale=locale
+        "humandesign",
+        req.model_dump(),
+        data,
+        hd_render.render(data, locale=locale),
+        detail=detail,
+        locale=locale,
     )
 
 
